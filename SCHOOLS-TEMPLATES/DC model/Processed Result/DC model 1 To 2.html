@@ -201,14 +201,14 @@
               }</td>
                             <td style="text-transform: uppercase" >${subject?.subjectName
               }</td>
-                            <td style="font-weight:${isNaN(unitTest1) ? "bold" : "normal"}" >${unitTest1}</td>
-                            <td style="font-weight:${isNaN(attendance) ? "bold" : "normal"}">${attendance}</td>
-                            <td style="font-weight:${isNaN(project) ? "bold" : "normal"}">${project}</td>
-                            <td style="font-weight:${isNaN(assessment) ? "bold" : "normal"}">${assessment}</td>
+                            <td style="font-weight:${isNaN(unitTest1) ? "bold" : "normal"}; text-align:center" >${unitTest1}</td>
+                            <td style="font-weight:${isNaN(attendance) ? "bold" : "normal"}; text-align:center">${attendance}</td>
+                            <td style="font-weight:${isNaN(project) ? "bold" : "normal"}; text-align:center">${project}</td>
+                            <td style="font-weight:${isNaN(assessment) ? "bold" : "normal"}; text-align:center">${assessment}</td>
                           
-                            <td >${subject?.marksObtained}</td>
+                            <td style="text-align:center">${subject?.marksObtained}</td>
                           
-                            <td >${subject?.grade}</td>
+                            <td  style="text-align:center">${subject?.grade}</td>
                         </tr>
                     `;
           } else {
