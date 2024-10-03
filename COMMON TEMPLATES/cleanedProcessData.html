@@ -1,0 +1,3080 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>refactoredData Process</div>
+</body>
+
+</html>
+<script>
+  function cleanedProcessData(dataList) {
+    // Function to create header data
+    function createHeaderData(school, markData) {
+      if (!school) return {};
+
+      const fullAddress = `${school.plotNumber}, ${school.area}, ${school.city}, ${school.state} - ${school.pincode}`;
+
+      // Cleaned school data
+      const cleanedSchoolData = {
+
+        academicSession: markData.academicSession,
+        className: markData.className,
+        sectionName: markData.sectionName,
+        classAndSection: (markData.className + "-" + markData.sectionName),
+        markSheetName: markData.markSheetName,
+
+        schoolName: school.schoolName,
+        schoolAbb: school.schoolAbb,
+        educationBoard: school.educationBoard,
+        registrationNo: school.registrationNo,
+        fullAddress,
+        plotNumber: school.plotNumber,
+        area: school.area,
+        city: school.city,
+        state: school.state,
+        pincode: school.pincode,
+        website: school.website ? school.website.toLowerCase() : null, // Ensure website is in lowercase
+        editedDate: school.editedDate,
+        email: school.contactEmail,
+        phoneNo1: school.phoneNo1,
+        phoneNo2: school.phoneNo2,
+        phoneNumbers: [school.phoneNo1, school.phoneNo2].filter(Boolean).join(", "),
+        editedUser: school.editedUser,
+        onlinePaymentEnabled: school.onlinePaymentEnabled,
+        notificationEnabled: school.notificationEnabled,
+        whatsAppEnabled: school.whatsAppEnabled,
+      };
+
+      return cleanedSchoolData;
+    }
+
+
+
+    // Function to clean and process student data
+    function cleanStudentData(student, baseTermData) {
+      function buildFullAddress(info) {
+        let addressParts = [];
+        if (info.area && info.area !== "NA") addressParts.push(info.area);
+        if (info.landmark && info.landmark !== "NA") addressParts.push(info.landmark);
+        if (info.city && info.city !== "NA") addressParts.push(info.city);
+        if (info.state && info.state !== "NA") addressParts.push(info.state);
+        if (info.pincode && info.pincode !== "NA") addressParts.push(info.pincode);
+        return addressParts.length ? addressParts.join(", ") : "";
+      }
+
+      const studentInfo = student?.studentInfoResponse?.[0] || {};
+
+      return {
+        studentName: student.studentName,
+        className: student.className,
+        sectionName: student.sectionName,
+        classAndSection: `${student.className}-${student.sectionName}`,
+        rollNo: student.rollNo,
+        fatherName: student.fatherName,
+        motherName: student.motherName,
+        dob: student.dob,
+        attendance: student.attendance
+          ? {
+            presentDay: +student.attendance.split("/")[0],
+            totalDay: +student.attendance.split("/")[1],
+            attendancePercentage: parseFloat(
+              (+student.attendance.split("/")[0] / +student.attendance.split("/")[1]) * 100
+            ).toFixed(2),
+            attendanceRow: student.attendance,
+          }
+          : {},
+        admissionNo: student.admissionNo,
+        gender: studentInfo.gender || "",
+        houses: studentInfo.houses || "",
+        mobileNumber: studentInfo.mobileNumber || "",
+        fatherMobile: studentInfo.fatherMobile || "",
+        height: studentInfo.height || "",
+        weight: studentInfo.weight || "",
+        bloodGroup: studentInfo.bloodGroup || "",
+        classTeacher: student.classTeacher || "",
+        imageUrl: baseTermData?.perSignedUrlResponse?.url || "",
+        address: {
+          area: studentInfo.area || "",
+          city: studentInfo.city || "",
+          pincode: studentInfo.pincode || "",
+          landmark: studentInfo.landmark || "",
+          state: studentInfo.state || "",
+        },
+        fullAddress: buildFullAddress(studentInfo),
+      };
+    }
+
+    // Function to refactor subjects with hierarchy and dynamic nature
+    function refactorSubjectsWithHierarchyAndDynamicNature(subjectList) {
+      const refactoredData = {};
+      const natureGroups = {};
+
+      subjectList.forEach((subject) => {
+        const { subjectName, nature, attachmentName } = subject?.subjectAllResponse || {};
+        const termName = subject?.termName;
+
+        if (!refactoredData[subjectName]) {
+          refactoredData[subjectName] = {
+            subjectName,
+            nature,
+            term: termName,
+            maxTotal: 0,
+            obtTotal: 0,
+            children: [],
+            grade: subject.grade || "",
+            remarkStatus: subject.remarkStatus || "",
+            attachmentName: attachmentName || "",
+          };
+        }
+
+        refactoredData[subjectName].maxTotal += subject.max;
+        refactoredData[subjectName].obtTotal += subject.markObtained;
+
+        if (subject?.subjectAllResponse?.parent?.length > 0) {
+          subject.subjectAllResponse.parent.forEach((parentId) => {
+            const parentSubject = subjectList.find((s) => s.subjectAllResponse.uid === parentId);
+            if (parentSubject) {
+              const parentName = parentSubject.subjectAllResponse.subjectName;
+              if (!refactoredData[parentName]) {
+                refactoredData[parentName] = {
+                  subjectName: parentName,
+                  nature: parentSubject.subjectAllResponse.nature,
+                  term: termName,
+                  maxTotal: 0,
+                  obtTotal: 0,
+                  children: [],
+                  grade: parentSubject.grade || "",
+                  remarkStatus: parentSubject.remarkStatus || "",
+                  attachmentName: parentSubject.subjectAllResponse.attachmentName || "",
+                };
+              }
+
+              refactoredData[parentName].children.push({
+                subjectName,
+                max: subject.max,
+                obtained: subject.markObtained,
+                grade: subject.grade || "",
+                remarkStatus: subject.remarkStatus || "",
+                attachmentName: subject.subjectAllResponse.attachmentName || "",
+              });
+            }
+          });
+        }
+      });
+
+      const resultArray = Object.values(refactoredData);
+
+      resultArray.forEach((subject) => {
+        const natureKey = `${subject.nature.toLowerCase()}Subjects`;
+        if (!natureGroups[natureKey]) {
+          natureGroups[natureKey] = [];
+        }
+        natureGroups[natureKey].push(subject);
+      });
+
+      return natureGroups;
+    }
+
+    // Function to clean and process mark data
+    function cleanMarkData(markData) {
+      const mainSubjects = {};
+
+      markData.subjectWiseMarkSheetReportResponses.forEach((subject) => {
+        const attachmentName = subject.markSheetReport[0].attachmentName;
+        const subjectKey = attachmentName ? attachmentName : subject.subjectName;
+
+        console.log(subjectKey, "ffffffffffff subjectKey")
+
+        if (!mainSubjects[subjectKey]) {
+          mainSubjects[subjectKey] = {
+            subjectName: subjectKey,
+            maxMarks: 0,
+            obtainedMarks: 0,
+            percentage: 0,
+            grade: "",
+
+            termDetails: [],
+          };
+        }
+
+        subject.markSheetReport.forEach((term) => {
+          const headerName = term.markSheetTermResponse.headerName;
+          const subHeaderName = term.markSheetTermResponse.subHeaderName || `(${term.markSheetTermResponse.weightage})`;
+
+          const uniqueObtainedKey = `${subjectKey}-${headerName}-obt`;
+          const uniqueMaxKey = `${subjectKey}-${headerName}-max`;
+          const uniqueGradeKey = `${subjectKey}-${headerName}-grade`;
+          const uniqueStatusKey = `${subjectKey}-${headerName}-status`;
+          const uniqueMaxTotalKey = `${subjectKey}-max-total`;
+          const uniqueObtainedTotalKey = `${subjectKey}-obt-total`;
+          const uniqueSubjectGradeKey = `${subjectKey}-grade`
+          const uniqueSubjectPercentageKey = `${subjectKey}-percentage`
+
+          mainSubjects[subjectKey].termDetails.push({
+            childSubjectName: subject.subjectName,
+            headerName: headerName,
+            subHeaderName: subHeaderName,
+            max: {
+              key: uniqueMaxKey,
+              value: term.max,
+            },
+            obtained: {
+              key: uniqueObtainedKey,
+              value: term.obtained,
+            },
+            grade: {
+              key: uniqueGradeKey,
+              value: term.grade,
+            },
+            status: {
+              key: uniqueStatusKey,
+              value: term.status,
+            },
+          });
+
+          mainSubjects[subjectKey].maxMarks = { key: uniqueMaxTotalKey, value: subject.total },
+            mainSubjects[subjectKey].obtainedMarks = { key: uniqueObtainedTotalKey, value: subject.marksObtained },
+
+            mainSubjects[subjectKey].percentage = { key: uniqueSubjectPercentageKey, value: subject.percentage };
+
+          mainSubjects[subjectKey].grade = { key: uniqueSubjectGradeKey, value: subject.grade };
+
+        });
+      });
+
+      return {
+        marksObtained: { key: "overall-obt-total", value: markData.marksObtained },
+        maxTotal: { key: "overall-max-total", value: markData.total },
+        percentage: { key: "overall-percentage", value: markData.percentage },
+        overAllGrade: { key: "overall-grade", value: markData.overAllGrade },
+        overAllRank: markData.overAllRank,
+        academicSession: markData.academicSession,
+        studentName: markData.studentName,
+        rollNo: markData.rollNo,
+        className: markData.className,
+        sectionName: markData.sectionName,
+        terms: markData.terms,
+        markSheetName: markData.markSheetName,
+        subjects: Object.values(mainSubjects),
+      };
+    }
+
+    // Function to handle teacher remarks
+    function cleanTeacherRemarks(remark) {
+      return remark?.description || "-";
+    }
+
+    // Process each data item in the list
+    const cleanedDataList = dataList.map((data) => {
+
+      const cleanedHeaderData = createHeaderData(data?.baseTermData?.school, data?.markData);
+      const cleanedStudentData = cleanStudentData(data?.student, data?.baseTermData);
+      const cleanedSubjectsWithHierarchy = refactorSubjectsWithHierarchyAndDynamicNature(data?.baseTermData?.subject || []);
+      const cleanStudentMarkData = cleanMarkData(data?.markData);
+      const cleanedTeacherRemarks = cleanTeacherRemarks(data?.remarks);
+      const header = data?.header
+      return {
+        customHeader: cleanedHeaderData,
+        header: header,
+        studentInfo: cleanedStudentData,
+        subjects: cleanedSubjectsWithHierarchy,
+        markData: cleanStudentMarkData,
+        remarks: cleanedTeacherRemarks,
+      };
+    });
+
+
+    return cleanedDataList;
+  }
+
+
+
+  const studentData = [{
+    student: {
+      dob: "16-06-2016",
+      admissionNo: "1903244",
+      studentName: "WAJID ALI",
+      className: "I",
+      sectionName: "A",
+      rollNo: 37,
+      fatherName: "SAJID ALI",
+      motherName: "Suhana ALI",
+      attendance: "118.0/132",
+      boardRollNumber: "",
+      studentInfoResponse: [
+        {
+          id: 92843,
+          userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+          userName: null,
+          fatherUserName: null,
+          motherUserName: null,
+          guardianUserName: null,
+          uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+          studentId: "1903244",
+          studentName: "WAJID ALI",
+          fatherName: "SAJID ALI",
+          motherName: "Suhana ALI",
+          dob: "16-06-2016",
+          gender: "NA",
+          studentAdhaarcard: "",
+          joiningClass: "I",
+          joiningSections: "A",
+          joiningDate: "01-01-2022",
+          plotNumber: "",
+          area: "Rohini",
+          city: "Delhi",
+          state: "",
+          pincode: 123456,
+          phone1: "",
+          rollNo: 37,
+          emergencyNumber: "",
+          mobileNumber: "8494005716",
+          studentEmail: null,
+          religion: "",
+          category: "",
+          minority: "",
+          motherTongue: "",
+          idMark: "",
+          height: "",
+          weight: "",
+          physicalDisability: "",
+          bloodGroup: "",
+          healthRemark: "",
+          siblingDetails: "",
+          alumni: "",
+          siblingResponse: [],
+          fatherOccupation: "",
+          fatherQualification: "",
+          fatherOrganization: "",
+          fatherDesignation: "",
+          fatherIncome: "",
+          fatherArea: "",
+          fatherCity: "",
+          fatherState: "",
+          fatherPincode: null,
+          fatherPhone: null,
+          fatherMobile: "9797895186",
+          fatherEmail: null,
+          fatherAdhaarNumber: null,
+          schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+          motherQualification: "",
+          motherOccupation: "",
+          motherOrganization: "",
+          motherDesignation: "",
+          motherIncome: "",
+          motherArea: "",
+          motherCity: "",
+          motherState: "",
+          motherPincode: null,
+          motherPhone: null,
+          motherMobile: "9797895186",
+          motherEmail: null,
+          motherAdhaarNumber: null,
+          guardianName: null,
+          relation: null,
+          guardianOccupation: null,
+          guardianPhone: null,
+          guardianMobile: null,
+          guardianEmail: null,
+          guardianAddress: null,
+          leavingDate: null,
+          previousSchoolName: "",
+          otp: "SwTBTi",
+          schoolName: "Demo Public School",
+          remark: "",
+          classTeacher: null,
+          classTeacherUserName: null,
+          classes: "I",
+          classUid: null,
+          sections: "A",
+          group: null,
+          wing: "NA",
+          status: "Studying",
+          academicSession: "2023-2024",
+          joiningStatus: "NA",
+          houses: "krushanlaksha",
+          certificates: "",
+          certificatesList: [],
+          caste: "",
+          listOfDocuments: ["string"],
+          attached: true,
+          required: false,
+          submitted: false,
+          studentHostel: [],
+          studentConcession: [],
+          studentTransport: [],
+          studentAadharCard: null,
+          fatherAadharCard: null,
+          motherAadharCard: null,
+          studentImage: null,
+          fatherImage: null,
+          motherImage: null,
+          guardianImage: null,
+          birthCertificate: null,
+          classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+          aluminiProof: null,
+          siblingProof: null,
+          residenceProof: null,
+          firstBornChildProof: null,
+          medicalFitnessCertificate: null,
+          fatherQualificationProof: null,
+          motherQualificationProof: null,
+          casteCertificate: null,
+          createdUser: "HAAKIIA",
+          editedUser: "HAAKIIA",
+          createddate: "2023-05-03 09:42:16.870927",
+          editeddate: "2023-05-18 03:10:59.980625",
+          studentAddressResponse: {
+            uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+            houseNo: null,
+            area: "",
+            landmark: null,
+            city: "",
+            district: null,
+            state: "",
+            poPs: null,
+            pincode: null,
+            street: "",
+            userName: "HIIAPJK134_1903244",
+            createdDate: "11-05-2023 03:49 PM",
+            editedDate: "11-05-2023 03:49 PM",
+            createdBy: "HAAKIIA",
+            editedBy: "HAAKIIA",
+          },
+          fatherAddressResponse: {
+            uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+            houseNo: null,
+            area: "",
+            landmark: null,
+            city: "",
+            district: null,
+            state: "",
+            poPs: null,
+            pincode: null,
+            street: "",
+            userName: "HIIAPJK134_F1903244",
+            createdDate: "11-05-2023 03:49 PM",
+            editedDate: "11-05-2023 03:49 PM",
+            createdBy: "HAAKIIA",
+            editedBy: "HAAKIIA",
+          },
+          motherAddressResponse: {
+            uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+            houseNo: null,
+            area: "",
+            landmark: null,
+            city: "",
+            district: null,
+            state: "",
+            poPs: null,
+            pincode: null,
+            street: "",
+            userName: "HIIAPJK134_M1903244",
+            createdDate: "11-05-2023 03:49 PM",
+            editedDate: "11-05-2023 03:49 PM",
+            createdBy: "HAAKIIA",
+            editedBy: "HAAKIIA",
+          },
+          guardianAddressResponse: null,
+          correspondenceAddressResponse: null,
+        },
+      ],
+      classTeacher: "",
+      classTeacherUserName: "",
+    },
+    markData: {
+      "academicSession": "2024-25",
+      "admissionNo": "506",
+      "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+      "studentName": "Mohd. Zayan",
+      "rollNo": 0,
+      "fatherName": "Aman Ali",
+      "className": "NC",
+      "sectionName": "A",
+      "terms": "TERM 1",
+      "markSheetName": "TERM 1",
+      "overAllRank": "1",
+      "markSheetTerms": [
+        {
+          "id": 923,
+          "headerName": "UNIT I",
+          "subHeaderName": "10",
+          "priority": 1,
+          "bestOf": 0,
+          "decimalPlaces": 2,
+          "weightage": 10,
+          "terms": [
+            "UNIT 1"
+          ]
+        },
+        {
+          "id": 924,
+          "headerName": "UNIT II",
+          "subHeaderName": "10",
+          "priority": 2,
+          "bestOf": 0,
+          "decimalPlaces": 2,
+          "weightage": 10,
+          "terms": [
+            "UNIT 2"
+          ]
+        },
+        {
+          "id": 925,
+          "headerName": "TERM I",
+          "subHeaderName": "80",
+          "priority": 3,
+          "bestOf": 0,
+          "decimalPlaces": 2,
+          "weightage": 80,
+          "terms": [
+            "TERM 1"
+          ]
+        }
+      ],
+      "subjectWiseMarkSheetReportResponses": [
+        {
+          "subjectUid": "36addd9e-5e35-4e96-8c0f-d6cf3d281059",
+          "subjectName": "English Writing",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "36addd9e-5e35-4e96-8c0f-d6cf3d281059",
+              "subjectName": "English Writing",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "36addd9e-5e35-4e96-8c0f-d6cf3d281059",
+              "subjectName": "English Writing",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 1,
+              "grade": "E2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "36addd9e-5e35-4e96-8c0f-d6cf3d281059",
+              "subjectName": "English Writing",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 44,
+              "grade": "C1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 55,
+          "total": 100,
+          "percentage": 55,
+          "grade": "C1",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 1,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "5a613b4c-eec6-4d2e-bb47-87e4d448f65b",
+          "subjectName": "English Dictation",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "5a613b4c-eec6-4d2e-bb47-87e4d448f65b",
+              "subjectName": "English Dictation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "5a613b4c-eec6-4d2e-bb47-87e4d448f65b",
+              "subjectName": "English Dictation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 7,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "5a613b4c-eec6-4d2e-bb47-87e4d448f65b",
+              "subjectName": "English Dictation",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 34,
+              "grade": "C2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 51,
+          "total": 100,
+          "percentage": 51,
+          "grade": "C1",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 2,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "009f5af9-8715-4890-9612-d8c291b72d4d",
+          "subjectName": "English Reading",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "009f5af9-8715-4890-9612-d8c291b72d4d",
+              "subjectName": "English Reading",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "009f5af9-8715-4890-9612-d8c291b72d4d",
+              "subjectName": "English Reading",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 7,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "009f5af9-8715-4890-9612-d8c291b72d4d",
+              "subjectName": "English Reading",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 35,
+              "grade": "C2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 52,
+          "total": 100,
+          "percentage": 52,
+          "grade": "C1",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 3,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "11b0e86b-41bc-4720-83e2-9e4e81c294d7",
+          "subjectName": "English Recitation",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "11b0e86b-41bc-4720-83e2-9e4e81c294d7",
+              "subjectName": "English Recitation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "11b0e86b-41bc-4720-83e2-9e4e81c294d7",
+              "subjectName": "English Recitation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 1,
+              "grade": "E2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "11b0e86b-41bc-4720-83e2-9e4e81c294d7",
+              "subjectName": "English Recitation",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 55,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 66,
+          "total": 100,
+          "percentage": 66,
+          "grade": "B2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 4,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "73fabc47-83fc-4fbd-8fb6-be23761e00d0",
+          "subjectName": "Hindi Writing",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "73fabc47-83fc-4fbd-8fb6-be23761e00d0",
+              "subjectName": "Hindi Writing",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "73fabc47-83fc-4fbd-8fb6-be23761e00d0",
+              "subjectName": "Hindi Writing",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 7.5,
+              "grade": "B1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "73fabc47-83fc-4fbd-8fb6-be23761e00d0",
+              "subjectName": "Hindi Writing",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 45,
+              "grade": "C1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 62.5,
+          "total": 100,
+          "percentage": 62.5,
+          "grade": "B2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 5,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "97086871-2a85-464c-83e6-032c5f43be9b",
+          "subjectName": "Hindi Dictation",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "97086871-2a85-464c-83e6-032c5f43be9b",
+              "subjectName": "Hindi Dictation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 9,
+              "grade": "A2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "97086871-2a85-464c-83e6-032c5f43be9b",
+              "subjectName": "Hindi Dictation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 8,
+              "grade": "B1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "97086871-2a85-464c-83e6-032c5f43be9b",
+              "subjectName": "Hindi Dictation",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 65,
+              "grade": "A2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 82,
+          "total": 100,
+          "percentage": 82,
+          "grade": "A2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 6,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "e819bc2e-64da-452c-bcf9-92f48b4d7a1b",
+          "subjectName": "Hindi Reading",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e819bc2e-64da-452c-bcf9-92f48b4d7a1b",
+              "subjectName": "Hindi Reading",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e819bc2e-64da-452c-bcf9-92f48b4d7a1b",
+              "subjectName": "Hindi Reading",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 7,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e819bc2e-64da-452c-bcf9-92f48b4d7a1b",
+              "subjectName": "Hindi Reading",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 45,
+              "grade": "C1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 62,
+          "total": 100,
+          "percentage": 62,
+          "grade": "B2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 7,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "4c82537f-1ec4-451d-a659-d5590dc3bc23",
+          "subjectName": "Hindi Recitation",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "4c82537f-1ec4-451d-a659-d5590dc3bc23",
+              "subjectName": "Hindi Recitation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "4c82537f-1ec4-451d-a659-d5590dc3bc23",
+              "subjectName": "Hindi Recitation",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 6.5,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "4c82537f-1ec4-451d-a659-d5590dc3bc23",
+              "subjectName": "Hindi Recitation",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 0,
+              "grade": "E2",
+              "status": "Absent",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            }
+          ],
+          "marksObtained": 16.5,
+          "total": 100,
+          "percentage": 16.5,
+          "grade": "E2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 8,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "02697be5-ffe4-47d8-a738-77ffd0aee540",
+          "subjectName": "Maths Written",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "02697be5-ffe4-47d8-a738-77ffd0aee540",
+              "subjectName": "Maths Written",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "02697be5-ffe4-47d8-a738-77ffd0aee540",
+              "subjectName": "Maths Written",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 9.5,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "02697be5-ffe4-47d8-a738-77ffd0aee540",
+              "subjectName": "Maths Written",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 66,
+              "grade": "A2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 85.5,
+          "total": 100,
+          "percentage": 85.5,
+          "grade": "A2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 9,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "3edcd162-5691-4824-8617-7ce585935a1d",
+          "subjectName": "Maths Oral",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "3edcd162-5691-4824-8617-7ce585935a1d",
+              "subjectName": "Maths Oral",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 10,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "3edcd162-5691-4824-8617-7ce585935a1d",
+              "subjectName": "Maths Oral",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 0,
+              "grade": "E2",
+              "status": "Absent",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "3edcd162-5691-4824-8617-7ce585935a1d",
+              "subjectName": "Maths Oral",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 76,
+              "grade": "A1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 86,
+          "total": 100,
+          "percentage": 86,
+          "grade": "A2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 10,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "e9699cbe-7500-463e-bb3c-871b66604791",
+          "subjectName": "EVS",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e9699cbe-7500-463e-bb3c-871b66604791",
+              "subjectName": "EVS",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 7.5,
+              "grade": "B1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e9699cbe-7500-463e-bb3c-871b66604791",
+              "subjectName": "EVS",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 0,
+              "grade": "E2",
+              "status": "Absent",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "e9699cbe-7500-463e-bb3c-871b66604791",
+              "subjectName": "EVS",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 66,
+              "grade": "A2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 73.5,
+          "total": 100,
+          "percentage": 73.5,
+          "grade": "B1",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 11,
+          "decimalPlaces": 2,
+          "visible": false
+        },
+        {
+          "subjectUid": "7142a25f-c15f-43f8-8f44-d771aef113d3",
+          "subjectName": "Art",
+          "subjectNature": "THEORY",
+          "markSheetReport": [
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "7142a25f-c15f-43f8-8f44-d771aef113d3",
+              "subjectName": "Art",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 8,
+              "grade": "B1",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 923,
+                "headerName": "UNIT I",
+                "subHeaderName": "10",
+                "priority": 1,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "7142a25f-c15f-43f8-8f44-d771aef113d3",
+              "subjectName": "Art",
+              "subjectNature": "THEORY",
+              "max": 10,
+              "obtained": 0,
+              "grade": "E2",
+              "status": "Absent",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 924,
+                "headerName": "UNIT II",
+                "subHeaderName": "10",
+                "priority": 2,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 10,
+                "terms": [
+                  "UNIT 2"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": false
+            },
+            {
+              "studentInfoUid": "5009a7e8-6edc-4d33-9b50-127398330b15",
+              "admissionNo": "506",
+              "studentName": "Mohd. Zayan",
+              "rollNo": 0,
+              "fatherName": "Aman Ali",
+              "className": "NC",
+              "sectionName": "A",
+              "classSectionUid": "c97c5399-66c3-419c-8a45-9929b4f524a1",
+              "terms": "TERM 1",
+              "subjectUid": "7142a25f-c15f-43f8-8f44-d771aef113d3",
+              "subjectName": "Art",
+              "subjectNature": "THEORY",
+              "max": 80,
+              "obtained": 54,
+              "grade": "B2",
+              "status": "",
+              "markSheetName": "TERM 1",
+              "attachmentName": "",
+              "session": "2024-25",
+              "decimalPlaces": 2,
+              "markSheetTermResponse": {
+                "id": 925,
+                "headerName": "TERM I",
+                "subHeaderName": "80",
+                "priority": 3,
+                "bestOf": 0,
+                "decimalPlaces": 2,
+                "weightage": 80,
+                "terms": [
+                  "TERM 1"
+                ]
+              },
+              "visible": false,
+              "graded": false,
+              "pass": true
+            }
+          ],
+          "marksObtained": 62,
+          "total": 100,
+          "percentage": 62,
+          "grade": "B2",
+          "className": "NC",
+          "sectionName": "A",
+          "terms": "TERM 1",
+          "markSheetName": "TERM 1",
+          "subjectPrt": 12,
+          "decimalPlaces": 2,
+          "visible": false
+        }
+      ],
+      "marksObtained": 754,
+      "total": 1200,
+      "percentage": 62.83,
+      "overAllGrade": "B2",
+      "visible": false
+    },
+    remarks: {
+      uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+      terms: ["TERM 1"],
+      studentId: "1903244",
+      studentName: "WAJID ALI",
+      rollNumber: 37,
+      classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+      classSection: "I-A",
+      description:
+        "is an enthusiastic learner who seems to enjoy school.",
+      fields: [
+        {
+          uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+          title: "Total No. of Present Days",
+          type: "NUMERIC",
+          value: "80",
+          masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+          masterName: "ATTENDANCE",
+        },
+        {
+          uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+          title: "Total No. of Working Days",
+          type: "NUMERIC",
+          value: "120",
+          masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+          masterName: "ATTENDANCE",
+        },
+      ],
+      status: true,
+      createdUser: "QuickCampus",
+      editedUser: "QuickCampus",
+      createdDate: "28-02-2024 05:33 PM",
+      editedDate: "28-02-2024 05:34 PM",
+    },
+
+    baseTermData: {
+      studentAcademic: {
+        dob: "16-06-2016",
+        admissionNo: "1903244",
+        studentName: "WAJID ALI",
+        className: "I",
+        sectionName: "A",
+        rollNo: 37,
+        fatherName: "SAJID ALI",
+        motherName: "Suhana ALI",
+        attendance: "119.0/133",
+        boardRollNumber: "",
+        studentInfoResponse: [
+          {
+            id: 92843,
+            userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+            userName: null,
+            fatherUserName: null,
+            motherUserName: null,
+            guardianUserName: null,
+            uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+            studentId: "1903244",
+            studentName: "WAJID ALI",
+            fatherName: "SAJID ALI",
+            motherName: "Suhana ALI",
+            dob: "16-06-2016",
+            gender: "NA",
+            studentAdhaarcard: "",
+            joiningClass: "I",
+            joiningSections: "A",
+            joiningDate: "01-01-2022",
+            plotNumber: "",
+            area: "Rohini",
+            city: "Delhi",
+            state: "Delhi",
+            pincode: 132456,
+            phone1: "",
+            rollNo: 37,
+            emergencyNumber: "",
+            mobileNumber: "8494005716",
+            studentEmail: null,
+            religion: "",
+            category: "",
+            minority: "",
+            motherTongue: "",
+            idMark: "",
+            height: "",
+            weight: "",
+            physicalDisability: "",
+            bloodGroup: "",
+            healthRemark: "",
+            siblingDetails: "",
+            alumni: "",
+            siblingResponse: [],
+            fatherOccupation: "",
+            fatherQualification: "",
+            fatherOrganization: "",
+            fatherDesignation: "",
+            fatherIncome: "",
+            fatherArea: "",
+            fatherCity: "",
+            fatherState: "",
+            fatherPincode: null,
+            fatherPhone: null,
+            fatherMobile: "9797895186",
+            fatherEmail: null,
+            fatherAdhaarNumber: null,
+            schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+            motherQualification: "",
+            motherOccupation: "",
+            motherOrganization: "",
+            motherDesignation: "",
+            motherIncome: "",
+            motherArea: "",
+            motherCity: "",
+            motherState: "",
+            motherPincode: null,
+            motherPhone: null,
+            motherMobile: "9797895186",
+            motherEmail: null,
+            motherAdhaarNumber: null,
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: "",
+            otp: "SwTBTi",
+            schoolName: "Demo Public School",
+            remark: "",
+            classTeacher: null,
+            classTeacherUserName: null,
+            classes: "I",
+            classUid: null,
+            sections: "A",
+            group: null,
+            wing: "NA",
+            status: "Studying",
+            academicSession: "2023-2024",
+            joiningStatus: "NA",
+            houses: "abc",
+            certificates: "",
+            certificatesList: [],
+            caste: "",
+            listOfDocuments: ["string"],
+            attached: true,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [],
+            studentTransport: [],
+            studentAadharCard: null,
+            fatherAadharCard: null,
+            motherAadharCard: null,
+            studentImage: null,
+            fatherImage: null,
+            motherImage: null,
+            guardianImage: null,
+            birthCertificate: null,
+            classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+            aluminiProof: null,
+            siblingProof: null,
+            residenceProof: null,
+            firstBornChildProof: null,
+            medicalFitnessCertificate: null,
+            fatherQualificationProof: null,
+            motherQualificationProof: null,
+            casteCertificate: null,
+            createdUser: "HAAKIIA",
+            editedUser: "HAAKIIA",
+            createddate: "2023-05-03 09:42:16.870927",
+            editeddate: "2023-05-18 03:10:59.980625",
+            studentAddressResponse: {
+              uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+              houseNo: null,
+              area: "",
+              landmark: null,
+              city: "",
+              district: null,
+              state: "",
+              poPs: null,
+              pincode: null,
+              street: "",
+              userName: "HIIAPJK134_1903244",
+              createdDate: "11-05-2023 03:49 PM",
+              editedDate: "11-05-2023 03:49 PM",
+              createdBy: "HAAKIIA",
+              editedBy: "HAAKIIA",
+            },
+            fatherAddressResponse: {
+              uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+              houseNo: null,
+              area: "",
+              landmark: null,
+              city: "",
+              district: null,
+              state: "",
+              poPs: null,
+              pincode: null,
+              street: "",
+              userName: "HIIAPJK134_F1903244",
+              createdDate: "11-05-2023 03:49 PM",
+              editedDate: "11-05-2023 03:49 PM",
+              createdBy: "HAAKIIA",
+              editedBy: "HAAKIIA",
+            },
+            motherAddressResponse: {
+              uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+              houseNo: null,
+              area: "",
+              landmark: null,
+              city: "",
+              district: null,
+              state: "",
+              poPs: null,
+              pincode: null,
+              street: "",
+              userName: "HIIAPJK134_M1903244",
+              createdDate: "11-05-2023 03:49 PM",
+              editedDate: "11-05-2023 03:49 PM",
+              createdBy: "HAAKIIA",
+              editedBy: "HAAKIIA",
+            },
+            guardianAddressResponse: null,
+            correspondenceAddressResponse: null,
+          },
+        ],
+        classTeacher: "",
+        classTeacherUserName: "",
+      },
+      subject: [
+        {
+          "subjectAllResponse": {
+            "uid": "e9699cbe-7500-463e-bb3c-871b66604791",
+            "subjectName": "EVS",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-07-03 06:38:02.631898",
+            "editeddate": "2024-07-03 06:38:02.631424"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 66,
+          "percentage": 82.5,
+          "grade": "A2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "7142a25f-c15f-43f8-8f44-d771aef113d3",
+            "subjectName": "Art",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "ShikharKhetan_505155",
+            "editedUser": "ShikharKhetan_505155",
+            "createddate": "2024-07-03 08:11:33.316374",
+            "editeddate": "2024-07-03 08:11:33.315385"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 54,
+          "percentage": 67.5,
+          "grade": "B2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "d055d832-c608-4d19-9180-be50b0e38a65",
+            "subjectName": "Personality - Appearance, Hygiene, Neatness",
+            "nature": "PERSONALITY CHART",
+            "natureUid": "29a0ed72-5693-42f3-a368-f5b8e3c40b3b",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-08-16 09:07:17.861256",
+            "editeddate": "2024-08-16 09:07:40.617889"
+          },
+          "termName": "TERM 1",
+          "max": 100,
+          "markObtained": 100,
+          "percentage": 100,
+          "grade": "A+",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": false,
+          "added": false
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "b72a8d93-36de-4784-81fb-26b5a1dd0778",
+            "subjectName": "Application - Attentive, Systematic, Regular, Punctual",
+            "nature": "PERSONALITY CHART",
+            "natureUid": "29a0ed72-5693-42f3-a368-f5b8e3c40b3b",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-08-16 09:10:42.053087",
+            "editeddate": "2024-08-16 09:10:42.05245"
+          },
+          "termName": "TERM 1",
+          "max": 100,
+          "markObtained": 100,
+          "percentage": 100,
+          "grade": "A+",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": false,
+          "added": false
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "8c9d4464-c576-4d34-88ec-4b47c5b00453",
+            "subjectName": "Courtesy - Respectful, Accept, Authority, Innovative",
+            "nature": "PERSONALITY CHART",
+            "natureUid": "29a0ed72-5693-42f3-a368-f5b8e3c40b3b",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-08-16 09:11:18.592769",
+            "editeddate": "2024-08-16 09:11:18.59174"
+          },
+          "termName": "TERM 1",
+          "max": 100,
+          "markObtained": 61.99,
+          "percentage": 61.99,
+          "grade": "A",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": false,
+          "added": false
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "ba730cd7-51c4-431f-b865-103760c08eb2",
+            "subjectName": "Co-operation (Helpful, Ready to Serve)",
+            "nature": "PERSONALITY CHART",
+            "natureUid": "29a0ed72-5693-42f3-a368-f5b8e3c40b3b",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-08-16 09:11:43.93652",
+            "editeddate": "2024-08-16 09:11:43.935733"
+          },
+          "termName": "TERM 1",
+          "max": 100,
+          "markObtained": 35.99,
+          "percentage": 35.99,
+          "grade": "B",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": false,
+          "added": false
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "129fa37f-1ab2-4958-b633-6e6531483c8c",
+            "subjectName": "Conduct or Leadership, Initiative, Volunteer",
+            "nature": "PERSONALITY CHART",
+            "natureUid": "29a0ed72-5693-42f3-a368-f5b8e3c40b3b",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-08-16 09:12:28.938907",
+            "editeddate": "2024-08-16 09:12:28.938145"
+          },
+          "termName": "TERM 1",
+          "max": 100,
+          "markObtained": 100,
+          "percentage": 100,
+          "grade": "A+",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": false,
+          "added": false
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "5a613b4c-eec6-4d2e-bb47-87e4d448f65b",
+            "subjectName": "English Dictation",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:35:41.450551",
+            "editeddate": "2024-09-25 06:35:41.449783"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 34,
+          "percentage": 42.5,
+          "grade": "C2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "009f5af9-8715-4890-9612-d8c291b72d4d",
+            "subjectName": "English Reading",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:35:48.301015",
+            "editeddate": "2024-09-25 06:35:48.300341"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 35,
+          "percentage": 43.75,
+          "grade": "C2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "11b0e86b-41bc-4720-83e2-9e4e81c294d7",
+            "subjectName": "English Recitation",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:35:56.150645",
+            "editeddate": "2024-09-25 06:35:56.15014"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 55,
+          "percentage": 68.75,
+          "grade": "B2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "36addd9e-5e35-4e96-8c0f-d6cf3d281059",
+            "subjectName": "English Writing",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:01.371227",
+            "editeddate": "2024-09-25 06:36:01.370565"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 44,
+          "percentage": 55,
+          "grade": "C1",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "97086871-2a85-464c-83e6-032c5f43be9b",
+            "subjectName": "Hindi Dictation",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:07.963677",
+            "editeddate": "2024-09-25 06:36:07.96289"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 65,
+          "percentage": 81.25,
+          "grade": "A2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "e819bc2e-64da-452c-bcf9-92f48b4d7a1b",
+            "subjectName": "Hindi Reading",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:13.148674",
+            "editeddate": "2024-09-25 06:36:13.147966"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 45,
+          "percentage": 56.25,
+          "grade": "C1",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "4c82537f-1ec4-451d-a659-d5590dc3bc23",
+            "subjectName": "Hindi Recitation",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:18.192696",
+            "editeddate": "2024-09-25 06:36:18.191886"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 0,
+          "percentage": 0,
+          "grade": "E2",
+          "remarkStatus": "Absent",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "73fabc47-83fc-4fbd-8fb6-be23761e00d0",
+            "subjectName": "Hindi Writing",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:23.134775",
+            "editeddate": "2024-09-25 06:36:23.134061"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 45,
+          "percentage": 56.25,
+          "grade": "C1",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "3edcd162-5691-4824-8617-7ce585935a1d",
+            "subjectName": "Maths Oral",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:28.012286",
+            "editeddate": "2024-09-25 06:36:28.011487"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 76,
+          "percentage": 95,
+          "grade": "A1",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        },
+        {
+          "subjectAllResponse": {
+            "uid": "02697be5-ffe4-47d8-a738-77ffd0aee540",
+            "subjectName": "Maths Written",
+            "nature": "THEORY",
+            "natureUid": "02f93aba-d831-4d81-89fa-5b5c8db6cb3e",
+            "cbseVIIICode": "",
+            "cbseXCode": "",
+            "cbseXIICode": "",
+            "status": true,
+            "parent": [],
+            "parentName": [],
+            "haveChild": false,
+            "createdUser": "QuickCampus",
+            "editedUser": "QuickCampus",
+            "createddate": "2024-09-25 06:36:33.559999",
+            "editeddate": "2024-09-25 06:36:33.559317"
+          },
+          "termName": "TERM 1",
+          "max": 80,
+          "markObtained": 66,
+          "percentage": 82.5,
+          "grade": "A2",
+          "remarkStatus": "",
+          "attachmentName": "",
+          "additional": false,
+          "scholastic": true,
+          "added": true
+        }
+      ],
+      remarksEntry: {
+        uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+        terms: ["TERM 1"],
+        studentId: "1903244",
+        studentName: "WAJID ALI",
+        rollNumber: 37,
+        classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+        classSection: "I-A",
+        description:
+          "is an enthusiastic learner who seems to enjoy school.",
+        fields: [
+          {
+            uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+            title: "Total No. of Present Days",
+            type: "NUMERIC",
+            value: "80",
+            masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+            masterName: "ATTENDANCE",
+          },
+          {
+            uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+            title: "Total No. of Working Days",
+            type: "NUMERIC",
+            value: "120",
+            masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+            masterName: "ATTENDANCE",
+          },
+        ],
+        status: true,
+        createdUser: "QuickCampus",
+        editedUser: "QuickCampus",
+        createdDate: "28-02-2024 05:33 PM",
+        editedDate: "28-02-2024 05:34 PM",
+      },
+      school: {
+        uid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+        apikey: "UdrZUz0Viw9pV5WLG3VUHTy4CJ9uREmJ",
+        schoolName: "HAAKIIA Islamic International Academy City Poonch",
+        schoolAbb: "HIIAPJK",
+        educationBoard: "Central Board of Secondary Education (CBSE)",
+        registrationNo: "CEO P Pvt 3000 02",
+        plotNumber: "Near Nakhon wali Road behind",
+        area: "Nai Basti Poonch",
+        city: "Jammu and Kashmir",
+        pincode: "185101",
+        state: "Jammu and Kashmir",
+        phoneNo1: "8494005716",
+        phoneNo2: "7298191935",
+        contactName: "Sajid Rather",
+        contactMobile: "8494005716",
+        contactEmail: "haakiiaacademy9@gmail.com",
+        schoolCode: "Haakiia p01",
+        pfCode: "185101",
+        societyManagement: "Anwar Abaad poonch",
+        language: "English Urdu Hindi",
+        schoolLogo: null,
+        schoolFavicon: null,
+        enabled: true,
+        subDomain: "haakiia",
+        website: "haakiiaacademy.com",
+        schemaPrefix: null,
+        editedDate: "28-02-2024 05:36 PM",
+        editedUser: "QuickCampus",
+        visitorSchool: false,
+        clientSchoolId: null,
+        cscId: null,
+        onlinePaymentEnabled: false,
+        registrationSeries: null,
+        underTakingDetails: null,
+        formNumberStart: null,
+        sessionResponse: null,
+        schoolLogoUrl: null,
+        printAcknowledge: false,
+        notificationEnabled: true,
+        loanEnabled: false,
+        whatsAppEnabled: false,
+        smsenabled: false,
+      },
+      promotedClass: "II",
+      promotedSection: "A",
+      perSignedUrlResponse: {
+        url: "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/QC/student-info/2225/student/images/2225.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240924T101304Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240924%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=21998c5106d13ddcaf62c21d25ee73bf04fef1d6b1efcb8f7d6a944135adde1d"
+        ,
+        fileName: "1903244.png",
+      },
+      pass: true,
+    },
+  },
+  ]
+  const cleanStudentData = cleanedProcessData(studentData)
+
+
+  console.log(cleanStudentData, "fffffffffffff cleanStudentData")
+
+  console.log(studentData, "ffffffffffffff studentData")
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+  const afs = {
+    "marksObtained": 754,
+    "maxTotal": 1200,
+    "percentage": 62.83,
+    "overAllGrade": "B2",
+    "overAllRank": "1",
+    "academicSession": "2024-25",
+    "studentName": "Mohd. Zayan",
+    "rollNo": 0,
+    "className": "NC",
+    "sectionName": "A",
+    "terms": "TERM 1",
+    "markSheetName": "TERM 1",
+    "subjects": [
+      {
+        "subjectName": "English Writing",
+        "maxMarks": 100,
+        "obtainedMarks": 55,
+        "percentage": 55,
+        "grade": "C1",
+        "termDetails": [
+          {
+            "headerName": "UNIT I",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 10,
+            "grade": "A1",
+            "status": ""
+          },
+          {
+            "headerName": "UNIT II",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 1,
+            "grade": "E2",
+            "status": ""
+          },
+          {
+            "headerName": "TERM I",
+            "subHeaderName": "80",
+            "max": 80,
+            "obtained": 44,
+            "grade": "C1",
+            "status": ""
+          }
+        ]
+      },
+      {
+        "subjectName": "English Dictation",
+        "maxMarks": 100,
+        "obtainedMarks": 51,
+        "percentage": 51,
+        "grade": "C1",
+        "termDetails": [
+          {
+            "headerName": "UNIT I",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 10,
+            "grade": "A1",
+            "status": ""
+          },
+          {
+            "headerName": "UNIT II",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 7,
+            "grade": "B2",
+            "status": ""
+          },
+          {
+            "headerName": "TERM I",
+            "subHeaderName": "80",
+            "max": 80,
+            "obtained": 34,
+            "grade": "C2",
+            "status": ""
+          }
+        ]
+      },
+      {
+        "subjectName": "English Reading",
+        "maxMarks": 100,
+        "obtainedMarks": 52,
+        "percentage": 52,
+        "grade": "C1",
+        "termDetails": [
+          {
+            "headerName": "UNIT I",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 10,
+            "grade": "A1",
+            "status": ""
+          },
+          {
+            "headerName": "UNIT II",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 7,
+            "grade": "B2",
+            "status": ""
+          },
+          {
+            "headerName": "TERM I",
+            "subHeaderName": "80",
+            "max": 80,
+            "obtained": 35,
+            "grade": "C2",
+            "status": ""
+          }
+        ]
+      },
+      {
+        "subjectName": "English Recitation",
+        "maxMarks": 100,
+        "obtainedMarks": 66,
+        "percentage": 66,
+        "grade": "B2",
+        "termDetails": [
+          {
+            "headerName": "UNIT I",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 10,
+            "grade": "A1",
+            "status": ""
+          },
+          {
+            "headerName": "UNIT II",
+            "subHeaderName": "10",
+            "max": 10,
+            "obtained": 1,
+            "grade": "E2",
+            "status": ""
+          },
+          {
+            "headerName": "TERM I",
+            "subHeaderName": "80",
+            "max": 80,
+            "obtained": 55,
+            "grade": "B2",
+            "status": ""
+          }
+        ]
+      },
+
+    ]
+  }
+
+
+</script>

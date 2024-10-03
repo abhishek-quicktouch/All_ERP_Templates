@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fee Bill</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        const twoBillOnOnePage = [];
+        for (let index = 0; index < dataList.length; index += 2) {
+          const temp = [];
+          temp.push(dataList[index]);
+          if (dataList?.[index + 1]) {
+            temp.push(dataList[index + 1]);
+          }
+          twoBillOnOnePage.push(temp);
+        }
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        console.log(twoBillOnOnePage, "sssssssssss");
+
+        twoBillOnOnePage?.forEach((twoStudents) => {
+          const multipleStudents = twoStudents;
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `
+  <style type="text/css">
+@page {
+size: A4
+}
+* {
+margin: 0px;
+padding: 0px;
+color: #000;
+}
+td {
+padding-left: 2mm;
+padding-right: 2mm;
+padding-top: 0.6mm;
+padding-bottom: 0.6mm;
+font-size: 8pt;
+color: #000000;
+font-family: Arial, Helvetica, sans-serif;
+}
+th {
+padding-left: 2mm;
+padding-right: 2mm;
+padding-top: 2mm;
+padding-bottom: 2mm;
+font-size: 11pt;
+background: #000000;
+color: #fcfcfc;
+font-family: Arial, Helvetica, sans-serif;
+}
+
+@media print {
+@page {
+margin:5mm;
+size: A4;
+}
+
+}
+</style>
+
+<page orientation="portrait" format="A4" margin="0">`;
+
+          multipleStudents?.forEach((element, ind) => {
+            const basicDetails = {
+              academicSession:
+                element?.student?.studentInfoResponse?.[0]?.academicSession,
+              admissionNo: element?.contentRequest?.admissionNo,
+              // rollNo:
+              studentName: element?.contentRequest?.studentName,
+              fatherName: element?.student?.fatherName,
+              phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+              classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+              address: `${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.houseNo
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.houseNo + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.street
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.street + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.landmark
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.landmark + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.area
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.area + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.city
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.city + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.district
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.district + ", "
+                  : ""
+              }${
+                element?.student?.studentInfoResponse?.[0]
+                  ?.studentAddressResponse?.pincode
+                  ? element?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.pincode
+                  : ""
+              }`,
+            };
+
+            const feeDetails = element?.contentRequest;
+            const studentDetails = element?.student;
+            const componentTotalAmount =
+              feeDetails.feeComponentAmountList?.reduce(
+                (prev, curr) => prev + Number(curr.componentAmount),
+                0
+              );
+
+            singleStudentHtml.innerHTML += `
+
+<!-- Record-1 -->
+<table cellspacing="0" style="width:100%; padding-top:3mm;">
+<tr>
+<td style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+<!-- start header section -->
+<table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;">
+                           <img align="left" style="width: 80px;" src="
+                            https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-06T08_08_17_209919856.png">
+                        </td>
+                        <td align="middle" style="width:80%; padding-top:0mm; padding-bottom:0mm;">
+                           <span style="font-size:15pt; text-transform:uppercase; font-weight:bold; padding-top:0mm; padding-bottom:0mm; font-family: math;">SDPS Punjabi Bagh</span>
+                           <br>
+                           <span style="width:80%; padding-top:0mm; padding-bottom:0mm; font-size:8pt; text-transform:uppercase; font-family: math;">Road No. 10, East Punjabi Bagh, New Delhi</span></br>
+                           <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:8pt; line-height: 140%; text-transform:uppercase; font-family: math;">
+                           (Under the aegis of Sanatan Dharam Education Trust)
+                        </span>
+                        </td>
+                        <td valign="middle" align="right" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:8pt; line-height: 140%; text-transform:uppercase; font-family: math;"> <br><br>
+                        </span>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+<!--// end header section -->
+
+<!-- title -->
+<table cellspacing="0" style="width:100%;">
+<tr>
+<td align="center" style="width:100%; padding-top:0mm; padding-bottom:3mm; font-size:11pt; font-weight:bold;">Fee Bill<br>Academic Session : ${
+              basicDetails.academicSession
+            }
+</td>
+</tr>	
+</table>
+<!--// title -->
+
+<!-- Affiliation -->
+<table cellspacing="0" style="width:100%;">
+<tr>
+<td align="left" style="width:20%; font-weight:bold;">Adm No.</td>
+<td align="left" style="width:40%;">${basicDetails.admissionNo}</td>
+<td align="left" style="width:20%; font-weight:bold;">Father Name</td>
+<td align="left" style="width:20%;">${basicDetails.fatherName}</td>
+</tr>
+<tr>
+<td align="left" style="width:20%; font-weight:bold;">Student Name</td>
+<td align="left" style="width:40%;">${basicDetails.studentName}</td>
+<td align="left" style="width:20%; font-weight:bold;">Class</td>
+<td align="left" style="width:20%;">${basicDetails.classSection}</td>
+</tr>
+<tr>
+<td align="left" style="width:20%; font-weight:bold;">Fee Period</td>
+<td align="left" colspan="3" style="width:80%;">${
+              feeDetails?.unPaidInstallmentsName
+            }</td>
+
+</tr>
+</table>	
+<!-- Affiliation -->
+
+<table cellspacing="0" style="width:100%;">
+<tr>
+<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:2mm;">&nbsp;</div></td>
+</tr>
+</table>
+
+<!-- Start Main Content -->
+<table cellspacing="0" style="width:100%; border: solid 0.25mm #000000;">
+<tr style="background:#e7e7e7;">
+<td align="center" style="width:5; border-right:solid 0.25mm #000000; font-weight:bold;">S.No.</td>
+<td align="left" style="width:45%; border-right:solid 0.25mm #000000; font-weight:bold;">Fee Head(S)</td>
+<td align="right" style="width:50%; font-weight:bold;">Amount Due</td>
+</tr>
+
+${feeDetails.feeComponentAmountList
+  ?.filter((v) => Number(v.componentAmount))
+  .map(
+    (val, index) => `
+<tr>
+<td align="center" style="width:5%; border-top:solid 0.25mm #000000; border-right:solid 0.25mm #000000;">${
+      index + 1
+    }</td>
+<td align="left" style="width:45%; border-top:solid 0.25mm #000000; border-right:solid 0.25mm #000000; text-transform:uppercase;">${
+      val.componentName
+    }</td>
+<td align="right" style="width:50%; border-top:solid 0.25mm #000000;">${
+      val.componentAmount
+    }</td>
+</tr>
+
+`
+  )
+  .join("")}
+<tr>
+<td align="center" style="width:5%; border-top:solid 0.25mm #000000; border-right:solid 0.25mm #000000;">&nbsp;</td>
+<td align="left" style="width:45%; border-top:solid 0.25mm #000000; border-right:solid 0.25mm #000000; font-weight:bold;">Total Amount</td>
+<td align="right" style="width:50%; border-top:solid 0.25mm #000000; font-weight:bold;">${componentTotalAmount}</td>
+</tr>
+</table>	
+<!--// End Main Content -->
+<table cellspacing="0" style="width:100%;">
+<tr>
+<td style="width:100%; padding-left:0mm; padding-right:0mm;"><strong>Amount in words</strong> : ${convertNumberToWords(
+              componentTotalAmount
+            )}</td>
+</tr>
+</table>	
+
+<table cellspacing="0" style="width:100%;">
+<tr>
+<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:2mm;">&nbsp;</div></td>
+</tr>
+</table>
+
+<table cellspacing="0" style="width:100%;">
+<tr align="center">
+<td align="center" style="width:100%; padding-left:0mm; padding-right:0mm; ${
+              ind ? "" : `border-bottom:dashed 0.25mm #000000;`
+            } "></td>
+</tr>
+</table>
+
+
+</td>
+</tr>
+
+</table>
+<!--// Record-1 -->
+
+
+`;
+          });
+          singleStudentHtml.innerHTML += `
+</page>
+`;
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "fewfef",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "fef",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+
+          contentRequest: {
+            feeUid: null,
+            admissionNo: "7014",
+            studentName: "Advik Goyal",
+            studentClass: "I",
+            studentSection: "A",
+            mobileNo: "6512346103",
+            unPaidInstallmentsName: "APR, MAY",
+            lastDateOfInstallment: "2023-05-10",
+            fineDateStart: "2023-05-11",
+            fineAmount: "1.0",
+            perDay: "true",
+            totalAmount: "13465",
+            feeComponentAmountList: [
+              {
+                componentName: "ADMISSION FEE",
+                componentAmount: "0",
+              },
+              {
+                componentName: "TUITION FEE",
+                componentAmount: "11880",
+              },
+              {
+                componentName: "ANNUAL CHARGES",
+                componentAmount: "1585",
+              },
+            ],
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-04-05T10_50_18_101325617.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "fewfef",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "fef",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+
+          contentRequest: {
+            feeUid: null,
+            admissionNo: "7066",
+            studentName: "Madhav Sapra",
+            studentClass: "I",
+            studentSection: "A",
+            mobileNo: "6512346114",
+            unPaidInstallmentsName: "APR, MAY",
+            lastDateOfInstallment: "2023-05-10",
+            fineDateStart: "2023-05-11",
+            fineAmount: "1.0",
+            perDay: "true",
+            totalAmount: "13465",
+            feeComponentAmountList: [
+              {
+                componentName: "ADMISSION FEE",
+                componentAmount: "0",
+              },
+              {
+                componentName: "TUITION FEE",
+                componentAmount: "11880",
+              },
+              {
+                componentName: "ANNUAL CHARGES",
+                componentAmount: "1585",
+              },
+            ],
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "fewfef",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "fef",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+
+          contentRequest: {
+            feeUid: null,
+            admissionNo: "7014",
+            studentName: "Advik Goyal",
+            studentClass: "I",
+            studentSection: "A",
+            mobileNo: "6512346103",
+            unPaidInstallmentsName: "APR, MAY",
+            lastDateOfInstallment: "2023-05-10",
+            fineDateStart: "2023-05-11",
+            fineAmount: "1.0",
+            perDay: "true",
+            totalAmount: "13465",
+            feeComponentAmountList: [
+              {
+                componentName: "ADMISSION FEE",
+                componentAmount: "0",
+              },
+              {
+                componentName: "TUITION FEE",
+                componentAmount: "11880",
+              },
+              {
+                componentName: "ANNUAL CHARGES",
+                componentAmount: "1585",
+              },
+            ],
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

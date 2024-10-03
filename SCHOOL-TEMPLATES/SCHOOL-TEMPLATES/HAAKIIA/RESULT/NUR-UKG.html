@@ -1,0 +1,2742 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HAAKIIA NUR-UKG</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const resultDate = "26-04-2024";
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+        };
+        const subjectNatures = {
+          AAA: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+          COACT:
+            "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+          PSQ: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+          TH: "THEORY",
+        };
+
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              baseTermData: data?.baseTermData,
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+              address: `${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.houseNo
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.houseNo + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.street
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.street + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.landmark
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.landmark + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.area
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.area + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.city
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.city + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.district
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.district + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.pincode
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.pincode
+                  : ""
+              }`,
+
+              remarks: data?.remarks?.details?.[0]?.description || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = `<style type="text/css">
+@page {
+size: A4
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+}
+td {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top: 1mm;
+	padding-bottom:1mm;
+	font-size: 8pt;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top:1mm;
+	padding-bottom: 1mm;
+	background: #e7e7e7;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@media print {
+@page {
+margin:auto;
+size: A4
+}
+	
+	
+}
+</style>`;
+        multipleStudents?.forEach((v) => {
+          const mainResult = v?.studentResponse ?? [];
+          const studentDetails = v.studentInfo;
+          const theorySubjects =
+            mainResult?.subjectWiseMarkSheetReportResponses;
+          const remarksEntry = v?.baseTermData?.remarksEntry;
+
+          const baseTermSubjects = (nature) => {
+            if (nature == subjectNatures.TH) {
+              return v?.baseTermData?.subject?.filter(
+                (v) =>
+                  v.subjectAllResponse?.nature == nature &&
+                  !theorySubjects?.find(
+                    (val) => val.subjectName == v.subjectAllResponse.subjectName
+                  )
+              );
+            }
+
+            return v?.baseTermData?.subject?.filter(
+              (v) => v.subjectAllResponse?.nature == nature
+            );
+          };
+
+          // v.baseTermData?.subject;
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML += `<page orientation="portrait" format="A4" margin="0">
+                 
+
+                  
+            <!-- START PAGE-1 --> 
+            <table cellspacing="0" style="width: 100%; background-image: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_30_12_406823627.jpeg'); background-repeat: no-repeat; background-position: center;">
+  		<tr valign="top">
+    	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+		<!-- logo and Name section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_29_18_632313344.png" /></td>
+				<td align="center" style="width:85%; color:#dd0812; font-size:15pt; font-weight:bold; text-transform:uppercase; line-height: 140%;">Hazrat Allama Anwar Shah kashmiri islamic international academy, Poonch</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; line-height: 140%;"><span style="color:#dd0812;">Head Office:</span> Mohalla Anwar Abad, Nakhon wali Road, Poonch<br>
+				Behind Forest Complex, City Poonch-185101 J & K (India)<br>
+				Mob. : 9797473121, 9622278204, 8494005716, 7051073084
+				</td>
+			</tr>
+		</table>	
+		<!--// logo and Name section -->
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Basic Details -->	
+		<table cellspacing="0" style="width:100%;">
+			<col style="width: 83%"/>
+    		<col style="width: 2%"/>
+    		<col style="width: 15%"/>
+			<tr>
+				<td style="width:83%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<!-- left -->
+				<table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" >
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Student's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.studentName
+              }</td>
+						</tr>
+					</table>
+				</td>
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Admission No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.admissionNo
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Father's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.fatherName
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Class/Section</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.className
+              }-${studentDetails.sectionName}</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Mother's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.motherName
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Roll No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.rollNo
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Date Of Birth</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.dob
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Mobile No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.studentInfoResponse?.[0]?.mobileNumber ?? ""
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+					
+				<tr>
+				<td colspan="2" style="width:100%;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:18%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Address</strong></td>
+							<td style="width:82%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                v?.address
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				</tr>
+					
+				</table>	
+				<!--// left -->
+				</td>
+				<td style="width:2%; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td align="right" style="width:15%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<div style="width:100px; height:100px; border:1px #000 solid; font-size:10px; line-height:130%; text-align:center;">
+          <img align="left" alt="student photo" style="width:100px; height:100px;" src=${
+            v?.baseTermData?.perSignedUrlResponse?.url
+          } />
+				</td>
+			</tr>
+		</table>
+
+    
+		
+		
+		<!--// Basic Details -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="center" colspan="3" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:center; font-size:12pt; font-weight:bold; color:#0000ff;">PART-A</td>
+			</tr>
+			<tr>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:50%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#0000ff; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">1. ACHIEVEMENTS IN ACADEMIC SUBJECTS</div></td>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		<!--// Term -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+
+
+
+    <!-- Main Subject Table -->	
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:5%; font-weight:bold;">S.No.</td>
+				<td align="center" style="width:21%; border-left: solid 0.264583333mm #000000; font-weight:bold; color:#4570bc;">Subject</td>
+				
+        ${v?.studentResponse?.markSheetTerms
+          ?.map(
+            (val) => `
+         
+
+
+        <td align="center" style="width:16%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">${val.headerName}</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt; color:#dd0812; font-weight:bold;">${val.subHeaderName}</div>
+				</td>
+        
+        `
+          )
+          .join("")}
+				
+				<td align="center" style="width:8%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Total</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt;">&nbsp;</div>
+				</td>
+				<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Percentage</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt; font-weight:bold;">%</div>
+				</td>
+				<td align="center" style="width:8%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Grade</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt;">&nbsp;</div>
+				</td>
+			</tr>
+
+      ${theorySubjects
+        ?.map(
+          (val, index) => `
+        <tr>
+				<td align="center" style="width:5%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+          index + 1
+        }.</td>
+				<td align="center" style="width:21%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold; color:#dd0812;">${
+          val.subjectName
+        }</td>
+
+        ${val.markSheetReport
+          ?.map(
+            (ele, j) => `
+            <td align="center" style="width:16%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">
+            ${ele.obtained}</td>
+				`
+          )
+          .join("")}
+			
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.marksObtained
+        }</td>
+				<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.percentage
+        }</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.grade
+        }</td>
+			</tr>`
+        )
+        .join("")}
+		</table>
+
+			
+		
+		<!--// Main Subject Table -->
+
+
+
+
+
+
+	
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Grade Total -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">		
+			<tr>
+				<td align="left" style="width:5%;">&nbsp;</td>
+				<td align="left" style="width:39%;">Grand Total (Out of <strong>${
+          mainResult?.total
+        }</strong> Marks)</td>
+				<td align="left" style="width:30%; border-left: solid 0.264583333mm #000000;">&nbsp;</td>
+				<td align="center" style="width:8%; font-weight:bold; border-left: solid 0.264583333mm #000000;">${
+          mainResult.marksObtained
+        }</td>
+				<td align="center" style="width:18%; border-left: solid 0.264583333mm #000000;">&nbsp;</td>
+			</tr>		
+		</table>
+		<!--// Grade Total -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Grades -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">		
+			<tr>
+				<td align="left" style="width:100%;">
+				<table cellspacing="0" style="width:100%;">
+					<tr>
+						<td align="left" style="width:10%; font-weight:bold;">Overall %</td>
+						<td align="left" style="width:15%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${
+              mainResult.percentage
+            }</td>
+						<td align="left" style="width:12%; font-weight:bold;">Overall Grade</td>
+						<td align="left" style="width:15%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${
+              mainResult.overAllGrade
+            }</td>
+						
+						<td align="left" style="width:28%; font-weight:bold;">Result (Pass/Fail) Result Date:</td>
+						<td align="left" style="width:20%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${resultDate}</td>
+					
+				</table>
+				</td>
+			</tr>		
+		</table>
+		<!--// Grades -->
+
+    
+    <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#800080; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">GRADING SUBJECTS :</div></td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:50%; font-weight:bold; color: #4570bc;">SUBJECT</td>
+				<td align="center" style="width:50%; border-left: solid 0.264583333mm #000000; font-weight:bold; color: #4570bc;">GRADE</td>
+			</tr>
+
+      ${baseTermSubjects(subjectNatures.TH)
+        ?.map(
+          (val, i) => `
+
+            <tr>
+				<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; font-weight:bold; color:#dd0812;">${val.subjectAllResponse.subjectName}</td>
+				<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${val.grade}</td>
+			</tr>
+`
+        )
+        .join("")}
+			
+		</table>
+
+
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#4472c4; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">KEY TO GRADES :</div></td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:25%; font-weight:bold;">Above</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Above 85%</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">A</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Excellent</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">75% & 84%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">B</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Very Good</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">55% & 64%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">C</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Good</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">40 & 49%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">D</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Average</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Below</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">below 40%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">E</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Poor</td>
+			</tr>
+		</table>
+		</td>
+  		</tr>
+		</table>	
+               
+
+
+
+    <!-- END PAGE-1 -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><p style="page-break-after: always;">&nbsp;</p>	</td>
+			</tr>
+		</table>
+
+    <!-- START PAGE-2 --> 
+		<table cellspacing="0" style="width: 100%; background-image:url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_30_12_406823627.jpeg'); background-repeat: no-repeat; background-position: center;">
+  		<tr valign="top">
+    	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:50%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#4472c4; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">2. ACHIEVEMENTS IN ACTIVITIES AREAS</div></td>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		
+		<!-- Activities Section -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:5%; font-weight:bold;">S.No.</td>
+				<td align="left" style="width:80%; border-left: solid 0.264583333mm #000000; font-weight:bold;">ACTIVITIES</td>
+				<td align="center" style="width:15%; border-left: solid 0.264583333mm #000000; font-weight:bold;">GRADE</td>
+			</tr>
+
+      ${baseTermSubjects(subjectNatures.AAA)
+        .map(
+          (val, i) => `<tr>
+				<td align="center" style="width:5%; border-top: solid 0.264583333mm #000000;">${
+          i + 1
+        }.</td>
+				<td align="left" style="width:80%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          val.subjectAllResponse.subjectName
+        }</td>
+				<td align="center" style="width:15%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          val.grade
+        }</td>
+			</tr>`
+        )
+        .join("")}
+			
+		
+			
+		</table>
+		<!--// Activities Section -->	
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="center" colspan="3" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:center; font-size:12pt; font-weight:bold; color:#0000ff;">PART-B</td>
+			</tr>
+			<tr>
+				<td style="width:20%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#800080; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">1. PERSONAL AND SOCIAL QUALITIES AND ATTITUDES</div></td>
+				<td style="width:20%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- personal Section -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:5%; font-weight:bold;">S.No.</td>
+				<td align="left" style="width:47%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Particulars</td>
+				<td align="center" style="width:12%; border-left: solid 0.264583333mm #000000; font-weight:bold;">1<sup>st</sup> Term<br>Assessment</td>
+				<td align="center" style="width:12%; border-left: solid 0.264583333mm #000000; font-weight:bold;">II<sup>nd</sup> Term<br>Assessment</td>
+				<td align="center" style="width:12%; border-left: solid 0.264583333mm #000000; font-weight:bold;">III<sup>rd</sup> Term<br>Assessment</td>
+				<td align="center" style="width:12%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Overall<br>Result</td>
+			</tr>
+			
+      ${baseTermSubjects(subjectNatures.PSQ)
+        .map(
+          (val) => `<tr>
+				<td align="center" style="width:5%; border-top: solid 0.264583333mm #000000;">1.</td>
+				<td align="left" style="width:47%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.subjectAllResponse.subjectName}</td>
+				<td align="center" style="width:12%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">-</td>
+				<td align="center" style="width:12%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">-</td>
+				<td align="center" style="width:12%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.grade}</td>
+				<td align="center" style="width:12%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.grade}</td>
+			</tr>`
+        )
+        .join("")}
+		
+			
+		</table>
+		<!--// personal Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:5%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:90%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#ff0000; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">2. CO-CURRICULAR ACTIVITIES AND INTEREST LITERARY  & CULTURAL ACTIVITIES</div></td>
+				<td style="width:5%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- co-curricular Section -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:25%; font-weight:bold;">Performance Level</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">1<sup>st</sup> Term Assessment</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">2<sup>nd</sup> Term Assessment</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Final Assessment of the<br>end of Third Term<br>Assessment</td>
+				
+			</tr>
+			
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Activity</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Grade</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Grade</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Grade</td>
+			</tr>
+			
+      ${baseTermSubjects(subjectNatures.COACT)
+        .map(
+          (val) => `<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000;">${val.subjectAllResponse.subjectName}</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">-</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">-</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.grade}</td>
+			</tr>`
+        )
+        .join("")}
+		</table>
+		<!--// co-curricular Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:35%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#0000ff; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">3. ATTENDANCE</div></td>
+				<td style="width:35%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- attendace Section -->
+    <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:30%; font-weight:bold;">Total No. of Working Days</td>
+				<td align="center" style="width:40%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Total No. of Present Days</td>
+				<td align="center" style="width:30%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Percentage %</td>		
+			</tr>
+			
+			<tr>
+				<td align="center" style="width:30%; border-top: solid 0.264583333mm #000000;">${
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Working Days"
+          )?.value
+        }</td>
+				<td align="center" style="width:40%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Present Days"
+          )?.value
+        }</td>
+				<td align="center" style="width:30%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${(
+          (Number(
+            remarksEntry?.fields?.find(
+              (val) => val.title == "Total No. of Present Days"
+            )?.value
+          ) *
+            100) /
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Working Days"
+          )?.value
+        ).toFixed(2)}</td>
+			</tr>
+		</table>
+		<!--// attendace Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:35%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#ff0000; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">TEACHER’S REMARKS</div></td>
+				<td style="width:35%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- remarks Section -->
+		<table cellspacing="0" style="width:100%; border:solid 0.264583333mm #000000;">
+        <tr>
+            <td align="left" style="width:100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="left" valign="top" style="width:10%; font-weight:bold;">Remarks:</td>
+                    <td align="left" style="width:90%; border-bottom: dotted 0.264583333mm #000000;">${
+                      remarksEntry?.description
+                    }</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" style="width:100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="left" valign="top" style="width:35%; font-weight:bold;">Promotion Granted / Not Granted to Class:</td>
+                    <td align="left" style="width:65%; border-bottom: dotted 0.264583333mm #000000;">${
+                      v?.baseTermData?.pass
+                        ? `Promoted to ${v?.baseTermData?.promotedClass}-${v.baseTermData?.promotedSection}.`
+                        : "Repeated in same class."
+                    }</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    	</table>
+		<!--// remarks Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		<!-- signature section -->
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:left; border-bottom: dotted 0.264583333mm #000000;"></td>
+				
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				
+				
+				
+				<td align="center" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:center; border-bottom: dotted 0.264583333mm #000000;"></td>
+				
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				
+				<td align="right" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:right; border-bottom: dotted 0.264583333mm #000000;"></td>
+			</tr>
+			
+			<tr>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:left; font-weight:bold;">Sign. of Class Teacher</td>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				<td align="center" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:center; font-weight:bold;">Sign. of HOD</td>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				<td align="right" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:right; font-weight:bold;">Sign. of Principal</td>
+			</tr>
+		</table>
+		<!--// signature section -->
+	
+		</td>
+  		</tr>
+		</table>
+		<!-- END PAGE-2 --> 	
+                </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "06-05-2017",
+            admissionNo: "2003278",
+            studentName: "MOHAMMAD AUSAF ADIL",
+            className: "UKG",
+            sectionName: "B",
+            rollNo: 3,
+            fatherName: "ADIL HAMID",
+            motherName: "TABASSAM QURESHI",
+            attendance: "125.0/135",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 92526,
+                userUid: "6134e99a-3a30-4160-baee-522e10765035",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "bd83922c-0859-410b-a981-701171beb181",
+                studentId: "2003278",
+                studentName: "MOHAMMAD AUSAF ADIL",
+                fatherName: "ADIL HAMID",
+                motherName: "TABASSAM QURESHI",
+                dob: "06-05-2017",
+                gender: "NA",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "B",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: "",
+                phone1: "",
+                rollNo: 3,
+                emergencyNumber: "",
+                mobileNumber: "9419610302",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: "",
+                fatherMobile: "9419610302",
+                fatherEmail: null,
+                fatherAdhaarNumber: "",
+                schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: null,
+                motherCity: null,
+                motherState: null,
+                motherPincode: null,
+                motherPhone: "",
+                motherMobile: "",
+                motherEmail: null,
+                motherAdhaarNumber: "",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "qz6WZe",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "UKG",
+                classUid: null,
+                sections: "B",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "NA",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: "",
+                fatherAadharCard: "",
+                motherAadharCard: "",
+                studentImage: "admissionNo.png",
+                fatherImage: "",
+                motherImage: "",
+                guardianImage: "",
+                birthCertificate: "",
+                classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                aluminiProof: "",
+                siblingProof: "",
+                residenceProof: "",
+                firstBornChildProof: "",
+                medicalFitnessCertificate: "",
+                fatherQualificationProof: "",
+                motherQualificationProof: "",
+                casteCertificate: "",
+                createdUser: "HAAKIIA",
+                editedUser: "HAAKIIA",
+                createddate: "2023-05-03 09:40:30.901607",
+                editeddate: "2023-12-22 07:38:30.933935",
+                studentAddressResponse: {
+                  uid: "78e999f9-a3fb-4dfa-955e-3228a1837d86",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: 0,
+                  street: "",
+                  userName: "HIIAPJK134_2003278",
+                  createdDate: "25-09-2023 05:17 PM",
+                  editedDate: "22-12-2023 01:08 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "HAAKIIA",
+                },
+                fatherAddressResponse: {
+                  uid: "77b86d50-865f-477c-ae39-1c3154ec9bf0",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: null,
+                  userName: null,
+                  createdDate: "22-12-2023 01:08 PM",
+                  editedDate: "22-12-2023 01:08 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                motherAddressResponse: {
+                  uid: "5d523f1a-2b9b-4c24-8f1c-ecda654af63a",
+                  houseNo: null,
+                  area: null,
+                  landmark: null,
+                  city: null,
+                  district: null,
+                  state: null,
+                  poPs: null,
+                  pincode: null,
+                  street: null,
+                  userName: null,
+                  createdDate: "26-01-2024 09:30 AM",
+                  editedDate: "26-01-2024 09:30 AM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: {
+                  uid: "fb38bf6b-130b-4cd1-8a4d-58a44ded900a",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_2003278",
+                  createdDate: "22-12-2023 01:08 PM",
+                  editedDate: "22-12-2023 01:08 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2023-2024",
+            admissionNo: "2003278",
+            studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+            studentName: "MOHAMMAD AUSAF ADIL",
+            rollNo: 3,
+            fatherName: "ADIL HAMID",
+            className: "UKG",
+            sectionName: "B",
+            terms: "TERM 3",
+            markSheetName: "TERM 3",
+            markSheetTerms: [
+              {
+                id: 242,
+                headerName: "Term-1",
+                subHeaderName: "(30)",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 30.0,
+                terms: ["TERM 1"],
+              },
+              {
+                id: 243,
+                headerName: "Term-2",
+                subHeaderName: "(30)",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 30.0,
+                terms: ["TERM 2"],
+              },
+              {
+                id: 244,
+                headerName: "Term-3",
+                subHeaderName: "(40)",
+                priority: 3,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 40.0,
+                terms: ["TERM 3"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "7bd16a64-a453-4435-95ea-890a6984f08c",
+                subjectName: "URDU",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "7bd16a64-a453-4435-95ea-890a6984f08c",
+                    subjectName: "URDU",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "7bd16a64-a453-4435-95ea-890a6984f08c",
+                    subjectName: "URDU",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "7bd16a64-a453-4435-95ea-890a6984f08c",
+                    subjectName: "URDU",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+              {
+                subjectUid: "e384868f-c498-4633-8ce8-f308dcb4ab28",
+                subjectName: "ARABIC",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "e384868f-c498-4633-8ce8-f308dcb4ab28",
+                    subjectName: "ARABIC",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "e384868f-c498-4633-8ce8-f308dcb4ab28",
+                    subjectName: "ARABIC",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "e384868f-c498-4633-8ce8-f308dcb4ab28",
+                    subjectName: "ARABIC",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+              {
+                subjectUid: "d4181d99-e681-499a-b660-f404fd30b8ed",
+                subjectName: "EVS",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "d4181d99-e681-499a-b660-f404fd30b8ed",
+                    subjectName: "EVS",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "d4181d99-e681-499a-b660-f404fd30b8ed",
+                    subjectName: "EVS",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "d4181d99-e681-499a-b660-f404fd30b8ed",
+                    subjectName: "EVS",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+              {
+                subjectUid: "063e14f4-d17b-4265-bb47-a65b67e3139d",
+                subjectName: "HINDI",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "063e14f4-d17b-4265-bb47-a65b67e3139d",
+                    subjectName: "HINDI",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "063e14f4-d17b-4265-bb47-a65b67e3139d",
+                    subjectName: "HINDI",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "063e14f4-d17b-4265-bb47-a65b67e3139d",
+                    subjectName: "HINDI",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+              {
+                subjectUid: "cbb4c431-ed9e-4ece-9144-cf3d7d48d219",
+                subjectName: "MATHS",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "cbb4c431-ed9e-4ece-9144-cf3d7d48d219",
+                    subjectName: "MATHS",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "cbb4c431-ed9e-4ece-9144-cf3d7d48d219",
+                    subjectName: "MATHS",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "cbb4c431-ed9e-4ece-9144-cf3d7d48d219",
+                    subjectName: "MATHS",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+              {
+                subjectUid: "3b537d13-20d9-4b2d-be1d-89238dd45309",
+                subjectName: "ENGLISH",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "3b537d13-20d9-4b2d-be1d-89238dd45309",
+                    subjectName: "ENGLISH",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 242,
+                      headerName: "Term-1",
+                      subHeaderName: "(30)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "3b537d13-20d9-4b2d-be1d-89238dd45309",
+                    subjectName: "ENGLISH",
+                    subjectNature: "THEORY",
+                    max: 30.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 243,
+                      headerName: "Term-2",
+                      subHeaderName: "(30)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["TERM 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bd83922c-0859-410b-a981-701171beb181",
+                    admissionNo: "2003278",
+                    studentName: "MOHAMMAD AUSAF ADIL",
+                    rollNo: 3,
+                    fatherName: "ADIL HAMID",
+                    className: "UKG",
+                    sectionName: "B",
+                    classSectionUid: "9f6c1b75-1a48-4f52-b781-509f72156356",
+                    terms: "TERM 3",
+                    subjectUid: "3b537d13-20d9-4b2d-be1d-89238dd45309",
+                    subjectName: "ENGLISH",
+                    subjectNature: "THEORY",
+                    max: 40.0,
+                    obtained: 40.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 3",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 244,
+                      headerName: "Term-3",
+                      subHeaderName: "(40)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["TERM 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 100.0,
+                total: 100.0,
+                percentage: 100.0,
+                grade: "A",
+                className: "UKG",
+                sectionName: "B",
+                terms: "TERM 3",
+                markSheetName: "TERM 3",
+                visible: false,
+              },
+            ],
+            marksObtained: 600.0,
+            total: 600.0,
+            percentage: 100.0,
+            overAllGrade: "A",
+            visible: false,
+          },
+          remarks: {
+            uid: null,
+            terms: null,
+            studentId: null,
+            studentName: null,
+            rollNumber: 0,
+            classSectionUid: null,
+            classSection: null,
+            description: null,
+            fields: null,
+            status: false,
+            createdUser: null,
+            editedUser: null,
+            createdDate: null,
+            editedDate: null,
+          },
+          baseTermData: {
+            pass: false,
+            perSignedUrlResponse: {
+              url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/HAAKIIA/student-info/2003278/student/images/2003278.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240227T124354Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240227%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=3ae7e87cf328d746b60c9f829e9f894b505f56236dab240f95223f891a5ac30e",
+              fileName: "2003278.png",
+            },
+            studentAcademic: {
+              dob: "16-06-2016",
+              admissionNo: "1903244",
+              studentName: "WAJID ALI",
+              className: "I",
+              sectionName: "A",
+              rollNo: 37,
+              fatherName: "SAJID ALI",
+              motherName: "SHAHIN AKHTER",
+              attendance: "118.0/132",
+              boardRollNumber: "",
+              studentInfoResponse: [
+                {
+                  id: 92843,
+                  userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+                  userName: null,
+                  fatherUserName: null,
+                  motherUserName: null,
+                  guardianUserName: null,
+                  uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+                  studentId: "1903244",
+                  studentName: "WAJID ALI",
+                  fatherName: "SAJID ALI",
+                  motherName: "SHAHIN AKHTER",
+                  dob: "16-06-2016",
+                  gender: "NA",
+                  studentAdhaarcard: "",
+                  joiningClass: "I",
+                  joiningSections: "A",
+                  joiningDate: "01-01-2022",
+                  plotNumber: "",
+                  area: "",
+                  city: "",
+                  state: "",
+                  pincode: null,
+                  phone1: "",
+                  rollNo: 37,
+                  emergencyNumber: "",
+                  mobileNumber: "8494005716",
+                  studentEmail: null,
+                  religion: "",
+                  category: "",
+                  minority: "",
+                  motherTongue: "",
+                  idMark: "",
+                  height: "",
+                  weight: "",
+                  physicalDisability: "",
+                  bloodGroup: "",
+                  healthRemark: "",
+                  siblingDetails: "",
+                  alumni: "",
+                  siblingResponse: [],
+                  fatherOccupation: "",
+                  fatherQualification: "",
+                  fatherOrganization: "",
+                  fatherDesignation: "",
+                  fatherIncome: "",
+                  fatherArea: "",
+                  fatherCity: "",
+                  fatherState: "",
+                  fatherPincode: null,
+                  fatherPhone: null,
+                  fatherMobile: "9797895186",
+                  fatherEmail: null,
+                  fatherAdhaarNumber: null,
+                  schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                  motherQualification: "",
+                  motherOccupation: "",
+                  motherOrganization: "",
+                  motherDesignation: "",
+                  motherIncome: "",
+                  motherArea: "",
+                  motherCity: "",
+                  motherState: "",
+                  motherPincode: null,
+                  motherPhone: null,
+                  motherMobile: "9797895186",
+                  motherEmail: null,
+                  motherAdhaarNumber: null,
+                  guardianName: null,
+                  relation: null,
+                  guardianOccupation: null,
+                  guardianPhone: null,
+                  guardianMobile: null,
+                  guardianEmail: null,
+                  guardianAddress: null,
+                  leavingDate: null,
+                  previousSchoolName: "",
+                  otp: "SwTBTi",
+                  schoolName: "Demo Public School",
+                  remark: "",
+                  classTeacher: null,
+                  classTeacherUserName: null,
+                  classes: "I",
+                  classUid: null,
+                  sections: "A",
+                  group: null,
+                  wing: "NA",
+                  status: "Studying",
+                  academicSession: "2023-2024",
+                  joiningStatus: "NA",
+                  houses: null,
+                  certificates: "",
+                  certificatesList: [],
+                  caste: "",
+                  listOfDocuments: ["string"],
+                  attached: true,
+                  required: false,
+                  submitted: false,
+                  studentHostel: [],
+                  studentConcession: [],
+                  studentTransport: [],
+                  studentAadharCard: null,
+                  fatherAadharCard: null,
+                  motherAadharCard: null,
+                  studentImage: null,
+                  fatherImage: null,
+                  motherImage: null,
+                  guardianImage: null,
+                  birthCertificate: null,
+                  classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+                  aluminiProof: null,
+                  siblingProof: null,
+                  residenceProof: null,
+                  firstBornChildProof: null,
+                  medicalFitnessCertificate: null,
+                  fatherQualificationProof: null,
+                  motherQualificationProof: null,
+                  casteCertificate: null,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2023-05-03 09:42:16.870927",
+                  editeddate: "2023-05-18 03:10:59.980625",
+                  studentAddressResponse: {
+                    uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  fatherAddressResponse: {
+                    uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_F1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  motherAddressResponse: {
+                    uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_M1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  guardianAddressResponse: null,
+                  correspondenceAddressResponse: null,
+                },
+              ],
+              classTeacher: "",
+              classTeacherUserName: "",
+            },
+            subject: [
+              {
+                subjectAllResponse: {
+                  uid: "3b537d13-20d9-4b2d-be1d-89238dd45309",
+                  subjectName: "ENGLISH",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:00:03.003773",
+                  editeddate: "2023-11-20 08:40:23.070324",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "cbb4c431-ed9e-4ece-9144-cf3d7d48d219",
+                  subjectName: "MATHS",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:00:19.50211",
+                  editeddate: "2023-11-20 08:40:27.111852",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "063e14f4-d17b-4265-bb47-a65b67e3139d",
+                  subjectName: "HINDI",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:00:37.986688",
+                  editeddate: "2023-11-20 08:40:32.257631",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "7bd16a64-a453-4435-95ea-890a6984f08c",
+                  subjectName: "URDU",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:00:47.075252",
+                  editeddate: "2023-11-20 08:40:36.175299",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "e384868f-c498-4633-8ce8-f308dcb4ab28",
+                  subjectName: "ARABIC",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2023-05-09 09:00:58.660015",
+                  editeddate: "2023-05-09 09:00:58.659501",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "d4181d99-e681-499a-b660-f404fd30b8ed",
+                  subjectName: "EVS",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:01:07.053912",
+                  editeddate: "2023-11-20 08:40:47.864093",
+                },
+                termName: "TERM 2",
+                max: 70,
+                markObtained: 70,
+                percentage: 100,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "f8d72cb0-d8c8-4c4a-b604-394bc024a136",
+                  subjectName: "COMPUTER",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-05-09 09:01:19.295538",
+                  editeddate: "2023-11-20 08:40:42.409871",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "fa226dc0-2e26-4768-ae68-3abd1a721de1",
+                  subjectName: "COMMUNICATION SKILL",
+                  nature: "THEORY",
+                  natureUid: "d4b8918a-a7f8-4c17-933d-0410d410b932",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-20 08:41:01.447598",
+                  editeddate: "2023-11-20 08:41:01.446258",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "c890c6d7-e61e-4538-8b56-333283468b2a",
+                  subjectName: "Regularity & Punctuality",
+                  nature: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+                  natureUid: "872f08b7-b057-453d-9b18-93f89e42ee34",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:55:02.888516",
+                  editeddate: "2024-02-24 05:55:52.227219",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "65ed4e30-4fcf-4b20-b365-8668f9e0c783",
+                  subjectName: "Personality & Development",
+                  nature: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+                  natureUid: "872f08b7-b057-453d-9b18-93f89e42ee34",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:55:39.819007",
+                  editeddate: "2024-02-24 05:55:39.818155",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "59420f95-0b59-434c-9522-308d6c0f7ff4",
+                  subjectName: "Diligence",
+                  nature: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+                  natureUid: "872f08b7-b057-453d-9b18-93f89e42ee34",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:56:11.545991",
+                  editeddate: "2024-02-24 05:56:11.545088",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "7047bdeb-7b84-41ee-b006-9f3061fd53e2",
+                  subjectName: "Discipline",
+                  nature: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+                  natureUid: "872f08b7-b057-453d-9b18-93f89e42ee34",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:56:47.486253",
+                  editeddate: "2024-02-24 05:56:47.485681",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "da12abb8-41ed-4e4b-bce1-5bc40b040135",
+                  subjectName: "Cleanliness",
+                  nature: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+                  natureUid: "872f08b7-b057-453d-9b18-93f89e42ee34",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:57:06.581354",
+                  editeddate: "2024-02-24 05:57:06.580344",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "489fef42-cdec-413b-88e7-0d786987dcfd",
+                  subjectName: "Recitation (Arabic)",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 05:59:51.961899",
+                  editeddate: "2024-02-24 05:59:51.960839",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "0312d7d3-35c4-4458-965c-cca24157be39",
+                  subjectName: "Debating",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:00:19.001561",
+                  editeddate: "2024-02-24 06:00:18.999243",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "de3ed565-29e9-4ab7-8b62-2ec882bc37f3",
+                  subjectName: "Speech Making",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:00:36.65451",
+                  editeddate: "2024-02-24 06:00:36.653693",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "5b03569a-037c-4408-80de-abf9fe17ae79",
+                  subjectName: "Creative Writing",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:01:25.8705",
+                  editeddate: "2024-02-24 06:01:25.86993",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "cbb462c3-1e44-4fe7-bb97-ee6def9d6476",
+                  subjectName: "Naat",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:01:46.663358",
+                  editeddate: "2024-02-24 06:02:27.882494",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "50ab92a1-cc1f-44d0-884b-198cfc01bd1e",
+                  subjectName: "Guiding",
+                  nature:
+                    "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+                  natureUid: "683a25bb-efcf-4196-bb0b-fe10e691eedc",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:02:12.776786",
+                  editeddate: "2024-02-24 06:02:12.772849",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "2fa33220-c160-4c27-9273-bbc1affe2b29",
+                  subjectName: "Health and Physical Education",
+                  nature: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+                  natureUid: "727877dc-eb8d-4f17-914f-f757063f9c31",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:03:32.843788",
+                  editeddate: "2024-02-24 06:03:32.843083",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "994044d5-924e-44d1-97ef-a24419fad231",
+                  subjectName: "Art Education (Visual and Performing Arts)",
+                  nature: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+                  natureUid: "727877dc-eb8d-4f17-914f-f757063f9c31",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:03:49.827135",
+                  editeddate: "2024-02-24 06:03:49.826569",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "163030a2-65f5-41b3-8bae-b3ebced1e42f",
+                  subjectName: "Moral Education",
+                  nature: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+                  natureUid: "727877dc-eb8d-4f17-914f-f757063f9c31",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:04:08.320933",
+                  editeddate: "2024-02-24 06:04:08.316953",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "bdddd459-3187-43d0-b651-8a866e906c40",
+                  subjectName: "General Knowledge",
+                  nature: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+                  natureUid: "727877dc-eb8d-4f17-914f-f757063f9c31",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2024-02-24 06:04:34.27843",
+                  editeddate: "2024-02-24 06:04:34.277685",
+                },
+                termName: "TERM 2",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "A",
+                scholastic: false,
+              },
+            ],
+            remarksEntry: {
+              uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+              terms: ["TERM 2"],
+              studentId: "1903244",
+              studentName: "WAJID ALI",
+              rollNumber: 37,
+              classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+              classSection: "I-A",
+              description:
+                "is an enthusiastic learner who seems to enjoy school.",
+              fields: [
+                {
+                  uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+                  title: "Total No. of Present Days",
+                  type: "NUMERIC",
+                  value: "80",
+                  masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                  masterName: "ATTENDANCE",
+                },
+                {
+                  uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+                  title: "Total No. of Working Days",
+                  type: "NUMERIC",
+                  value: "120",
+                  masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                  masterName: "ATTENDANCE",
+                },
+              ],
+              status: true,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createdDate: "28-02-2024 05:33 PM",
+              editedDate: "28-02-2024 05:34 PM",
+            },
+
+            school: {
+              uid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+              apikey: "UdrZUz0Viw9pV5WLG3VUHTy4CJ9uREmJ",
+              schoolName: "HAAKIIA Islamic International Academy City Poonch",
+              schoolAbb: "HIIAPJK",
+              educationBoard: "Central Board of Secondary Education (CBSE)",
+              registrationNo: "CEO P Pvt 3000 02",
+              plotNumber: "Near Nakhon wali Road behind",
+              area: "Nai Basti Poonch",
+              city: "Jammu and Kashmir",
+              pincode: "185101",
+              state: "Jammu and Kashmir",
+              phoneNo1: "8494005716",
+              phoneNo2: "7298191935",
+              contactName: "Sajid Rather",
+              contactMobile: "8494005716",
+              contactEmail: "haakiiaacademy9@gmail.com",
+              schoolCode: "Haakiia p01",
+              pfCode: "185101",
+              societyManagement: "Anwar Abaad poonch",
+              language: "English Urdu Hindi",
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "haakiia",
+              website: "haakiiaacademy.com",
+              schemaPrefix: null,
+              editedDate: "18-12-2023 11:45 AM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: false,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+            },
+            status_code: 200,
+          },
+        },
+      ]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>marksheet anual</title>
+</head>
+
+<body>
+    <div id="mainDiv">
+    </div>
+
+    <script>
+        window.SetTemplateData = (argDataArray) => {
+
+            function getDayName(dateString) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const date = new Date(dateString);
+                const dayIndex = date.getDay();
+                return days[dayIndex];
+            }
+
+            function convertTo12HourFormat(dateTimeString) {
+                const date = new Date(dateTimeString);
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+                const period = hours < 12 ? 'AM' : 'PM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+
+                return `${hours}:${minutes} ${period}`;
+            }
+
+            let manipulatedData = argDataArray;
+
+            manipulatedData?.forEach(({ data, header, footer }) => {
+                const mainData = data ?? [];
+
+                let mainDivChild = document.createElement("div");
+                mainDivChild.style.padding = "10px 30px";
+
+
+                // header div;
+                let headerDiv = document.createElement("div");
+                headerDiv.innerHTML = header || "";
+
+                // student info div
+                let student_info_div = document.createElement("div");
+                student_info_div.style.margin = "auto;"
+                student_info_div.innerHTML = null;
+                student_info_div.innerHTML = `
+                    <table id="student_info"
+                        style="width: 100%; border-collapse: collapse; border: 2px solid black; font-family: Arial, sans-serif;">
+                        <tr>
+                            <th style="text-align: left; padding: 5px;">Examination</th>
+                                <td style="padding: 5px;">: ${mainData?.datesheetName || "-"}
+                                </td>
+                            <th style="text-align: left; padding: 5px;">Term Name</th>
+                                <td style="padding: 5px;">: ${mainData?.termName || ""}
+                                </td>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left; padding: 5px;">Class-Section</th>
+                                <td style="padding: 5px;">: ${mainData?.classes || "-"}-${mainData?.sections?.length ? mainData?.sections[0] : ""}
+                                </td>
+                            <th style="text-align: left; padding: 5px;">Academic-Session</th>
+                            <td style="padding: 5px;">: ${mainData?.academicSession || "-"}</td>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left; padding: 5px;">Exam Start Date</th>
+                            <td style="padding: 5px;">: ${mainData?.startDate || "-"}</td>
+                            <th style="text-align: left; padding: 5px;">Exam End Date</th>
+                            <td style="padding: 5px;">: ${mainData?.endDate || "-"}</td>
+                        </tr>
+                    </table>`
+
+
+                // result table;
+                let datesheet_div = document.createElement("div");
+                datesheet_div.style.margin = "auto";
+                datesheet_div.style.marginTop = "20px";
+                datesheet_div.innerHTML = null;
+
+                datesheet_div.innerHTML = `<table
+                style="width: 100%; border-collapse: collapse; border: 1px solid black; font-family: Arial, sans-serif; text-align: center;">
+                    <!-- first row -->
+                        <tr>
+                            <th style="border: 1px solid black; padding: 10px 4px; width:33%;">DATE & TIME</th>
+                            <th style="border: 1px solid black; padding: 10px 4px; width:33%;">DAY</th>
+                            <th style="border: 1px solid black; padding: 10px 4px; width:33%;">SUBJECT</th>
+                        </tr>
+                    ${mainData?.dateSheetSettingResponseList?.map(t=>
+                        `<tr>
+                            <td style="border: 1px solid black; padding: 10px 4px;">${t?.examDate || "-"} (${convertTo12HourFormat(t?.startTime)}-${convertTo12HourFormat(t?.endTime)})</td>
+
+                             <td style="border: 1px solid black; padding: 10px 4px;">${getDayName(t?.examDate?.split("-")?.reverse()?.join("-")) || "-"}</td>
+
+                           <td style="border: 1px solid black; padding: 10px 4px;">${t?.subject || "-"}</td>
+                           
+                        </tr>`
+                    )?.join("")}
+                </table>
+                `
+
+                // signatures;
+                let footerDiv = document.createElement("div");
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                let mm = today.getMonth() + 1; // Months start at 0!
+                let dd = today.getDate();
+
+                if (dd < 10) dd = '0' + dd;
+                if (mm < 10) mm = '0' + mm;
+
+                const formattedToday = dd + '-' + mm + '-' + yyyy;
+
+                mainDivChild.append(headerDiv, student_info_div, datesheet_div)
+                document.getElementById("mainDiv").append(mainDivChild)
+
+            })
+
+        }
+    </script>
+
+
+    <script>
+        window.SetTemplateData([
+            {
+               data: {
+                    "uid": "ad1463b6-1339-44b6-a02a-0ec0ad9b1e61",
+                    "datesheetName": "Final-Term Datesheet",
+                    "termUid": "70aa8a74-588e-4fa9-b2bd-225c5d97daad",
+                    "termName": "Open Book Test",
+                    "classes": "LKG",
+                    "sections": [
+                        "GLORY"
+                    ],
+                    "classSectionUids": [
+                        "b8306f6f-6870-4af6-add4-580b48aa2bb3"
+                    ],
+                    "startDate": "13-05-2024",
+                    "endDate": "18-05-2024",
+                    "academicSession": "2023-2024",
+                    "dateSheetSettingResponseList": [
+                        {
+                            "subject": "Hindi",
+                            "examDate": "13-05-2024",
+                            "maxMarks": 100.0,
+                            "startTime": "2024-05-13T13:00",
+                            "endTime": "2024-05-13T14:30",
+                            "description": "best of luck for your exam",
+                            "subjectUid": "ca4f7d76-776c-498e-b8fa-3b11e0152761"
+                        },
+                        {
+                            "subject": "Number Skills",
+                            "examDate": "15-05-2024",
+                            "maxMarks": 100.0,
+                            "startTime": "2024-05-15T09:00",
+                            "endTime": "2024-05-15T10:30",
+                            "description": "best of luck for your exam",
+                            "subjectUid": "cca5847e-daba-4e12-a7f7-d2fa520d229b"
+                        }
+                    ],
+                    "enabled": false
+                }, 
+                header: `<div style="margin-top:20px; padding: 20px; text-align: center; font-family: 'Roboto Slab', serif; position: relative">
+        <img src="https://preprod-erp.quickcampus.online/static/media/dailyFeeCollectionStudentImage.11a3d1aa8cf56da3646f.png" alt="School Logo" style="width: 120px; height: auto; position: absolute; top: 30px; left: 10px">
+        <div style="height:35px; display:flex; flex-direction: column; justify-content: center; align-items: center;">
+            <p style="font-size: 30px; font-weight: bold;" >Bhatnagar International School</p>    
+        </div>
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold;">Sector-8, Pocket-X, Vasant Kunj, New Delhi-110070</div>
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold;">Website : www.bhatnagarinternationalschool.in</div>
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold;">CBSE Affiliation No. : 2730193</div>
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold;">PROGRESS RECORD</div>
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold;">2023-2024</div>
+    </div>`,
+                footer: `
+            <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+
+    <!-- bottom grades -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+					<!-- start grades table -->
+					<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+						<tr style="background:#e7e7e7;">
+							<td align="center" style="width:33; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Grades</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Range</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; font-size:7pt;"><strong>Remarks</strong></td>
+						</tr>
+
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A+</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>90%-100%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Outstanding</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>75%-89%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Excellent</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>B</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>56%-74%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Very Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>C</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>35%-55%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>D</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>Below 35%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Scope for improvement</strong></td>
+						</tr>
+						
+						</table>	
+						<!--// end grades table -->
+						</td>
+						<td align="left" style="width:3%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:3mm; padding-bottom:0mm;">
+							<h2 style="font-size:12pt; font-family: 'Courier New', monospace; font-style: italic;">Wishing you all the best for your bright future.</h2></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// bottom grades -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Sign. section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:36%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold; font-size:10pt;">This is a computer-generated document. No signature is required.</td>					
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Sign. section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+			
+		<!-- copyright -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&#169; Redwoods Global School</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// copyright -->`,
+            }
+        ])
+    </script>
+
+</body>
+
+</html>

@@ -4,399 +4,487 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Processed Dynamic School Report Generator Script</title>
+    <title>Student Report Card</title>
+
 </head>
 
 <body>
-    <div id="studentsList">
-        Processed Dynamic School Report Generator Script
-    </div>
+    <div id="studentsList">Student Report Card</div>
 </body>
 <script>
     window.SetTemplateData = function (data) {
 
-
-        console.log(data[0]?.student, "ddddddddddddddddddd data.student");
-
-
-
-        const config = {
-            schoolLogo:
-                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_24_05_218290156.png",
-            schoolName: "SREEJI SCHOOL",
-            schoolAddress: `<h5 >Affiliated to CBSE vide Aff No. 530531</h5>
-                <h5>Sector-9, Faridabad, (Haryana) India-121006</h5>
-                <h5 >Email Id : dcmodelfaridabad@gmail.com Help Desk : +91-129-2226000, 9871583000</h5>`,
-            studentInfoFields: [
-                {
-                    label: "NAME OF THE STUDENT",
-                    key: "studentName",
-                    additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
-                },
-                {
-                    label: "FATHER'S NAME",
-                    key: "fatherName",
-                    additionalInfo: { label: "ROLL NO.", key: "rollNo" },
-                },
-                {
-                    label: "MOTHER'S NAME",
-                    key: "motherName",
-                    additionalInfo: { label: "CLASS & SECTION", key: "className" },
-                },
-            ],
-            gradingScale: "on 8-point (A1-E) Grading Scale",
-            gradeScale: [
-                { minPercentage: 91, grade: "A1" },
-                { minPercentage: 81, grade: "A2" },
-                { minPercentage: 71, grade: "B1" },
-                { minPercentage: 61, grade: "B2" },
-                { minPercentage: 51, grade: "C1" },
-                { minPercentage: 41, grade: "C2" },
-                { minPercentage: 33, grade: "D" },
-                { minPercentage: 0, grade: "E" },
-            ],
-            scholasticConfig: {
-                nature: "THEORY",
-            },
-            coScholasticConfig: {
-                nature: "2A LIFE-SKILLS",
-            },
-            coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
-            signatures: ["CLASS TEACHER", "HEADMISTRESS", "PARENT/GUARDIAN"],
-            footnotes: [
-                "*S.E.A - Subject Enrichment Activity",
-                "*M.A - Multiple Assessment",
-            ],
-            styles: `
-            @page { size: A4; margin: 10mm; }
-            @media print { @page { margin: auto; size: A4; } }
-            body { font-family: Arial, sans-serif; }
-            .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-            .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
-            .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; } 
-            .header img { max-width: 500px; }
-            .section { margin-bottom: 20px; }
-            .section table { width: 100%; border-collapse: collapse; }
-            .section table, .section th, .section td { border: 1px solid #000; }
-            .section td { padding: 2px; text-align: left; font-size: 14px; margin: 0px; }
-            .section h4, .section th { padding: 2px; text-align: center; font-size: 14px; margin: 0px; }
-            .remarks { margin-bottom: 20px; }
-            .signatures { display: flex; justify-content: space-between; }
-            .signatures div { font-size: 14px; margin: 0px; padding: 0px; width: 30%; text-align: center; }
-            .signatures p { margin: 0px; font-weight: bold; }
-        `,
-        };
-
         const dataList = Array.isArray(data) ? data : [data];
         const viewTemplate = dataList[0]?.viewTemplate;
-        const staticData = []// Function to return attendance/mark based on status
-        function getAttendanceOrMark(status, mark) {
-            const attendanceValue = {
-                Absent: "AB",
-                Medical: "M",
-                Sports: "S",
-                Leave: "L",
-                "Late Admission": "LA",
-                Exempted: "EX",
-                NA: "NA",
-            };
-            return attendanceValue[status] || mark || "-";
-        }
+        const staticData = [
+            {
+                markData: {
+                    academicSession: "2023-2024",
+                    markSheetName: "MID TERM",
+                    markSheetTerms: [
+                        { subHeaderName: "UNIT TEST-I", headerName: "(50)" },
+                        { subHeaderName: "ATTENDANCE", headerName: "(10)" },
+                        {
+                            subHeaderName: "COLD CALLING + MULTI DISCIPLINARY PROJECT",
+                            headerName: "(20)",
+                        },
+                        {
+                            subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+                            headerName: "(20)",
+                        },
+                        { subHeaderName: "MID TERM", headerName: "(100)" },
+                    ],
+                    subjectWiseMarkSheetReportResponses: [
+                        {
+                            subjectName: "Mathematics",
+                            markSheetReport: [
+                                {
+                                    markSheetTermResponse: { subHeaderName: "UNIT TEST-I" },
+                                    obtained: "45",
+                                    max: "50",
+                                },
+                                {
+                                    markSheetTermResponse: { subHeaderName: "ATTENDANCE" },
+                                    obtained: "10",
+                                    max: "10",
+                                },
+                                {
+                                    markSheetTermResponse: {
+                                        subHeaderName:
+                                            "COLD CALLING + MULTI DISCIPLINARY PROJECT",
+                                    },
+                                    obtained: "18",
+                                    max: "20",
+                                },
+                                {
+                                    markSheetTermResponse: {
+                                        subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+                                    },
+                                    obtained: "19",
+                                    max: "20",
+                                },
+                                {
+                                    markSheetTermResponse: { subHeaderName: "MID TERM" },
+                                    obtained: "90",
+                                    max: "100",
+                                },
+                            ],
+                            marksObtained: "182",
+                            percentage: "91%",
+                            grade: "A",
+                        },
+                        // Add more subjects as needed
+                    ],
+                },
+                student: {
+                    studentName: "John Doe",
+                    admissionNo: "12345",
+                    fatherName: "Mr. Doe",
+                    motherName: "Mrs. Doe",
+                    className: "10",
+                    sectionName: "A",
+                    rollNo: "12",
+                    dob: "01/01/2008",
+                    attendance: "95%",
+                    studentInfoResponse: [
+                        {
+                            studentAddressResponse: {
+                                houseNo: "123",
+                                area: "Main Street",
+                                landmark: "Near Park",
+                                city: "New Delhi",
+                                state: "Delhi",
+                                pincode: "110001",
+                            },
+                            mobileNumber: "9876543210",
+                            height: "150 cm",
+                            weight: "50 kg",
+                            bloodGroup: "O+",
+                        },
+                    ],
+                },
+                baseTermData: {
+                    subject: [
+                        {
+                            subjectAllResponse: {
+                                parentName: ["Mathematics"],
+                                subjectName: "Algebra",
+                                nature: "2A LIFE-SKILLS",
+                            },
+                            grade: "A",
+                        },
+                        {
+                            subjectAllResponse: {
+                                parentName: ["Science"],
+                                subjectName: "Physics",
+                                nature: "3A LIFE SKILLS",
+                            },
+                            grade: "B",
+                        },
+                        // Add more subjects as needed
+                    ],
+                    remarksEntry: {
+                        description: "Excellent performance",
+                    },
+                },
+                header: "School Name: XYZ School",
+                footer: "Footer Information",
+            },
+        ];
 
-        // Calculate grade based on percentage
-        function calculateGrade(percentage) {
-            for (const grade of config.gradeScale) {
-                if (percentage >= grade.minPercentage) {
-                    return grade.grade;
-                }
-            }
-            return "F";
-        }
-
-        // Generate scholastic table
-        function generateScholasticTable(subjects, termConfig) {
+        function generateScholasticRows(subjects) {
             let totalMarksObtained = 0;
             let totalPossibleMarks = 0;
 
-            const scholasticSubjects = subjects?.filter(
-                (subject) => subject?.subjectNature === config.scholasticConfig.nature
-            );
-            const rows = scholasticSubjects
+            const rows = subjects
                 ?.map((subject) => {
-                    let subjectTotal = 0;
-                    let subjectMaxTotal = 0;
-                    const marks = {};
+                    let unitTest1 = "-",
+                        unitTotal = "",
+                        attendance = "-",
+                        attendanceTotal = "",
+                        project = "-",
+                        projectTotal = "",
+                        assessment = "-",
+                        assessmentTotal = "",
+                        midTerm = "-",
+                        midTermTotal = "";
 
                     subject?.markSheetReport?.forEach((report) => {
-                        const termName = report?.markSheetTermResponse?.subHeaderName;
-                        marks[termName] = {
-                            obtained: getAttendanceOrMark(report?.status, report?.obtained), // Use getAttendanceOrMark function
-                            max: report?.max || "-",
-                        };
-                        subjectTotal += Number(report?.obtained) || 0;
-                        subjectMaxTotal += Number(report?.max) || 0;
+                        switch (report?.markSheetTermResponse?.subHeaderName) {
+                            case "UNIT TEST-I":
+                                unitTest1 = report?.obtained;
+                                unitTotal = report?.max;
+                                break;
+                            case "ATTENDANCE":
+                                attendance = report?.obtained;
+                                attendanceTotal = report?.max;
+                                break;
+                            case "COLD CALLING + MULTI DISCIPLINARY PROJECT":
+                                project = report?.obtained;
+                                projectTotal = report?.max;
+                                break;
+                            case "PORTFOLIO + MULTIPLE ASSESSMENT":
+                                assessment = report?.obtained;
+                                assessmentTotal = report?.max;
+                                break;
+                            case "MID TERM":
+                                midTerm = report?.obtained;
+                                midTermTotal = report?.max;
+                                break;
+                        }
                     });
 
-                    totalMarksObtained += subjectTotal;
-                    totalPossibleMarks += subjectMaxTotal;
+                    if (!subject?.markSheetReport[0]?.graded) {
+                        totalMarksObtained += Number(subject?.marksObtained) || 0;
+                        totalPossibleMarks +=
+                            Number(unitTotal) +
+                            Number(attendanceTotal) +
+                            Number(projectTotal) +
+                            Number(assessmentTotal) +
+                            Number(midTermTotal);
 
-                    const percentage = (subjectTotal / subjectMaxTotal) * 100;
-                    const grade = calculateGrade(percentage);
-
-                    return `
-                <tr>
-                    <td style="font-weight:bold">${subject?.subjectName}</td>
-                    ${termConfig
-                            .map(
-                                (term) => `<td style="font-weight:${isNaN(marks[term]?.obtained) ? "bold" : "normal"
-                                    };
-                    text-align:center">${marks[term]?.obtained || "-"}/${marks[term]?.max || "-"
-                                    }</td>`
-                            )
-                            .join("")}
-                    <td style="text-align:center">${subjectTotal}/${subjectMaxTotal}</td>
-                    <td style="text-align:center">${percentage.toFixed(2)}%</td>
-                    <td style="text-align:center">${grade}</td>
-                </tr>
-            `;
+                        return `
+                        <tr>
+                            <td >${subject?.subjectName}</td>
+                            <td >${unitTest1}</td>
+                            <td >${attendance}</td>
+                            <td >${project}</td>
+                            <td >${assessment}</td>
+                            <td >${midTerm}</td>
+                            <td >${subject?.marksObtained}</td>
+                          
+                            <td >${subject?.grade}</td>
+                        </tr>
+                    `;
+                    } else {
+                        return "";
+                    }
                 })
                 .join("");
 
-            const overallPercentage =
-                (totalMarksObtained / totalPossibleMarks) * 100;
-            const overallGrade = calculateGrade(overallPercentage);
-
-            return `
-            <table>
-                <tr>
-                    <th colspan="${termConfig.length + 4}">
-                        <div style="text-align: center; justify-content: space-between; display: flex;">
-                            <span>SCHOLASTIC AREAS</span>
-                            <span style="margin-left: auto;">${config.gradingScale
-                }</span>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th style="text-align: center; width: 16%;">SUBJECT</th>
-                    ${termConfig
-                    .map(
-                        (term) =>
-                            `<th style="text-align: center; width: 12%;">${term}</th>`
-                    )
-                    .join("")}
-                    <th style="text-align: center;width: 12%;">TOTAL MARKS</th>
-                    <th style="text-align: center;width: 12%;">PERCENTAGE</th>
-                    <th style="text-align: center; width: 12%;">GRADE</th>
-                </tr>
-                ${rows}
-                <tr>
-                    <td colspan="${termConfig.length + 1
-                }"><strong>OVERALL PERFORMANCE</strong></td>
-                    <td style="text-align:center"><strong>${totalMarksObtained}/${totalPossibleMarks}</strong></td>
-                    <td style="text-align:center"><strong>${overallPercentage.toFixed(
-                    2
-                )}%</strong></td>
-                    <td style="text-align:center"><strong>${overallGrade}</strong></td>
-                </tr>
-            </table>
-        `;
+            return {
+                rows,
+                totalMarksObtained,
+                totalPossibleMarks,
+            };
         }
-
-        // Generate co-scholastic table
-        function generateCoScholasticTable(subjects) {
-            console.log(subjects, "fffffffffffffff subjects");
+        function generateCoScholasticRows(subjects) {
             const coScholasticSubjects = subjects?.filter(
-                (subject) =>
-                    subject?.subjectNature === config.coScholasticConfig.nature
+                (subject) => subject?.subjectAllResponse?.nature === "2A LIFE-SKILLS"
             );
             const halfLength = Math.ceil(coScholasticSubjects.length / 2);
             let tableContent = "";
-            console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
+
             for (let i = 0; i < halfLength; i++) {
                 const leftSubject = coScholasticSubjects[i];
                 const rightSubject = coScholasticSubjects[i + halfLength];
 
                 tableContent += `
-                <tr>
-                    <td style="width: 30%;">${leftSubject?.subjectName || ""
+            <tr>
+                <td style="width: 30%;">${leftSubject?.subjectAllResponse?.subjectName || ""
                     }</td>
-                    <td style="width: 20%; text-align: center">${leftSubject?.grade || ""
+                <td style="width: 20%;">${leftSubject?.grade || ""}</td>
+                <td style="width: 30%;">${rightSubject?.subjectAllResponse?.subjectName || ""
                     }</td>
-                    <td style="width: 30%;">${rightSubject?.subjectName || ""
-                    }</td>
-                    <td style="width: 20%; text-align: center">${rightSubject?.grade || ""
-                    }</td>
-                </tr>
-            `;
+                <td style="width: 25%;">${rightSubject?.grade || ""}</td>
+            </tr>
+        `;
             }
 
-            return `
-            <table>
-                <tr>
-                    <th colspan="4" style="border: none;">
-                        <div style="text-align: center; justify-content: space-between; display: flex;">
-                            <span>CO-SCHOLASTIC COMPETENCIES</span>
-                            <span style="margin-left: auto;">${config.coScholasticGradingScale}</span>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th>PARTICULAR</th>
-                    <th>GRADE</th>
-                    <th>PARTICULAR</th>
-                    <th>GRADE</th>
-                </tr>
-                ${tableContent}
-            </table>
-        `;
+            return tableContent;
         }
-
-        // Set student data
         const multipleStudents = viewTemplate ? staticData : dataList;
         const studentHtml = document.getElementById("studentsList");
         studentHtml.innerHTML = ``;
-
         multipleStudents?.forEach((element) => {
+            console.log(element, "fffffffff")
             const singleStudentHtml = document.createElement("div");
             singleStudentHtml.style.pageBreakAfter = "always";
 
-            const termConfig =
-                element?.markData?.markSheetTerms?.map(
-                    (term) => term.subHeaderName
-                ) || [];
+            const scholasticResult = generateScholasticRows(
+                element?.markData?.subjectWiseMarkSheetReportResponses
+            );
+            let totalHeaderName = 0;
 
             singleStudentHtml.innerHTML = `
-            <style type="text/css">${config.styles}</style>
-            <page orientation="portrait" format="A4" margin="0">
+            <style type="text/css">
+@page {
+size: A4
+}
+
+                @media print {
+@page {
+margin:auto;
+size: A4;
+}
+
+}
+                 body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .section table,
+        .section th,
+        .section td {
+            border: 1px solid #000;
+        }
+
+        .section th,
+        .section td {
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+
+
+        .remarks {
+            margin-bottom: 20px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+
+        }
+
+        .signatures div {
+
+            width: 30%;
+            text-align: center;
+        }
+            </style>
+                      <page orientation="portrait" format="A4" margin="0">
                 <div class="container">
                     <div class="header">
-            
-${element.header
-                    ? element.header
-                    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
-              <div style="text-align:center">
-                        <h1 >${config.schoolName}</h1>
-                        <div >${config.schoolAddress}</div>
-                        <h4 style="margin:5px" >ACADEMIC SESSION-${element?.markData?.academicSession || ""
-                    }, ${element?.markData?.markSheetName || ""}</h4> 
-                
-              </div>
-              <img src="${config.schoolLogo}" alt="School Logo"/> 
-            `
-                }
-
-             
+                         <div style="height:70px;">
+                          <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-07T10_48_06_661575730.png" alt="School Logo" style="height:100%;">  
+                        </div>
+                        <p style="font-size:12px;margin-bottom:5px;">Gurudwara Lane, Nanesh Enclave, Prahladpur, Khera Road Sector -35 Rohini, Delhi</p>
+                        <p style="font-size:14px;">ACADEMIC SESSION-${element.markData.academicSession
+                }, ${element.markData.markSheetName}</p>
+                        <p style="font-size:14px;">GRADE: ${element.student.className}</p>
+                    </div>
+                    <div class="section">
+                        <table>
+                            <tr>
+                                <th style="width: 30%;">NAME OF THE STUDENT</th>
+                                <td style="width: 20%;">${element.student.studentName}</td>
+                                <th style="width: 30%;">ADMISSION NO.</th>
+                                <td style="width: 20%;">${element.student.admissionNo}</td>
+                            </tr>
+                            <tr>
+                                <th>FATHER'S NAME</th>
+                                <td>${element.student.fatherName}</td>
+                                <th>ROLL NO.</th>
+                                <td>${element.student.rollNo}</td>
+                            </tr>
+                            <tr>
+                                <th>MOTHER'S NAME</th>
+                                <td>${element.student.motherName}</td>
+                                <th>CLASS & SECTION</th>
+                                <td>${element.student.className} - ${element.student.sectionName
+                }</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="section">
+                        <h3 style="text-align: center;">ACADEMIC PERFORMANCE</h3>
+                        <table>
+                            <tr>
+                                <th colspan="8">
+                                    <div style="text-align: center; justify-content: space-between; display: flex; ">
+                            <spam> SCHOLASTIC AREAS</spam>
+                            <spam style="margin-left: auto;">on 8-point(AI-E)Grading Scale</spam>
+                            </div>
+                                    </th>
+                                
+                            </tr>
+                            <tr>
+                                <th style="text-align: center; width: 16%;">SUBJECT</th>
+                                ${element?.markData?.markSheetTerms
+                    ?.map((term) => {
+                        const headerValue =
+                            parseInt(
+                                term?.headerName?.replace(/[()]/g, "")
+                            ) || 0;
+                        totalHeaderName += headerValue;
+                        return `<th style="text-align: center; width: 12%;"><h4>${term?.subHeaderName}</h4>${term?.headerName}</th>`;
+                    })
+                    .join("")}
+                                <th style="text-align: center;width: 12%;"><h4>TOTAL MARKS OBTAINED</h4>(${totalHeaderName})</th>
+                             
+                                <th style="text-align: center; width: 12%;">GRADE</th>
+                            </tr>
+                            ${scholasticResult.rows}
+                            
+                        </table>
+                    </div>
+                    <div class="section " style="margin-top: -21px ; border-top: none">
+   <table>
+                    <tr>
+                        <th colspan="4" style="border: none;" > 
+                            <div style="text-align: center; justify-content: space-between; display: flex; ">
+                            <spam> CO-SCHOLASTIC COMPETENCIES</spam>
+                            <spam style="margin-left: auto;">on a 5-point(A-E)Grading Scale</spam>
+                            </div>
+                        </th>
+                    </tr>
+                   
+                    <tr>
+                        <th>PARTICULAR</th>
+                        <th>GRADE</th>
+                        <th>PARTICULAR</th>
+                        <th>GRADE</th
+                    </tr>
+                    ${generateCoScholasticRows(element?.baseTermData?.subject)}
+                </table>
 </div>
 <div class="section">
-                        <table>
-                            ${config.studentInfoFields
-                    .map(
-                        (field) => `
-                                <tr>
-                                    <th style="width: 25%; text-align: left">${field.label
-                            }</th>
-                                    <td style="width: 25%;">${element?.student?.[field.key] || ""
-                            }</td>
-                                    ${field.additionalInfo
-                                ? `
-                                        <th style="width: 25%;text-align: left">${field.additionalInfo.label
-                                }</th>
-                                        <td style="width: 25%;">${element?.student?.[
-                                field.additionalInfo.key
-                                ] || ""
-                                }</td>
-                                    `
-                                : ""
-                            }
-                                </tr>
-                            `
-                    )
-                    .join("")}
-                        </table>
-                    </div>
-
-                    <div class="section">
-                        <h3 style="text-align: center; font-size: 14px;">ACADEMIC PERFORMANCE</h3>
-                        ${generateScholasticTable(
-                        element?.markData
-                            ?.subjectWiseMarkSheetReportResponses,
-                        termConfig
-                    )}
-                    </div>
-
-                    <div class="section">
-                        ${generateCoScholasticTable(
-                        element?.markData?.subjectWiseMarkSheetReportResponses
-                    )}
-                    </div>
-
-                    <div class="section">
-                        <table>
-                            <tr>
-                                <td><strong>ATTENDANCE:</strong> ${element?.student?.attendance || ""
+                    <table >
+                        <tr >
+                     
+                         <td style="white-space: nowrap;" >
+                            <div style="display: flex;justify-content:space-around;  text-align: center;">
+                                <strong>ATTENDANCE:</strong> ${element.student.attendance || ""
+                }<strong> DATE:</strong>${element.
+                    baseTermData?.remarksEntry?.createdDate || "__________"
+                }   <strong>PLACE:</strong> ${element.baseTermData?.school?.city || "______"}
+                                </div>
+                            </td >
+                        </tr >
+            <tr>
+                <td > <strong>REMARKS: </strong>${element.baseTermData?.remarksEntry?.description || " __________________________________________________________________________________"
                 }</td>
-                            </tr>
-                            <tr>
-                                <td><strong>REMARKS:</strong> ${element?.baseTermData?.remarksEntry
-                    ?.description || "___"
-                }</td>
-                            </tr>
-                        </table>
-                    </div>
+            </tr>
+                    </table >
 
+                    </div >
                     <div class="signatures">
-                        ${config.signatures
-                    .map(
-                        (sig) => `
-                            <div>
-                                <p>_____________</p>
-                                <p>${sig}</p>
-                            </div>
-                        `
-                    )
-                    .join("")}
+                        <div>
+                            <p>_____________</p>
+                            <p>CLASS TEACHER</p>
+                        </div>
+                        <div>
+                            <p>_____________</p>
+                            <p>HEADMISTRESS</p>
+                        </div>
+                        <div>
+                            <p>_____________</p>
+                            <p>PARENT/GUARDIAN</p>
+                        </div>
                     </div>
-
                     <div>
-                        ${element.footer
-                    ? element.footer
-                    : config.footnotes
-                        .map(
-                            (note) => `
-                            <p style="font-size: 12px;">${note}</p>
-                        `
-                        )
-                        .join("")
-                }
+                        <p style="border-bottom: 1px solid;"></p>
+                        <p>*S.E.A- Subject Enrichment Activity</p>
+                        <p>*M.A- Multiple Assessment</p>
                     </div>
-                </div>
-            </page>
-        `;
-
+                </div >
+                </page>
+            `;
             studentHtml.appendChild(singleStudentHtml);
         });
     };
 </script>
 
 <script>
+    window.SetTemplateData(
+        {
+            viewTemplate: true,
+        }
 
-
-
-
-
-
-
-
-
-
+    );
 </script>
 
-<script>
+
+<!-- <script>
     window.SetTemplateData([
         {
-            header: ``,
-            footer: ``,
+            header: `< div style = "display: flex; align-items: center; justify-content:center; margin: 0px; padding: 0px;" >
+        <img src="school_logo_url" alt="School Logo" class="logo">
+            <div>
+                <h1 style="margin: 0px;">DE INDIAN</h1>
+                <h2 style="margin: 0px;">PUBLIC SCHOOL</h2>
+                <p style="margin: 0px;">GIVE WINGS TO YOUR DREAMS</p>
+                <p style="margin: 0px;">A Senior Secondary School, Affiliated to CBSE</p>
+            </div>
+            <img src="school_logo_url" alt="School Logo" class="logo">
+            </div>`,
+            footer: `<p style="font-size: 0.8em; margin-top: 20px;">Note: This is a computer generated Report Card. It does not need any signature. In case of any typing error or discrepancy please contact the Class Teacher.</p>`,
             student: {
                 dob: "06-01-2016",
                 admissionNo: "20220146",
@@ -2019,7 +2107,7 @@ ${element.header
                     {
                         subjectUid: "ba147ef7-a9e6-48e0-8d80-e09e09230ec2",
                         subjectName: "ART & WORK EDUCATION",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2033,7 +2121,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "ba147ef7-a9e6-48e0-8d80-e09e09230ec2",
                                 subjectName: "ART & WORK EDUCATION",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2072,7 +2160,7 @@ ${element.header
                     {
                         subjectUid: "cb374bd7-c0c5-4cfb-b307-cc9e1c89749e",
                         subjectName: "MUSIC",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2086,7 +2174,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "cb374bd7-c0c5-4cfb-b307-cc9e1c89749e",
                                 subjectName: "MUSIC",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2125,7 +2213,7 @@ ${element.header
                     {
                         subjectUid: "00d080dc-e75d-40fb-939a-19192933e011",
                         subjectName: "DANCE",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2139,7 +2227,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "00d080dc-e75d-40fb-939a-19192933e011",
                                 subjectName: "DANCE",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2178,7 +2266,7 @@ ${element.header
                     {
                         subjectUid: "002c09c5-6f0d-48b6-afb0-a9c4c1348806",
                         subjectName: "BASKETBALL",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2192,7 +2280,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "002c09c5-6f0d-48b6-afb0-a9c4c1348806",
                                 subjectName: "BASKETBALL",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2231,7 +2319,7 @@ ${element.header
                     {
                         subjectUid: "affce34f-bde9-47a5-ae7d-b34ef66b263e",
                         subjectName: "SKATING",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2245,7 +2333,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "affce34f-bde9-47a5-ae7d-b34ef66b263e",
                                 subjectName: "SKATING",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2284,7 +2372,7 @@ ${element.header
                     {
                         subjectUid: "d0e3438d-0f07-4a04-8e9c-c5e3162d0027",
                         subjectName: "SWIMMING & YOGA",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2298,7 +2386,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d0e3438d-0f07-4a04-8e9c-c5e3162d0027",
                                 subjectName: "SWIMMING & YOGA",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2337,7 +2425,7 @@ ${element.header
                     {
                         subjectUid: "d14b068c-2e95-4d43-8135-b8645e4eeae8",
                         subjectName: "NUTRITIVE DEVELOPMENT",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2351,7 +2439,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d14b068c-2e95-4d43-8135-b8645e4eeae8",
                                 subjectName: "NUTRITIVE DEVELOPMENT",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2390,7 +2478,7 @@ ${element.header
                     {
                         subjectUid: "fa39debf-1696-4c49-9393-dc5f1e62e514",
                         subjectName: "COURTEOUSNESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2404,7 +2492,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "fa39debf-1696-4c49-9393-dc5f1e62e514",
                                 subjectName: "COURTEOUSNESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2443,7 +2531,7 @@ ${element.header
                     {
                         subjectUid: "900b7869-e0cb-4400-ba13-24aab0681eb2",
                         subjectName: "ATTENTIVENESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2457,7 +2545,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "900b7869-e0cb-4400-ba13-24aab0681eb2",
                                 subjectName: "ATTENTIVENESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 0,
                                 grade: "D",
@@ -2496,7 +2584,7 @@ ${element.header
                     {
                         subjectUid: "544c45c0-1559-4e87-8e03-0210918ae7dd",
                         subjectName: "PERSONAL CLEANLINESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2510,7 +2598,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "544c45c0-1559-4e87-8e03-0210918ae7dd",
                                 subjectName: "PERSONAL CLEANLINESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2549,7 +2637,7 @@ ${element.header
                     {
                         subjectUid: "f7d8cdf7-02ea-49b6-b550-f012428c2090",
                         subjectName: "CONFIDENCE AND INITIATIVE",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2563,7 +2651,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "f7d8cdf7-02ea-49b6-b550-f012428c2090",
                                 subjectName: "CONFIDENCE AND INITIATIVE",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2602,7 +2690,7 @@ ${element.header
                     {
                         subjectUid: "43621d59-abbe-4f2a-be20-2e5f34367345",
                         subjectName: "INTRAPERSONAL SKILLS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2616,7 +2704,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "43621d59-abbe-4f2a-be20-2e5f34367345",
                                 subjectName: "INTRAPERSONAL SKILLS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2655,7 +2743,7 @@ ${element.header
                     {
                         subjectUid: "13380468-c78d-4043-919b-738b35a859ad",
                         subjectName: "INTERPERSONAL SKILLS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2669,7 +2757,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "13380468-c78d-4043-919b-738b35a859ad",
                                 subjectName: "INTERPERSONAL SKILLS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2708,7 +2796,7 @@ ${element.header
                     {
                         subjectUid: "d88ddcf7-5f3d-4cd4-b561-6e30484d29a0",
                         subjectName: "SHARING AND CARING",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2722,7 +2810,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d88ddcf7-5f3d-4cd4-b561-6e30484d29a0",
                                 subjectName: "SHARING AND CARING",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 0,
                                 grade: "D",
@@ -2765,8 +2853,6 @@ ${element.header
                 overAllGrade: "B2",
                 visible: false,
             },
-
-
             remarks: {
                 uid: null,
                 terms: null,
@@ -4047,6 +4133,6 @@ ${element.header
             },
         },
     ]);
-</script>
+</script> -->
 
 </html>

@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>REPORT CARD</title>
+  </head>
+  <body>
+    <div id="mainDiv" style="margin: 25px">Pre School Marksheet</div>
+  </body>
+  <script>
+    window.SetTemplateData = function (content) {
+      const basicInfo = {
+        principle: "principle",
+        academicSession:
+          content?.[0]?.student?.studentInfoResponse?.[0]?.academicSession ||
+          "-",
+        inCharge: "charge",
+        date: "10-11-2024",
+        place: "Delhi",
+      };
+      const studentMarksData = (resultData) => {
+        let attachment = [];
+        let subjects = [];
+        let langSubjects = [];
+
+        function organizeSubjects(subjects) {
+          const subjectGroups = {};
+
+          subjects.forEach((subject) => {
+            organizeSubject(subjectGroups, subject, new Set());
+          });
+
+          return subjectGroups;
+        }
+
+        function organizeSubject(groups, subject, visited) {
+          const parents = subject.parent || [];
+          let currentGroup = groups;
+
+          parents.forEach((parent) => {
+            // if(currentGroup[parent]){}
+            currentGroup[parent] = currentGroup[parent] || {};
+            currentGroup = currentGroup[parent];
+          });
+
+          if (!visited.has(subject.subject) && subject.priority) {
+            visited.add(subject.subject);
+            currentGroup[subject.subjectName] = {
+              ...subject,
+            };
+
+            if (subject.parent && subject.parent.length > 0) {
+              // Recursive call for child subjects
+              organizeSubject(currentGroup, subject, visited);
+            }
+          }
+        }
+
+        const subject = organizeSubjects(
+          resultData?.termWiseSubjectResponse?.[0]?.subjectMarksEntryRequests?.map(
+            (v) => ({ ...v, parent: v.parent.toReversed() })
+          )
+        );
+        return subject;
+      };
+
+      const priorityFun = (studentMarks, allSubjects) => {
+        const parentSub = [];
+        const subChild = [];
+        const topMostSub = [];
+        studentMarks?.forEach((current) => {
+          if (!current.parent.length) {
+            topMostSub.push({
+              subject: current.subjectName,
+              priority: current.priority,
+              level: 0,
+            });
+          }
+          if (current.parent.length == 2) {
+            if (!subChild.find((v) => v.subject == current.parent[0])) {
+              subChild.push({
+                subject: current.parent[0],
+                priority: current.priority,
+                level: 2,
+              });
+            }
+          }
+          if (current.parent.length == 1) {
+            if (!subChild.find((v) => v.subject == current.subjectName)) {
+              subChild.push({
+                subject: current.subjectName,
+                priority: current.priority,
+                level: 2,
+              });
+            }
+          }
+          if (!parentSub?.find((v) => current.parent.includes(v.subject))) {
+            if (current.parent.length == 1) {
+              parentSub.push({
+                subject: current.parent[0],
+                priority: current.priority,
+                level: 1,
+              });
+            }
+            if (current.parent.length == 2) {
+              parentSub.push({
+                subject: current.parent[1],
+                priority: current.priority,
+                level: 1,
+              });
+            }
+          }
+        });
+
+        const sortedKeys = (key, secondKey, number) => {
+          if (!number) {
+            return topMostSub?.sort((a, b) => a.priority - b.priority);
+          }
+
+          if (number == 1) {
+            return subChild.filter((val) =>
+              Object.keys(allSubjects?.[key]).includes(val.subject)
+            );
+          }
+          if (number == 2) {
+            const subSubject = [];
+            Object.keys(allSubjects?.[key][secondKey]).forEach((v) => {
+              if (
+                !subSubject.find((val) => val.subject == v) &&
+                allSubjects?.[key][secondKey][v]?.priority
+              ) {
+                subSubject.push({
+                  subject: v,
+                  priority: allSubjects?.[key][secondKey][v]?.priority,
+                  level: 3,
+                });
+              }
+            });
+            return subSubject?.sort((a, b) => a - b);
+          }
+        };
+        const scholastic = (key) => {
+          return studentMarks?.find((v) => v.parent.includes(key))?.scholastic;
+        };
+
+        return { parentSub, subChild, sortedKeys, scholastic, topMostSub };
+      };
+
+      const convertData = (perStudent) => {
+        const res = perStudent?.map((data) => {
+          const address = `${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.houseNo
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.houseNo}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.street
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.street}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.landmark
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.landmark}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.area
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.area}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.district
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.district}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.city
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.city}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.state
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.state}, `
+              : ""
+          }${
+            data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.pincode
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.pincode}`
+              : ""
+          }`;
+          return {
+            academicSession: {
+              year: data?.markData?.academicSession || "",
+              reportName: data?.markData?.markSheetName || "",
+              class: data?.markData?.className || "",
+              classTeacher: "",
+            },
+            studentInfo: [
+              {
+                key: "STUDENT'S NAME",
+                value: data?.student?.studentName || "-",
+                key2: "ROLL NO.",
+                value2: data?.student?.rollNo || "-",
+              },
+              {
+                key: "Father's Name",
+                value: data?.student?.fatherName || "-",
+                key2: "Admission No.",
+                value2: data?.student?.admissionNo || "-",
+              },
+              {
+                key: "Mother's Name",
+                value: data?.student?.motherName || "-",
+                key2: "Class-Section",
+                value2: `${data?.student?.className || "-"}-${
+                  data?.student?.sectionName || "-"
+                }`,
+              },
+              {
+                key: "Date Of Birth",
+                value: data?.student?.dob || "-",
+                key2: "Attendance",
+                value2: data?.student?.attendance || "-",
+              },
+            ],
+            studentInfo2: [
+              {
+                key: "STUDENT'S NAME",
+                value: data?.student?.studentName || "-",
+              },
+              {
+                key: "ROLL NO.",
+                value: data?.student?.rollNo || "-",
+              },
+              {
+                key: "CLASS-SECTION",
+                value: `${data?.student?.className || ""}-${
+                  data?.student?.sectionName || ""
+                }`,
+              },
+            ],
+            scholasticGradingScale: [
+              { Grade: "A*", Parameters: "Advanced", Range: "90 % – 100%" },
+              { Grade: "A", Parameters: "Proficient", Range: "75% – 89%" },
+              { Grade: "B", Parameters: "Progressing", Range: "56% – 74%" },
+              { Grade: "C", Parameters: "Beginner", Range: "33% – 55%" },
+              {
+                Grade: "D",
+                Parameters: "Scope for improvement",
+                Range: "Below 33%",
+              },
+            ],
+            studentResult: studentMarksData(data?.markData),
+            remarks: data?.remarks ?? null,
+            generalRemarks: data?.remarks?.description ?? "-",
+            header: data?.header || "",
+            footer: data?.footer || "",
+            classTeacher: "Sudhir",
+            subjectsPriorityWise: priorityFun(
+              data?.markData?.termWiseSubjectResponse?.[0]
+                ?.subjectMarksEntryRequests,
+              studentMarksData(data?.markData)
+            ),
+          };
+        });
+        return res;
+      };
+
+      const data = convertData(content);
+      const mainDivElement = document.getElementById("mainDiv");
+      mainDivElement.innerHTML = "";
+      data?.forEach((element) => {
+        const divElement = document.createElement("div");
+        divElement.style.pageBreakAfter = "always";
+        divElement.innerHTML =
+          (element?.header || "") +
+          `<style type="text/css">
+                        @page {
+                        size: A4
+                        }
+                        * {
+                        	margin: 0px;
+                        	padding: 0px;
+                        	color: #000;
+                        }
+                        td {
+                        	padding-left: 1mm;
+                        	padding-right: 1mm;
+                        	padding-top: 0.8mm;
+                        	padding-bottom:0.8mm;
+                        	font-size: 9pt;
+                        	color: #000000;
+                        	font-family: Arial, Helvetica, sans-serif;
+                        }
+                        th {
+                        	padding-left: 1mm;
+                        	padding-right: 1mm;
+                        	padding-top:0.7mm;
+                        	padding-bottom: 0.7mm;
+                        	background: #e7e7e7;
+                        	font-family: Arial, Helvetica, sans-serif;
+                        }
+
+                        @media print {
+                        @page {
+                        margin:auto;
+                        size: A4
+                        }
+                        }
+                        </style>
+                      <page orientation="portrait" format="A4" margin="0">
+                      <table style="width:100%;" cellspacing="0" cellpadding="0">
+                    	<tr>
+                    		<td style="width:25%;">&nbsp;</td>
+                    		<td  style="width:50%; line-height: 140%; padding-top:4mm; padding-bottom:1mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center"><strong>Academic Session : ${
+                          basicInfo.academicSession
+                        }<br />Comprehensive Progress Card</strong></td>
+                    		<td style="width:25%;" valign="top" align="center">&nbsp;</td>
+                    	</tr>
+                    </table>
+                      <table cellspacing="0" style="width:100%;">
+    	<tr>
+    		<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:6mm;">&nbsp;</div></td>
+    	</tr>
+    </table>
+                        <table
+                           cellspacing="0"
+                           style="width: 100%; border: solid 0.264583333mm #000000"
+                           id=${element.studentInfo[1]?.value2}-studentInfo
+                           >
+                        </table>
+
+                        <!-- CYCLE -->
+                        <table cellspacing="0" style="width:100%;">
+                        <tr>
+                          <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:7mm;">&nbsp;</div></td>
+                        </tr>
+                      </table>
+
+                      <!-- Term -->
+                      <table style="width:100%;" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td style="width:25%;">&nbsp;</td>
+                          <td  style="width:50%; line-height: 120%; padding-top:2mm; padding-bottom:2mm; text-align:center; color:#333333; font-size:11pt;" valign="top" align="center"><strong>${
+                            content?.[0]?.markData?.termWiseSubjectResponse?.[0]
+                              ?.termName
+                          }</strong></td>
+                          <td style="width:25%;">&nbsp;</td>
+                        </tr>
+                      </table>
+
+                        <table cellspacing="0" style="width:100%; " id=${
+                          element.studentInfo[1]?.value2
+                        }-languageDevelopment>
+
+                        </table>
+
+                        <table cellspacing="0" style="width:100%;">
+                      			<tr>
+                      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><p style="page-break-after: always;">&nbsp;</p>	</td>
+                      			</tr>
+                      		</table>
+                          <table
+                           cellspacing="0"
+                           style="width: 100%; border: solid 0.264583333mm #000000"
+                           id=${element.studentInfo[1]?.value2}-studentInfo1
+                           >
+                        </table>
+                        <table cellspacing="0" style="width:100%;">
+                     		<tr>
+                     			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+                     		</tr>
+                     	</table>
+                        ${element?.subjectsPriorityWise?.topMostSub
+                          ?.map(
+                            (parent, i) => `
+                          <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                       		<tr>
+                       			<td align="left" style="width:90%; text-transform:uppercase; font-weight:bold;">${
+                              parent?.subject
+                            }</td>
+                       			<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold;">GRADE</td>
+                       		</tr>
+                       		<tr>
+                       			<td align="left" style="width:90%; border-top: solid 0.264583333mm #000000;">${
+                              element?.studentResult[parent.subject]
+                                ?.description || "-"
+                            }</td>
+                       			<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                              element?.studentResult[parent.subject]?.grade ||
+                              "-"
+                            }</td>
+                       		</tr>
+                       	</table>
+
+                       	<table cellspacing="0" style="width:100%;">
+                       		<tr>
+                       			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+                       		</tr>
+                       	</table>`
+                          )
+                          .join("")}
+
+                      		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                            ${element?.subjectsPriorityWise?.parentSub
+                              ?.map((parent, i) => {
+                                if (
+                                  i <
+                                  element?.subjectsPriorityWise.parentSub
+                                    .length -
+                                    1
+                                )
+                                  return;
+                                return `<tr>
+                                  		<td align="left" style="width:5%; text-transform:uppercase; font-weight:bold;">*</td>
+                                  		<td align="left" style="width:85%; text-transform:uppercase; font-weight:bold; border-left: solid 0.264583333mm #000000;">${
+                                        parent.subject
+                                      }</td>
+                                  		<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold;">GRADE</td>
+                                  	</tr>
+                                      ${element?.subjectsPriorityWise
+                                        .sortedKeys(parent.subject, "", 1)
+                                        .map(
+                                          (subChild, index) => `<tr>
+                                                        	<td align="left" style="width:5%; border-top: solid 0.264583333mm #000000; background:${
+                                                            !(index % 2)
+                                                              ? "#e7e7e7"
+                                                              : ""
+                                                          } ;">${
+                                            index + 1
+                                          }.</td>
+                                                        	<td align="left" style="width:85%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; background:${
+                                                            !(index % 2)
+                                                              ? "#e7e7e7"
+                                                              : ""
+                                                          };">${
+                                            element?.studentResult[
+                                              parent.subject
+                                            ][subChild.subject].subjectName
+                                          }
+                                          </td>
+                                          	<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; background:${
+                                              !(index % 2) ? "#e7e7e7" : ""
+                                            };">${
+                                            element?.studentResult[
+                                              parent.subject
+                                            ][subChild.subject].grade
+                                          }</td>
+                                       </tr>`
+                                        )
+                                        .join("")}`;
+                              })
+                              .join("")}
+                            </table>
+
+                            <table cellspacing="0" style="width:100%;">
+                              <tr>
+                                <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+                              </tr>
+                            </table>
+
+                              <!-- Remarks -->
+                           	<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                           		<tr>
+                           			<td align="left" style="width:100%; height:15mm;" valign="top">
+                           			<table cellspacing="0" cellpadding="0" style="width:100%;">
+                           				<tr>
+                           					<td align="left" valign="top" style="width:20%; margin:0; padding:0; font-weight:bold;">GENERAL REMARKS: </td>
+                           					<td align="left" valign="top" style="width:80%; margin:0; padding:0">${
+                                      element?.generalRemarks
+                                    }</td>
+                           				</tr>
+                           			</table>
+                           			</td>
+                           		</tr>
+                           	</table>
+                           	<!--// Remarks -->
+
+                           	<table cellspacing="0" style="width:100%;">
+                           		<tr>
+                           			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+                           		</tr>
+                           	</table>
+
+                           	<!-- CONGRATULATIONS -->
+                           	<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                           		<tr>
+                           			<td align="left" style="width:100%; height:15mm;" valign="top">
+                           			<table cellspacing="0" cellpadding="0" style="width:100%;">
+                           				<tr>
+                           					<td colspan="2" align="left" valign="top" style="width:100%; margin:0; padding:0; font-weight:bold;">CONGRATULATIONS !</td>
+                           				</tr>
+                           				<tr>
+                           					<td colspan="2" align="left" valign="top" style="width:100%; margin:0; padding:0;">&nbsp;</td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" valign="top" style="width:25%; margin:0; padding:0; font-weight:bold;">NEW SESSION BEGINS ON: </td>
+                           					<td align="left" valign="top" style="width:75%; margin:0; padding:0">
+                                      ${
+                                        element?.remarks?.fields?.find(
+                                          (v) => v?.title == "Session Date"
+                                        )?.value ?? "-"
+                                      }</td>
+                           				</tr>
+                           			</table>
+                           			</td>
+                           		</tr>
+                           	</table>
+                           	<!--// CONGRATULATIONS -->
+
+                           	<table cellspacing="0" style="width:100%;">
+                           		<tr>
+                           			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+                           		</tr>
+                           	</table>
+
+                           	<!-- Official Details -->
+                           	<table cellspacing="0" style="width:100%;">
+                           		<col style="width: 40%"/>
+                              		<col style="width: 20%"/>
+                              		<col style="width: 40%"/>
+                           		<tr>
+                           			<td align="left" valign="top" style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                           			<table width="100%" border="0" cellspacing="0" >
+                           				<tr>
+                           					<td style="width:34%; padding-left:0mm; padding-right:0mm;">Class Teacher</td>
+                           					<td style="width:66%; padding-left:0mm; padding-right:0mm;">: ${
+                                      element?.classTeacher
+                                    }</td>
+                           				</tr>
+                           				<tr>
+                           					<td style="width:34%; padding-left:0mm; padding-right:0mm;">Incharge</td>
+                           					<td style="width:66%; padding-left:0mm; padding-right:0mm;">: ${
+                                      basicInfo.inCharge
+                                    }</td>
+                           				</tr>
+                           				<tr>
+                           					<td style="width:34%; padding-left:0mm; padding-right:0mm;">Principal</td>
+                           					<td style="width:66%; padding-left:0mm; padding-right:0mm;">: ${
+                                      basicInfo.principle
+                                    }</td>
+                           				</tr>
+                           				<tr>
+                           					<td style="width:34%; padding-left:0mm; padding-right:0mm;">Date</td>
+                           					<td style="width:66%; padding-left:0mm; padding-right:0mm;">: ${
+                                      basicInfo.date
+                                    }</td>
+                           				</tr>
+                           				<tr>
+                           					<td style="width:34%; padding-left:0mm; padding-right:0mm;">Place</td>
+                           					<td style="width:66%; padding-left:0mm; padding-right:0mm;">: ${
+                                      basicInfo.place
+                                    }</td>
+                           				</tr>
+                           			</table>
+
+                           			</td>
+                           			<td align="left" valign="top" style="width:20%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+                           			<td align="left" valign="top" style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                           			<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                           				<tr>
+                           					<td colspan="2" align="center" style="width:100%;"><strong>EVALUATION KEY</strong></td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">A+</td>
+                           					<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">EXCELLENT</td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">A</td>
+                           					<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">VERY GOOD</td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">B</td>
+                           					<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">GOOD</td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">C</td>
+                           					<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">AVERAGE</td>
+                           				</tr>
+                           				<tr>
+                           					<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">NA</td>
+                           					<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">NEEDS ATTENTION</td>
+                           				</tr>
+                           			</table>
+                           			</td>
+                           		</tr>
+                           	</table>
+                           	<!--//  Official Details -->
+
+                           	<table cellspacing="0" style="width:100%;">
+                           		<tr>
+                           			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+                           		</tr>
+                           	</table>
+
+                        <table cellspacing="0" style="width: 100%" id=${
+                          element.studentInfo[1]?.value2
+                        }-footer>
+                        </table>
+
+                        </page>`;
+        mainDivElement.appendChild(divElement);
+
+        for (let index = 0; index < 2; index++) {
+          const studentInfoElement = document.getElementById(
+            `${element.studentInfo[1]?.value2}-studentInfo${index ? index : ""}`
+          );
+          studentInfoElement.innerHTML = `
+                    ${element?.studentInfo
+                      .map((element, index) => {
+                        return `<tr>
+
+    		<td style="width:50%; border-bottom:${
+          index == 3 ? "" : "solid 0.264583333mm #000000"
+        }; ">
+    			<table width="100%" border="0" cellspacing="0" >
+    				<tr>
+    					<td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${
+                element?.key
+              }</strong></td>
+    					<td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                element?.value
+              }</td>
+    				</tr>
+    			</table>
+    		</td>
+    		<td style="width:50%; border-bottom: ${
+          index == 3 ? "" : "solid 0.264583333mm #000000"
+        }; border-left: solid 0.264583333mm #000000;">
+    			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    				<tr>
+    					<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${
+                element?.key2
+              }</strong></td>
+    					<td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                element?.value2
+              }</td>
+    				</tr>
+    			</table>
+    		</td>
+    	</tr>`;
+                      })
+                      .join("")}`;
+        }
+
+        const studentInfoElement = document.getElementById(
+          `${element.studentInfo[1]?.value2}-studentInfo`
+        );
+        studentInfoElement.innerHTML = `
+                    ${element?.studentInfo
+                      .map((element, index) => {
+                        return `<tr>
+
+    		<td style="width:50%; border-bottom:${
+          index == 3 ? "" : "solid 0.264583333mm #000000"
+        }; ">
+    			<table width="100%" border="0" cellspacing="0" >
+    				<tr>
+    					<td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${
+                element?.key
+              }</strong></td>
+    					<td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                element?.value
+              }</td>
+    				</tr>
+    			</table>
+    		</td>
+    		<td style="width:50%; border-bottom: ${
+          index == 3 ? "" : "solid 0.264583333mm #000000"
+        }; border-left: solid 0.264583333mm #000000;">
+    			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    				<tr>
+    					<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${
+                element?.key2
+              }</strong></td>
+    					<td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                element?.value2
+              }</td>
+    				</tr>
+    			</table>
+    		</td>
+    	</tr>`;
+                      })
+                      .join("")}`;
+
+        const footer = document.getElementById(
+          `${element.studentInfo[1]?.value2}-footer`
+        );
+
+        footer.innerHTML = element.footer || "";
+
+        const subjectReplace = {
+          ENGLISH: "LANGUAGE SKILLS IN ENGLISH",
+          HINDI: "LANGUAGE SKILLS IN HINDI",
+          SKILLS: "NUMBER SKILLS",
+        };
+        const languageDevelopmentElement = document.getElementById(
+          `${element.studentInfo[1]?.value2}-languageDevelopment`
+        );
+
+        languageDevelopmentElement.innerHTML = `
+          <tr>
+    		<td colspan="2" align="center" style="width:100%; border: solid 0.264583333mm #000000; text-transform:uppercase; font-size:11pt;"><strong>Achievement Record</strong></td>
+    	</tr>
+        ${element?.subjectsPriorityWise?.parentSub
+          ?.map((parent, i) => {
+            if (i > 2) return;
+            return `
+            <tr>
+    		<td align="left" style="width:90%;border-left:solid 0.264583333mm #000000; border-top:${
+          i == 0 ? "" : "solid 0.264583333mm #000000"
+        } ; text-transform:uppercase; font-weight:bold;">${
+              subjectReplace[parent?.subject]
+            }</td>
+    		<td align="center" style="width:10%;border-right:solid 0.264583333mm #000000; border-top: ${
+          i == 0 ? "" : "solid 0.264583333mm #000000"
+        }; border-left: solid 0.264583333mm #000000; font-weight:bold;">GRADE</td>
+    	</tr>
+
+          ${element?.subjectsPriorityWise
+            .sortedKeys(parent.subject, "", 1)
+            ?.map((subChild) => {
+              return `
+            <tr>
+    		<td colspan="2" align="left" style="width:100%; border-left:solid 0.264583333mm #000000;border-right:solid 0.264583333mm #000000;border-top: solid 0.264583333mm #000000; text-transform:uppercase; background:#e7e7e7;">${
+          subChild?.subject
+        }</td>
+    	</tr>
+        ${
+          element?.studentResult[parent.subject][subChild.subject]?.grade
+            ? `<tr>
+    		<td align="left" style="width:90%; border-top: solid 0.264583333mm #000000;border-left:solid 0.264583333mm #000000;">${
+          element?.studentResult[parent.subject][subChild.subject]
+            .description || "-"
+        }</td>
+    		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000;border-right:solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          element?.studentResult[parent.subject][subChild.subject].grade
+        }</td>
+    	</tr>`
+            : element?.subjectsPriorityWise
+                .sortedKeys(parent.subject, subChild.subject, 2)
+                .map((child) => {
+                  return `<tr>
+    		<td align="left" style="width:90%; border-top: solid 0.264583333mm #000000;border-left:solid 0.264583333mm #000000;">${
+          child?.subject
+        }</td>
+    		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000;border-right:solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          element?.studentResult[parent.subject][subChild.subject][
+            child.subject
+          ].grade
+        }</td>
+    	</tr>`;
+                })
+                .join("")
+        }
+        `;
+            })
+            .join("")}
+            <tr>
+    		<td colspan="2" align="left" style="width:100%;border-top:solid 0.264583333mm #000000;padding-top:30px"></td>
+
+    	</tr>
+
+
+        `;
+          })
+          .join("")}
+
+          `;
+      });
+    };
+
+    window.SetTemplateData([
+      {
+        student: {
+          dob: "11-02-2019",
+          admissionNo: "7378",
+          studentName: "Eklavya Jadwani",
+          className: "PRE SCHOOL",
+          sectionName: "A",
+          rollNo: 1,
+          fatherName: "Mohit Jadwani",
+          motherName: "Sonal Jadwani",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 173828,
+              userUid: "50daa25a-76e1-4d08-a583-fa2598dcc67e",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "a5270f7a-27da-47ae-b993-ec7f9e40ba90",
+              studentId: "7378",
+              studentName: "Eklavya Jadwani",
+              fatherName: "Mohit Jadwani",
+              motherName: "Sonal Jadwani",
+              dob: "11-02-2019",
+              gender: "Male",
+              studentAdhaarcard: "665567651279",
+              joiningClass: "PRE SCHOOL",
+              joiningSections: "A",
+              joiningDate: "04-01-2023",
+              plotNumber: "",
+              area: "Shalimar Bagh",
+              city: "Delhi",
+              state: "Delhi",
+              pincode: "110088",
+              phone1: null,
+              rollNo: 1,
+              emergencyNumber: "",
+              mobileNumber: "9910201369",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "No",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "O+",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "Abce",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "111111",
+              fatherPhone: null,
+              fatherMobile: "9910201369",
+              fatherEmail: null,
+              fatherAdhaarNumber: "556473647875",
+              schoolUid: "ec75582e-5242-4251-b822-aeff70640797",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "Abce",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "111111",
+              motherPhone: null,
+              motherMobile: "9910201369",
+              motherEmail: null,
+              motherAdhaarNumber: "657483551325",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: "L1PNK2",
+              schoolName: "Demo Public School",
+              remark: null,
+              classes: "PRE SCHOOL",
+              classUid: null,
+              sections: "A",
+              group: null,
+              wing: "Senior",
+              status: "Studying",
+              academicSession: "2023-2024",
+              joiningStatus: "New",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "indian1234",
+              editedUser: "indian1234",
+              createddate: "2023-09-13 12:22:53.630549",
+              editeddate: "2023-09-13 12:22:53.630549",
+              studentAddressResponse: {
+                uid: "a9718e32-236a-4c98-9124-cffe0f632433",
+                houseNo: null,
+                area: "Shalimar Bagh",
+                landmark: null,
+                city: "Delhi",
+                district: null,
+                state: "Delhi",
+                poPs: null,
+                pincode: 110088,
+                street: "Cb-8c",
+                userName: "DIPST279_7378",
+                createdDate: "13-09-2023 05:52 PM",
+                editedDate: "13-09-2023 05:52 PM",
+                createdBy: "indian1234",
+                editedBy: "indian1234",
+              },
+              fatherAddressResponse: {
+                uid: "20ae31b3-e520-484b-97fc-1459ab77fdb4",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 111111,
+                street: null,
+                userName: "DIPST279_F7378",
+                createdDate: "13-09-2023 05:52 PM",
+                editedDate: "13-09-2023 05:52 PM",
+                createdBy: "indian1234",
+                editedBy: "indian1234",
+              },
+              motherAddressResponse: {
+                uid: "18942f19-b7e9-486a-a3f8-b2accf956ca2",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 111111,
+                street: null,
+                userName: "DIPST279_M7378",
+                createdDate: "13-09-2023 05:52 PM",
+                editedDate: "13-09-2023 05:52 PM",
+                createdBy: "indian1234",
+                editedBy: "indian1234",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+        },
+        markData: {
+          admissionNo: "15607",
+          studentName: "Avni Gupta",
+          className: "LKG",
+          sectionName: "A",
+          classSectionUid: "02cc86c8-335f-4a9d-9f1c-ee583898cb14",
+          academicSession: "2023-24",
+          fatherName: "Mr. Saurabh Goel",
+          uid: "f095e1dd-a775-421b-a460-0624504b4334",
+          attendanceResponse: null,
+          pass: false,
+          rollNo: 5,
+          termWiseSubjectResponse: [
+            {
+              totalMarks: 900.0,
+              totalObtained: 773.91,
+              overAllGrade: "A",
+              totalPercentage: 85.99,
+              termName: "TERM-I",
+              termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+              pass: true,
+              subjectMarksEntryRequests: [
+                {
+                  marks: 100.0,
+                  description: "",
+                  status: "",
+                  subject: "b963eddb-8239-4dc4-8825-43d69bd1d8be",
+                  subjectName: "Recites rhymes with actions and expressions",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 1,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["RECITATION", "ENGLISH"],
+                  grade: "A+",
+                  percentage: 100.0,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "f8cf6c30-5835-4f93-a42d-c45dcfd2a483",
+                  subjectName: "Reads with fluency and accuracy",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 2,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["RECOGNITION AND READING", "ENGLISH"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "e1e136f9-1f55-45d2-a7ae-db60f692736f",
+                  subjectName: "Participates in classroom conversation",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 3,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["CONVERSATION", "ENGLISH"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 70.99,
+                  description:
+                    "Can write the letters done in the class but needs guidance while doing exercises like look and write and circle the correct letter.",
+                  status: "",
+                  subject: "b58139f4-9ff7-469d-a35e-5e34b19e88c5",
+                  subjectName: "WRITTEN",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 4,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["ENGLISH"],
+                  grade: "B",
+                  percentage: 70.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 100.0,
+                  description: "",
+                  status: "",
+                  subject: "1331888e-82da-4959-8c13-48fdde11f1db",
+                  subjectName: "Recites rhymes with actions and expressions",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 5,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["RECITATION", "HINDI"],
+                  grade: "A+",
+                  percentage: 100.0,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "16983fcd-243c-4940-b0ce-96de9a9658fb",
+                  subjectName: "Displays confidence while reading",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 6,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["RECOGNITION AND READING", "HINDI"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "fa33eccb-07f3-4548-9ae8-9b0c27e8e6c5",
+                  subjectName:
+                    "Understands and identifies shapes and pre-numbers",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 7,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["ORALS", "SKILLS"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "d6b4c43e-cf9d-475e-a51b-0cb8b7f8fced",
+                  subjectName: "Demonstrates number-object relationship",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 8,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["ORALS", "SKILLS"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 70.99,
+                  description: "",
+                  status: "",
+                  subject: "747180e0-130e-417a-a892-c7df5e854032",
+                  subjectName: "Recognition of numbers 1-10 1-20",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 10,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["ORALS", "SKILLS"],
+                  grade: "B",
+                  percentage: 70.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 100.0,
+                  description: "",
+                  status: "",
+                  subject: "933831d3-1cf0-4456-a032-67cc9da02461",
+                  subjectName: "WRITTEN",
+                  scholastic: false,
+                  max: 100.0,
+                  priority: 11,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["SKILLS"],
+                  grade: "A+",
+                  percentage: 100.0,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "2ab16874-06a2-4f06-b32c-c996dd1130f9",
+                  subjectName: "GENERAL AWARENESS",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 12,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: [],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "146f38d6-c4a4-4277-badb-40cd54b45462",
+                  subjectName: "CREATIVE ART",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 13,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "ART",
+                  parent: [],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "7d22e9c4-d1cc-4cf9-bfe2-fd298359f131",
+                  subjectName: "Personal hygiene",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 14,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "2eb015ec-49fd-4a23-a948-e9572e555b4b",
+                  subjectName: "Expression of needs",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 15,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "08a1cd41-f441-4820-9deb-aefc0075b197",
+                  subjectName: "Plays and works well in peer group",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 16,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "3bc0af43-b35b-452c-a3e7-7acbb75817ba",
+                  subjectName: "Completes work in time",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 17,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "735432ac-05d5-4358-9ce8-d61c1e88afb5",
+                  subjectName: "Displays confidence",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 18,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "62a512c6-8123-48ae-aabb-04964aa308ef",
+                  subjectName: "Enjoys outdoor activities",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 19,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+                {
+                  marks: 85.99,
+                  description: "",
+                  status: "",
+                  subject: "aefc4d54-4109-497a-b8dc-0e41152f4e3b",
+                  subjectName:
+                    "Inclination towards dance and musical activities",
+                  scholastic: true,
+                  max: 100.0,
+                  priority: 20,
+                  min: 0.0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: ["PA"],
+                  grade: "A",
+                  percentage: 85.99,
+                  term: "TERM-I",
+                  termUid: "a564a319-f2da-4b9e-bb66-af997a08bf8c",
+                  pass: true,
+                  graded: true,
+                },
+              ],
+            },
+          ],
+        },
+        remarks: {
+          uid: "69431c26-f12d-4927-b4d2-b076a36e30ce",
+          terms: ["TERM-I"],
+          studentId: "15516",
+          studentName: "Niya Massey",
+          rollNumber: 20,
+          classSectionUid: "02cc86c8-335f-4a9d-9f1c-ee583898cb14",
+          classSection: "LKG-A",
+          description: "GENERAL REMARKS",
+          fields: [
+            {
+              uid: "87abd191-f913-421e-8606-1619006ae3ce",
+              title: "Session Date",
+              type: "ALPHA_NUMERIC",
+              value: "1st Of April 2024",
+              masterUid: "d6bdde3b-5399-4edb-88c3-f4bbb1bfa6ec",
+              masterName: "NEW SESSION BEGINS ON",
+            },
+            {
+              uid: "0b5777e4-291c-4bcf-a503-d5a4560f5343",
+              title: "TEACHER REMARK",
+              type: "ALPHABETS_WITH_SPECIAL",
+              value: "HI HELLO",
+              masterUid: "59de457f-192d-43ae-96b4-23d323467b74",
+              masterName: "REMARKS",
+            },
+            {
+              uid: "34cc79e5-9cc1-4e98-a0a9-ff6309e6b95a",
+              title: "TOTAL ATTENDANCE",
+              type: "NUMERIC",
+              value: "",
+              masterUid: "46a05041-392f-4825-aa64-bd5b6dd4ca05",
+              masterName: "ATTENDANCE",
+            },
+          ],
+          status: true,
+          createdUser: "PremSir_453226",
+          editedUser: "PremSir_453226",
+          createdDate: "31-01-2024 11:14 AM",
+          editedDate: "31-01-2024 11:14 AM",
+        },
+        header: `<div>
+                <table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      			<td align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/cbse-logo.png" /></td>
+      			<td style="width:70%; line-height: 140%; padding-top:6mm; padding-bottom:2mm; text-align:center; font-size:11pt;" valign="top" align="center">
+      			<span style="color:#53395c; font-size:16pt; font-weight:bold;">SACHDEVA PUBLIC SCHOOL</span><br/>
+      			<span style="color:#53395c; font-size:11pt; padding-top:5mm;">Maurya Enclave, Pitampura<br />
+      			Delhi - 110088</span>
+      			</td>
+      			<td style="width:15%;" valign="top" align="right"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/school-logo.png" /></td>
+      			</tr>
+      		</table>
+
+         </div>`,
+        footer:
+          '<page_footer>\n <table cellspacing="0" cellpadding="0" style="\n        padding-left: 0mm;\n        padding-right: 0mm;\n        padding-top: 2mm;\n        padding-bottom: 0mm;\n      ">\n  <tbody>\n   <tr>\n    <td width="100%" align="left" valign="top" style="\n            width: 100%;\n            padding-left: 0mm;\n            padding-right: 0mm;\n            padding-top: 0mm;\n            padding-bottom: 0mm;\n          "><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table> \n</page_footer>',
+      },
+    ]);
+  </script>
+</html>

@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result Template</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const printDate = "22-03-2024";
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+        };
+
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            console.log(data);
+
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+
+              remarks: data?.remarks || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+          const mainResult = v?.studentResponse ?? [];
+          const studentDetails = v.studentInfo;
+          const studentRemarks = v?.remarks;
+          console.log(mainResult, "aaaaa");
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `<page orientation="portrait" format="A4" margin="0">
+                  <style type="text/css">
+                    @page {
+                      size: A4;
+                    }
+
+                    * {
+                      margin: 0px;
+                      padding: 0px;
+                      color: #000;
+                    }
+
+                    td {
+                      padding-left: 1mm;
+                      padding-right: 1mm;
+                      padding-top: 2mm;
+                      padding-bottom: 2mm;
+                      font-size: 9pt;
+                      color: #000000;
+                      font-family: Arial, Helvetica, sans-serif;
+                    }
+
+                    th {
+                      padding-left: 1mm;
+                      padding-right: 1mm;
+                      padding-top: 2mm;
+                      padding-bottom: 2mm;
+                      background: #e7e7e7;
+                      font-family: Arial, Helvetica, sans-serif;
+                    }
+
+                    .signImg {
+                      width: 150px;
+                      height: auto;
+                    }
+
+                    @media print {
+                      @page {
+                        margin: 5mm;
+                        size: A4;
+                      }
+
+                      .signImg {
+                        width: 150px;
+                        height: auto;
+                      }
+                    }
+                  </style>
+
+                  
+                  <!-- logo and Name section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-03-21T10_33_45_770834218.jpeg" /></td>
+				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+					<span style="color:#fe0000; font-size:24pt; text-transform:uppercase; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">Sardar Patel Public School</span>
+					<br/><span style="color: #000000; text-transform:uppercase; font-weight:bold; font-size:10pt; line-height: 140%;">A-25, Dayal Bagh, Eros Garden, Near Sutajkund, Faridabad-121009</span>
+					<br/><span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">
+					Phone No. : 9911991213<br>
+					Email : spps.edu@gmail.com<br>
+					Website : sardarpatelpublicschool.com
+					</span>
+					
+					</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<col style="width: 10%"/>
+				<col style="width: 80%"/>
+				<col style="width: 10%"/>
+				<tr>
+					<td style="width:10%;">&nbsp;</td>
+					<td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt;">Academic Session : 2023-24</td>
+					<td style="width:10%;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>	
+		<!--// logo and Name section -->
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+                  <table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0">
+                            <tr>
+                                <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails?.studentName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails?.admissionNo
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.fatherName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS/SECTION</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.className
+                                }-${studentDetails.sectionName}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.motherName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.rollNo
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.dob
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  (studentRemarks?.fields?.find(
+                                    (val) => val?.title == "Present Days"
+                                  )?.value || 0) +
+                                  "/" +
+                                  (studentRemarks?.fields?.find(
+                                    (val) => val?.title == "Working days"
+                                  )?.value || 0)
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    </table>
+                             
+                              <table cellspacing="0" style="width:100%;">
+                  	<tr>
+                  		<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+                  	</tr>
+                  </table>
+                
+                  <!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="center" style="width:100%; padding-left:0mm; padding-right:0mm; padding-bottom:2mm; text-align:center; font-size:11pt; font-weight:bold; color:#000000;">Marksheet</td>
+			</tr>
+		</table>
+		<!--// Term -->
+                
+                    <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                  	<tr style="background-color:#e7e7e7;">
+                  		<td rowspan="2" align="center" style="width:20%; font-weight:bold; font-size:10pt; line-height: 140%;">SUBJECT<br>PAPERS</td>
+                  		<td colspan="3" align="center" style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">${
+                        v?.studentResponse?.markSheetName
+                      }</td>
+                    
+                  		<td rowspan="2" align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Total<br>100</td>
+                  		<td rowspan="2" align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Per.<br>%</td>
+                  		<td rowspan="2" align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Grade</td>
+                  	</tr>
+                  	<tr style="background-color:#e7e7e7;">
+                      ${mainResult?.markSheetTerms
+                        ?.map(
+                          (
+                            val,
+                            index,
+                            arr
+                          ) => `<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000; border-right:${
+                            index == arr.length - 1
+                              ? "solid 0.00000003mm #000000"
+                              : ""
+                          }; ">
+                  		<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-weight:bold;">${
+                        val.headerName
+                      }</div>
+                      			<div style=" width:100%; text-align:center; font-size:8pt; font-weight:bold;">${
+                              val.subHeaderName
+                            }</div>
+                          
+                  		</td>`
+                        )
+                        .join("")}
+                    
+                  	</tr>
+                    ${mainResult?.subjectWiseMarkSheetReportResponses
+                      ?.map(
+                        (val) => `<tr>
+                  		<td align="center" style="width:20%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+                        val.subjectName
+                      }</td>
+                    
+                      ${val.markSheetReport
+                        ?.map(
+                          (ele) => `
+                        <td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                          attendanceValue[ele.status] || ele.obtained
+                        }</td>`
+                        )
+                        .join("")}
+                      
+                  		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                        val.marksObtained
+                      }</td>
+                  		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.percentage?.toFixed(
+                        2
+                      )}</td>
+                  		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                        val.grade
+                      }</td>
+                  	</tr>`
+                      )
+                      .join("")}
+                  
+                  
+                  </table>
+                
+                  <!-- // Main Subject Table -->
+                
+	            	<table cellspacing="0" style="width:100%;">
+	            		<tr>
+	            			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+	            		</tr>
+	            	</table>
+              
+                <!-- Result -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">	
+				<tr>
+					<td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+					
+					<td style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Marks Obtained:</td>
+					<td style="width:9%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            mainResult.marksObtained
+          } / ${mainResult.total}</td>
+					
+					<td style="width:6%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Grade:</td>
+					<td style="width:9%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            mainResult.overAllGrade
+          }</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Result -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+
+                <!-- teacher remarks -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:10%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Remarks:</td>
+					<td align="left" style="width:90%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            studentRemarks?.description || ""
+          }</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// teacher remarks -->
+              
+               
+                
+            <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+
+    <!-- bottom grades -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+					<!-- start grades table -->
+					<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+						<tr style="background:#e7e7e7;">
+							<td align="center" style="width:33; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Grades</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Range</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; font-size:7pt;"><strong>Remarks</strong></td>
+						</tr>
+
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A+</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>90%-100%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Outstanding</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>80%-89%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Excellent</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>B+</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>70%-79%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>B</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>60%-69%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Satisfactory</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>C</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>50%-59%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Acceptable</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>D</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>40%-49%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Needs improvement</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>E</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>Below 40%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Unsatisfactory</strong></td>
+						</tr>
+						
+						</table>	
+						<!--// end grades table -->
+						</td>
+						<td align="left" style="width:3%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:3mm; padding-bottom:0mm;">
+							<h2 style="font-size:12pt; font-family: 'Courier New', monospace; font-style: italic;">Wishing you all the best for your bright future.</h2></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// bottom grades -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Sign. section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+					<tr>
+						<td align="right" colspan="3" style="width:100%; padding-bottom:5mm;"><strong>Date</strong> : ${printDate}</td>
+					</tr>
+					<tr>
+						<td valign="top" align="center" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Class Teacher</strong></td>
+						<td valign="top" align="center" style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Parent's Sign</strong></td>
+						<td valign="top" align="center" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Principal</strong></td>
+					</tr>
+					
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Sign. section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+			
+		<!-- copyright -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&#169; Sardar Patel Public School</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// copyright -->
+
+               
+                </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2023-2024",
+            admissionNo: "364",
+            studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+            studentName: "Deepika Patel",
+            rollNo: 0,
+            fatherName: "Santosh Kumar",
+            className: "NINETH",
+            sectionName: "B",
+            terms: "SA 2",
+            markSheetName: "TERM 2",
+            markSheetTerms: [
+              {
+                id: 277,
+                headerName: "FA 3",
+                subHeaderName: "(10)",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 10.0,
+                terms: ["FA 3"],
+              },
+              {
+                id: 278,
+                headerName: "FA 4",
+                subHeaderName: "(10)",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 10.0,
+                terms: ["FA 4"],
+              },
+              {
+                id: 279,
+                headerName: "SA 2",
+                subHeaderName: "(80)",
+                priority: 3,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 80.0,
+                terms: ["SA 2"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "77fe8fdd-7138-4099-b7e1-7ca88c80c581",
+                subjectName: "English",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "77fe8fdd-7138-4099-b7e1-7ca88c80c581",
+                    subjectName: "English",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 6.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 277,
+                      headerName: "FA 3",
+                      subHeaderName: "(10)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "77fe8fdd-7138-4099-b7e1-7ca88c80c581",
+                    subjectName: "English",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 6.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 278,
+                      headerName: "FA 4",
+                      subHeaderName: "(10)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 4"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "77fe8fdd-7138-4099-b7e1-7ca88c80c581",
+                    subjectName: "English",
+                    subjectNature: "Theory",
+                    max: 80.0,
+                    obtained: 44.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 279,
+                      headerName: "SA 2",
+                      subHeaderName: "(80)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["SA 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 56.0,
+                total: 100.0,
+                percentage: 56.0,
+                grade: "C",
+                className: "NINETH",
+                sectionName: "B",
+                terms: "SA 2",
+                markSheetName: "TERM 2",
+                subjectPrt: 1,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "ebc39676-ff4d-4e96-8cf4-9ef35bed6d66",
+                subjectName: "Hindi",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "ebc39676-ff4d-4e96-8cf4-9ef35bed6d66",
+                    subjectName: "Hindi",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 5.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 277,
+                      headerName: "FA 3",
+                      subHeaderName: "(10)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "ebc39676-ff4d-4e96-8cf4-9ef35bed6d66",
+                    subjectName: "Hindi",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 6.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 278,
+                      headerName: "FA 4",
+                      subHeaderName: "(10)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 4"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "ebc39676-ff4d-4e96-8cf4-9ef35bed6d66",
+                    subjectName: "Hindi",
+                    subjectNature: "Theory",
+                    max: 80.0,
+                    obtained: 55.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 279,
+                      headerName: "SA 2",
+                      subHeaderName: "(80)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["SA 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 66.0,
+                total: 100.0,
+                percentage: 66.0,
+                grade: "B",
+                className: "NINETH",
+                sectionName: "B",
+                terms: "SA 2",
+                markSheetName: "TERM 2",
+                subjectPrt: 2,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "f27ea27a-e00c-4e86-9314-89b428a00189",
+                subjectName: "Mathematics",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "f27ea27a-e00c-4e86-9314-89b428a00189",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 5.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 277,
+                      headerName: "FA 3",
+                      subHeaderName: "(10)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "f27ea27a-e00c-4e86-9314-89b428a00189",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 5.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 278,
+                      headerName: "FA 4",
+                      subHeaderName: "(10)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 4"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "f27ea27a-e00c-4e86-9314-89b428a00189",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 80.0,
+                    obtained: 21.0,
+                    grade: "E",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 279,
+                      headerName: "SA 2",
+                      subHeaderName: "(80)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["SA 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                ],
+                marksObtained: 31.0,
+                total: 100.0,
+                percentage: 31.0,
+                grade: "E",
+                className: "NINETH",
+                sectionName: "B",
+                terms: "SA 2",
+                markSheetName: "TERM 2",
+                subjectPrt: 3,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "57e1fcec-79cc-4e70-bdf3-5c21c9f3e92d",
+                subjectName: "Science",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "57e1fcec-79cc-4e70-bdf3-5c21c9f3e92d",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 7.0,
+                    grade: "B+",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 277,
+                      headerName: "FA 3",
+                      subHeaderName: "(10)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "57e1fcec-79cc-4e70-bdf3-5c21c9f3e92d",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 5.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 278,
+                      headerName: "FA 4",
+                      subHeaderName: "(10)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 4"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "57e1fcec-79cc-4e70-bdf3-5c21c9f3e92d",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 80.0,
+                    obtained: 38.0,
+                    grade: "D",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 279,
+                      headerName: "SA 2",
+                      subHeaderName: "(80)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["SA 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 50.0,
+                total: 100.0,
+                percentage: 50.0,
+                grade: "C",
+                className: "NINETH",
+                sectionName: "B",
+                terms: "SA 2",
+                markSheetName: "TERM 2",
+                subjectPrt: 4,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "fe97adbe-6efe-486c-8b6a-4570484c6ed7",
+                subjectName: "Social Studies",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "fe97adbe-6efe-486c-8b6a-4570484c6ed7",
+                    subjectName: "Social Studies",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 5.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 277,
+                      headerName: "FA 3",
+                      subHeaderName: "(10)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 3"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "fe97adbe-6efe-486c-8b6a-4570484c6ed7",
+                    subjectName: "Social Studies",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 4.0,
+                    grade: "D",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 278,
+                      headerName: "FA 4",
+                      subHeaderName: "(10)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10.0,
+                      terms: ["FA 4"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b2be0b91-7499-4d0d-94a3-0a32589b30ce",
+                    admissionNo: "364",
+                    studentName: "Deepika Patel",
+                    rollNo: 0,
+                    fatherName: "Santosh Kumar",
+                    className: "NINETH",
+                    sectionName: "B",
+                    classSectionUid: "568c4661-4d0a-4162-a5dc-c1bf380b2dea",
+                    terms: "SA 2",
+                    subjectUid: "fe97adbe-6efe-486c-8b6a-4570484c6ed7",
+                    subjectName: "Social Studies",
+                    subjectNature: "Theory",
+                    max: 80.0,
+                    obtained: 35.0,
+                    grade: "D",
+                    status: "",
+                    markSheetName: "TERM 2",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 279,
+                      headerName: "SA 2",
+                      subHeaderName: "(80)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["SA 2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 44.0,
+                total: 100.0,
+                percentage: 44.0,
+                grade: "D",
+                className: "NINETH",
+                sectionName: "B",
+                terms: "SA 2",
+                markSheetName: "TERM 2",
+                subjectPrt: 5,
+                decimalPlaces: 2,
+                visible: false,
+              },
+            ],
+            marksObtained: 247.0,
+            total: 500.0,
+            percentage: 49.4,
+            overAllGrade: "D",
+            visible: false,
+          },
+
+          header: ``,
+          footer: ``,
+        },
+      ]);
+    </script>
+  </body>
+</html>

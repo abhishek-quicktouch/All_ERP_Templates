@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPS</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        const installmentStartEndDate = (val, session) => {
+          const fromYear = session?.split("-")[0];
+          const toYear = session?.split("-")[1];
+          const obj = {
+            JAN: `31-JAN-${toYear}`,
+            FEB: `28-FEB-${toYear}`,
+            MAR: `31-MAR-${toYear}`,
+            APR: `30-APR-${fromYear}`,
+            MAY: `31-MAY-${fromYear}`,
+            JUN: `30-JUN-${fromYear}`,
+            JUL: `31-JUL-${fromYear}`,
+            AUG: `31-AUG-${fromYear}`,
+            SEP: `30-SEP-${fromYear}`,
+            OCT: `31-OCT-${fromYear}`,
+            NOV: `30-NOV-${fromYear}`,
+            DEC: `31-DEC-${fromYear}`,
+          };
+          const obj2 = {
+            JAN: `${toYear}`,
+            FEB: `${toYear}`,
+            MAR: `${toYear}`,
+          };
+          const installments = val.split(",");
+
+          const string = `01-${installments[0]}-${
+            obj2[installments[0]] ?? fromYear
+          } TO ${obj[installments[installments.length - 1]]}`;
+
+          return string;
+        };
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = `
+        <style type="text/css">
+   @page {
+   size: A4
+   }
+   * {
+   margin: 0px;
+   padding: 0px;
+   color: #000;
+   }
+   td {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 0.5mm;
+   padding-bottom: 0.5mm;
+   font-size: 7pt;
+   color: #000000;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   th {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 1mm;
+   padding-bottom: 1mm;
+   background: #e7e7e7;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   @media print {
+   @page {
+   margin:5mm;
+   size: A4
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   }
+   @media print {
+   .pagebreak {
+   clear: both;
+   page-break-after: always;
+   }
+   }
+</style>`;
+        multipleStudents?.forEach((element) => {
+          const basicDetails = {
+            academicSession:
+              element?.student?.studentInfoResponse?.[0]?.academicSession,
+            admissionNo: element?.contentRequest?.admissionNo,
+            studentName: element?.contentRequest?.studentName,
+            fatherName: element?.student?.fatherName,
+            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+            address: `${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.houseNo
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.houseNo + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.street
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.street + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.landmark
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.landmark + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.area
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.area + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.city
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.city + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.district
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.district + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.pincode
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.pincode
+                : ""
+            }`,
+          };
+
+          const feeDetails = element?.contentRequest;
+          const componentTotal = (component) => {
+            return feeDetails?.studentFeeCollectionReceiptList?.reduce(
+              (prev, current) => prev + Number(current[component]),
+              0
+            );
+          };
+
+          console.log(element, basicDetails, feeDetails, "ddddddddddddd");
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `<page orientation="portrait" format="A4" margin="0">
+            <table style="width: 100%;">
+      <tbody>
+         <tr valign="top">
+            <td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <!-- Header Section -->
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;">
+                           <img align="left" style="width: 80px;" src="
+               https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-27T13_10_51_952257095.jpeg">
+                        </td>
+                        <td align="middle" style="width:80%; padding-top:0mm; padding-bottom:0mm;">
+                           <span style="font-size:15pt; text-transform:uppercase; font-weight:bold; padding-top:0mm; padding-bottom:0mm; font-family: math;">GOODLEY&nbsp;PUBLIC&nbsp;SCHOOL</span>
+                           <br>
+                           <span style="width:80%; padding-top:0mm; padding-bottom:0mm; font-size:8pt; text-transform:uppercase; font-family: math;">SHALIMAR BAGH, DELHI-110088 </span>
+                        </td>
+                        <td valign="middle" align="right" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:8pt; line-height: 140%; text-transform:uppercase; font-family: math;"> <br><br>PARENT&nbsp;COPY
+                        </span>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:8%; padding-top:0mm; padding-bottom:0mm;">
+                           &nbsp;
+                        </td>
+                        <td align="middle" style="width:84%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000">
+                           <span style="width:84%; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-transform:uppercase; font-family: math;">FEE RECEIPT FOR THE PERIOD (${installmentStartEndDate(
+                             feeDetails.paidInstallmentsName,
+                             basicDetails?.academicSession
+                           )}) REFEE RECEIPT</span>
+                        </td>
+                        <td valign="middle" align="right" style="width:8%; padding-top:0mm; padding-bottom:0mm; ">
+                           &nbsp;
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Header Section -->
+               <!-- Student | Receipt Details -->
+               <table cellspacing="0" style="width: 100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Admission No.</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails?.admissionNo
+                                    } (${basicDetails?.classSection})</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Receipt Date</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeDate
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       Student Name
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails.studentName
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Receipt No</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails.receiptNo
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       Father Name
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails.fatherName
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Student | Receipt Details -->
+               <!-- Main Table Head -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Fee Description </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Amount</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Concession</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Net Amount </td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Paid Amt.</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Main Table Head -->
+               <!-- FEE | ADMISSION -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     ${feeDetails?.studentFeeCollectionReceiptList
+                       ?.map(
+                         (val) => `
+                        <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentName
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentAmount
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentConcession
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      Number(val.componentAmount) -
+                                      Number(val.componentConcession)
+                                    }</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                        `
+                       )
+                       .join("")}
+                   
+                  </tbody>
+               </table>
+               <!-- FEE | ADMISSION -->
+               <!-- TOTAL | CHEQUE | FINE -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">TOTAL</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${componentTotal(
+                                      "componentAmount"
+                                    )}</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${componentTotal(
+                                      "componentConcession"
+                                    )}</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      componentTotal("componentAmount") -
+                                      componentTotal("componentConcession")
+                                    }</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">CHEQUE BOUNCE</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails?.studentFeeCollectionReceiptList?.find(
+                                        (val) =>
+                                          val?.componentType == "BOUNCE CHARGES"
+                                      )?.componentReceived ?? 0
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">FINE</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails?.studentFeeCollectionReceiptList?.find(
+                                        (val) => val?.componentType == "FINE"
+                                      )?.componentReceived ?? 0
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- TOTAL | CHEQUE | FINE -->
+               <!-- Net Amount Received -->
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="right" colspan="3" style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">Net Amount Received</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="right" colspan="3" style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">Balance</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      componentTotal("componentAmount") -
+                                      componentTotal("componentConcession") -
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center" style="width:100%; border-top:2px dashed #000; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0.5mm;">
+                        </td>
+                     </tr>
+                     
+
+
+                     ${
+                       feeDetails?.feeMode == "CASH"
+                         ? ""
+                         : `
+                     <table cellspacing="0" style="width: 100%;">
+                  <tbody>
+                     ${
+                       feeDetails?.feeMode == "ONLINE"
+                         ? `
+                         <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">PAYMENT MODE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${feeDetails?.feeMode}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">TRANSACTION ID</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${feeDetails?.feeUid}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>`
+                         : `
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">PAYMENT MODE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeMode
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">${
+                                      feeDetails?.feeMode
+                                    } DATE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeDate ??
+                                      feeDetails?.modeDate
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       ${feeDetails?.feeMode} NUMBER
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeNumber ??
+                                      feeDetails?.modeNo
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">BANK</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.modeBank ?? feeDetails?.bank
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">BRANCH</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.modeBranch ??
+                                      feeDetails?.branch
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">REMARK</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeRemark ?? "-"
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     `
+                     }
+                  
+                  </tbody>
+               </table>`
+                     }
+
+
+
+
+                     <tr>
+                        <td align="center" style="border-top:2px dashed #000;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="padding-left:0mm; padding-right:0mm; padding-top:1mm; padding-bottom:0mm; font-size: 9pt; font-family: math;">(Amount in Words : ${convertNumberToWords(
+                                      Number(feeDetails.netReceived)
+                                    )} )</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Net Amount Received -->
+               <!-- footer -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td align="right" valign="bottom" style="padding-left:0mm; width:33%; height:10mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:9pt; text-align:right; font-family: math;">(Accounts Department) </td>
+                  </tr>
+               </table>
+               <!-- footer -->
+            </td>
+         </tr>
+      </tbody>
+   </table>
+
+   <!--// content area-->
+   <table cellspacing="0" style="width:100%;">
+      <tbody>
+         <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <div style="height:5mm;">&nbsp;</div>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   <!--content area-->
+
+   <table style="width: 100%;">
+      <tbody>
+         <tr valign="top">
+            <td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <!-- Header Section -->
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;">
+                           <img align="left" style="width: 80px;" src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-27T13_10_51_952257095.jpeg">
+                        </td>
+                        <td align="middle" style="width:80%; padding-top:0mm; padding-bottom:0mm;">
+                           <span style="font-size:15pt; text-transform:uppercase; font-weight:bold; padding-top:0mm; padding-bottom:0mm; font-family: math;">GOODLEY&nbsp;PUBLIC&nbsp;SCHOOL</span>
+                           <br>
+                           <span style="width:80%; padding-top:0mm; padding-bottom:0mm; font-size:8pt; text-transform:uppercase; font-family: math;">SHALIMAR BAGH, DELHI-110088 </span>
+                        </td>
+                        <td valign="middle" align="right" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:8pt; line-height: 140%; text-transform:uppercase; font-family: math;"> <br><br>SCHOOL&nbsp;COPY
+                        </span>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:8%; padding-top:0mm; padding-bottom:0mm;">
+                           &nbsp;
+                        </td>
+                        <td align="middle" style="width:84%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000">
+                           <span style="width:84%; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-transform:uppercase; font-family: math;">FEE RECEIPT FOR THE PERIOD (${installmentStartEndDate(
+                             feeDetails.paidInstallmentsName,
+                             basicDetails.academicSession
+                           )}) REFEE RECEIPT</span>
+                        </td>
+                        <td valign="middle" align="right" style="width:8%; padding-top:0mm; padding-bottom:0mm; ">
+                           &nbsp;
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Header Section -->
+               <!-- Student | Receipt Details -->
+               <table cellspacing="0" style="width: 100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Admission No.</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails?.admissionNo
+                                    } (${basicDetails?.classSection})</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Receipt Date</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeDate
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       Student Name
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails.studentName
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">Receipt No</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails.receiptNo
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       Father Name
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      basicDetails.fatherName
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Student | Receipt Details -->
+               <!-- Main Table Head -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Fee Description </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Amount</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Concession</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Net Amount </td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size: 8pt; font-family: math;">Paid Amt.</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Main Table Head -->
+               <!-- FEE | ADMISSION -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     ${feeDetails?.studentFeeCollectionReceiptList
+                       ?.map(
+                         (val) => `
+                        <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentName
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentAmount
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentConcession
+                                    }</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      Number(val.componentAmount) -
+                                      Number(val.componentConcession)
+                                    }</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      val.componentReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                        `
+                       )
+                       .join("")}
+                   
+                  </tbody>
+               </table>
+               <!-- FEE | ADMISSION -->
+               <!-- TOTAL | CHEQUE | FINE -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; border-bottom: solid 0.264583333mm #000000;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">TOTAL</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${componentTotal(
+                                      "componentAmount"
+                                    )}</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${componentTotal(
+                                      "componentConcession"
+                                    )}</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      componentTotal("componentAmount") -
+                                      componentTotal("componentConcession")
+                                    }</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">CHEQUE BOUNCE</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp; </td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails?.studentFeeCollectionReceiptList?.find(
+                                        (val) =>
+                                          val?.componentType == "BOUNCE CHARGES"
+                                      )?.componentReceived ?? 0
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">FINE</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails?.studentFeeCollectionReceiptList?.find(
+                                        (val) => val?.componentType == "FINE"
+                                      )?.componentReceived ?? 0
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- TOTAL | CHEQUE | FINE -->
+               <!-- Net Amount Received -->
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="right" colspan="3" style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">Net Amount Received</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="right" colspan="3" style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">Balance</td>
+                                    <td align="right" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">&nbsp;</td>
+                                    <td align="right" style="width:16%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math; font-size: 8pt;">${
+                                      componentTotal("componentAmount") -
+                                      componentTotal("componentConcession") -
+                                      feeDetails.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center" style="width:100%; border-top:2px dashed #000; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0.5mm;">
+                        </td>
+                     </tr>
+
+                     ${
+                       feeDetails?.feeMode == "CASH"
+                         ? ""
+                         : `
+                     <table cellspacing="0" style="width: 100%;">
+                  <tbody>
+                     ${
+                       feeDetails?.feeMode == "ONLINE"
+                         ? `
+                         <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">PAYMENT MODE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${feeDetails?.feeMode}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">TRANSACTION ID</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${feeDetails?.feeUid}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>`
+                         : `
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">PAYMENT MODE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeMode
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">${
+                                      feeDetails?.feeMode
+                                    } DATE</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeDate ??
+                                      feeDetails?.modeDate
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">
+                                       ${feeDetails?.feeMode} NUMBER
+                                    </td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeNumber ??
+                                      feeDetails?.modeNo
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">BANK</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.modeBank ?? feeDetails?.bank
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">BRANCH</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.modeBranch ??
+                                      feeDetails?.branch
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: math;">REMARK</td>
+                                    <td style="width:65%; font-size:8pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: math;"> :&nbsp;&nbsp;${
+                                      feeDetails?.feeModeRemark ?? "-"
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     `
+                     }
+                  
+                  </tbody>
+               </table>`
+                     }
+
+
+                     <tr>
+                        <td align="center" style="border-top:2px dashed #000;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="padding-left:0mm; padding-right:0mm; padding-top:1mm; padding-bottom:0mm; font-size: 9pt; font-family: math;">(Amount in Words : ${convertNumberToWords(
+                                      Number(feeDetails.netReceived)
+                                    )} )</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Net Amount Received -->
+               <!-- footer -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td align="right" valign="bottom" style="padding-left:0mm; width:33%; height:10mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:9pt; text-align:right; font-family: math;">(Accounts Department) </td>
+                  </tr>
+               </table>
+               <!-- footer -->
+            </td>
+         </tr>
+      </tbody>
+   </table>
+            
+            </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "fewfef",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "fef",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+
+          contentRequest: {
+            feeUid: "bed03ecd-b5f4-4c78-9d57-963d5c1edd4e",
+            receiptNo: "10",
+            admissionNo: "20140097",
+            studentName: "Lakshya Sansi",
+            studentClass: "XI",
+            studentSection: "E",
+            paidInstallmentsName: "APR,MAY,JUN",
+            feeDate: "02-04-2024",
+            feeTime: "11:29:47",
+            userName: "user_374799",
+            feeMode: "CASH",
+            feeModeNumber: "-",
+            modeBank: "-",
+            modeBranch: "-",
+            feeModeDate: "-",
+            feeModeRemark: null,
+            feeDeleteRemark: null,
+            isBounced: "0",
+            bouncedDate: "-",
+            totalAmount: "15555.00",
+            excessPaid: "0.00",
+            excessUsed: "0.00",
+            excessBalance: "0.0",
+            netReceived: "15555.00",
+            studentFeeCollectionReceiptList: [
+              {
+                componentName: "DEVELOPMENT CHARGES",
+                componentAmount: "2025.00",
+                componentType: "",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                accountName: "ACCOUNT 1",
+                accountUid: "b515091c-021c-4bd6-9706-11a39b5c1a3d",
+                componentReceived: "2025.00",
+              },
+              {
+                componentName: "FEES",
+                componentAmount: "13530.00",
+                componentType: "",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                accountName: "ACCOUNT 1",
+                accountUid: "b515091c-021c-4bd6-9706-11a39b5c1a3d",
+                componentReceived: "13530.00",
+              },
+            ],
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:8pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:8pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:8pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

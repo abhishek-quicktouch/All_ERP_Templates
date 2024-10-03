@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card</title>
+</head>
+<body>
+
+    <div id="studentsList">
+    </div>
+
+    <script>
+        window.SetTemplateData = function (dataList) {
+            const studentHtml = document.getElementById("studentsList");
+            studentHtml.innerHTML = "";
+            let tempData = dataList
+            tempData?.forEach((el)=>{
+                 const singleStudentHtml = document.createElement("div");
+                singleStudentHtml.style.pageBreakAfter = "always";
+                singleStudentHtml.innerHTML =
+                    (el?.header || "") + `
+                    <style  type="text/css">
+        * {
+            margin: 0px;
+            padding: 0px;
+            color: #000000;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+                    <div style="height: 380px; width: 300px; border: 1px solid; margin: auto; border-radius: 10px; overflow: hidden; position: relative;box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; border-color:#8c8c8c;">
+                <div style="height:22%; padding: 5px; background: linear-gradient(90deg, hsla(311, 74%, 87%, 0.6) 0%, hsla(275, 19%, 88%, 0.6) 100%);">
+                <p style="font-size: 17px;  text-align:center; font-weight: 900; color: rgb(247, 116, 116);word-wrap: break-word;  margin-top: -2px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; padding: 0px 5px;">${el?.school?.schoolName ?? ""}</p>
+                <p style="font-size: 12px; text-align: center; word-wrap: break-word; padding: 1px 5px; font-weight: 700;">${el?.school?.plotNumber ?? ""} ${el?.school?.area ?? ""} ${el?.school?.city ?? ""}</p>
+                <p style="font-size: 12px; text-align: center; word-wrap: break-word; padding: 1px 5px; font-weight: 700;">Ph: ${el?.school?.phoneNo1 ?? ''}, ${el?.school?.phoneNo2 ?? ""}</p>
+            </div>
+            <div style="height:78%;">
+                <div style="display: flex; justify-content: space-evenly; align-items: center; margin-top: 10px;">
+                    <div><img
+                            src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_29_18_632313344.png" />
+                    </div>
+                    <div style="border: 1.5px solid; height: 100px; width: 80px; overflow: hidden; border-radius:6px;">
+                    <img style="height:100%; width:100%;object-fit: contain;"
+                        src=${el?.contentRequest?.preSignedUrlResponse?.url ?? ""} />
+                    </div>
+                </div>
+                <div>
+                    <p style="font-size: 20px; text-align: center; word-wrap: break-word; padding: 1px 5px; font-weight: 700; text-transform: uppercase; color: rgb(247, 116, 116);word-wrap: break-word;  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;margin-top: 5px;">${el?.contentRequest?.studentName ?? ""}</p>
+                </div>
+                <div style="text-transform: uppercase;">
+                    <div style="display: flex; padding: 0px 5px; margin-top: 5px;">
+                        <p style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 40%;">Father Name</p>
+                        <p>:</p>
+                        <p style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 60%;">${el?.contentRequest?.fatherInformation?.name ?? "-"}</p>
+                    </div>
+
+                    <div style="display: flex; padding: 0px 5px; margin-top: 5px;">
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 40%;">
+                            Admn No.</p>
+                        <p>:</p>
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 60%;">
+                            ${el?.contentRequest?.admissionNo ?? "-"}</p>
+                    </div>
+
+                    <div style="display: flex; padding: 0px 5px; margin-top: 5px;">
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 40%;">
+                            Mobile No.</p>
+                        <p>:</p>
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 60%;">
+                            ${el?.contentRequest?.permanentAddress?.mobileNo ?? "-"}</p>
+                    </div>
+                    <div style="display: flex; padding: 0px 5px; margin-top: 5px;">
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 40%;">
+                            Address</p>
+                        <p>:</p>
+                        <p
+                            style="font-size: 14px; text-align: left; word-wrap: break-word; padding: 1px 5px; font-weight: 600; width: 60%;">${el?.contentRequest?.permanentAddress?.houseNo ?? ""} 
+                            ${el?.contentRequest?.permanentAddress?.street ?? ""} ${el?.contentRequest?.permanentAddress?.city ?? "" } ${el?.contentRequest?.permanentAddress?.pincode ?? "" }</p>
+                    </div>
+
+                </div>
+
+                <div>
+                    <p
+                        style="font-size: 15px; word-wrap: break-word; padding: 1px 5px; font-weight: 700; text-transform: uppercase; color: rgb(247, 116, 116);word-wrap: break-word;  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;margin-top: 5px; position: absolute; bottom: 5px; right: 5px;">
+                        Principal</p>
+                </div>
+            </div>
+        </div>`
+                studentHtml.appendChild(singleStudentHtml);
+
+            })
+        }
+    </script>
+    <script>
+        window.SetTemplateData([
+            {
+                school: {
+                    uid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                    apikey: "UdrZUz0Viw9pV5WLG3VUHTy4CJ9uREmJ",
+                    schoolName: "HAAKIIA Islamic International Academy City Poonch",
+                    schoolAbb: "HIIAPJK",
+                    educationBoard: "Central Board of Secondary Education (CBSE)",
+                    registrationNo: "CEO P Pvt 3000 02",
+                    plotNumber: "Near Nakhon wali Road behind",
+                    area: "Nai Basti Poonch",
+                    city: "Jammu and Kashmir",
+                    pincode: "185101",
+                    state: "Jammu and Kashmir",
+                    phoneNo1: "8494005716",
+                    phoneNo2: "7298191935",
+                    contactName: "Sajid Rather",
+                    contactMobile: "8494005716",
+                    contactEmail: "haakiiaacademy9@gmail.com",
+                    schoolCode: "Haakiia p01",
+                    pfCode: "185101",
+                    societyManagement: "Anwar Abaad poonch",
+                    language: "English Urdu Hindi",
+                    schoolLogo: null,
+                    schoolFavicon: null,
+                    enabled: true,
+                    subDomain: "haakiia",
+                    website: "haakiiaacademy.com",
+                    schemaPrefix: null,
+                    editedDate: "28-02-2024 05:36 PM",
+                    editedUser: "QuickCampus",
+                    visitorSchool: false,
+                    clientSchoolId: null,
+                    cscId: null,
+                    onlinePaymentEnabled: false,
+                    registrationSeries: null,
+                    underTakingDetails: null,
+                    formNumberStart: null,
+                    sessionResponse: null,
+                    schoolLogoUrl: null,
+                    printAcknowledge: false,
+                    notificationEnabled: true,
+                    loanEnabled: false,
+                    whatsAppEnabled: false,
+                    smsenabled: false,
+                },
+                contentRequest: {
+                    uid: "f78379ef-7e9a-47e2-ad6f-23f63a53bddb",
+                    admissionNo: "20230001",
+                    studentName: "Naysha Bansa",
+                    className: "PRE SCHOOL",
+                    sectionName: "A",
+                    joiningStatus: "New",
+                    joiningDate: "2023-12-28",
+                    gender: "NA",
+                    certificate: null,
+                    joiningClassName: "PRE SCHOOL",
+                    joiningSectionName: "A",
+                    group: null,
+                    status: "Studying",
+                    caste: null,
+                    wing: "NA",
+                    house: null,
+                    dob: "2019-05-19",
+                    rollNo: 15,
+                    session: "2023-24",
+                   preSignedUrlResponse: {
+                    url: "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/TSQ342/student-info/1/student/images/1.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240513T110936Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240513%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=b1692426159d947b5195dac2b32ad69a552f2ddbc2076faa9a7bb49262bf0012",
+                    fileName: "1.png"
+                },
+                    fatherInformation: {
+                        name: "Mr. Amit Bansal",
+                        qualification: null,
+                        occupation: null,
+                        yearlyIncome: null,
+                        email: null,
+                    },
+                    motherInformation: {
+                        name: "Mrs. Chinki Devi",
+                        qualification: null,
+                        occupation: null,
+                        yearlyIncome: null,
+                        email: null,
+                    },
+                    permanentAddress: {
+                        houseNo: null,
+                        area: "Phase-1",
+                        street: "L-1/22, Budh Vihar",
+                        city: "Delhi",
+                        pincode: "110086",
+                        state: "NA",
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "987575758",
+                    },
+                    correspondanceAddress: {
+                        houseNo: null,
+                        area: null,
+                        street: null,
+                        city: null,
+                        pincode: null,
+                        state: null,
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "1111111111",
+                    },
+                    officialAddress: {
+                        houseNo: "NA",
+                        area: null,
+                        street: null,
+                        city: null,
+                        pincode: null,
+                        state: null,
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "",
+                    },
+                    guardianInformation: {
+                        guradianName: null,
+                        guradianRelation: null,
+                        guradianOccupation: null,
+                        guradianEmail: null,
+                        guradianMobileNo: null,
+                    },
+                    characterCertificateDetail: {
+                        uid: "84164f89-4b4e-4edf-8997-9155b3674021",
+                        type: "GOOD",
+                        issueDate: "2024-02-12",
+                    },
+                    transportDetails: {
+                        circleName: null,
+                        routeName: null,
+                        pickUp: null,
+                        drop: null,
+                    },
+                    certificateList: [],
+                    status_code: 200,
+                },
+                header: `
+              <table cellspacing="0" style="width:100%;">
+                 <tr>
+                    <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+                       <div style="height:10mm;">&nbsp;</div>
+                    </td>
+                 </tr>
+              </table>
+        `,
+                footer:
+                    '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+            },
+        ]);
+    </script>
+</body>
+</html>

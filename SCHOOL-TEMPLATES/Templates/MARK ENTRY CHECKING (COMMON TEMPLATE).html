@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="studentarr">Student Result</div>
+    <script>
+        window.SetTemplateData = function(data){
+        function converData(data) {
+        let temp = {};
+        if (data?.data?.length) {
+            (temp.academicSession = data?.data?.[0]?.academicSession || "-"),
+            (temp.classSectionName = `${data?.data?.[0]?.className || "-"}-${
+                data?.data?.[0]?.sectionName || "-"
+            }`);
+        }
+        return temp;
+        }
+
+    let headerData = converData(data);
+
+
+    let studentarr = document.getElementById("studentarr");
+    studentarr.innerHTML = "";
+    let mainData = "";
+
+    let header = ` <div
+          style="
+            width: 100%;
+            text-align: center;
+            font-family: Courier Prime, monospace;
+            font-weight: 400;
+            font-style: normal;
+          "
+        >
+          SESSION : ${headerData?.academicSession}
+        </div>
+        <div
+          style="
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+            font-family: Courier Prime, monospace;
+            font-weight: 400;
+            font-style: normal;
+          "
+        >
+          MARKS ENTRY CHECKING REPORT
+        </div>
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            margin-top: 10px;
+            justify-content: space-between;
+            font-family: Courier Prime, monospace;
+            font-weight: 400;
+            font-style: normal;
+          "
+        >
+          <div style="width: 70%; height: 100%">
+            <div style="width: 100%; display: flex; height: 50%">
+              <p style="min-width: 15%; font-size: 12px">TERM :</p>
+              <p style="word-wrap: break-word; font-size: 12px">
+                ${data?.termName?.join(", ")}
+              </p>
+            </div>
+            <div
+              style="
+                width: 100%;
+                display: flex;
+                align-items: center;
+                height: 50%;
+                margin-top: -20px;
+              "
+            >
+              <p style="width: 15%; font-size: 12px">CLASS:</p>
+              <p style="font-size: 12px">${headerData?.classSectionName}</p>
+            </div>
+          </div>
+          <div style="width: 30%; height: 100%; text-align: right">
+            <span style="font-size: 12px">Date :</span>
+            <span style="margin-left: 10px; font-size: 12px">${
+              data?.date || "-"
+            }</span>
+          </div>
+        </div>`;
+
+    let PageStart =
+      "<div style='page-break-before: always;'></div> <div style='width: 100%;'>";
+    let PageEnd = "</div>";
+
+    let col = 4;
+    let pageHeaders = [];
+    let row = 25;
+    let PageRows = [];
+    
+    if (data?.header?.length) {
+      for (let i = 0; i < Math.ceil(data?.header.length / col); i++) {
+        let temp = data?.header.slice(i * col, i * col + col);
+        pageHeaders.push(temp);
+      }
+    }
+
+    if (data?.data?.length) {
+      for (let i = 0; i < Math.ceil(data?.data.length / row); i++) {
+        let temp = data.data.slice(i * row, i * row + row);
+        PageRows.push(temp);
+      }
+    }
+
+    const colspan4=["Grand Total","Grand Obtained","Grand Percentage"]
+    let pageNo = 1;
+    for (let i = 0; i < pageHeaders.length; i++) {
+      for (let j = 0; j < PageRows.length; j++) {
+        mainData += PageStart;
+        mainData += header;
+        mainData += `<table style="width: 100%; border: 1px solid; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border: 1px solid; text-align: left;font-family: Courier Prime, monospace;
+                        font-weight: 400;
+                        font-style: normal;">
+                            <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left">ADM. NO</th>
+                            <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left">STUDENT NAME</th>
+
+                            ${pageHeaders[i]
+                              ?.map((el) => {
+                                return `<th colspan="4" style="border: 1px solid;font-size:12px;min-width:60px; text-align: center">${el}</th>`;
+                              })
+                              .join("")}
+                        </tr>
+                        <tr>
+                            <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left">  
+                            </th>
+                            <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                            </th>
+                            ${(pageHeaders[i])?.map(el=>{
+                                if(colspan4.includes(el)){
+                                return `<th colspan="4" style="border: 1px solid;font-size:12px;min-width:60px; text-align: left"></th>`;
+                                }
+                                return `
+                               <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                                Total.
+                            </th>
+                              <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                                Obt.
+                            </th>
+                              <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                                Grade.
+                            </th>
+                              <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                                Per.
+                            </th>
+                               `
+                            }).join("")}
+                        </tr>
+                    </thead>
+                    <tbody>
+                       ${PageRows[j]
+                         ?.map((el) => {
+                           return `
+                        <tr style="font-size: 13px;">
+                               <td style="border: 1px solid; text-align: left">${
+                                 el?.admissionNo || "-"
+                               }</td>
+                               <td style="border: 1px solid; text-align: left">${
+                                 el?.studentName || "-"
+                               }</td>
+                               ${pageHeaders[i]
+                                 ?.map((h) => {
+                                       if(colspan4.includes(h)){
+                                return `<th colspan="4" style="border: 1px solid;font-size:12px;min-width:60px; text-align: left">
+                                    ${el[h]}${h=="Grand Percentage" ? "%":""}
+                                    </th>`;
+                                }
+                                   return `<td style="border: 1px solid; text-align: left">${
+                                     el[h + "1"]?.t || "-"
+                                   }</td>
+                                   <td style="border: 1px solid; text-align: left">${
+                                     el[h + "1"]?.o ?? "-"
+                                   }</td>
+                                   <td style="border: 1px solid; text-align: left">${
+                                   el[h + "1"]?.g ? el[h + "1"]?.g : "-"
+                                   }</td>
+                                   <td style="border: 1px solid; text-align: left">${
+                                    el[h + "1"]?.per ? `${el[h + "1"]?.per}%` : "-"
+                                   }</td>
+                                   `;
+                                 })
+                                 .join("")}
+                        </tr>`;
+                         })
+                         .join("")}
+                    </tbody>
+                </table>`;
+
+        mainData += PageEnd;
+        pageNo++;
+      }
+    }
+    studentarr.innerHTML = mainData;
+}
+    </script>
+    <script>
+        window.SetTemplateData(
+        {
+            "date":"05-02-2023",
+            "termName":["TERM-1,VIVA,ASSIGNMENT-I,ASSIGNMENT-II,EVALUATION-I,EVALUATION-II,VIVA/ORAL"],
+            "data": [
+                {
+                    "admissionNo": "14159",
+                    "permanentEducationNumber": null,
+                    "studentName": "MANNAN SARAN",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "11f16a7a-7d14-48c6-bfc3-02f05e18fd16",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 48,
+                            "overAllGrade": "B",
+                            "totalPercentage": 60,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 48,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "B2",
+                                    "percentage": 60,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 48,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 48,
+                        "g": "B",
+                        "status": "PASS",
+                    },
+                    "TERM-MID TERM": "(T-80) (O-48.00) (G-B)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 48,
+                        "g": "",
+
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 48,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-48.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-48.00) (G-) (Per-60.00)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 48,
+                        "g": "B2",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-48.00) (G-B2)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 48,
+                    "Grand Percentage": "60.00"
+                },
+                {
+                    "admissionNo": "14165",
+                    "permanentEducationNumber": null,
+                    "studentName": "TARUSH DEY",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "a2abbf79-c340-4a69-ba7f-c8c97fbd8eea",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 76,
+                            "overAllGrade": "A",
+                            "totalPercentage": 95,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 76,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "A1",
+                                    "percentage": 95,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 76,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": "A",
+                        "status": "PASS"
+                    },
+                    "TERM-MID TERM": "(T-80) (O-76.00) (G-A)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-76.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-76.00) (G-) (Per-95.00)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": "A1",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-76.00) (G-A1)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 76,
+                    "Grand Percentage": "95.00"
+                },
+                {
+                    "admissionNo": "14177",
+                    "permanentEducationNumber": null,
+                    "studentName": "ANVESHA AGGARWAL",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "14f371c5-4e09-45fa-9b23-45bfd3d4d619",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 77,
+                            "overAllGrade": "A",
+                            "totalPercentage": 96.25,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 77,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "A1",
+                                    "percentage": 96.25,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 77,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 77,
+                        "g": "A",
+                        "status": "PASS"
+                    },
+                    "TERM-MID TERM": "(T-80) (O-77.00) (G-A)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 77,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 77,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-77.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-77.00) (G-) (Per-96.25)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 77,
+                        "g": "A1",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-77.00) (G-A1)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 77,
+                    "Grand Percentage": "96.25"
+                },
+                {
+                    "admissionNo": "14160",
+                    "permanentEducationNumber": null,
+                    "studentName": "ARVIND BHARDWAJ",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "c742ab8c-d00f-4e0f-9ae2-4790514c784e",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 67,
+                            "overAllGrade": "A",
+                            "totalPercentage": 83.75,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 67,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "A2",
+                                    "percentage": 83.75,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 67,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 67,
+                        "g": "A",
+                        "status": "PASS"
+                    },
+                    "TERM-MID TERM": "(T-80) (O-67.00) (G-A)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 67,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 67,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-67.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-67.00) (G-) (Per-83.75)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 67,
+                        "g": "A2",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-67.00) (G-A2)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 67,
+                    "Grand Percentage": "83.75"
+                },
+                {
+                    "admissionNo": "14157",
+                    "permanentEducationNumber": null,
+                    "studentName": "ACHINTHYA SHANKARARAMAN",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "",
+                    "uid": "f6289d12-97e1-4036-a4d8-137a04ae02f2",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 240,
+                            "totalObtained": 81,
+                            "overAllGrade": "D",
+                            "totalPercentage": 33.75,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": false,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 13,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "E",
+                                    "percentage": 16.25,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": false,
+                                    "graded": false
+                                },
+                                {
+                                    "marks": 56,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "539585b1-6065-4379-8d4a-0a5f1e1bdf8e",
+                                    "subjectName": "LISTENING SKILLS",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 2,
+                                    "min": 45,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [
+                                        "ENGLISH"
+                                    ],
+                                    "grade": "B",
+                                    "percentage": 70,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "marks": 12,
+                                    "description": null,
+                                    "status": "",
+                                    "subject": "b71c1708-ce55-456b-bb78-06a0ec681b99",
+                                    "subjectName": "MATHEMATICS",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 3,
+                                    "min": 27,
+                                    "attachmentName": null,
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "E",
+                                    "percentage": 15,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": false,
+                                    "graded": false
+                                }
+                            ]
+                        },
+                        {
+                            "totalMarks": 70,
+                            "totalObtained": 34,
+                            "overAllGrade": "C2",
+                            "totalPercentage": 48.57142857142857,
+                            "termName": "MULTIPLE ASSESS - I",
+                            "termUid": "64c10446-c6a4-4d9d-9049-481fe8cb13a3",
+                            "pass": false,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 10,
+                                    "description": null,
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 20,
+                                    "priority": 1,
+                                    "min": 7,
+                                    "attachmentName": null,
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "C1",
+                                    "percentage": 50,
+                                    "term": "MULTIPLE ASSESS - I",
+                                    "termUid": "64c10446-c6a4-4d9d-9049-481fe8cb13a3",
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "marks": 8,
+                                    "description": null,
+                                    "status": "",
+                                    "subject": "b71c1708-ce55-456b-bb78-06a0ec681b99",
+                                    "subjectName": "MATHEMATICS",
+                                    "scholastic": true,
+                                    "max": 20,
+                                    "priority": 3,
+                                    "min": 7,
+                                    "attachmentName": null,
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "C2",
+                                    "percentage": 40,
+                                    "term": "MULTIPLE ASSESS - I",
+                                    "termUid": "64c10446-c6a4-4d9d-9049-481fe8cb13a3",
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "marks": 16,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "539585b1-6065-4379-8d4a-0a5f1e1bdf8e",
+                                    "subjectName": "LISTENING SKILLS",
+                                    "scholastic": true,
+                                    "max": 30,
+                                    "priority": 9,
+                                    "min": 10,
+                                    "attachmentName": null,
+                                    "subjectNature": "THEORY",
+                                    "parent": [
+                                        "ENGLISH"
+                                    ],
+                                    "grade": "C1",
+                                    "percentage": 53.333333333333336,
+                                    "term": "MULTIPLE ASSESS - I",
+                                    "termUid": "64c10446-c6a4-4d9d-9049-481fe8cb13a3",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        },
+                        {
+                            "totalMarks": 40,
+                            "totalObtained": 24,
+                            "overAllGrade": "B2",
+                            "totalPercentage": 60,
+                            "termName": "PERIODIC TEST - I",
+                            "termUid": "16e6db66-2482-4e84-9aa2-0a963c638a2b",
+                            "pass": false,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 11,
+                                    "description": null,
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 20,
+                                    "priority": 1,
+                                    "min": 7,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "C1",
+                                    "percentage": 55.00000000000001,
+                                    "term": "PERIODIC TEST - I",
+                                    "termUid": "16e6db66-2482-4e84-9aa2-0a963c638a2b",
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "marks": 13,
+                                    "description": null,
+                                    "status": "",
+                                    "subject": "b71c1708-ce55-456b-bb78-06a0ec681b99",
+                                    "subjectName": "MATHEMATICS",
+                                    "scholastic": true,
+                                    "max": 20,
+                                    "priority": 3,
+                                    "min": 7,
+                                    "attachmentName": null,
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "B2",
+                                    "percentage": 65,
+                                    "term": "PERIODIC TEST - I",
+                                    "termUid": "16e6db66-2482-4e84-9aa2-0a963c638a2b",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 350,
+                    "grandObtain": 139,
+                    "TERM-MID TERM1": {
+                        "t": 240,
+                        "o": 81,
+                        "g": "D",
+                        "status": "FAIL"
+                    },
+                    "TERM-MID TERM": "(T-240) (O-81.00) (G-D)",
+                    "ENGLISH TOTAL1": {
+                        "t": 120,
+                        "o": 34,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 180,
+                        "o": 80,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-120) (O-34.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-180) (O-80.00) (G-) (Per-44.44)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 13,
+                        "g": "E",
+                        "status": "FAIL"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-13.00) (G-E)",
+                    "ENGLISH > LISTENING SKILLS TOTAL1": {
+                        "t": 110,
+                        "o": 72,
+                        "g": ""
+                    },
+                    "ENGLISH PARENT TOTAL1": {
+                        "t": 230,
+                        "o": 106,
+                        "g": ""
+                    },
+                    "ENGLISH > LISTENING SKILLS TOTAL": "(T-110) (O-72.00) (G-)",
+                    "ENGLISH PARENT TOTAL": "(T-230) (O-106.00) (G-) (Per-46.09)",
+                    "MID TERM ENGLISH > LISTENING SKILLS1": {
+                        "t": 80,
+                        "o": 56,
+                        "g": "B",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH > LISTENING SKILLS": "(T-80) (O-56.00) (G-B)",
+                    "MATHEMATICS TOTAL1": {
+                        "t": 120,
+                        "o": 33,
+                        "g": ""
+                    },
+                    "MATHEMATICS TOTAL": "(T-120) (O-33.00) (G-)",
+                    "null ATTACHMENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM MATHEMATICS1": {
+                        "t": 80,
+                        "o": 12,
+                        "g": "E",
+                        "status": "FAIL"
+                    },
+                    "MID TERM MATHEMATICS": "(T-80) (O-12.00) (G-E)",
+                    "TERM-MULTIPLE ASSESS - I1": {
+                        "t": 70,
+                        "o": 34,
+                        "g": "C2",
+                        "status": "FAIL"
+                    },
+                    "TERM-MULTIPLE ASSESS - I": "(T-70) (O-34.00) (G-C2)",
+                    "MULTIPLE ASSESS - I ENGLISH1": {
+                        "t": 20,
+                        "o": 10,
+                        "g": "C1",
+                        "status": "PASS"
+                    },
+                    "MULTIPLE ASSESS - I ENGLISH": "(T-20) (O-10.00) (G-C1)",
+                    "MULTIPLE ASSESS - I MATHEMATICS1": {
+                        "t": 20,
+                        "o": 8,
+                        "g": "C2",
+                        "status": "PASS"
+                    },
+                    "MULTIPLE ASSESS - I MATHEMATICS": "(T-20) (O-8.00) (G-C2)",
+                    "MULTIPLE ASSESS - I ENGLISH > LISTENING SKILLS1": {
+                        "t": 30,
+                        "o": 16,
+                        "g": "C1",
+                        "status": "PASS"
+                    },
+                    "MULTIPLE ASSESS - I ENGLISH > LISTENING SKILLS": "(T-30) (O-16.00) (G-C1)",
+                    "TERM-PERIODIC TEST - I1": {
+                        "t": 40,
+                        "o": 24,
+                        "g": "B2",
+                        "status": "FAIL"
+                    },
+                    "TERM-PERIODIC TEST - I": "(T-40) (O-24.00) (G-B2)",
+                    "PERIODIC TEST - I ENGLISH1": {
+                        "t": 20,
+                        "o": 11,
+                        "g": "C1",
+                        "status": "PASS"
+                    },
+                    "PERIODIC TEST - I ENGLISH": "(T-20) (O-11.00) (G-C1)",
+                    "PERIODIC TEST - I MATHEMATICS1": {
+                        "t": 20,
+                        "o": 13,
+                        "g": "B2",
+                        "status": "PASS"
+                    },
+                    "PERIODIC TEST - I MATHEMATICS": "(T-20) (O-13.00) (G-B2)",
+                    "Grand Total": 350,
+                    "Grand Obtained": 139,
+                    "Grand Percentage": "39.71"
+                },
+                {
+                    "admissionNo": "14167",
+                    "permanentEducationNumber": null,
+                    "studentName": "ANIKA SHARMA",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "f0aed02e-c083-481c-964c-c77c14df1c3d",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 76,
+                            "overAllGrade": "A",
+                            "totalPercentage": 95,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 76,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "A1",
+                                    "percentage": 95,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 76,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": "A",
+                        "status": "PASS"
+                    },
+                    "TERM-MID TERM": "(T-80) (O-76.00) (G-A)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-76.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-76.00) (G-) (Per-95.00)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 76,
+                        "g": "A1",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-76.00) (G-A1)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 76,
+                    "Grand Percentage": "95.00"
+                },
+                {
+                    "admissionNo": "14174",
+                    "permanentEducationNumber": null,
+                    "studentName": "PIYANSHI KHANDELWAL",
+                    "className": "IX",
+                    "sectionName": "A",
+                    "classSectionUid": "47f13816-9565-49eb-9572-ff5311dd2b1f",
+                    "academicSession": "2022-2023",
+                    "fatherName": "NA",
+                    "uid": "726f2e20-293a-442a-99f5-d29f601b6b19",
+                    "attendanceResponse": null,
+                    "pass": false,
+                    "rollNo": 0,
+                    "termWiseSubjectResponse": [
+                        {
+                            "totalMarks": 80,
+                            "totalObtained": 56,
+                            "overAllGrade": "B",
+                            "totalPercentage": 70,
+                            "termName": "MID TERM",
+                            "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                            "pass": true,
+                            "subjectMarksEntryRequests": [
+                                {
+                                    "marks": 56,
+                                    "description": "",
+                                    "status": "",
+                                    "subject": "88e39dca-c9f8-4e39-aead-1b3c66192551",
+                                    "subjectName": "ENGLISH",
+                                    "scholastic": true,
+                                    "max": 80,
+                                    "priority": 1,
+                                    "min": 27,
+                                    "attachmentName": "ENGLISH",
+                                    "subjectNature": "THEORY",
+                                    "parent": [],
+                                    "grade": "B1",
+                                    "percentage": 70,
+                                    "term": "MID TERM",
+                                    "termUid": "0c5d4a5b-05a3-49a2-87b7-0552caba16e8",
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ]
+                        }
+                    ],
+                    "grandTotal": 80,
+                    "grandObtain": 56,
+                    "TERM-MID TERM1": {
+                        "t": 80,
+                        "o": 56,
+                        "g": "B",
+                        "status": "PASS"
+                    },
+                    "TERM-MID TERM": "(T-80) (O-56.00) (G-B)",
+                    "ENGLISH TOTAL1": {
+                        "t": 80,
+                        "o": 56,
+                        "g": ""
+                    },
+                    "ENGLISH ATTACHMENT TOTAL1": {
+                        "t": 80,
+                        "o": 56,
+                        "g": ""
+                    },
+                    "ENGLISH TOTAL": "(T-80) (O-56.00) (G-)",
+                    "ENGLISH ATTACHMENT TOTAL": "(T-80) (O-56.00) (G-) (Per-70.00)",
+                    "undefined PARENT TOTAL": "(T-undefined) (O-undefined) (G-undefined) (Per-NaN)",
+                    "MID TERM ENGLISH1": {
+                        "t": 80,
+                        "o": 56,
+                        "g": "B1",
+                        "status": "PASS"
+                    },
+                    "MID TERM ENGLISH": "(T-80) (O-56.00) (G-B1)",
+                    "Grand Total": 80,
+                    "Grand Obtained": 56,
+                    "Grand Percentage": "70.00"
+                }
+            ],
+            "header": [
+                "PERIODIC TEST - I ENGLISH",
+                "MULTIPLE ASSESS - I ENGLISH",
+                "MID TERM ENGLISH",
+                "ENGLISH TOTAL",
+                "MULTIPLE ASSESS - I ENGLISH > LISTENING SKILLS",
+                "MID TERM ENGLISH > LISTENING SKILLS",
+                "ENGLISH > LISTENING SKILLS TOTAL",
+                "ENGLISH PARENT TOTAL",
+                "ENGLISH ATTACHMENT TOTAL",
+                "PERIODIC TEST - I MATHEMATICS",
+                "MULTIPLE ASSESS - I MATHEMATICS",
+                "MID TERM MATHEMATICS",
+                "MATHEMATICS TOTAL",
+                "Grand Total",
+                "Grand Percentage",
+                "Grand Obtained"
+            ]
+                }
+        );
+    </script>
+</body>
+</html>

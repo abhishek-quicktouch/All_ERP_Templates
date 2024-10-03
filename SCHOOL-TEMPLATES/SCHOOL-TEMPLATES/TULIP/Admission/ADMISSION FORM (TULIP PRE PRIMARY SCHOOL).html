@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPS SLC</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Character certificate</div>
+   <script>
+    window.SetTemplateData = function (dataList) {
+            const todayDate = () => {
+              const monthName = {
+                1: "01",
+                2: "02",
+                3: "03",
+                4: "04",
+                5: "05",
+                6: "06",
+                7: "07",
+                8: "08",
+                9: "09",
+                10: "10",
+                11: "11",
+                12: "12",
+              };
+              const today = new Date();
+
+              const day = today.getDate();
+              const month = today.getMonth() + 1;
+              const year = today.getFullYear();
+
+              const formattedDate =
+                (day < 10 ? "0" : "") + day + "-" + monthName[month] + "-" + year;
+
+              return formattedDate;
+            };
+
+            const studentHtml = document.getElementById("studentsList");
+            studentHtml.innerHTML = `
+                  <style type="text/css">
+             @page {
+             size: A4
+             }
+             * {
+             margin: 0px;
+             padding: 0px;
+             color: #000;
+             }
+             td {
+             padding-left: 0.5mm;
+             padding-right: 0.5mm;
+             padding-top: 1mm;
+             padding-bottom: 1mm;
+             font-size: 9pt;
+             color: #000000;
+             font-family: Arial, Helvetica, sans-serif;
+             }
+             th {
+             padding-left: 0.5mm;
+             padding-right: 0.5mm;
+             padding-top: 1mm;
+             padding-bottom: 1mm;
+             background: #e7e7e7;
+             font-family: Arial, Helvetica, sans-serif;
+             }
+             .signImg {
+             width: 150px;
+             height: auto;
+             }
+             @media print {
+             @page {
+             margin:5mm;
+             size: potrait;
+
+             }
+             body {
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.5;
+          margin: 0;
+          padding: 0;
+      }
+      h1 {
+          text-align: center;
+      }
+      span {
+          font-size: 12px;
+      }
+      li{
+        padding-top: 10px;
+      }
+
+             }
+          </style>`;
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakAfter = "always";
+            console.log("dataList?.contentRequest?.contentRequest",dataList?.contentRequest?.contentRequest)
+            singleStudentHtml.innerHTML =
+            `
+                             <page orientation="portrait" format="A4" margin="0">
+          <!-- main heading -->
+          <div
+            style="flex-direction: row;
+                padding: 10px;display: flex;"
+          >
+            <div
+              style="width: 20%;
+                    display: flex;
+                    height: 70px;
+                    "
+            >
+              <img
+                style="width: 90px;height: 70px;"
+                src=${dataList?.contentRequest?.schoolLogo || "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/slider/images/UploadFile2024-06-12T10_07_50_225050928.png"}
+              />
+            </div>
+
+            <div style="width: 60%;">
+              <div>
+                <h1
+                  style=" font-size: 20px;
+                    text-align: center;padding: 0px;margin: 0px;"
+                >
+                ${dataList?.contentRequest?.schoolDetails?.schoolName || "-"}
+                </h1>
+                <div>
+                  <div
+                    style="display: flex;justify-content: center;padding: 0px;margin: 0px;"
+                  >
+                    <h2
+                      style="font-size: 16px;text-align: center;margin-bottom: 3px;padding: 0px;margin: 0px;"
+                    >
+                    ${dataList?.contentRequest?.schoolDetails?.area || ""}
+                    ${dataList?.contentRequest?.schoolDetails?.area && ", "}
+                    ${dataList?.contentRequest?.schoolDetails?.city || ""}
+                    ${dataList?.contentRequest?.schoolDetails?.city && ", "}
+                    ${dataList?.contentRequest?.schoolDetails?.state || ""}
+                    ${dataList?.contentRequest?.schoolDetails?.pincode && "-"}
+                    ${dataList?.contentRequest?.schoolDetails?.pincode || ""}
+
+                    </h2>
+                  </div>
+                  <div
+                    style="font-size: 16px;text-align: center;margin-bottom: 3px;"
+                  >
+                    ${dataList?.contentRequest?.schoolDetails?.educationBoard || "-"}
+                  </div>
+                  <div
+                    style="font-size: 14px;text-align: center;margin-bottom: 3px;"
+                  >
+                    ADMISSION FORM SESSION:${dataList?.contentRequest?.contentRequest[0]?.academicSession || "-"}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="width: 20%;
+                  display: flex;
+                  "
+            >
+
+            </div>
+          </div>
+          <!-- sr no and admission no -->
+          <div
+            style="display: flex;flex-direction:row center;padding: 0px;margin: 0px; justify-content: space-between;padding-top: 10px;"
+          >
+            <div style="font-size: 16px;margin-bottom: 3px;">
+
+            </div>
+            <div style="font-size: 14px;margin-bottom: 3px;">
+              <!-- {schoolDetails?.contactMobile && schoolDetails?.contactMobile}
+            {schoolDetails?.contactMobile && schoolDetails?.contactEmail &&
+            ", "} {schoolDetails?.contactEmail &&
+            schoolDetails?.contactEmail} -->
+              Admission No :${dataList?.contentRequest?.contentRequest[0]?.studentId || "-"}
+            </div>
+          </div>
+          <!-- 3 photos -->
+          <div
+            style="display: flex;justify-content: space-around;  padding-top: 10px;"
+          >
+            <div
+              style="width: 150px;
+              display: flex;
+              flex-direction:column;
+              height: 170px;
+              border: 1px solid black;
+              text-align:center;
+              border-radius:8px;
+              overflow:hidden;"
+            >
+              <img style="width:150px;" alt="Student-Image" src=${dataList?.contentRequest?.studentImage || "-"} 
+              onerror="this.onerror=null; this.src='https://thumbs.dreamstime.com/b/default-avatar-profile-icon-grey-photo-placeholder-illustrations-vectors-default-avatar-profile-icon-grey-photo-placeholder-99724602.jpg';" />
+<p>Student Image</p>
+            </div>
+            <div
+               style="width: 150px;
+              display: flex;
+              flex-direction:column;
+              height: 170px;
+              border: 1px solid black;
+              text-align:center;
+              border-radius:8px;
+              overflow:hidden;"
+            >
+              <img style="width:150px;" alt="father-image" src=${dataList?.contentRequest?.fatherImage || "-"} 
+              onerror="this.onerror=null; this.src='https://thumbs.dreamstime.com/b/default-avatar-profile-icon-grey-photo-placeholder-illustrations-vectors-default-avatar-profile-icon-grey-photo-placeholder-99724602.jpg';" 
+              />
+              <p>Father Image</p>
+            </div>
+            <div
+              style="width: 150px;
+              display: flex;
+              flex-direction:column;
+              height: 170px;
+              border: 1px solid black;
+              text-align:center;
+              border-radius:8px;
+              overflow:hidden;"
+            >
+              <img style="width:150px;" src=${dataList?.contentRequest?.motherImage || "-"} 
+              onerror="this.onerror=null; this.src='https://thumbs.dreamstime.com/b/default-avatar-profile-icon-grey-photo-placeholder-illustrations-vectors-default-avatar-profile-icon-grey-photo-placeholder-99724602.jpg';" 
+              />
+              <p>Mother Image</p>
+            </div>
+          </div>
+          <!-- first data -->
+          <div style="padding:5px;">
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;padding-top: 30px;"
+            >
+              <div
+                style="width: 50%;
+                  display: flex;"
+              >
+                <span style="width: 35%;">Class</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.classes || ""}-${dataList?.contentRequest?.contentRequest[0]?.sections || ""}</span>
+              </div>
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Applicant’s Name</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentName || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                  display: flex;"
+              >
+                <span style="width: 35%;">Date of Birth</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.dob || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Gender</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.gender || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Blood Group</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.bloodGroup || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Religion</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.religion || "-"}</span>
+              </div>
+            </div>
+            <div style="padding: 0px 25px;">
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Aadhaar No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAdhaarcard || "-"}</span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <!-- Residential Address  -->
+          <div style="padding:5px;">
+            <div
+              style="font-size: 16px;font-weight: bold;padding-left: 25px;padding-top: 3px;"
+            >
+              Residential Address
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">House No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAddressResponse?.street || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">State</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAddressResponse?.state || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Area</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAddressResponse?.area || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;"> Phone 1</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.phone1 || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">City</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAddressResponse?.city || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Phone 2</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.phone2 || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Pincode</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentAddressResponse?.houseNo || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">Mobile</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.mobileNumber || "-"}</span>
+              </div>
+            </div>
+            <div style="padding: 0px 25px;">
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">E-mail</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.studentEmail || "-"}</span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <!-- Personal Info -->
+          <!-- parents particulars -->
+          <div style="padding:5px;">
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                Father’s Particulars
+              </div>
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                Mother’s Particulars
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Name</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherName || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Name</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherName || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Qualification</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherQualification || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Qualification</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherQualification || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Occupation</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherOccupation || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">Occupation</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherOccupation || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">Income</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherIncome || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+        display: flex;"
+              >
+                <span style="width: 35%;">Income</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherIncome || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+        display: flex;"
+              >
+                <span style="width: 35%;">Aadhaar No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherAdhaarNumber || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+      display: flex;"
+              >
+                <span style="width: 35%;">Aadhaar No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherAdhaarNumber || "-"}</span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <!-- parents office info -->
+          <div style="padding:5px;">
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                Father’s Office Address
+              </div>
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                Mother’s Office Address
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Organization</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherOrganization || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Organization</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherOrganization || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Address</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherAddressResponse?.houseNo || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Address</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherAddressResponse?.houseNo || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;">Area</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherAddressResponse?.area || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">Area</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherAddressResponse?.area || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">Mobile No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.fatherMobile || "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+        display: flex;"
+              >
+                <span style="width: 35%;">Mobile No.</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.motherMobile || "-"}</span>
+              </div>
+            </div>
+            <div style="padding: 0px 25px;">
+              <div style="width: 100%;">
+                <span style="width: 45%;">Guardian’s Name & Relationship</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 53%;">${dataList?.contentRequest?.contentRequest[0]?.relation || "-"}</span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <!-- school alumni -->
+          <div style="padding:5px;">
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                In case of School Alumni
+              </div>
+              <div style="font-size: 16px;font-weight: bold;width: 50%;">
+                In case of Sibling
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;">Father’s Name & Batch</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.alumni ? dataList?.contentRequest?.contentRequest[0]?.fatherName : "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Name</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.siblingResponse?.[0]?.siblingName || "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;">Mother’s Name & Batch</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.alumni ? dataList?.contentRequest?.contentRequest[0]?.motherName : "-"}</span>
+              </div>
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;"> Father’s Name</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.siblingResponse?.[0]?.siblingName ? dataList?.contentRequest?.contentRequest[0]?.fatherName : "-"}</span>
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;"
+            >
+              <div
+                style="width: 50%;
+            display: flex;"
+              ></div>
+              <div
+                style="width: 50%;
+          display: flex;"
+              >
+                <span style="width: 35%;">ID</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 64%;">${dataList?.contentRequest?.contentRequest[0]?.siblingResponse?.[0]?.admissionNo || "-"}</span>
+              </div>
+            </div>
+            <div style="padding: 0px 25px;">
+              <div style="width: 100%;">
+                <span style="width: 45%;"
+                  >Whether SC / ST / Backward Class / OBC / Minority / General (If
+                  any enclose certificate)</span
+                >
+                <span style="width: 2%;">:</span>
+                <span style="width: 53%;">${dataList?.contentRequest?.contentRequest[0]?.category || "-"}</span>
+              </div>
+            </div>
+            <!--// <div style="padding: 0px 25px;">
+            //   <div style="width: 100%;">
+            //     <span style="width: 45%;"
+            //       >Whether school transport is required (YES / NO)</span
+            //     >
+            //     <span style="width: 2%;">:</span>
+            //     <span style="width: 53%;">${dataList?.contentRequest?.contentRequest[0]?.studentId || "-"}</span>
+            //   </div>
+            // </div>
+            // <div style="padding: 0px 25px;">
+            //   <div style="width: 100%;">
+            //     <span style="width: 45%;"
+            //       >(Available for existing routes only )</span
+            //     >
+            //   </div>
+            // </div>-->
+            <div style="padding: 0px 25px;">
+              <div style="width: 100%;">
+                <span style="width: 45%;">Name of Previous school</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 53%;">${dataList?.contentRequest?.contentRequest[0]?.previousSchoolName || "-"}</span>
+              </div>
+            </div>
+            <div style="padding: 0px 25px;">
+              <div style="width: 100%;">
+                <span style="width: 45%;">Health Remark/Status</span>
+                <span style="width: 2%;">:</span>
+                <span style="width: 53%;">${dataList?.contentRequest?.contentRequest[0]?.healthRemark || "-"}</span>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <!-- Undertaking -->
+          <div style="page-break-before: always">
+            <h1
+              style=" font-size: 20px;
+              text-align: center;padding: 0px;margin: 0px;"
+            >
+              UNDERTAKING
+            </h1>
+          </div>
+          <div>
+            <h2
+              style="font-size: 18px;
+              text-align: left;padding: 0px;margin: 0px; padding-left: 25px;padding-top: 20px;"
+            >
+              I Undertake following:
+            </h2>
+          </div>
+          <div>
+            <ul>
+              <li style="font-size: 16px;font-weight: bold;">
+                I certify that I give my consent and am in a position to pay the
+                prescribed fees and funds and will not ask for fee concession.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I will pay school fee of my ward regularly and will not ask for part
+                payment.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I undertake that I will pay the school fee as per the time schedule
+                given by the school.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I also know that brother/sister’s fees concession, in not granted.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I have seen the fee structure shown to me at the time of admission.
+                I know fee structure is subject to change as per norms.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I have read and checked the details given by me and understand if
+                found incorrect at any stage would lead to cancellation of Admission
+                of my ward.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I agree to abide by the rules and regulations of the school and will
+                not involve myself in any anti school activity.
+              </li>
+              <li style="font-size: 16px;font-weight: bold;">
+                I also understand that I will not bring the mobile phone or any
+                other electronic device inside the school premises while attending
+                the PTM or for any other reason.
+              </li>
+            </ul>
+            <div>
+              <div
+                style="font-size: 16px;
+                text-align: left;padding: 0px;margin: 0px; padding-left: 25px;padding-top: 20px;"
+              >
+                I ${dataList?.contentRequest?.contentRequest[0]?.fatherName || "-"} father and ${dataList?.contentRequest?.contentRequest[0]?.motherName || "-"} mother of ${dataList?.contentRequest?.contentRequest[0]?.studentName || "-"} hereby
+                declare that information given above is based on facts and authentic
+                records. Admission of my child will be cancelled if any information
+                is found to be false / incorrect.
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;padding-top: 30px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Father’s Name</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Mother’s Name</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;padding-top: 20px;"
+            >
+              <div
+                style="width: 50%;
+                display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Signature</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Signature</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;padding-top: 20px;"
+            >
+              <div
+                style="width: 50%;
+              display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Date</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+              <div
+                style="width: 50%;
+            display: flex;"
+              >
+                <span style="width: 35%;font-size: 16px">Date</span>
+                <span style="width: 2%;font-size: 16px">:</span>
+                <span style="width: 64%;font-size: 16px"
+                  >______________________</span
+                >
+              </div>
+            </div>
+            <div
+              style="display: flex;justify-content: space-around;padding: 0px 25px;padding-top: 50px;"
+            >
+              <div style="width: 60%;"></div>
+              <div
+                style="width: 40%;
+              display: flex; align-items: right; justify-content: right;padding-right: 10px;"
+              >
+                <span style="width: 35%;font-size: 16px;text-align: right;"
+                  >(PRINCIPAL)</span
+                >
+              </div>
+            </div>
+          </div>
+        </page>
+                      `
+                       ;
+
+            studentHtml.appendChild(singleStudentHtml);
+          };
+   </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "01-12-2019",
+            admissionNo: "7242",
+            studentName: "Aashvi Singh",
+            className: "PRE SCHOOL",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "Singh Pal Singh",
+            motherName: "Monika Sharma",
+            attendance: "0.0/0",
+            boardRollNumber: "134",
+            studentInfoResponse: [
+              {
+                id: 182797,
+                userUid: "0f95a441-234a-4152-b735-6fbc4f1a8772",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "03981e78-a58e-4972-ad1b-eab8b3be3d0b",
+                studentId: "7242",
+                studentName: "Aashvi Singh",
+                fatherName: "Singh Pal Singh",
+                motherName: "Monika Sharma",
+                dob: "01-12-2019",
+                gender: "Female",
+                studentAdhaarcard: "667656431425",
+                joiningClass: "PRE SCHOOL",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "Shalimar Bagh",
+                city: "NA",
+                state: "NA",
+                pincode: "110088",
+                phone1: null,
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "6512345678",
+                studentEmail: null,
+                religion: "Hindu",
+                category: "GENERAL",
+                minority: "No",
+                motherTongue: "Hindi",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "O+",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "Abcd",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "NA",
+                fatherCity: "NA",
+                fatherState: "NA",
+                fatherPincode: "",
+                fatherPhone: null,
+                fatherMobile: "6565415231",
+                fatherEmail: null,
+                fatherAdhaarNumber: "556473647874",
+                schoolUid: "6e51d605-a1d5-4bef-980f-406ca13780e5",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "Abcd",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "NA",
+                motherCity: "NA",
+                motherState: "NA",
+                motherPincode: "",
+                motherPhone: null,
+                motherMobile: "6765231423",
+                motherEmail: null,
+                motherAdhaarNumber: "223212323432",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: null,
+                otp: "poV3S2",
+                schoolName: "Demo Public School",
+                remark: null,
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "PRE SCHOOL",
+                classUid: null,
+                sections: "A",
+                group: "PRE SCHOOL",
+                wing: "NA",
+                status: "Left",
+                academicSession: "2023-24",
+                joiningStatus: "New",
+                houses: "RED",
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: null,
+                attached: false,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "b3a631f8-732b-4ad5-9cf8-e9f2787626a5",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "user_365099",
+                editedUser: "user_365099",
+                createddate: "2023-10-23 10:08:31.471156",
+                editeddate: "2023-10-23 10:08:31.471156",
+                studentAddressResponse: {
+                  uid: "69e0b00a-15f8-4b36-b60e-b1e32d1b0f81",
+                  houseNo: null,
+                  area: "Shalimar Bagh",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 110088,
+                  street: "111",
+                  userName: "DPS286_7242",
+                  createdDate: "23-10-2023 03:38 PM",
+                  editedDate: "23-10-2023 03:38 PM",
+                  createdBy: "user_365099",
+                  editedBy: "user_365099",
+                },
+                fatherAddressResponse: {
+                  uid: "f87a0128-ab89-44e7-8483-a69fdf0185dc",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "23-10-2023 03:38 PM",
+                  editedDate: "23-10-2023 03:38 PM",
+                  createdBy: "user_365099",
+                  editedBy: "user_365099",
+                },
+                motherAddressResponse: {
+                  uid: "d88731dc-3b76-44f2-b47a-9b8554294a54",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "23-10-2023 03:38 PM",
+                  editedDate: "23-10-2023 03:38 PM",
+                  createdBy: "user_365099",
+                  editedBy: "user_365099",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+            school: {
+              uid: "6e51d605-a1d5-4bef-980f-406ca13780e5",
+              apikey: "TLnBWksPD0y2tuIfZmRG5plMgyVSogig",
+              schoolName: "DEMO PUBLIC SCHOOL",
+              schoolAbb: "DPS",
+              educationBoard: "",
+              registrationNo: "1234",
+              plotNumber: "123",
+              area: "Shalimar  Bagh",
+              city: "Delhi",
+              pincode: "110088",
+              state: "Delhi",
+              phoneNo1: "",
+              phoneNo2: "",
+              contactName: "Demo",
+              contactMobile: "6765654543",
+              contactEmail: "Demo@gmail.com",
+              schoolCode: "",
+              pfCode: "",
+              societyManagement: "",
+              language: "",
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "",
+              website: "",
+              schemaPrefix: null,
+              editedDate: "29-02-2024 06:50 PM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: true,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              loanEnabled: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+              notificationEnabled: true,
+            },
+          },
+          contentRequest: {
+            id: 39,
+            uid: "199e60b0-f19a-4046-b115-8a3feeaf6da1",
+            studentId: "7242",
+            dob: "01-12-2019",
+            gender: "Female",
+            studentAdhaarcard: "667656431425",
+            joiningClass: "PRE SCHOOL",
+            joiningSections: "A",
+            joiningDate: "01-01-2022",
+            plotNumber: null,
+            area: null,
+            city: null,
+            state: null,
+            pincode: null,
+            phone1: null,
+            rollNo: 0,
+            emergencyNumber: "",
+            mobileNumber: "6512345678",
+            studentEmail: null,
+            religion: "Hindu",
+            schoolUid: "6e51d605-a1d5-4bef-980f-406ca13780e5",
+            minority: "No",
+            motherTongue: "Hindi",
+            idMark: null,
+            height: null,
+            weight: null,
+            physicalDisability: null,
+            bloodGroup: "O+",
+            healthRemark: null,
+            siblingDetails: null,
+            alumni: null,
+            fatherOccupation: null,
+            fatherQualification: null,
+            fatherOrganization: "Abcd",
+            fatherDesignation: null,
+            fatherIncome: null,
+            fatherArea: null,
+            fatherCity: null,
+            fatherState: null,
+            fatherPincode: null,
+            fatherPhone: null,
+            fatherMobile: "6565415231",
+            fatherEmail: null,
+            fatherAdhaarNumber: "556473647874",
+            motherQualification: null,
+            motherOccupation: null,
+            motherOrganization: "Abcd",
+            motherDesignation: null,
+            motherIncome: null,
+            motherArea: null,
+            motherCity: null,
+            motherState: null,
+            motherPincode: null,
+            motherPhone: null,
+            motherMobile: "6765231423",
+            motherEmail: null,
+            motherAdhaarNumber: "223212323432",
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: null,
+            remark: null,
+            classes: "PRE SCHOOL",
+            sections: "A",
+            group: "PRE SCHOOL",
+            wing: "NA",
+            joiningStatus: "New",
+            houses: "RED",
+            certificates: null,
+            certificatesList: [],
+            caste: null,
+            listOfDocuments: null,
+            attached: false,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [],
+            studentTransport: [],
+            status: "Left",
+            presentClass: "PRE SCHOOL A",
+            promotedClass: "PRE SCHOOL",
+            feePaidUpto: "jan",
+            reasonWithdrawal: "",
+            anyOtherRemark: "NA",
+            generalConduct: "Good",
+            applicationDate: "29-02-2024",
+            issueDate: "29-02-2024",
+            fatherName: "Singh Pal Singh",
+            motherName: "Monika Sharma",
+            studentName: "Aashvi Singh",
+            examLastTaken: "",
+            weatherFailed: "No",
+            academicSession: "2023-24",
+            admissionNo: "7242",
+            printDate: "2024-02-29 13:03:39.299071",
+            medium: null,
+            subjects: "Math",
+            nccOrScout: "",
+            gamesOrExtraCurricular: "NA",
+            category: "GENERAL",
+            nationality: "India",
+            weatherQualifiedForPromotion: "Yes",
+            anyFeeConcession: "",
+            totalWorkingDays: "0",
+            totalDaysPresent: "0",
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createdDate: "2024-02-29 13:03:39.320131",
+            editedDate: null,
+          },
+          header: `
+          <table cellspacing="0" style="width:100%;">
+             <tr>
+                <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+                   <div style="height:10mm;">&nbsp;</div>
+                </td>
+             </tr>
+          </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

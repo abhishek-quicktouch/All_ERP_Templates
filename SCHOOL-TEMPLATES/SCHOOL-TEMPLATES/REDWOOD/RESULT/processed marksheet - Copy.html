@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result Template</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            console.log(data);
+            let termArr = data?.markData?.markSheetTerms?.map((v) => ({
+              key: v.headerName,
+              value: termSubHeading(v.headerName, data),
+            }));
+            let totalObtained = attachments(data)?.reduce(
+              (ac, el) => ac + Number(el?.value?.[el?.value?.length - 1]),
+              0
+            );
+            let totalPer =
+              (totalObtained /
+                (termArr?.reduce((acc, curr) => acc + curr.value[2], 0) *
+                  attachments(data)?.length)) *
+              100;
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              studentInfo: [
+                {
+                  key: "STUDENT'S NAME",
+                  value: data?.student?.studentName || "",
+                  key2: "ADMISSION NO.",
+                  value2: data?.student?.admissionNo || "",
+                },
+                {
+                  key: "FATHER'S NAME",
+                  value: data?.student?.fatherName || "",
+                  key2: "CLASS/SECTION",
+                  value2: `${data?.student?.className || ""}-${
+                    data?.student?.sectionName || ""
+                  }`,
+                },
+                {
+                  key: "MOTHER'S NAME",
+                  value: data?.student?.fatherName || "",
+                  key2: "ROLL NO.",
+                  value2: data?.student?.rollNo ?? "",
+                },
+                {
+                  key: "DATE OF BIRTH",
+                  value: data?.student?.dob || "",
+                  key2: "ATTENDANCE",
+                  value2: data?.student?.attendance ?? "",
+                },
+              ],
+
+              termArray: [
+                ...termArr,
+                {
+                  key: "Total",
+                  value: [
+                    termArr?.reduce((acc, curr) => acc + curr.value[0], 0),
+                    termArr?.reduce((acc, curr) => acc + curr.value[1], 0),
+                    termArr?.reduce((acc, curr) => acc + curr.value[2], 0),
+                  ],
+                },
+              ],
+              studentResult: attachments(data),
+              studentResponse: data?.markData,
+
+              StudentResultTotal: {
+                number:
+                  totalObtained !== "Infinity"
+                    ? Number.isInteger(totalObtained)
+                      ? totalObtained
+                      : totalObtained?.toFixed(1)
+                    : 0,
+                percentage: `${
+                  totalPer !== "Infinity"
+                    ? Number.isInteger(totalPer)
+                      ? totalPer
+                      : totalPer?.toFixed(1)
+                    : 0
+                }%`,
+              },
+              remarks: data?.remarks?.details?.[0]?.description || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const attachments = (data) => {
+          let attachment = [];
+          let subjects = [];
+          data?.markData?.subjectWiseMarkSheetReportResponses?.forEach((v) =>
+            v.markSheetReport.forEach((val) => {
+              if (!attachment?.find((v) => v == val.attachmentName))
+                attachment.push(val.attachmentName);
+            })
+          );
+          return attachment
+            ?.filter((v) => v)
+            ?.map((val) => {
+              let value = [];
+              let total = {
+                theory: 0,
+                practical: 0,
+              };
+              data?.markData?.markSheetTerms?.forEach((element) => {
+                let final = {
+                  theory: 0,
+                  practical: 0,
+                };
+
+                data?.markData?.subjectWiseMarkSheetReportResponses?.forEach(
+                  (v) =>
+                    v.markSheetReport.forEach((el) => {
+                      if (
+                        el?.markSheetTermResponse.headerName ==
+                          element.headerName &&
+                        val == el.attachmentName
+                      ) {
+                        if (el.subjectNature == "THEORY") {
+                          final.theory = el.obtained;
+                          total.theory = total.theory + el.obtained;
+                        }
+                        if (el.subjectNature == "PRACTICAL") {
+                          final.practical = el.obtained;
+                          total.practical = total.practical + el.obtained;
+                        }
+                      }
+                    })
+                );
+                value.push(
+                  final.theory !== "Infinity" ? final.theory?.toFixed(1) : 0,
+                  final.practical !== "Infinity"
+                    ? final.practical?.toFixed(1)
+                    : 0,
+                  final.theory + final.practical !== "Infinity"
+                    ? (final.theory + final.practical)?.toFixed(1)
+                    : 0
+                );
+              });
+              value.push(
+                total.theory !== "Infinity" ? total.theory?.toFixed(1) : 0,
+                total.practical !== "Infinity"
+                  ? total.practical?.toFixed(1)
+                  : 0,
+                total.theory + total.practical !== "Infinity"
+                  ? (total.theory + total.practical)?.toFixed(1)
+                  : 0
+              );
+
+              return {
+                key: val,
+                value,
+              };
+            });
+
+          data?.markData?.subjectWiseMarkSheetReportResponses?.forEach((v) => {
+            if (!subjects?.find((val) => val == v.subjectName)) {
+              if (!v.attachmentName) {
+                subjects.push(v.subjectName);
+              }
+            }
+          });
+          const subjectsData = subjects
+            ?.filter((v) => v)
+            ?.map((val) => {
+              let value = [];
+              let total = {
+                theory: 0,
+                practical: 0,
+              };
+              data?.markData?.markSheetTerms?.forEach((element) => {
+                let final = {
+                  theory: 0,
+                  practical: 0,
+                };
+
+                data?.markData?.subjectWiseMarkSheetReportResponses?.forEach(
+                  (v) =>
+                    v.markSheetReport.forEach((el) => {
+                      if (
+                        el?.markSheetTermResponse.headerName ==
+                          element.headerName &&
+                        val == el.subjectName
+                      ) {
+                        if (el.subjectNature == "THEORY") {
+                          final.theory = el.obtained;
+                          total.theory = total.theory + el.obtained;
+                        }
+                        if (el.subjectNature == "PRACTICAL") {
+                          final.practical = el.obtained;
+                          total.practical = total.practical + el.obtained;
+                        }
+                      }
+                    })
+                );
+                value.push(
+                  final.theory !== "Infinity" ? final.theory?.toFixed(1) : 0,
+                  final.practical !== "Infinity"
+                    ? final.practical
+                      ? final.practical?.toFixed(1)
+                      : "-"
+                    : 0,
+                  final.theory + final.practical !== "Infinity"
+                    ? (final.theory + final.practical)?.toFixed(1)
+                    : 0
+                );
+              });
+              value.push(
+                total.theory !== "Infinity" ? total.theory?.toFixed(1) : 0,
+                total.practical !== "Infinity"
+                  ? total.practical
+                    ? total.practical?.toFixed(1)
+                    : "-"
+                  : 0,
+                total.theory + total.practical !== "Infinity"
+                  ? (total.theory + total.practical)?.toFixed(1)
+                  : 0
+              );
+
+              return {
+                key: val,
+                value,
+              };
+            });
+          return [...attachmentSubs, ...subjectsData];
+        };
+
+        const termSubHeading = (header, data) => {
+          let value = [];
+          let marks = {
+            theory: 0,
+            practical: 0,
+          };
+          data?.markData?.subjectWiseMarkSheetReportResponses?.forEach((v) => {
+            v.markSheetReport.forEach((val) => {
+              if (
+                val.markSheetTermResponse.headerName == header &&
+                !marks.theory &&
+                val.subjectNature == "THEORY"
+              ) {
+                marks.theory = val.max;
+              }
+              if (
+                val.markSheetTermResponse.headerName == header &&
+                !marks.practical &&
+                val.subjectNature == "PRACTICAL"
+              ) {
+                marks.practical = val.max;
+              }
+            });
+          });
+          value.push(
+            marks.theory,
+            marks.practical,
+            marks.theory + marks.practical
+          );
+          return value;
+        };
+
+        const multipleStudents = convertData(dataList);
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+          console.log(v, "ddddddddddddd");
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML =
+            (v?.header || "") +
+            `<page orientation="portrait" format="A4" margin="0">
+              <style type="text/css">
+                @page {
+                  size: A4;
+                }
+
+                * {
+                  margin: 0px;
+                  padding: 0px;
+                  color: #000;
+                }
+
+                td {
+                  padding-left: 1mm;
+                  padding-right: 1mm;
+                  padding-top: 2mm;
+                  padding-bottom: 2mm;
+                  font-size: 9pt;
+                  color: #000000;
+                  font-family: Arial, Helvetica, sans-serif;
+                }
+
+                th {
+                  padding-left: 1mm;
+                  padding-right: 1mm;
+                  padding-top: 2mm;
+                  padding-bottom: 2mm;
+                  background: #e7e7e7;
+                  font-family: Arial, Helvetica, sans-serif;
+                }
+
+                .signImg {
+                  width: 150px;
+                  height: auto;
+                }
+
+                @media print {
+                  @page {
+                    margin: 5mm;
+                    size: A4;
+                  }
+
+                  .signImg {
+                    width: 150px;
+                    height: auto;
+                  }
+                }
+              </style>
+              <table
+                cellspacing="0"
+                style="
+                  width: 100%;
+                  border: solid 0.264583333mm #000000;
+                  padding-top: 8px;
+                "
+                id=${v.studentInfo[1].value}-studentInfo
+              >
+              ${v?.studentInfo
+                ?.map(
+                  (details) => `
+                <tr>
+                  <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                      <table width="100%" border="0" cellspacing="0" >
+                          <tr>
+                              <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${details?.key}</strong></td>
+                              <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${details?.value}</td>
+                          </tr>
+                      </table>
+                  </td>
+                  <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                              <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>${details?.key2}</strong></td>
+                              <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${details?.value2}</td>
+                          </tr>
+                      </table>
+                  </td>
+                  </tr>
+                `
+                )
+                .join("")}
+              </table>
+              <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:left; font-size:11pt; font-weight:bold; color:#000000;">Student Report Chart:</td>
+			</tr>
+		</table>
+		<!--// Term -->
+
+              <table
+                cellspacing="0"
+                style="
+                  width: 100%;
+                  border: solid 0.264583333mm #000000;
+                  margin-top: 16px;
+                "
+                id=${v.studentInfo[1].value}-studentResult
+              >
+             
+                <tr style="background-color: #e7e7e7">
+                 <td
+                   rowspan="2"
+                   align="center"
+                   style="width: 20%; font-weight: bold; font-size: 10pt"
+                 >
+                   SUBJECT<br />PAPERS
+                 </td>
+                 ${v.studentResponse.markSheetTerms
+                   ?.reduce((prev, current) => {
+                     if (!prev?.includes(current.headerName)) {
+                       return [...prev, current.headerName];
+                     }
+                     return prev;
+                   }, [])
+                   ?.map(
+                     (element) => ` <td
+                   colspan="4"
+                   align="center"
+                   style="
+                     width: 20%;
+                     border-left: solid 0.264583333mm #000000;
+                     font-weight: bold;
+                     font-size: 10pt;
+                   "
+                 >
+                  ${element}
+                 </td>`
+                   )
+                   .join("")}
+                
+               
+               
+                 <td
+                   rowspan="2"
+                   align="center"
+                   style="
+                     width: 10%;
+                     border-left: solid 0.264583333mm #000000;
+                     font-weight: bold;
+                     font-size: 10pt;
+                   "
+                 >
+                   Gross<br />Marks
+                 </td>
+                 <td
+                   rowspan="2"
+                   align="center"
+                   style="
+                     width: 10%;
+                     border-left: solid 0.264583333mm #000000;
+                     font-weight: bold;
+                     font-size: 10pt;
+                   "
+                 >
+                   Total<br />100M
+                 </td>
+                 <td
+                   rowspan="2"
+                   align="center"
+                   style="
+                     width: 10%;
+                     border-left: solid 0.264583333mm #000000;
+                     font-weight: bold;
+                     font-size: 10pt;
+                   "
+                 >
+                   Per.<br />%
+                 </td>
+                 <td
+                   rowspan="2"
+                   align="center"
+                   style="
+                     width: 10%;
+                     border-left: solid 0.264583333mm #000000;
+                     font-weight: bold;
+                     font-size: 10pt;
+                   "
+                 >
+                   Grade
+                 </td>
+               </tr>
+               <tr style="background-color: #e7e7e7">
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (20M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (30M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (40M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (10M)
+            </td>
+
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (20M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (30M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (40M)
+            </td>
+            <td
+              align="center"
+              style="
+                width: 5%;
+                border-top: solid 0.264583333mm #000000;
+                border-left: solid 0.264583333mm #000000;
+                font-weight: bold;
+              "
+            >
+              (10M)
+            </td>
+          </tr>
+
+              </table>
+
+            
+
+              <table cellspacing="0" style="width: 100%" id=${
+                v.studentInfo[1].value
+              }-remarks></table>
+
+              <table cellspacing="0" style="width: 100%" id=${
+                v.studentInfo[1].value
+              }-sign></table>
+              <table cellspacing="0" style="width: 100%" id=${
+                v.studentInfo[1].value
+              }-footer></table>
+            </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+          if (v) {
+            // Academic session Part
+            const academicSessionEle = document.getElementById(
+              `${v.studentInfo[1].value}-AcademicSession`
+            );
+            if (academicSessionEle) {
+              if (v.academicSession) {
+                academicSessionEle.innerHTML = `Academic Session : ${v.academicSession.year} <br />${v.academicSession.reportName}<br />Class : ${v.academicSession.class}`;
+              } else {
+                academicSessionEle.innerHTML =
+                  "Academic Session : 2023-2024<br />Annual Report Card<br />Class : XI";
+              }
+            }
+          }
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2023-2024",
+            admissionNo: "120",
+            studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+            studentName: "Subham Kumar kushwaha",
+            rollNo: 0,
+            fatherName: "RANJAN KUMAR",
+            className: "NUR",
+            sectionName: "A",
+            terms: "Viva/Oral",
+            markSheetName: "Term-I",
+            markSheetTerms: [
+              {
+                id: 173,
+                headerName: "Ass-I",
+                subHeaderName: "(20M)",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 20.0,
+                terms: ["Assessment-I"],
+              },
+              {
+                id: 174,
+                headerName: "Ass-II",
+                subHeaderName: "(30M)",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 30.0,
+                terms: ["Assessment-II"],
+              },
+              {
+                id: 175,
+                headerName: "Eva-I",
+                subHeaderName: "(40M)",
+                priority: 3,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 40.0,
+                terms: ["Evaluation-I"],
+              },
+              {
+                id: 176,
+                headerName: "Vi/Or",
+                subHeaderName: "(10M)",
+                priority: 4,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 10.0,
+                terms: ["Viva/Oral"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                subjectName: "Mathematics",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 20.0,
+                    obtained: 16.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 173,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20.0,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 30.0,
+                    obtained: 16.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 174,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 40.0,
+                    obtained: 26.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 175,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 10.0,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 176,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 10.0,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                ],
+                marksObtained: 68.0,
+                total: 100.0,
+                percentage: 68.0,
+                grade: "B",
+                className: "NUR",
+                sectionName: "A",
+                terms: "Viva/Oral",
+                markSheetName: "Term-I",
+                visible: false,
+              },
+              {
+                subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                subjectName: "1st Language (Hindi)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 20.0,
+                    obtained: 12.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 173,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20.0,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 30.0,
+                    obtained: 21.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 174,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 40.0,
+                    obtained: 29.0,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 175,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 8.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 176,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 10.0,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                ],
+                marksObtained: 70.0,
+                total: 100.0,
+                percentage: 70.0,
+                grade: "B",
+                className: "NUR",
+                sectionName: "A",
+                terms: "Viva/Oral",
+                markSheetName: "Term-I",
+                visible: false,
+              },
+              {
+                subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                subjectName: "Art & Crafts",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 20.0,
+                    obtained: 8.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 173,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20.0,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 30.0,
+                    obtained: 25.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 174,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 40.0,
+                    obtained: 37.0,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 175,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                ],
+                marksObtained: 70.0,
+                total: 90.0,
+                percentage: 77.77777777777779,
+                grade: "A",
+                className: "NUR",
+                sectionName: "A",
+                terms: "Viva/Oral",
+                markSheetName: "Term-I",
+                visible: false,
+              },
+              {
+                subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                subjectName: "2nd Language (English)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 20.0,
+                    obtained: 10.0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 173,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20.0,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 30.0,
+                    obtained: 0.0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 174,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 30.0,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    pass: false,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 40.0,
+                    obtained: 30.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 175,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 40.0,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                  {
+                    studentInfoUid: "4b4bfc9a-322e-4bef-81f5-5e01b3d84da6",
+                    admissionNo: "120",
+                    studentName: "Subham Kumar kushwaha",
+                    rollNo: 0,
+                    fatherName: "RANJAN KUMAR",
+                    className: "NUR",
+                    sectionName: "A",
+                    classSectionUid: "f08e5752-950f-4423-b630-9246c518a70e",
+                    terms: "Viva/Oral",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 10.0,
+                    obtained: 9.0,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-I",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    markSheetTermResponse: {
+                      id: 176,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 10.0,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    pass: true,
+                    graded: false,
+                  },
+                ],
+                marksObtained: 49.0,
+                total: 100.0,
+                percentage: 49.0,
+                grade: "C",
+                className: "NUR",
+                sectionName: "A",
+                terms: "Viva/Oral",
+                markSheetName: "Term-I",
+                visible: false,
+              },
+            ],
+            marksObtained: 257.0,
+            total: 390.0,
+            percentage: 65.8974358974359,
+            overAllGrade: "B",
+            visible: false,
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+            	<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/RGS117/school-logo.png" /></td>
+				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+					<span style="color:#0089e0; font-size:24pt; text-transform:uppercase; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">Redwoods Global School</span>
+					<br/><span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Chakmal, Pokhraira Chowk, Muzaffarpur, Bihar-843106<br>
+					www.redwoodsglobals.com | Email: redwoodsglobals@gmail.com</span>
+					
+					</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<col style="width: 10%"/>
+				<col style="width: 80%"/>
+				<col style="width: 10%"/>
+				<tr>
+					<td style="width:10%;">&nbsp;</td>
+					<td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt;">Student Report Card : 2023-2024</td>
+					<td style="width:10%;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>`,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

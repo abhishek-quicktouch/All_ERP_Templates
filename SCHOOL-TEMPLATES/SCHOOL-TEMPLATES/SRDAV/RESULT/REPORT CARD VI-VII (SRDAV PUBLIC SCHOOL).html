@@ -1,0 +1,3423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+</head>
+<body>
+   <div id="studentsList">Student Result</div>
+<script>
+    window.SetTemplateData = function (dataList) {
+      const resultDate = "26-04-2024";
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+        };
+        const subjectNatures = {
+          AAA: "ACHIEVEMENTS IN ACTIVITIES AREAS",
+          COACT:
+            "CO CURRICULAR ACTIVITIES AND INTEREST LITERARY AND CULTURAL ACTIVITIES",
+          PSQ: "PERSONAL AND SOCIAL QUALITIES AND ATTITUDES",
+          TH: "THEORY",
+          SC: "1B Scholastic"
+        };
+        const parentSubjectName2=[
+           "SCIENCE",
+           "SOCIAL SCIENCE",
+         ]
+         const parentSubjectName1=[
+            "ENGLISH",
+            "HINDI",
+      ]
+      const parentSubjectName3=[
+         "MATHEMATICS",
+      ]
+
+      let act1=["COLLABORATION & COOPERATION","CARE OF SCHOOL PROPERTY","RELATIONS WITH PEERS","RELATIONS WITH TEACHERS","VALUES AND LIFE SKILLS","ENVIRONMENT/COMMUNITY WORK"]
+      let act2=["INITIATIVE AND CONFIDENCE","DISCIPLINE, PUNCTUALITY, REGULARITY"]
+      let act3=["CLEANLINESS(HAIR, HANDS,FACE,SHOES & UNIFORM)","SEWA PROJECT","SPORTS & GAMES","YOGA"]
+      let act4=["ART, CRAFT, PAINTING, SCULPTURE","MUSIC, DANCE, THEATRE, DRAMA"]
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              baseTermData: data?.baseTermData,
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+              address: `${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.houseNo
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.houseNo + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.street
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.street + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.landmark
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.landmark + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.area
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.area + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.city
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.city + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.district
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.district + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.pincode
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.pincode
+                  : ""
+              }`,
+
+              remarks: data?.remarks?.details?.[0]?.description || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+      const studentHtml = document.getElementById("studentsList");
+      studentHtml.innerHTML=`<style type="text/css">
+   @page {
+   size: A4
+   }
+   * {
+   margin: 0px;
+   padding: 0px;
+   color: #000;
+   }
+   td {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 1mm;
+   padding-bottom: 1mm;
+   font-size: 9pt;
+   color: #000000;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   th {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 1mm;
+   padding-bottom: 1mm;
+   /*   background: #e7e7e7;*/
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   @media print {
+   @page {
+   margin:4mm;
+   size: A4
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   }
+</style>`
+multipleStudents?.forEach(v=>{
+   const mainResult = v?.studentResponse ?? [];
+   console.log(v)
+          const studentDetails = v.studentInfo;
+          const theorySubjects =
+            mainResult?.subjectWiseMarkSheetReportResponses;
+          const remarksEntry = v?.baseTermData?.remarksEntry;
+
+          const baseTermSubjects = (nature) => {
+            let sub=["GENERAL KNOWLEDGE", "NAITIK SHIKSHA", "COMPUTER ICT"]
+            if (nature == subjectNatures.TH) {
+              return v?.baseTermData?.subject?.filter(
+                (v) =>
+                  v.subjectAllResponse?.nature == nature &&
+                  !theorySubjects?.find(
+                    (val) => val.subjectName == v.subjectAllResponse.subjectName
+                  )
+              );
+            }
+            if (nature == subjectNatures.SC) {
+              return v?.baseTermData?.subject?.filter(
+                (v) =>
+                  v.subjectAllResponse?.nature == nature &&
+                  sub?.includes(v?.subjectAllResponse?.subjectName)
+              );
+            }
+
+            return v?.baseTermData?.subject?.filter(
+              (v) => v.subjectAllResponse?.nature == nature
+            );
+          };
+
+          // v.baseTermData?.subject;
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML += `<page orientation="portrait" format="A4" margin="0">
+   <table style="width:100%;" cellspacing="0" cellpadding="0">
+               <tr>
+                  <td style="width: 15%;" valign="top" align="center"><img style="width:100%;" align="left" src=${v?.baseTermData?.perSignedUrlResponse?.url}  onerror="this.onerror=null; this.src='https://static.vecteezy.com/system/resources/previews/007/979/845/non_2x/eps10-grey-school-building-with-flag-filled-icon-or-logo-in-simple-flat-trendy-modern-style-isolated-on-white-background-free-vector.jpg';"/></td>
+                  <td style="width: 70%;" valign="top" align="left">
+                     <div style=" width:100%; line-height: 150%; text-align:center; font-size:11pt; color:#01293c;">
+                        <span style="color:#01293c; font-size:20pt; font-weight:bold; padding-top:5mm;">SRDAV PUBLIC SCHOOL</span><br/>
+                        <span style="color:#01293c; font-size:10pt; font-weight:bold;">DAYANAND VIHAR,DELHI-110092<br>(ANNUAL PROGRESS REPORT)</span>
+                        <span style="width: 100%;text-align: center;" valign="top" align="left">
+                     <div style=" width:100%; line-height: 130%; padding-bottom:0mm; text-align:center; font-size:11pt; color:#000; font-weight:bold;">Academic Session: ${v?.academicSession?.year || "-"}<br/>Comprehensive Progress Report</div>
+                  </span>
+                     </div>
+                  </td>
+                  <td style="width: 15%;" valign="top" align="center">&nbsp;</td>
+               </tr>
+            </table>
+  
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width: 100%; border: solid 0.3mm #000000;">
+               <tr>
+                  <td style="width: 60%; border-bottom: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" >
+                        <tr>
+                           <td style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                           <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.studentName || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width: 40%; border-bottom: solid 0.3mm #000000; border-left: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                           <td style="width:58%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.rollNo || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width: 60%; border-bottom: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              <strong>FATHER'S NAME</strong>
+                           </td>
+                           <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.fatherName || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width: 40%; border-bottom: solid 0.3mm #000000; border-left: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                           <td style="width:58%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.admissionNo || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width: 60%; border-bottom: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              <strong>MOTHER'S NAME</strong>
+                           </td>
+                           <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.motherName || "-"} </td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width: 40%; border-bottom: solid 0.3mm #000000; border-left: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              <strong>CLASS-SECTION</strong>
+                           </td>
+                           <td style="width:58%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; "> : ${studentDetails?.className || "-"}-${studentDetails?.sectionName || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width: 60%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              <strong>DATE OF BIRTH</strong>
+                           </td>
+                           <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.dob || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width: 40%; border-left: solid 0.3mm #000000;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              <strong>ATTENDANCE</strong>
+                           </td>
+                           <td style="width:58%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"> : ${studentDetails?.attendance || "-"}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table>
+            <!-- SCHOLASTIC GRADING SCALE -->
+            <table style="width:100%;" cellspacing="0" cellpadding="0">
+               <tr>
+                  <td style="width: 60%;" valign="top">
+                     <div style="line-height: 150%; text-align:right; font-size:15pt; color:#01293c;">
+                        <span style="color:#01293c; font-size:15pt; font-weight:bold; padding-top:5mm;">SCHOLASTIC AREAS</span>
+                     </div>
+                  </td>
+                  <td style="width:40%; font-weight:bold; font-size:8pt; line-height: 130%;" valign="bottom" align="right">(Grading on 8-point scale - A1,A2,B1,B2,C1,C2,D,E)</td>
+               </tr>
+            </table>
+            <!-- SCHOLASTIC GRADING SCALE -->
+            <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+               <tr>
+                  <th align="left" style="font-size:9pt; width: 30%; font-weight:bold; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">SUBJECT</th>
+                  <th colspan="6" align="center" style="font-size:9pt; width: 70%; font-weight:bold; border-bottom: solid 0.3mm #000000; ">TERM-I</th>
+               </tr>
+               <tr>
+                  <td valign="middle" style="font-size:9pt; width: 14%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;"></td>
+                     ${v?.studentResponse?.markSheetTerms?.map((val) => `
+                     <td align="center" style="width:9%; border-right: solid 0.264583333mm #000000;border-bottom: solid 0.264583333mm #000000;">
+				         <div style="height:7mm; text-align:center; width:100%; font-size:8pt; line-height:100%; font-weight:bold;">${val.headerName}</div>
+                     <div style=" width:100%; text-align:center;font-weight:bold;">${val.subHeaderName}</div>
+                  </td>`).join("")}
+                  </td>
+                  <td valign="middle" style="font-size:9pt; width: 14%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;">
+                     <div style="height:5mm; text-align:center; width:100%; font-size:8pt; line-height:80%; font-weight:bold;">TOTAL</div>
+                     <div style=" width:100%; text-align:center;">(100)</div>
+                  </td>
+                  <td valign="middle" style="font-size:9pt; width: 16%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;">
+                     <div style="height:5mm; text-align:center; width:100%; font-size:8pt; line-height:80%; font-weight:bold;">PERCENTAGE</div>
+                     <div style=" width:100%; text-align:center;">(%)</div>
+                  </td>
+                  <td valign="middle" style="font-size:9pt; width: 10%; border-bottom: solid 0.3mm #000000; font-weight:bold;">
+                     <div style="height:5mm; text-align:center; width:100%; font-size:8pt; line-height:80%; font-weight:bold;">GRADE</div>
+                  </td>
+               </tr>
+             
+  ${theorySubjects
+        ?.map(
+          (val, index) => `
+        <tr>
+				<td align="center" style="width:20%; border-top: ${index==0 ? "": "solid 0.264583333mm #000000"}; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.subjectName
+        }</td>
+
+        ${val.markSheetReport
+          ?.map(
+            (ele, j) => `<td align="center" style="width:${
+              j ? "10%" : "9%"
+            }; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+              ele.obtained
+            }</td>
+				`
+          )
+          .join("")}
+			
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.marksObtained
+        }</td>
+				<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.percentage
+        }</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.grade
+        }</td>
+			</tr>`
+        )
+        .join("")}
+            </table>
+            <!-- SCHOLASTIC GRADING SCALE -->
+            <!-- DETAILED INTERNAL ASSESSMENT -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="width: 100%;" valign="top">
+                     <div style="line-height: 130%; padding-top: 2mm; text-align:center; font-size:10pt; color:#000; font-weight:bold;">DETAILED INTERNAL ASSESSMENT</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- DETAILED INTERNAL ASSESSMENT -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:1mm; padding-bottom:0mm;">
+                        <div style="height:1mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <!-- DETAILED INTERNAL ASSESSMENT -II -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                 
+                      <tr>
+                     ${parentSubjectName1?.map(el=>{
+                        const subjectWiseData=v?.baseTermData?.subject?.filter(val=>val.subjectAllResponse?.parentName?.includes(el))
+                        return `
+                        <td style="width: 49%; padding: 1;">
+                           <table cellspacing="0" style="width:100%; border: 0.3mm solid #000;">
+                        <tr>
+                           <th colspan="2" align="center" style="font-size:9pt; font-weight:bold; border-bottom: 0.3mm solid #000;">${el}</th>
+                        </tr>
+                        <tr>
+                           <td align="left" style="font-size:9pt; font-weight: bold; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">Skills/Competencies</td>
+                           <td align="center" style="font-size:9pt; font-weight: bold; width: 20%; border-bottom: 0.3mm solid #000;">TERM 1</td>
+                        </tr>
+                        ${subjectWiseData?.map(sb=>{
+                           return `<tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">${sb?.subjectAllResponse?.subjectName|| "-"}</td>
+                           <td align="center" style="font-size:9pt; width: 20%; border-bottom: 0.3mm solid #000;">${sb?.markObtained}</td>
+                        </tr>`
+                        }).join("")}
+                        <!-- Add more rows for other skills/competencies -->
+                        <tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;">TOTAL(${subjectWiseData?.reduce((acc,curr)=>acc+curr?.max,0)})</td>
+                           <td align="center" style="font-size:9pt; width: 20%;">${subjectWiseData?.reduce((acc,curr)=>acc+curr?.markObtained,0)}</td>
+                        </tr>
+                     </table>
+                     </td>`
+                     }).join("")}
+                     </tr>
+
+                  <tr>
+                     ${parentSubjectName2?.map(el=>{
+                        const subjectWiseData=v?.baseTermData?.subject?.filter(val=>val.subjectAllResponse?.parentName?.includes(el))
+                        return `
+                        <td style="width: 49%; padding: 1;">
+                           <table cellspacing="0" style="width:100%; border: 0.3mm solid #000;">
+                        <tr>
+                           <th colspan="2" align="center" style="font-size:9pt; font-weight:bold; border-bottom: 0.3mm solid #000;">${el}</th>
+                        </tr>
+                        <tr>
+                           <td align="left" style="font-size:9pt; font-weight: bold; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">Skills/Competencies</td>
+                           <td align="center" style="font-size:9pt; font-weight: bold; width: 20%; border-bottom: 0.3mm solid #000;">TERM 1</td>
+                        </tr>
+                        ${subjectWiseData?.map(sb=>{
+                           return `<tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">${sb?.subjectAllResponse?.subjectName|| "-"}</td>
+                           <td align="center" style="font-size:9pt; width: 20%; border-bottom: 0.3mm solid #000;">${sb?.markObtained}</td>
+                        </tr>`
+                        }).join("")}
+                        <!-- Add more rows for other skills/competencies -->
+                        <tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;">TOTAL(${subjectWiseData?.reduce((acc,curr)=>acc+curr?.max,0)})</td>
+                           <td align="center" style="font-size:9pt; width: 20%;">${subjectWiseData?.reduce((acc,curr)=>acc+curr?.markObtained,0)}</td>
+                        </tr>
+                     </table>
+                     </td>`
+                     }).join("")}
+                     </tr>
+                  
+            </table>
+            <div style="page-break-after: always;"></div>
+            <!-- STUDENT DETAILED SECTION-II -->
+            <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+               <tr>
+                  <td valign="middle" style="font-size:9pt; text-align: left; font-weight: bold; width: 50%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;">NAME</td>
+                  <td valign="middle" style="font-size:9pt; text-align: left; width: 50%; border-bottom: solid 0.3mm #000000;">: ${studentDetails?.studentName || "-"}</td>
+               </tr>
+               <tr>
+                  <td valign="middle" style="font-size:9pt; width: 50%; text-align: left; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000; font-weight: bold;">ROLL NO.</td>
+                  <td valign="middle" style="font-size:9pt; width: 50%; text-align: left; border-bottom: solid 0.3mm #000000;"> : ${studentDetails?.rollNo || "-"}</td>
+               </tr>
+               <tr>
+                  <td valign="middle" style="font-size:9pt; width: 50%; text-align: left; border-right: solid 0.3mm #000000; font-weight: bold;">CLASS-SECTION </td>
+                  <td valign="middle" style="font-size:9pt; width: 50%; text-align: left;"> : ${studentDetails?.className || "-"}-${studentDetails?.sectionName || "-"}</td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;margin-top:20px;>
+              <tr>
+                     ${parentSubjectName3?.map(el=>{
+                        const subjectWiseData=v?.baseTermData?.subject?.filter(val=>val.subjectAllResponse?.parentName?.includes(el))
+                        return `
+                        <td style="width: 100%; padding: 1;">
+                           <table cellspacing="0" style="width:100%; border: 0.3mm solid #000;">
+                        <tr>
+                           <th colspan="2" align="center" style="font-size:9pt; font-weight:bold; border-bottom: 0.3mm solid #000;">${el}</th>
+                        </tr>
+                        <tr>
+                           <td align="left" style="font-size:9pt; font-weight: bold; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">Skills/Competencies</td>
+                           <td align="center" style="font-size:9pt; font-weight: bold; width: 20%; border-bottom: 0.3mm solid #000;">TERM 1</td>
+                        </tr>
+                        ${subjectWiseData?.map(sb=>{
+                           return `<tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000; border-bottom: 0.3mm solid #000;">${sb?.subjectAllResponse?.subjectName|| "-"}</td>
+                           <td align="center" style="font-size:9pt; width: 20%; border-bottom: 0.3mm solid #000;">${sb?.markObtained}</td>
+                        </tr>`
+                        }).join("")}
+                        <!-- Add more rows for other skills/competencies -->
+                        <tr>
+                           <td align="left" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;">TOTAL(${subjectWiseData?.reduce((acc,curr)=>acc+curr?.max,0)})</td>
+                           <td align="center" style="font-size:9pt; width: 20%;">${subjectWiseData?.reduce((acc,curr)=>acc+curr?.markObtained,0)}</td>
+                        </tr>
+                     </table>
+                     </td>`
+                     }).join("")}
+                     </tr>   
+            </table>
+            <!-- STUDENT DETAILED SECTION-II -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:3mm; padding-bottom:0mm;">
+                        <div style="height:2mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+
+            <!-- DETAILED INTERNAL ASSESSMENT -III -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:1mm; padding-bottom:0mm;">
+                        <div style="height:2mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <!-- MINOR SUBJECTS -->
+         	<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:50%; font-weight:bold; ">MINOR SUBJECT</td>
+				<td align="center" style="width:50%; border-left: solid 0.264583333mm #000000; font-weight:bold; ">TERM 1</td>
+			</tr>
+
+      ${baseTermSubjects(subjectNatures.SC)
+        ?.map(
+          (val, i) => `
+            <tr>
+				<td align="left" style="width:50%; border-top: solid 0.264583333mm #000000;">${val.subjectAllResponse.subjectName}</td>
+				<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.grade}</td>
+			</tr>
+`
+        )
+        .join("")}
+			
+		</table>
+            <!-- MINOR SUBJECTS -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:1mm; padding-bottom:0mm;">
+                        <div style="height:1mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <!-- 8-POINT GRADING SCALE FOR SCHOLASTIC AREAS -->
+            <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+               <tr>
+                  <th colspan="8" align="center" style="font-size:9pt; width: 100%; font-weight:bold; border-bottom: solid 0.3mm #000000; ">8-POINT GRADING SCALE FOR SCHOLASTIC AREAS</th>
+               </tr>
+               <tr>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">A1</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">A2</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">B1</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">B2</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">C1</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">C2</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">D</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-bottom: solid 0.3mm #000000;">E</td>
+               </tr>
+               <tr>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">91-100</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">81-90</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">71-80</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">61-70</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">51-60</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">41-50</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%; border-right: solid 0.3mm #000000;">33-40</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 12.5%;">32 & BELOW</td>
+               </tr>
+            </table>
+            <!-- 8-POINT GRADING SCALE FOR SCHOLASTIC AREAS -->
+            <!-- CO-SCHOLASTIC AREAS -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <div style="height:2mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <th colspan="4" align="center" style="font-size:9pt; width: 100%; font-weight:bold; border-top: solid 0.3mm #000000; border-right: solid 0.3mm #000000; border-left: solid 0.3mm #000000; ">CO-SCHOLASTIC AREAS</th>
+                  </tr>
+                  <tr valign="top">
+                     <td style="width: 49%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+                           <tbody>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; font-weight: bold; width: 80%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;">SOCIAL HABITS AND ATTITUDES</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; font-weight: bold; width: 20%; border-bottom: solid 0.3mm #000000;">TERM 1</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">COLLABORATION & COOPERATION</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="COLLABORATION & COOPERATION")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">CARE OF SCHOOL PROPERTY</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="CARE OF SCHOOL PROPERTY")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">RELATIONS WITH PEERS</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="RELATIONS WITH PEERS")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">VALUES AND LIFE SKILLS</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="VALUES AND LIFE SKILLS")?.markObtained || "-"}</td>
+                              </tr>
+
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; font-weight: bold; border-right: solid 0.3mm #000000;">ENVIRONMENT/COMMUNITY WORK</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;"></td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000; border-bottom: solid 0.3mm #000000;">INITIATIVE AND CONFIDENCE</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="INITIATIVE AND CONFIDENCE")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;">DISCIPLINE, PUNCTUALITY, REGULARITY</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="DISCIPLINE, PUNCTUALITY, REGULARITY")?.markObtained || "-"}</td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </td>
+                     <td style="width: 2%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+                     <td style="width: 49%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+                           <tbody>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; font-weight: bold; width: 80%; border-bottom: solid 0.3mm #000000; font-weight:bold; border-right: solid 0.3mm #000000;">HEALTH & PHYSICAL EDUCATION</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; font-weight: bold; width: 20%; border-bottom: solid 0.3mm #000000;">TERM 1</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">CLEANLINESS(HAIR, HANDS,FACE,SHOES & UNIFORM)</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="CLEANLINESS(HAIR, HANDS,FACE,SHOES & UNIFORM)")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">SEWA PROJECT</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="SEWA PROJECT")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">SPORTS & GAMES</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="SPORTS & GAMES")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">YOGA</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="YOGA")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; font-weight: bold; border-right: solid 0.3mm #000000;">VISUAL AND PERFORMING ARTS</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;"></td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">ART, CRAFT, PAINTING, SCULPTURE</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="ART, CRAFT, PAINTING, SCULPTURE")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">MUSIC, DANCE, THEATRE, DRAMA</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="MUSIC, DANCE, THEATRE, DRAMA")?.markObtained || "-"}</td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;  border-bottom: solid 0.3mm #000000; font-weight: bold;">SUPW / WORK EDUCATION</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;"></td>
+                              </tr>
+                              <tr>
+                                 <td align="left" valign="middle" style="font-size:9pt; width: 80%; border-right: solid 0.3mm #000000;">LIFE SKILLS</td>
+                                 <td align="center" valign="middle" style="font-size:9pt; width: 20%; ">${v?.baseTermData?.subject?.find(m=>m?.subjectAllResponse?.subjectName=="LIFE SKILLS")?.markObtained || "-"}</td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <!-- CO-SCHOLASTIC AREAS -->
+            <table cellspacing="0" style="width:100%;">
+               <tbody>
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:2mm; padding-bottom:0mm;">
+                        <div style="height:2mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <!-- 5-POINT GRADING SCALE FOR CO-SCHOLASTIC AREAS -->
+            <table cellspacing="0" style="width:100%; border: solid 0.3mm #000000;">
+               <tr>
+                  <th colspan="8" align="center" style="font-size:9pt; width: 100%; font-weight:bold; border-bottom: solid 0.3mm #000000; ">5-POINT GRADING SCALE FOR CO-SCHOLASTIC AREAS</th>
+               </tr>
+               <tr>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">A1</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">A2</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">B1</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000; border-right: solid 0.3mm #000000;">B2</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-bottom: solid 0.3mm #000000;">C</td>
+               </tr>
+               <tr>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-right: solid 0.3mm #000000;">HIGHLY COMPETENT</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-right: solid 0.3mm #000000;">QUITE CAPABLE</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-right: solid 0.3mm #000000;">PERFORMS SATISFACTORILY</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%; border-right: solid 0.3mm #000000;">TRYING WELL</td>
+                  <td align="center" valign="middle" style="font-size:9pt; width: 20%;">CAN DO BETTER</td>
+               </tr>
+            </table>
+            <!-- 5-POINT GRADING SCALE FOR CO-SCHOLASTIC AREAS -->
+            <table cellspacing="0" style="width:100%;">
+               
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <div style="height:1mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               
+            </table>
+            <!-- TEACHER'S SUGGESTIVE REMARKS -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="width: 100%;" valign="top">
+                     <div style="line-height: 100%; padding-bottom:0mm; text-align:center; font-size:10pt; color:#000; font-weight:bold; text-decoration: underline; text-underline-offset: 3px;">TEACHER'S SUGGESTIVE REMARKS</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- TEACHER'S SUGGESTIVE REMARKS -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="width:100%; font-size:11pt">
+                     <table width="100%" style="border-bottom: solid 0.3mm #000000; border-spacing: 2mm;" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:100%; padding-left:0mm; text-align: left; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; ">${
+                      remarksEntry?.description || ""
+                    }</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:4mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td align="left" valign="bottom" style="padding-left:0mm; width:33%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:10pt; text-align:left;"><br /><strong>CLASS TEACHER</strong></td>
+                  <td align="center" valign="bottom" style="padding-left:0mm; width:34%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:10pt; text-align:center;"><br /><strong>SUPERVISORY HEAD</strong></td>
+                  <td align="right" valign="bottom" style="padding-left:0mm; width:33%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:10pt; text-align:right;"><br /><strong>PRINCIPAL</strong></td>
+               </tr>
+            </table>
+</page>`;
+studentHtml.appendChild(singleStudentHtml);
+})
+    }
+</script>
+   <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "16-06-2016",
+            admissionNo: "1903244",
+            studentName: "WAJID ALI",
+            className: "I",
+            sectionName: "A",
+            rollNo: 37,
+            fatherName: "SAJID ALI",
+            motherName: "SHAHIN AKHTER",
+            attendance: "118.0/132",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 92843,
+                userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+                studentId: "1903244",
+                studentName: "WAJID ALI",
+                fatherName: "SAJID ALI",
+                motherName: "SHAHIN AKHTER",
+                dob: "16-06-2016",
+                gender: "NA",
+                studentAdhaarcard: "",
+                joiningClass: "I",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 37,
+                emergencyNumber: "",
+                mobileNumber: "8494005716",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9797895186",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: "9797895186",
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "SwTBTi",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "NA",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "HAAKIIA",
+                editedUser: "HAAKIIA",
+                createddate: "2023-05-03 09:42:16.870927",
+                editeddate: "2023-05-18 03:10:59.980625",
+                studentAddressResponse: {
+                  uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                fatherAddressResponse: {
+                  uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_F1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                motherAddressResponse: {
+                  uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_M1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData:{
+            "academicSession": "2024-25",
+            "admissionNo": "18510",
+            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+            "studentName": "Aadvik Mangal",
+            "rollNo": 1,
+            "fatherName": "Mr. Sumit Mangal",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "HALF YEARLY",
+            "markSheetName": "TERM-I",
+            "markSheetTerms": [
+                {
+                    "id": 491,
+                    "headerName": "I.A-I",
+                    "subHeaderName": "(30)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 1,
+                    "weightage": 30.0,
+                    "terms": [
+                        "I.A-I"
+                    ]
+                },
+                {
+                    "id": 492,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(20)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 1,
+                    "weightage": 20.0,
+                    "terms": [
+                        "PERIODIC TEST 1"
+                    ]
+                },
+                {
+                    "id": 493,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(50)",
+                    "priority": 3,
+                    "bestOf": 0,
+                    "decimalPlaces": 1,
+                    "weightage": 50.0,
+                    "terms": [
+                        "HALF YEARLY"
+                    ]
+                }
+            ],
+            "subjectWiseMarkSheetReportResponses": [
+                {
+                    "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "THEORY",
+                    "markSheetReport": [
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                            "subjectName": "ENGLISH",
+                            "subjectNature": "THEORY",
+                            "max": 30.0,
+                            "obtained": 25.0,
+                            "grade": "A2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 491,
+                                "headerName": "I.A-I",
+                                "subHeaderName": "(30)",
+                                "priority": 1,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 30.0,
+                                "terms": [
+                                    "I.A-I"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                            "subjectName": "ENGLISH",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 33.3,
+                            "grade": "B2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 492,
+                                "headerName": "PERIODIC TEST 1",
+                                "subHeaderName": "(20)",
+                                "priority": 2,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 20.0,
+                                "terms": [
+                                    "PERIODIC TEST 1"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                            "subjectName": "ENGLISH",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 24.0,
+                            "grade": "C2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 493,
+                                "headerName": "HALF YEARLY",
+                                "subHeaderName": "(50)",
+                                "priority": 3,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 50.0,
+                                "terms": [
+                                    "HALF YEARLY"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        }
+                    ],
+                    "marksObtained": 82.3,
+                    "total": 130.0,
+                    "percentage": 63.3,
+                    "grade": "B2",
+                    "className": "III",
+                    "sectionName": "A",
+                    "terms": "HALF YEARLY",
+                    "markSheetName": "TERM-I",
+                    "subjectPrt": 1,
+                    "decimalPlaces": 1,
+                    "visible": false
+                },
+                {
+                    "subjectUid": "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff",
+                    "subjectName": "HINDI",
+                    "subjectNature": "THEORY",
+                    "markSheetReport": [
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff",
+                            "subjectName": "HINDI",
+                            "subjectNature": "THEORY",
+                            "max": 30.0,
+                            "obtained": 26.0,
+                            "grade": "A2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 491,
+                                "headerName": "I.A-I",
+                                "subHeaderName": "(30)",
+                                "priority": 1,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 30.0,
+                                "terms": [
+                                    "I.A-I"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff",
+                            "subjectName": "HINDI",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 35.0,
+                            "grade": "B2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 492,
+                                "headerName": "PERIODIC TEST 1",
+                                "subHeaderName": "(20)",
+                                "priority": 2,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 20.0,
+                                "terms": [
+                                    "PERIODIC TEST 1"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff",
+                            "subjectName": "HINDI",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 25.0,
+                            "grade": "C2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 493,
+                                "headerName": "HALF YEARLY",
+                                "subHeaderName": "(50)",
+                                "priority": 3,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 50.0,
+                                "terms": [
+                                    "HALF YEARLY"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        }
+                    ],
+                    "marksObtained": 86.0,
+                    "total": 130.0,
+                    "percentage": 66.2,
+                    "grade": "B2",
+                    "className": "III",
+                    "sectionName": "A",
+                    "terms": "HALF YEARLY",
+                    "markSheetName": "TERM-I",
+                    "subjectPrt": 2,
+                    "decimalPlaces": 1,
+                    "visible": false
+                },
+                {
+                    "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "THEORY",
+                    "markSheetReport": [
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                            "subjectName": "MATHEMATICS",
+                            "subjectNature": "THEORY",
+                            "max": 30.0,
+                            "obtained": 27.0,
+                            "grade": "A2",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 491,
+                                "headerName": "I.A-I",
+                                "subHeaderName": "(30)",
+                                "priority": 1,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 30.0,
+                                "terms": [
+                                    "I.A-I"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                            "subjectName": "MATHEMATICS",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 36.7,
+                            "grade": "B1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 492,
+                                "headerName": "PERIODIC TEST 1",
+                                "subHeaderName": "(20)",
+                                "priority": 2,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 20.0,
+                                "terms": [
+                                    "PERIODIC TEST 1"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                            "subjectName": "MATHEMATICS",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 26.0,
+                            "grade": "C1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 493,
+                                "headerName": "HALF YEARLY",
+                                "subHeaderName": "(50)",
+                                "priority": 3,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 50.0,
+                                "terms": [
+                                    "HALF YEARLY"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        }
+                    ],
+                    "marksObtained": 89.7,
+                    "total": 130.0,
+                    "percentage": 69.0,
+                    "grade": "B2",
+                    "className": "III",
+                    "sectionName": "A",
+                    "terms": "HALF YEARLY",
+                    "markSheetName": "TERM-I",
+                    "subjectPrt": 3,
+                    "decimalPlaces": 1,
+                    "visible": false
+                },
+                {
+                    "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                    "subjectName": "SCIENCE",
+                    "subjectNature": "THEORY",
+                    "markSheetReport": [
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                            "subjectName": "SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 30.0,
+                            "obtained": 28.0,
+                            "grade": "A1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 491,
+                                "headerName": "I.A-I",
+                                "subHeaderName": "(30)",
+                                "priority": 1,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 30.0,
+                                "terms": [
+                                    "I.A-I"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                            "subjectName": "SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 38.3,
+                            "grade": "B1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 492,
+                                "headerName": "PERIODIC TEST 1",
+                                "subHeaderName": "(20)",
+                                "priority": 2,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 20.0,
+                                "terms": [
+                                    "PERIODIC TEST 1"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                            "subjectName": "SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 27.0,
+                            "grade": "C1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 493,
+                                "headerName": "HALF YEARLY",
+                                "subHeaderName": "(50)",
+                                "priority": 3,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 50.0,
+                                "terms": [
+                                    "HALF YEARLY"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        }
+                    ],
+                    "marksObtained": 93.3,
+                    "total": 130.0,
+                    "percentage": 71.8,
+                    "grade": "B1",
+                    "className": "III",
+                    "sectionName": "A",
+                    "terms": "HALF YEARLY",
+                    "markSheetName": "TERM-I",
+                    "subjectPrt": 4,
+                    "decimalPlaces": 1,
+                    "visible": false
+                },
+                {
+                    "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                    "subjectName": "SOCIAL SCIENCE",
+                    "subjectNature": "THEORY",
+                    "markSheetReport": [
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                            "subjectName": "SOCIAL SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 30.0,
+                            "obtained": 29.0,
+                            "grade": "A1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 491,
+                                "headerName": "I.A-I",
+                                "subHeaderName": "(30)",
+                                "priority": 1,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 30.0,
+                                "terms": [
+                                    "I.A-I"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                            "subjectName": "SOCIAL SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 40.0,
+                            "grade": "B1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 492,
+                                "headerName": "PERIODIC TEST 1",
+                                "subHeaderName": "(20)",
+                                "priority": 2,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 20.0,
+                                "terms": [
+                                    "PERIODIC TEST 1"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        },
+                        {
+                            "studentInfoUid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                            "admissionNo": "18510",
+                            "studentName": "Aadvik Mangal",
+                            "rollNo": 1,
+                            "fatherName": "Mr. Sumit Mangal",
+                            "className": "III",
+                            "sectionName": "A",
+                            "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                            "terms": "HALF YEARLY",
+                            "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                            "subjectName": "SOCIAL SCIENCE",
+                            "subjectNature": "THEORY",
+                            "max": 50.0,
+                            "obtained": 28.0,
+                            "grade": "C1",
+                            "status": "",
+                            "markSheetName": "TERM-I",
+                            "attachmentName": "",
+                            "session": "2024-25",
+                            "decimalPlaces": 1,
+                            "markSheetTermResponse": {
+                                "id": 493,
+                                "headerName": "HALF YEARLY",
+                                "subHeaderName": "(50)",
+                                "priority": 3,
+                                "bestOf": 0,
+                                "decimalPlaces": 1,
+                                "weightage": 50.0,
+                                "terms": [
+                                    "HALF YEARLY"
+                                ]
+                            },
+                            "visible": false,
+                            "pass": true,
+                            "graded": false
+                        }
+                    ],
+                    "marksObtained": 97.0,
+                    "total": 130.0,
+                    "percentage": 74.6,
+                    "grade": "B1",
+                    "className": "III",
+                    "sectionName": "A",
+                    "terms": "HALF YEARLY",
+                    "markSheetName": "TERM-I",
+                    "subjectPrt": 5,
+                    "decimalPlaces": 1,
+                    "visible": false
+                }
+            ],
+            "marksObtained": 448.3,
+            "total": 650.0,
+            "percentage": 69.0,
+            "overAllGrade": "B2",
+            "visible": false
+        },
+          remarks: {
+            uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+            terms: ["TERM 2"],
+            studentId: "1903244",
+            studentName: "WAJID ALI",
+            rollNumber: 37,
+            classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+            classSection: "I-A",
+            description:
+              "is an enthusiastic learner who seems to enjoy school.",
+            fields: [
+              {
+                uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+                title: "Total No. of Present Days",
+                type: "NUMERIC",
+                value: "80",
+                masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                masterName: "ATTENDANCE",
+              },
+              {
+                uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+                title: "Total No. of Working Days",
+                type: "NUMERIC",
+                value: "120",
+                masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                masterName: "ATTENDANCE",
+              },
+            ],
+            status: true,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createdDate: "28-02-2024 05:33 PM",
+            editedDate: "28-02-2024 05:34 PM",
+          },
+          baseTermData:{
+    "studentAcademic": {
+        "dob": "06-10-2016",
+        "admissionNo": "18510",
+        "studentName": "Aadvik Mangal",
+        "className": "III",
+        "sectionName": "A",
+        "rollNo": 1,
+        "fatherName": "Mr. Sumit Mangal",
+        "motherName": "Mrs. Sonal Mangal",
+        "attendance": "6.0/7",
+        "boardRollNumber": "",
+        "studentInfoResponse": [
+            {
+                "id": 287412,
+                "userUid": "21853674-6a32-4422-9155-952d4cf88a7b",
+                "userName": null,
+                "fatherUserName": null,
+                "motherUserName": null,
+                "guardianUserName": null,
+                "uid": "57c946f4-5165-4692-aab0-101905bd6a40",
+                "studentId": "18510",
+                "exAdmissionNo": null,
+                "studentName": "Aadvik Mangal",
+                "fatherName": "Mr. Sumit Mangal",
+                "motherName": "Mrs. Sonal Mangal",
+                "dob": "06-10-2016",
+                "gender": "MALE",
+                "studentAdhaarcard": "330347834785",
+                "joiningClass": "III",
+                "joiningSections": "A",
+                "joiningDate": "06-05-2024",
+                "plotNumber": "",
+                "area": "Krishna Nagar",
+                "city": "Delhi",
+                "state": "NA",
+                "pincode": "110051",
+                "phone1": null,
+                "rollNo": 1,
+                "emergencyNumber": "9891313193",
+                "mobileNumber": "9891073332",
+                "studentEmail": "2801.SUMIT@GMAIL.COM",
+                "religion": "HINDU",
+                "category": "",
+                "minority": "",
+                "motherTongue": "",
+                "idMark": "",
+                "height": "",
+                "weight": "",
+                "physicalDisability": "",
+                "bloodGroup": "",
+                "healthRemark": "",
+                "siblingDetails": "",
+                "alumni": "",
+                "siblingResponse": [],
+                "fatherOccupation": "",
+                "fatherQualification": "",
+                "fatherOrganization": "",
+                "fatherDesignation": "",
+                "fatherIncome": "",
+                "fatherArea": "NA",
+                "fatherCity": "NA",
+                "fatherState": "NA",
+                "fatherPincode": "",
+                "fatherPhone": null,
+                "fatherMobile": "9891313193",
+                "fatherEmail": null,
+                "fatherAdhaarNumber": "",
+                "schoolUid": "508425ac-8c1a-4702-bbae-b24621aab919",
+                "motherQualification": "",
+                "motherOccupation": "",
+                "motherOrganization": "",
+                "motherDesignation": "",
+                "motherIncome": "",
+                "motherArea": "NA",
+                "motherCity": "NA",
+                "motherState": "NA",
+                "motherPincode": "",
+                "motherPhone": null,
+                "motherMobile": "",
+                "motherEmail": null,
+                "motherAdhaarNumber": "",
+                "guardianName": null,
+                "relation": null,
+                "guardianOccupation": null,
+                "guardianPhone": null,
+                "guardianMobile": null,
+                "guardianEmail": null,
+                "guardianAddress": null,
+                "leavingDate": null,
+                "previousSchoolName": null,
+                "otp": null,
+                "schoolName": "Demo Public School",
+                "remark": null,
+                "classTeacher": "",
+                "classTeacherUserName": "",
+                "classes": "III",
+                "classUid": null,
+                "sections": "A",
+                "group": "III-IV",
+                "wing": "NA",
+                "status": "Studying",
+                "academicSession": "2024-25",
+                "joiningStatus": "Old",
+                "houses": null,
+                "certificates": "",
+                "certificatesList": [],
+                "caste": "",
+                "listOfDocuments": null,
+                "attached": false,
+                "required": false,
+                "submitted": false,
+                "studentHostel": [],
+                "studentConcession": [],
+                "studentTransport": [],
+                "studentAadharCard": null,
+                "fatherAadharCard": null,
+                "motherAadharCard": null,
+                "studentImage": null,
+                "fatherImage": null,
+                "motherImage": null,
+                "guardianImage": null,
+                "birthCertificate": null,
+                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                "aluminiProof": null,
+                "siblingProof": null,
+                "residenceProof": null,
+                "firstBornChildProof": null,
+                "medicalFitnessCertificate": null,
+                "fatherQualificationProof": null,
+                "motherQualificationProof": null,
+                "casteCertificate": null,
+                "createdUser": "Reena_487422",
+                "editedUser": "Reena_487422",
+                "createddate": "2024-05-06 09:42:00.24225",
+                "editeddate": "2024-05-06 09:42:00.24225",
+                "permanentEducationNumber": null,
+                "studentAddressResponse": {
+                    "uid": "2b29f73d-bb23-459f-93cf-fa42b6492fa8",
+                    "houseNo": null,
+                    "area": "Krishna Nagar",
+                    "landmark": null,
+                    "city": "Delhi",
+                    "district": null,
+                    "state": "NA",
+                    "poPs": null,
+                    "pincode": 110051,
+                    "street": "66 Old Anarkali",
+                    "userName": "SRDAV831_18510",
+                    "createdDate": "06-05-2024 03:12 PM",
+                    "editedDate": "06-05-2024 03:12 PM",
+                    "createdBy": "Reena_487422",
+                    "editedBy": "Reena_487422"
+                },
+                "fatherAddressResponse": {
+                    "uid": "8d0c7ad5-d05e-4583-9b65-1657b36e2573",
+                    "houseNo": null,
+                    "area": "NA",
+                    "landmark": null,
+                    "city": "NA",
+                    "district": null,
+                    "state": "NA",
+                    "poPs": null,
+                    "pincode": 0,
+                    "street": null,
+                    "userName": null,
+                    "createdDate": "06-05-2024 03:12 PM",
+                    "editedDate": "06-05-2024 03:12 PM",
+                    "createdBy": "Reena_487422",
+                    "editedBy": "Reena_487422"
+                },
+                "motherAddressResponse": {
+                    "uid": "9b659082-34a2-4ab5-bb12-c282bb750088",
+                    "houseNo": null,
+                    "area": "NA",
+                    "landmark": null,
+                    "city": "NA",
+                    "district": null,
+                    "state": "NA",
+                    "poPs": null,
+                    "pincode": 0,
+                    "street": null,
+                    "userName": null,
+                    "createdDate": "06-05-2024 03:12 PM",
+                    "editedDate": "06-05-2024 03:12 PM",
+                    "createdBy": "Reena_487422",
+                    "editedBy": "Reena_487422"
+                },
+                "guardianAddressResponse": null,
+                "correspondenceAddressResponse": null
+            }
+        ],
+        "classTeacher": "",
+        "classTeacherUserName": "",
+        "permanentEducationNumber": null,
+        "school": {
+            "uid": "508425ac-8c1a-4702-bbae-b24621aab919",
+            "apikey": "NCxlflgpv06g_hefzhFO64jWpirLDxyG",
+            "schoolName": "SRDAV PUBLIC SCHOOL",
+            "schoolAbb": "SRDAV",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": null,
+            "area": "DAYANAND VIHAR",
+            "city": "DELHI",
+            "pincode": "110092",
+            "state": "Delhi",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Reena",
+            "contactMobile": null,
+            "contactEmail": "DAVR_DV@YAHOO.COM",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "srdav",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "27-05-2024 02:56 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+        }
+    },
+    "subject": [
+        {
+            "subjectAllResponse": {
+                "uid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                "subjectName": "ENGLISH",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": true,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-05-11 11:42:35.562213",
+                "editeddate": "2024-05-11 11:42:35.560768"
+            },
+            "termName": "HALF YEARLY",
+            "max": 50.0,
+            "markObtained": 24.0,
+            "percentage": 48.0,
+            "grade": "C2",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff",
+                "subjectName": "HINDI",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": true,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-05-11 11:42:47.767082",
+                "editeddate": "2024-05-11 11:42:47.766507"
+            },
+            "termName": "HALF YEARLY",
+            "max": 50.0,
+            "markObtained": 25.0,
+            "percentage": 50.0,
+            "grade": "C2",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                "subjectName": "MATHEMATICS",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": true,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-05-11 11:43:01.015655",
+                "editeddate": "2024-05-11 11:43:01.014128"
+            },
+            "termName": "HALF YEARLY",
+            "max": 50.0,
+            "markObtained": 26.0,
+            "percentage": 52.0,
+            "grade": "C1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                "subjectName": "SCIENCE",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": true,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-05-11 11:43:09.752893",
+                "editeddate": "2024-05-11 11:43:09.752195"
+            },
+            "termName": "HALF YEARLY",
+            "max": 50.0,
+            "markObtained": 27.0,
+            "percentage": 54.0,
+            "grade": "C1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                "subjectName": "SOCIAL SCIENCE",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": true,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-05-11 11:43:17.377704",
+                "editeddate": "2024-05-11 11:43:17.3768"
+            },
+            "termName": "HALF YEARLY",
+            "max": 50.0,
+            "markObtained": 28.0,
+            "percentage": 56.0,
+            "grade": "C1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "3bb11606-c540-417e-b41d-7a350d8964b5",
+                "subjectName": "Listening Skill",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:26:42.421942",
+                "editeddate": "2024-06-19 09:26:42.420806"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "8ea122dc-aefc-4d41-803b-2a9003dfe9a9",
+                "subjectName": "Speaking Skll",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:26:56.22175",
+                "editeddate": "2024-06-19 09:26:56.220672"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "9bbb9e0d-0adf-4233-b3ca-e9d34a767989",
+                "subjectName": "Reading Skill",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:27:04.093532",
+                "editeddate": "2024-06-19 09:27:04.092839"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "dc7714e3-98aa-4db8-bf03-3fe5c7e02758",
+                "subjectName": "Writing Skill & Language (Vocab, Spelling, Grammar)",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:27:18.556922",
+                "editeddate": "2024-06-19 09:27:18.555895"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2aef68d6-82b3-48cf-8701-e9ad00c2127a",
+                "subjectName": "Project & Viva",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:27:28.237389",
+                "editeddate": "2024-06-19 09:27:28.236569"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "c9e9b7af-f11b-4ae5-856c-413257a1b127",
+                "subjectName": "Portfolio (Notebook & SEA)",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 09:27:46.979842",
+                "editeddate": "2024-06-19 09:27:46.979015"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "dd399fe1-44a8-40ac-ab54-9dfd74992d92",
+                "subjectName": "Reading Bonus",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "bb3f81d2-ac03-4d7e-87ac-0286dc409c12"
+                ],
+                "parentName": [
+                    "ENGLISH"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:09:33.476762",
+                "editeddate": "2024-06-19 10:09:33.47611"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "b2c732e6-69b9-47fb-ba3a-e9e0096dc6ec",
+                "subjectName": "Listening Skill",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:09:57.277647",
+                "editeddate": "2024-06-19 10:09:57.273736"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2d959460-3775-4ed5-999b-428bdbcbae1f",
+                "subjectName": "Speaking Skill",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:10:05.240219",
+                "editeddate": "2024-06-19 10:10:05.239096"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "fd7528eb-fde7-44a0-8fce-9ca893eea6f8",
+                "subjectName": "Reading Skill",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:10:14.057656",
+                "editeddate": "2024-06-19 10:10:14.053637"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "84dd4109-14ac-438b-b5c7-d57d44216cba",
+                "subjectName": "Writing Skill & Language (Vocab, Spelling, Grammar)",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:10:34.493068",
+                "editeddate": "2024-06-19 10:10:34.492156"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "0d56a5be-b136-446c-b06b-028a8a0dc2ba",
+                "subjectName": "Project&Viva",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:10:48.637895",
+                "editeddate": "2024-06-19 10:10:48.636757"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "ffa799bf-9f13-4a48-9e9a-67872357c745",
+                "subjectName": "Portfolio (Notebook & SEA)",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "c5a9ea69-9eed-40f5-985f-9c47a1ba77ff"
+                ],
+                "parentName": [
+                    "HINDI"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:10:57.885413",
+                "editeddate": "2024-06-19 10:11:09.019296"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "1192ba88-36c8-4b8c-8825-2a72070d6d49",
+                "subjectName": "Critical Thinking & Evaluation",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "ec52ea16-59c2-43d5-a433-10c23701676c"
+                ],
+                "parentName": [
+                    "SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:54:27.532934",
+                "editeddate": "2024-06-19 10:54:27.532045"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2e12d2bf-9e4a-4f9b-b85a-d3facf7c25ed",
+                "subjectName": "Problem Solving & Inference",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "ec52ea16-59c2-43d5-a433-10c23701676c"
+                ],
+                "parentName": [
+                    "SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:54:37.075106",
+                "editeddate": "2024-06-19 10:54:37.074248"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "6d6ce027-2d9c-4b74-b704-6f961f2c0d50",
+                "subjectName": "Collaboration & Creative Thinking",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "ec52ea16-59c2-43d5-a433-10c23701676c"
+                ],
+                "parentName": [
+                    "SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:54:45.873151",
+                "editeddate": "2024-06-19 10:54:45.872109"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "b37c73ce-c482-4853-99db-d342de85f0fc",
+                "subjectName": "Value Ethical Application of Concepts",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "ec52ea16-59c2-43d5-a433-10c23701676c"
+                ],
+                "parentName": [
+                    "SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:55:10.537851",
+                "editeddate": "2024-06-19 10:55:10.536854"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "410031cd-9e2b-4c1f-ae31-6844c9f6892c",
+                "subjectName": "Portfolio Notebook SEA",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "ec52ea16-59c2-43d5-a433-10c23701676c"
+                ],
+                "parentName": [
+                    "SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:55:29.428533",
+                "editeddate": "2024-06-19 10:55:29.427561"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "c8884a7a-bea7-4ebb-8992-8b63865350db",
+                "subjectName": "Critical Thinking & Evaluation",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "b9048a6b-dae0-4483-8be5-b6c0f2f84d72"
+                ],
+                "parentName": [
+                    "SOCIAL SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:55:39.785412",
+                "editeddate": "2024-06-19 10:55:39.781253"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "41e8561c-f650-43cf-b3ea-756d3f22b421",
+                "subjectName": "Problem-solving & Inference",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "b9048a6b-dae0-4483-8be5-b6c0f2f84d72"
+                ],
+                "parentName": [
+                    "SOCIAL SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:55:52.636911",
+                "editeddate": "2024-06-19 10:55:52.636427"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "574b4045-d12e-49df-98f7-6b9f042a95f6",
+                "subjectName": "Collaboration & Creative Thinking",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "b9048a6b-dae0-4483-8be5-b6c0f2f84d72"
+                ],
+                "parentName": [
+                    "SOCIAL SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:56:02.647092",
+                "editeddate": "2024-06-19 10:56:02.645998"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "571bfef9-94b3-421f-9170-f7fb90d3b4a9",
+                "subjectName": "Value Ethical application of concept",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "b9048a6b-dae0-4483-8be5-b6c0f2f84d72"
+                ],
+                "parentName": [
+                    "SOCIAL SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:56:27.54865",
+                "editeddate": "2024-06-19 10:56:27.54729"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "0c77cc79-9db5-48c3-991d-45577cfffb8e",
+                "subjectName": "Portfolio Notebook & SEA",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "b9048a6b-dae0-4483-8be5-b6c0f2f84d72"
+                ],
+                "parentName": [
+                    "SOCIAL SCIENCE"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:56:41.356057",
+                "editeddate": "2024-06-19 10:56:41.354752"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "9501a63a-ac4c-4061-a62b-7c5ec1734e0f",
+                "subjectName": "Evaluation & Inference(",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:56:55.497543",
+                "editeddate": "2024-06-19 10:56:55.493589"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2d3b0a2d-81d8-433f-be96-a319a56c006f",
+                "subjectName": "Critical Thinking& Problem Solving",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:57:04.437943",
+                "editeddate": "2024-06-19 10:57:04.43721"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "8e140f75-6fcc-480e-823f-aa4c323aa239",
+                "subjectName": "Collaboration & Creative Thinking",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:57:13.651123",
+                "editeddate": "2024-06-19 10:57:13.650378"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2ae31da8-e41e-439c-b860-75a8871501bc",
+                "subjectName": "Value Ethical Application of Concepts",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:57:30.566189",
+                "editeddate": "2024-06-19 10:57:30.565398"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "9c613323-8c3d-49dc-b844-b666582bdba9",
+                "subjectName": "Project& Viva",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:57:39.596552",
+                "editeddate": "2024-06-19 10:57:39.595567"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "1c3bae11-19d7-4a86-9cab-9ff759babf8b",
+                "subjectName": "Portfolio Notebook & SEA",
+                "nature": "THEORY",
+                "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [
+                    "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc"
+                ],
+                "parentName": [
+                    "MATHEMATICS"
+                ],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 10:57:53.888303",
+                "editeddate": "2024-06-19 10:57:53.887516"
+            },
+            "termName": "HALF YEARLY",
+            "max": 5.0,
+            "markObtained": 5.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": true
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "22a5abbf-839e-43ab-b9b7-284f31771cb5",
+                "subjectName": "COLLABORATION & COOPERATION",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 12:43:38.519557",
+                "editeddate": "2024-06-19 12:43:38.517887"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "A2",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "a3cb278b-748e-4e99-a246-98375e601ec6",
+                "subjectName": "CARE OF SCHOOL PROPERTY",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 12:43:55.132661",
+                "editeddate": "2024-06-19 12:43:55.13149"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "d6e55081-c2bf-4890-bbcd-64a94092ff0e",
+                "subjectName": "RELATIONS WITH PEERS",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 12:44:01.5193",
+                "editeddate": "2024-06-19 12:44:01.518497"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "eaa100f2-bd5a-4752-b3ba-a06610ac3cee",
+                "subjectName": "VALUES AND LIFE SKILLS",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 12:59:38.683681",
+                "editeddate": "2024-06-19 12:59:38.68322"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "05e8f98a-9b36-40e3-a88a-6ad78d3ae25b",
+                "subjectName": "ENVIRONMENT COMMUNITY WORK",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:01:30.78374",
+                "editeddate": "2024-06-19 13:01:30.783195"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "25d6726d-a23b-45dd-a4d1-bd4ca29fb55d",
+                "subjectName": "INITIATIVE AND CONFIDENCE",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:01:46.553051",
+                "editeddate": "2024-06-19 13:01:46.552358"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "A2",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "dd1b5ac7-90f1-4a54-8003-706f63b959e9",
+                "subjectName": "DISCIPLINE, PUNCTUALITY, REGULARITY",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:03:15.519861",
+                "editeddate": "2024-06-19 13:25:11.693729"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "0ee1a5dc-37af-4544-bccb-60a6317a74fc",
+                "subjectName": "CLEANLINESS(HAIR, HANDS,FACE,SHOES & UNIFORM)",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:03:33.102839",
+                "editeddate": "2024-06-19 13:03:33.102001"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "d28b4390-a3da-4127-8e78-93c4c002f1ee",
+                "subjectName": "SEWA PROJECT",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:03:43.486491",
+                "editeddate": "2024-06-19 13:03:43.485484"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "2afb9969-a9e0-45a0-a920-72b5bd6fd837",
+                "subjectName": "SPORTS & GAMES",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:03:52.755471",
+                "editeddate": "2024-06-19 13:03:52.754496"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "9fd085f9-a216-448a-9f4c-eccb75fdb431",
+                "subjectName": "YOGA",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:04:02.486071",
+                "editeddate": "2024-06-19 13:04:14.876767"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "db761d79-5095-4826-96ef-78c38e342cfc",
+                "subjectName": "ART, CRAFT, PAINTING, SCULPTURE",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:04:26.619176",
+                "editeddate": "2024-06-19 13:25:03.309505"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "56559aaf-4a29-45ca-a657-9d8bfc581e88",
+                "subjectName": "MUSIC, DANCE, THEATRE, DRAMA",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:04:41.273945",
+                "editeddate": "2024-06-19 13:04:41.273025"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "A2",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "d870cb6d-edee-49eb-a7ac-8577b49bc7a2",
+                "subjectName": "SUPW  WORK EDUCATION",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:05:03.057484",
+                "editeddate": "2024-06-19 13:05:03.055189"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "A2",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "aa4fe66d-d9c3-453c-92b9-fb512b34b253",
+                "subjectName": "LIFE SKILLS",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:05:29.904227",
+                "editeddate": "2024-06-19 13:05:29.90338"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "A2",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "48b7544e-8f31-4163-8165-505c6027c19a",
+                "subjectName": "GENERAL KNOWLEDGE",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:24:11.016974",
+                "editeddate": "2024-06-19 13:24:11.015915"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "B1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "4d857f75-f659-4dee-9c70-fb38857c2c35",
+                "subjectName": "NAITIK SHIKSHA",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:24:19.863666",
+                "editeddate": "2024-06-19 13:24:19.862958"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        },
+        {
+            "subjectAllResponse": {
+                "uid": "e6f0071f-f857-4f67-a4d6-4a78f08c4021",
+                "subjectName": "COMPUTER ICT",
+                "nature": "1B Scholastic",
+                "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "QuickCampus",
+                "editedUser": "QuickCampus",
+                "createddate": "2024-06-19 13:24:38.400233",
+                "editeddate": "2024-06-19 13:24:38.39898"
+            },
+            "termName": "HALF YEARLY",
+            "max": 100.0,
+            "markObtained": 100.0,
+            "percentage": 100.0,
+            "grade": "A1",
+            "scholastic": false
+        }
+    ],
+    "remarksEntry": {
+        "uid": null,
+        "terms": null,
+        "studentId": null,
+        "studentName": null,
+        "rollNumber": 0,
+        "classSectionUid": null,
+        "classSection": null,
+        "description": null,
+        "fields": null,
+        "status": false,
+        "createdUser": null,
+        "editedUser": null,
+        "createdDate": null,
+        "editedDate": null
+    },
+    "school": {
+        "uid": "508425ac-8c1a-4702-bbae-b24621aab919",
+        "apikey": "NCxlflgpv06g_hefzhFO64jWpirLDxyG",
+        "schoolName": "SRDAV PUBLIC SCHOOL",
+        "schoolAbb": "SRDAV",
+        "educationBoard": "Central Board of Secondary Education (CBSE)",
+        "registrationNo": null,
+        "plotNumber": null,
+        "area": "DAYANAND VIHAR",
+        "city": "DELHI",
+        "pincode": "110092",
+        "state": "Delhi",
+        "phoneNo1": null,
+        "phoneNo2": null,
+        "contactName": "Reena",
+        "contactMobile": null,
+        "contactEmail": "DAVR_DV@YAHOO.COM",
+        "schoolCode": null,
+        "pfCode": null,
+        "societyManagement": null,
+        "language": null,
+        "schoolLogo": null,
+        "schoolFavicon": null,
+        "enabled": true,
+        "subDomain": "srdav",
+        "website": null,
+        "schemaPrefix": null,
+        "editedDate": "27-05-2024 02:56 PM",
+        "editedUser": "QuickCampus",
+        "visitorSchool": false,
+        "clientSchoolId": null,
+        "cscId": null,
+        "onlinePaymentEnabled": false,
+        "registrationSeries": null,
+        "underTakingDetails": null,
+        "formNumberStart": null,
+        "sessionResponse": null,
+        "schoolLogoUrl": null,
+        "printAcknowledge": false,
+        "whatsAppEnabled": false,
+        "smsenabled": false,
+        "notificationEnabled": true,
+        "loanEnabled": false
+    },
+    "promotedClass": null,
+    "promotedSection": null,
+    "perSignedUrlResponse": {
+        "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SRDAV/student-info/18510/student/images/18510.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240620T125048Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240620%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=27ff6e0856ee581ad259008c64517e68739f4ab213ad2405cda487f6b7d977af",
+        "fileName": "18510.png"
+    },
+    "pass": false
+},
+          },
+      ]);
+    </script>
+</body>
+</html>

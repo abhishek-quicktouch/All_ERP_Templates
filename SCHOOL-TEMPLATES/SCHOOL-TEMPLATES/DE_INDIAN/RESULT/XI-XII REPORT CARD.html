@@ -1,0 +1,3311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="studentsList">Student Report Card</div>
+</body>
+
+<script>
+  window.SetTemplateData = function (data) {
+    const dataList = Array.isArray(data) ? data : [data];
+    const viewTemplate = dataList[0]?.viewTemplate;
+
+    const attendanceValue = {
+      Absent: "Ab",
+      Medical: "M",
+      Sports: "S",
+      Leave: "L",
+      "Late Admission": "La",
+      Exempted: "Ex",
+      NA: "NA",
+    };
+
+    let gradeRequests = [
+      {
+        remark: "",
+        grade: "A1",
+        floorValue: 91,
+        ceilingValue: 100,
+        weightage: 10,
+      },
+      {
+        remark: "",
+        grade: "A2",
+        floorValue: 81,
+        ceilingValue: 90.99,
+        weightage: 9,
+      },
+      {
+        remark: "",
+        grade: "B1",
+        floorValue: 71,
+        ceilingValue: 80.99,
+        weightage: 8,
+      },
+      {
+        remark: "",
+        grade: "B2",
+        floorValue: 61,
+        ceilingValue: 70.99,
+        weightage: 7,
+      },
+      {
+        remark: "",
+        grade: "C1",
+        floorValue: 51,
+        ceilingValue: 60.99,
+        weightage: 6,
+      },
+      {
+        remark: "",
+        grade: "C2",
+        floorValue: 41,
+        ceilingValue: 50.99,
+        weightage: 5,
+      },
+      {
+        remark: "",
+        grade: "D",
+        floorValue: 33,
+        ceilingValue: 40.99,
+        weightage: 4,
+      },
+      {
+        remark: "",
+        grade: "E",
+        floorValue: 0,
+        ceilingValue: 32.99,
+        weightage: 3,
+      },
+    ];
+
+    const getGradeCustomFunction = (int) => {
+      let num = int;
+      if (typeof num != "number") {
+        num = +int;
+      }
+      return gradeRequests?.find(
+        (el) => num >= el?.floorValue && num <= el?.ceilingValue
+      )?.grade;
+    };
+
+    const staticData = {
+      viewTemplate: true,
+      markData: {
+        academicSession: "2023-2024",
+        markSheetName: "MID TERM",
+        markSheetTerms: [
+          { subHeaderName: "UNIT TEST-I", headerName: "(50)" },
+          { subHeaderName: "ATTENDANCE", headerName: "(10)" },
+          {
+            subHeaderName: "COLD CALLING + MULTI DISCIPLINARY PROJECT",
+            headerName: "(20)",
+          },
+          {
+            subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+            headerName: "(20)",
+          },
+          { subHeaderName: "MID TERM", headerName: "(100)" },
+        ],
+        subjectWiseMarkSheetReportResponses: [
+          {
+            subjectName: "Mathematics",
+            markSheetReport: [
+              {
+                markSheetTermResponse: { subHeaderName: "UNIT TEST-I" },
+                obtained: "45",
+                max: "50",
+              },
+              {
+                markSheetTermResponse: { subHeaderName: "ATTENDANCE" },
+                obtained: "10",
+                max: "10",
+              },
+              {
+                markSheetTermResponse: {
+                  subHeaderName: "COLD CALLING + MULTI DISCIPLINARY PROJECT",
+                },
+                obtained: "18",
+                max: "20",
+              },
+              {
+                markSheetTermResponse: {
+                  subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+                },
+                obtained: "19",
+                max: "20",
+              },
+              {
+                markSheetTermResponse: { subHeaderName: "MID TERM" },
+                obtained: "90",
+                max: "100",
+              },
+            ],
+            marksObtained: "182",
+            percentage: "91%",
+            grade: "A",
+          },
+          // Add more subjects as needed
+        ],
+      },
+      student: {
+        studentName: "John Doe",
+        admissionNo: "12345",
+        fatherName: "Mr. Doe",
+        motherName: "Mrs. Doe",
+        className: "10",
+        sectionName: "A",
+        rollNo: "12",
+        dob: "01/01/2008",
+        attendance: "95%",
+        studentInfoResponse: [
+          {
+            studentAddressResponse: {
+              houseNo: "123",
+              area: "Main Street",
+              landmark: "Near Park",
+              city: "New Delhi",
+              state: "Delhi",
+              pincode: "110001",
+            },
+            mobileNumber: "9876543210",
+            height: "150 cm",
+            weight: "50 kg",
+            bloodGroup: "O+",
+          },
+        ],
+      },
+      baseTermData: {
+        subject: [
+          {
+            subjectAllResponse: {
+              parentName: ["Mathematics"],
+              subjectName: "Algebra",
+              nature: "2A LIFE-SKILLS",
+            },
+            grade: "A",
+          },
+          {
+            subjectAllResponse: {
+              parentName: ["Science"],
+              subjectName: "Physics",
+              nature: "3A LIFE SKILLS",
+            },
+            grade: "B",
+          },
+          // Add more subjects as needed
+        ],
+        remarksEntry: {
+          description: "Excellent performance",
+        },
+      },
+      header: "School Name: XYZ School",
+      footer: "Footer Information",
+    };
+
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = "";
+
+    function generateScholasticRows(subjects) {
+      let totalMarksObtained = 0;
+      let totalPossibleMarks = 0;
+      let count = 0;
+      const rows = subjects
+        ?.map((subject) => {
+          let periodic = "-",
+            periodicTotal = "",
+            mutlipleAssesment = "-",
+            mutlipleAssesmentTotal = "",
+            portfolio = "-",
+            portfolioTotal = "",
+            midTerm = "-",
+            midTermTotal = "",
+            subjectEnrich = "",
+            subjectEnrichTotal = "-",
+            ai = "",
+            aiTotal = "-";
+
+          subject?.markSheetReport?.forEach((report) => {
+            switch (report?.markSheetTermResponse?.headerName) {
+              case "Periodic Test":
+                periodic = report?.status
+                  ? attendanceValue[report?.status]
+                  : report?.obtained;
+                periodicTotal = report?.max;
+                break;
+              case "Multiple Assessment":
+                mutlipleAssesment = report?.status
+                  ? attendanceValue[report?.status]
+                  : report?.obtained;
+                mutlipleAssesmentTotal = report?.max;
+                break;
+              case "Port Folio":
+                portfolio = report?.status
+                  ? attendanceValue[report?.status]
+                  : report?.obtained;
+                portfolioTotal = report?.max;
+                break;
+              case "Subject Enrichment":
+                subjectEnrich = report?.status
+                  ? attendanceValue[report?.status]
+                  : report?.obtained;
+                subjectEnrichTotal = report?.max;
+                break;
+              case "Mid Term":
+                midTerm = report?.status
+                  ? attendanceValue[report?.status]
+                  : report?.obtained;
+                midTermTotal = report?.max;
+                break;
+            }
+          });
+
+          if (!subject?.markSheetReport[0]?.graded) {
+            totalMarksObtained += Number(subject?.marksObtained) || 0;
+            totalPossibleMarks += Number(subject?.total) || 0;
+            // Number(periodicTotal) +
+            // Number(mutlipleAssesmentTotal) +
+            // Number(portfolioTotal) +
+            // Number(subjectEnrichTotal) +
+            // Number(midTermTotal);
+
+            if (subject?.subjectName.includes("ARTIFICIAL INTELLIGENCE")) {
+              if (count >= 1) {
+                return "";
+              }
+              ++count;
+
+              const practical = subjects.find(
+                (d) => d.subjectName === "ARTIFICIAL INTELLIGENCE PR"
+              );
+              const total = practical?.marksObtained + subject?.marksObtained;
+
+              return `  <tr>
+                          <td style="font-size: 12px; padding: 4px; margin: 0;">${subject?.subjectName
+                }</td>
+                            <td colspan="2" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
+                                    <div style="padding:4px 0px;"> MID TERM <br/> PRACTICAL (${practical?.total
+                })</div>
+                                    <div style="border-top:2px solid; padding:10px 0px;">${practical?.marksObtained
+                }<div>
+                            </td>
+                             <td colspan="3" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
+                                    <div style="padding:4px 0px;"> MID TERM <br/> THEORY (${subject?.total
+                })</div>
+                                    <div style="border-top:2px solid; padding:10px 0px;">${subject?.marksObtained
+                }<div>
+                            </td>
+                       <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${total}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${getGradeCustomFunction(
+                  total
+                )}</td>
+                   
+                    </tr>`;
+            }
+
+            return `
+                        <tr>
+                            <td style="font-size: 12px; padding: 4px; margin: 0;">${subject?.subjectName
+              }</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center;font-weight:${isNaN(periodic) ? "bold" : "normal"
+              }">${periodic}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(mutlipleAssesment) ? "bold" : "normal"
+              }"">${mutlipleAssesment}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(portfolio) ? "bold" : "normal"
+              }"">${portfolio}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(subjectEnrich) ? "bold" : "normal"
+              }"">${subjectEnrich}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(midTerm) ? "bold" : "normal"
+              }"">${midTerm}</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.marksObtained
+              }</td>
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.grade
+              }</td>
+                        </tr>
+                    `;
+          } else {
+            return "";
+          }
+        })
+        .join("");
+      return {
+        rows,
+        totalMarksObtained,
+        totalPossibleMarks,
+      };
+    }
+
+    function generateSubjectSkillsTable(subjects) {
+      const subjectMap = new Map();
+
+      subjects?.forEach((subject) => {
+        const parentSubject =
+          subject?.subjectAllResponse?.parentName[0] ||
+          subject?.subjectAllResponse?.subjectName;
+        if (subject?.subjectAllResponse?.parentName?.length > 0) {
+          if (!subjectMap.has(parentSubject)) {
+            subjectMap.set(parentSubject, []);
+          }
+          subjectMap.get(parentSubject).push({
+            skill: subject?.subjectAllResponse?.subjectName,
+            grade: subject?.grade,
+          });
+        }
+      });
+
+      return Array.from(subjectMap.entries())
+        ?.filter(([_, skills]) => skills?.length > 0)
+        ?.map(
+          ([subject, skills], i) => `
+                        <tr style="font-size: 12px; ${i === 2
+              ? `page-break-before: always; margin-top: 20px`
+              : ""
+            }">
+                            <td style="width: 30%; padding: 4px; margin: 0; vertical-align: center; text-align: center;" rowspan="${skills?.length
+            }">${subject}</td>
+                            <td style="width: 35%;padding: 4px; margin: 0;">${skills[0]?.skill
+            }</td>
+                            <td style="width: 35%;padding: 4px; margin: 0;">${skills[0]?.grade
+            }</td>
+                        </tr>
+                        ${skills
+              ?.slice(1)
+              ?.map(
+                (skill) => `
+                                    <tr style="font-size: 12px">
+                                        <td style="padding: 4px; margin: 0;">${skill?.skill}</td>
+                                        <td style="padding: 4px; margin: 0;">${skill?.grade}</td>
+                                    </tr>
+                                `
+              )
+              .join("")}
+                    `
+        )
+        .join("");
+    }
+
+    (viewTemplate ? [staticData] : dataList)?.forEach((studentData) => {
+      const studhtml = document.createElement("div");
+      studhtml.style.pageBreakAfter = "always";
+      let totalHeaderName = 0;
+
+      function generateCoScholasticGrade(sub) {
+        let temp = studentData?.baseTermData?.subject?.find(
+          (subject) => subject?.subjectAllResponse?.subjectName == sub
+        );
+        if (temp?.remarkStatus) {
+          return {
+            value: attendanceValue[temp?.remarkStatus],
+            style: `font-weight:bold`
+          }
+        } else {
+          return {
+            value: temp?.grade,
+          }
+        }
+      }
+
+      function generatePersonalityDevelopmentRows(subjects) {
+        const personalitySubjects = subjects?.filter(
+          (subject) =>
+            subject?.subjectAllResponse?.nature === "3A LIFE SKILLS"
+        );
+
+        if (personalitySubjects?.length === 0) {
+          return "";
+        }
+
+        return `
+                    <tr style="font-size: 11px">
+                      <th style="width: 50%; padding: 2px; margin: 0; ">DISCIPLINE</th>
+                    <th style="text-align:center;">GRADE</th>
+                    </tr>
+                    ${personalitySubjects
+            ?.map(
+              (subject) => `
+                                <tr style="font-size: 11px; padding:0px;">
+                                    <td style="width: 50%; padding: 0px 4px; margin: 0;">${subject?.subjectAllResponse?.subjectName}</td>
+                                    <td style="padding: 0px 4px; margin: 0; text-align:center;">${subject?.grade}</td>
+                                </tr>
+                            `
+            )
+            .join("")}
+                `;
+      }
+      const scholasticResult = generateScholasticRows(
+        studentData?.markData?.subjectWiseMarkSheetReportResponses
+      );
+
+      const getResultData = () => {
+        let subjectName = [];
+        let subjectData = {};
+        let additionalSubName = [];
+        let additionalSubData = []
+        let totalMarksObj = {
+          PERIODIC_TEST_TOTAL: 0,
+          MID_TERM_THEORY_MAX_TOTAL: 0,
+          MID_TERM_THEORY_MAX_OBT: 0,
+          MID_TERM_PRAC_MAX_TOTAL: 0,
+          MID_TERM_PRAC_MAX_OBT: 0,
+          MID_TERM_TOTAL: 0,
+          OVERALL_TOTAL: 0,
+        };
+
+        const mainSubject =
+          studentData?.markData?.subjectWiseMarkSheetReportResponses?.reduce((acc, curr) => {
+            if (
+              !studentData?.baseTermData?.subject?.some(
+                (s) =>
+                  s?.subjectAllResponse?.uid == curr?.subjectUid &&
+                  s?.additional
+              )
+            ) {
+              acc["nonAdditional"].push(curr);
+            }
+            else {
+              acc["additional"]?.push(curr)
+            }
+            return acc
+          }, { nonAdditional: [], additional: [] });
+
+        mainSubject?.nonAdditional?.map(
+          (s) => {
+            let mrk = s?.markSheetReport;
+            mrk?.map((t) => {
+              if (!subjectName?.includes(t?.attachmentName)) {
+                subjectName.push(t?.attachmentName);
+                subjectData[t?.attachmentName] = {};
+              }
+
+              subjectData[t?.attachmentName][
+                t?.markSheetTermResponse?.headerName
+              ] = {
+                ...subjectData[t?.attachmentName][
+                t?.markSheetTermResponse?.headerName
+                ],
+                [t?.subjectNature]: {
+                  max: t?.max || 0,
+                  status: t?.status ? attendanceValue[t?.status] : "",
+                  obtained: t?.obtained,
+                },
+              };
+            });
+          }
+        );
+
+        mainSubject?.additional?.map(
+          (s) => {
+            let mrk = s?.markSheetReport;
+            mrk?.map((t) => {
+              if (!additionalSubName?.includes(t?.attachmentName)) {
+                additionalSubName.push(t?.attachmentName);
+                additionalSubData[t?.attachmentName] = {};
+              }
+
+              additionalSubData[t?.attachmentName][
+                t?.markSheetTermResponse?.headerName
+              ] = {
+                ...additionalSubData[t?.attachmentName][
+                t?.markSheetTermResponse?.headerName
+                ],
+                [t?.subjectNature]: {
+                  max: t?.max || 0,
+                  status: t?.status ? attendanceValue[t?.status] : "",
+                  obtained: t?.obtained,
+                },
+              };
+            });
+          }
+        );
+
+        subjectName?.forEach((subj) => {
+          totalMarksObj.PERIODIC_TEST_TOTAL += Number(
+            subjectData[subj]["PERIODIC TEST"]?.THEORY?.obtained
+          );
+
+          totalMarksObj.MID_TERM_THEORY_MAX_TOTAL += Number(
+            subjectData[subj]["MID TERM"]?.THEORY?.max
+          );
+
+          totalMarksObj.MID_TERM_THEORY_MAX_OBT += Number(
+            subjectData[subj]["MID TERM"]?.THEORY?.obtained
+          );
+
+          totalMarksObj.MID_TERM_PRAC_MAX_TOTAL += Number(
+            subjectData[subj]["MID TERM"]?.PRACTICAL?.max
+          );
+
+          totalMarksObj.MID_TERM_PRAC_MAX_OBT += Number(
+            subjectData[subj]["MID TERM"]?.PRACTICAL?.obtained
+          );
+
+          totalMarksObj.MID_TERM_TOTAL =
+            totalMarksObj.MID_TERM_THEORY_MAX_OBT +
+            totalMarksObj.MID_TERM_PRAC_MAX_OBT;
+
+          totalMarksObj.OVERALL_TOTAL =
+            totalMarksObj.MID_TERM_TOTAL + totalMarksObj.PERIODIC_TEST_TOTAL;
+        });
+        return {
+          subjectList: subjectName,
+          resSub: subjectData,
+          totalMarksObj,
+          additionalSubData,
+          additionalSubName
+        };
+      };
+
+      const { subjectList, resSub, totalMarksObj, additionalSubData, additionalSubName } = getResultData();
+
+      studhtml.innerHTML =
+
+        `<page orientation="portrait" format="A4" margin="0"><style type="text/css">
+ body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        th,
+        td {
+            border: 2px solid;
+            padding: 2px;
+            text-align: left;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: -20px;
+        }
+
+        .logo {
+            max-width: 100px;
+            height: auto;
+        }
+
+        @media print {
+                  @page {
+                    margin: 2mm;
+                    size: A4;
+                  }
+
+                  .signImg {
+                    width: 150px;
+                    height: auto;
+                  }
+                }
+                </style>
+                 <div style="display: flex; align-items: center;   padding: 0px;width:100%;justify-content:center">
+                 
+${studentData?.header}
+
+
+                   
+    
+    </div>
+<div style="display:flex; justify-content:flex-end; width:99%; text-transform:uppercase; font-weight:bold; font-size:13px; align-items:center;margin-top:-12px;">Affiliation No. : 2730712</div>
+                <div class="header">
+                    <h4 style="margin: 0; padding: 0">ACADEMIC SESSION ${studentData?.markData?.academicSession
+        }</h4>
+                    <h5 style="margin: 0; margin-bottom: -5px">${studentData?.markData?.markSheetName
+        } REPORT CARD</h5>
+                </div>
+                <table>
+                    <tr>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>STUDENT’S NAME:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.studentName
+        }</td>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ADMISSION NO.:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.admissionNo
+        }</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>FATHER’S NAME:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.fatherName
+        }</td>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>CLASS & SECTION:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.className +
+          " - " +
+          studentData?.student?.sectionName
+        }</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>MOTHER’S NAME:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.motherName
+        }</td>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ROLL NO.:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.rollNo
+        }</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>DATE OF BIRTH:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.dob
+        }</td>
+                        <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ATTENDANCE:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student?.attendance
+        }</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; font-size: 12px; padding: 4px; margin: 0;"><strong>ADDRESS:</strong> ${viewTemplate
+          ? "__________"
+          : `${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.houseNo
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.houseNo + ", "
+            : ""
+          }${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.area
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.area + ", "
+            : ""
+          }${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.landmark
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.landmark + ", "
+            : ""
+          }${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.city
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.city + ", "
+            : ""
+          }${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.state
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.state + ", "
+            : ""
+          }${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.pincode
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.pincode
+            : ""
+          }`
+        }</td>
+                        <td style="padding: 0; width: 50%; font-size: 12px">
+                            <table style="width: 100%; padding: 0; margin-bottom: 0px">
+                                <tr>
+                                    <td style="width: 100%; border: none; font-size: 12px; padding: 4px; margin: 0;">
+                                        <strong>CONTACT NO.:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.student
+            ?.studentInfoResponse[0]
+            ?.mobileNumber
+        }<br>
+                                    </td>
+                                </tr>
+                                <tr style="margin-bottom: -10px">
+                                    <td style="width: 100%;border-bottom: none; border-left: none; border-right: none; padding: 4px; margin: 0;">
+                                        <p style="font-weight: bold; display: inline">HEALTH STATUS:</p>
+                                        <p style="font-weight: bold; display: inline">Ht.:<strong style="margin-left: 5px; font-weight: normal; width: 45px; display: inline-block; ">${viewTemplate
+          ? "__________"
+          : studentData?.student
+            ?.studentInfoResponse[0]?.height
+        }</strong></p>
+                                        <p style="font-weight: bold; display: inline">Wt.:<strong style="margin-left: 5px; font-weight: normal; width: 45px; display: inline-block; ">${viewTemplate
+          ? "__________"
+          : studentData?.student
+            ?.studentInfoResponse[0]?.weight
+        }</strong></p>
+                                        <p style="font-weight: bold; display: inline">B.G.:<strong style="margin-left: 5px; font-weight: normal; width: 45px; display: inline-block; ">${viewTemplate
+          ? "__________"
+          : studentData?.student
+            ?.studentInfoResponse[0]
+            ?.bloodGroup
+        }</strong></p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <div style="width: 100%; margin-bottom: 20px;">
+                <table>
+                    <tr rowspan>
+                        <th colspan="9" style="font-size: 14px">
+                            <div style="display: flex; justify-content:space-between; align-items:center;">
+                                <div style="display: flex; justify-content:center align-items:center;"> SCHOLASTIC AREAS: </div>
+                                <div style="display: flex; justify-content:center align-items:center; font-size:12px;"> (Grading on 8 point scale - A1,A2,B1,B2,C1,C2,D,E)</div>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                            <th style="text-align: center; font-size: 11px; padding: 0px; margin: 0;">SUBJECTS</th>
+
+                            <th style="text-align: center; font-size: 11px; padding: 0px; margin: 0;"><h4 style="margin-top: 1px; margin-bottom: 1px; text-transform: uppercase;">PERIODIC TEST-I</h4> (30)</th>
+
+                            <th colspan=2 style="text-align: center; font-size: 11px; padding: 0px; margin: 0px;">
+                                <div style="width:100%;  border-bottom:2px solid; display:flex; justify-content:center; align-items:center;">
+                                    MID TERM THEORY
+                                </div>    
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         MAX MARKS
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px;  ">
+                                         MAX OBTAINED
+                                    </div>      
+                                </div>
+                            </th>
+
+                             <th colspan=2 style="text-align: center; font-size: 11px; padding: 0px; margin: 0px;">
+                                
+                                    <div style="width:100%;  border-bottom:2px solid; display:flex; justify-content:center; align-items:center;">
+                                    MID TERM PRACTICAL
+                                </div>    
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         MAX MARKS
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px;  ">
+                                         MAX OBTAINED
+                                    </div>     
+                                </div>
+                            </th>
+
+                            <th style="text-align: center; font-size: 11px; padding: 0px; margin: 0;"><h4 style="margin-top: 1px; margin-bottom: 1px; text-transform: uppercase;"> MID TERM TOTAL</h4> (100)</th>
+
+                            <th style="text-align: center; font-size: 11px; padding: 0px; margin: 0;"><h4 style="margin-top: 1px; margin-bottom: 1px"> TOTAL(130) </h4> (PT+MT)</th>
+                    </tr>
+
+                    ${subjectList
+          ?.map((subj) => {
+            return `<tr>
+                                <td style="font-size: 12px; padding:0px 2px; margin: 0; text-transform:uppercase;">${subj}</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0; font-weight:${resSub[subj]["PERIODIC TEST"]?.THEORY?.status
+                ? "bold"
+                : ""
+              }">${resSub[subj]["PERIODIC TEST"]?.THEORY?.status ||
+              resSub[subj]["PERIODIC TEST"]?.THEORY?.obtained
+              }</td>
+
+                            <td colspan=2 style="text-align: center; font-size: 12px; padding: 0px; margin: 0px;">
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         ${resSub[subj]["MID TERM"]?.THEORY?.max
+              }
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px; font-weight:${resSub[subj]["MID TERM"]?.THEORY?.status
+                ? "bold"
+                : ""
+              } ">
+                                        ${resSub[subj]["MID TERM"]?.THEORY?.status ||
+              resSub[subj]["MID TERM"]?.THEORY?.obtained
+              }
+                                    </div>     
+                                </div>
+                            </td>
+
+                            <td colspan=2 style="text-align: center; font-size: 12px; padding: 0px; margin: 0px;">
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         ${resSub[subj]["MID TERM"]?.PRACTICAL?.max
+              }
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px; font-weight:${resSub[subj]["MID TERM"]?.PRACTICAL?.status
+                ? "bold"
+                : ""
+              } ">
+                                        ${resSub[subj]["MID TERM"]?.PRACTICAL?.status ||
+              resSub[subj]["MID TERM"]?.PRACTICAL?.obtained
+              }
+                                    </div>     
+                                </div>
+                            </td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${resSub[subj]["MID TERM"]?.PRACTICAL
+                ?.obtained +
+              resSub[subj]["MID TERM"]?.THEORY?.obtained
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${resSub[subj]["PERIODIC TEST"]?.THEORY
+                ?.obtained +
+              resSub[subj]["MID TERM"]?.PRACTICAL
+                ?.obtained +
+              resSub[subj]["MID TERM"]?.THEORY?.obtained
+              }</td>
+                            </tr>`;
+          })
+          .join("")}
+                    
+                    <tr>
+                        <td  style="font-size: 12px; padding:0px; margin: 0; font-weight:bold;">TOTAL</td>
+
+                        <td  style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold; text-align:center;">${totalMarksObj.PERIODIC_TEST_TOTAL
+        }</td>
+
+                        <td colspan=2 style="text-align: center; font-size: 12px; padding: 0px; margin: 0px; font-weight:bold;">
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         ${totalMarksObj.MID_TERM_THEORY_MAX_TOTAL
+        }
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px;">
+                                        ${totalMarksObj.MID_TERM_THEORY_MAX_OBT
+        }
+                                    </div>     
+                                </div>
+                            </td>
+                            <td colspan=2 style="text-align: center; font-size: 12px; padding: 0px; margin: 0px; font-weight:bold;">
+                                <div style="width:100%; display:flex; align-items:center;">
+                                    <div style="width:50%; border-right:2px solid; display:flex; justify-content:center; align-items:center; padding: 0px; margin: 0px; ">
+                                         ${totalMarksObj.MID_TERM_PRAC_MAX_TOTAL
+        }
+                                    </div>
+                                    <div style="width:50%;padding: 0px; margin: 0px;">
+                                        ${totalMarksObj.MID_TERM_PRAC_MAX_OBT
+        }
+                                    </div>     
+                                </div>
+                            </td>
+
+                        <td  style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold; text-align:center;">${totalMarksObj.MID_TERM_TOTAL
+        }</td>
+
+                        <td  style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold; text-align:center;">${totalMarksObj.OVERALL_TOTAL
+        }</td>
+                    </tr>
+                    <tr>
+                        <td colspan=7 style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold;">AGGREGATE %</td>
+
+                        <td  style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold; text-align:center;">${(
+          (totalMarksObj.OVERALL_TOTAL /
+            (subjectList?.length * 130)) *
+          100
+        ).toFixed(0)}%</td>
+                    </tr>
+                    <tr>
+                        <td colspan=8 style="border:none;padding: 0px; margin: 0;">&nbsp</td>    
+                    </tr>
+                     ${additionalSubName
+          ?.map((subj) => {
+            return `<tr>
+                                <td style="font-size: 12px; padding:0px; margin: 0; text-transform:uppercase;">${subj}</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0; font-weight:${additionalSubData[subj]["PERIODIC TEST"]?.THEORY?.status
+                ? "bold"
+                : ""
+              }">${additionalSubData[subj]["PERIODIC TEST"]?.THEORY?.status ||
+              additionalSubData[subj]["PERIODIC TEST"]?.THEORY?.obtained
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${additionalSubData[subj]["MID TERM"]?.THEORY?.max
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0; font-weight:${additionalSubData[subj]["MID TERM"]?.THEORY?.status
+                ? "bold"
+                : ""
+              }">${additionalSubData[subj]["MID TERM"]?.THEORY?.status ||
+              additionalSubData[subj]["MID TERM"]?.THEORY?.obtained
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${additionalSubData[subj]["MID TERM"]?.PRACTICAL?.max
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0; font-weight:${additionalSubData[subj]["MID TERM"]?.PRACTICAL?.status
+                ? "bold"
+                : ""
+              }">${additionalSubData[subj]["MID TERM"]?.PRACTICAL?.status ||
+              additionalSubData[subj]["MID TERM"]?.PRACTICAL?.obtained
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${additionalSubData[subj]["MID TERM"]?.PRACTICAL
+                ?.obtained +
+              additionalSubData[subj]["MID TERM"]?.THEORY?.obtained
+              }</td>
+
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${additionalSubData[subj]["PERIODIC TEST"]?.THEORY
+                ?.obtained +
+              additionalSubData[subj]["MID TERM"]?.PRACTICAL
+                ?.obtained +
+              additionalSubData[subj]["MID TERM"]?.THEORY?.obtained
+              }</td>
+                            </tr>`;
+          })
+          .join("")}
+               
+                </table>
+                </div>
+                
+                    <div style="display:flex;justify-content:space-between;">
+                        <table style="width:45%">
+                    <tr>
+                        
+                        <th colspan="2" style="border:none; text-align: left; font-size: 14px; padding: 4px; margin: 0;">
+                            <div>Grading on 8 point scale (A1,A2,B1,B2,C1,C2, D,E) </div>
+                            <div style="text-align: left;"> HEALTH  AND  PHYSICAL  EDUCATION
+                                </div>
+                                
+                                </th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <th>STRAND 1 : GAMES</th>
+                        <th style="text-align:center;">GRADE</th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <td>BASKETBALL</td>
+                        <td style="text-align:center; ${generateCoScholasticGrade("BASKETBALL")?.style}">${generateCoScholasticGrade("BASKETBALL")?.value || "-"}</td>
+                    </tr>
+                    <tr style="font-size: 11px;">
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <th>STRAND 2 : HEALTH & FITNESS</th>
+                        <th style="text-align:center;">GRADE</th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <td>MUSIC/DANCE</td>
+                        <td style="text-align:center; ${generateCoScholasticGrade("MUSIC")?.style}">${generateCoScholasticGrade("MUSIC")?.value || "-"}</td>
+                    </tr>
+                    <tr style="font-size: 11px;">
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <th>STRAND 3 : SEWA PROJECT</th>
+                        <th style="text-align:center;">GRADE</th>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <td>GENERAL STUDIES</td>
+                        <td style="text-align:center; ${generateCoScholasticGrade("GENERAL STUDIES")?.style}">${generateCoScholasticGrade("GENERAL STUDIES")?.value || "-"}</td>
+                    </tr>
+                    <tr style="font-size: 11px;">
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                        <th style="text-align:center; padding:5px; border:none;"></th>
+                    </tr>
+
+                    <tr style="font-size: 11px">
+                        <td>SEWA PROJECT</td>
+                        <td style="text-align:center;  ${generateCoScholasticGrade("SEWA PROJECT")?.style}">${generateCoScholasticGrade("SEWA PROJECT")?.value || "-"}</td>
+                    </tr>
+                    <tr style="font-size: 11px;">
+                        <td style="text-align:center; padding:5px; border:none;"></td>
+                    </tr>
+                    <tr  style="font-size: 11px">
+                        <td>WORK EDUCATION</td>
+                        <td style="text-align:center;  ${generateCoScholasticGrade("WORK EDUCATION")?.style}">${generateCoScholasticGrade("WORK EDUCATION")?.value || "-"}</td>
+                    </tr>
+                </table> 
+                <table style="width:45%;height:300px;">
+                                        <tr>
+                        <th colspan="2" style="border:none; text-align: left; font-size: 14px; padding: 4px; margin: 0;">
+                            <div>Grading on 8 point scale (A1,A2,B1,B2,C1,C2, D,E) </div>
+                             <div style="text-align: left;">
+                                CO-SCHOLASTIC SUBJECTS
+                                </div>
+                                </th>
+                    </tr>
+
+                    ${generatePersonalityDevelopmentRows(
+            studentData?.baseTermData?.subject
+          )}
+                    
+                </table>
+                </div>
+                    </div>
+                
+                <div>
+                    <p style="font-size: 0.7em; margin-top: 0px; text-align:center; font-weight:bold;">[${(() => {
+          let string = []
+          for (let key in attendanceValue) {
+            string.push(`${key}-${attendanceValue[key]}`)
+          }
+          return string.join(", ")
+        })()}]</p>
+                </div>
+                <div style="padding: 4px; border: 2px solid black; height: 50px;">
+                    <strong >REMARKS:</strong> ${viewTemplate
+          ? "__________"
+          : studentData?.baseTermData?.remarksEntry
+            ?.description || ""
+        }
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <div>
+                        <p style="padding:0;margin:0;">${viewTemplate ? "__________" : (studentData?.baseTermData?.studentAcademic?.classTeacher || "&nbsp")}</p>
+                        <p style="padding:0;margin-top:4px; font-weight:bold;">Class Teacher</p>
+                    </div>
+                    <div>
+                        <p style="padding:0;margin:0;">${viewTemplate ? "__________" : "&nbsp"}</p>
+                        <p style="padding:0;margin-top:4px; font-weight:bold;">Officiating Principal</p>
+                    </div>
+                    <div>
+                        <p style="padding:0;margin:0;">${viewTemplate ? "__________" : "&nbsp"}</p>
+                        <p style="padding:0;margin-top:4px; font-weight:bold;">Parent/Guardian</p>
+                    </div>
+                </div>
+                </page>
+            ` +
+        (studentData?.footer || "");
+      studentHtml.appendChild(studhtml);
+    });
+  };
+</script>
+<script>
+  window.SetTemplateData([
+    {
+      student: {
+        dob: "03-10-2010",
+        admissionNo: "20130046",
+        studentName: "Manya Jindal",
+        className: "IX",
+        sectionName: "B",
+        rollNo: 0,
+        fatherName: "Mr. Sandeep Jindal",
+        motherName: "Mrs. Rakhi Jindal",
+        attendance: "0.0/0",
+        boardRollNumber: "",
+        studentInfoResponse: [
+          {
+            id: 262859,
+            userUid: "b0653df5-ba94-421f-8a4e-b2ff83caa0c3",
+            userName: null,
+            fatherUserName: null,
+            motherUserName: null,
+            guardianUserName: null,
+            uid: "587e956f-484c-4af4-b0e0-2ad35b130e4f",
+            studentId: "20130046",
+            exAdmissionNo: null,
+            studentName: "Manya Jindal",
+            fatherName: "Mr. Sandeep Jindal",
+            motherName: "Mrs. Rakhi Jindal",
+            dob: "03-10-2010",
+            gender: "Female",
+            studentAdhaarcard: "",
+            joiningClass: "VIII",
+            joiningSections: "B",
+            joiningDate: "25-02-2013",
+            plotNumber: "",
+            area: "Sector-24, Rohini",
+            city: "Delhi",
+            state: "NA",
+            pincode: "110085",
+            phone1: null,
+            rollNo: 0,
+            emergencyNumber: "9999757151",
+            mobileNumber: "9891148990",
+            studentEmail: null,
+            religion: "",
+            category: "General",
+            minority: "",
+            motherTongue: "",
+            idMark: "",
+            height: "",
+            weight: "",
+            physicalDisability: "",
+            bloodGroup: "",
+            healthRemark: "",
+            siblingDetails: "",
+            alumni: "",
+            siblingResponse: [],
+            fatherOccupation: "",
+            fatherQualification: "",
+            fatherOrganization: "",
+            fatherDesignation: "",
+            fatherIncome: "",
+            fatherArea: "NA",
+            fatherCity: "NA",
+            fatherState: "NA",
+            fatherPincode: "",
+            fatherPhone: null,
+            fatherMobile: "",
+            fatherEmail: null,
+            fatherAdhaarNumber: "",
+            schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            motherQualification: "",
+            motherOccupation: "",
+            motherOrganization: "",
+            motherDesignation: "",
+            motherIncome: "",
+            motherArea: "NA",
+            motherCity: "NA",
+            motherState: "NA",
+            motherPincode: "",
+            motherPhone: null,
+            motherMobile: "",
+            motherEmail: null,
+            motherAdhaarNumber: "",
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: null,
+            otp: null,
+            schoolName: "Demo Public School",
+            remark: null,
+            classTeacher: "",
+            classTeacherUserName: "",
+            classes: "IX",
+            classUid: null,
+            sections: "B",
+            group: "IST 2019-20",
+            wing: "NA",
+            status: "Studying",
+            academicSession: "2024-25",
+            joiningStatus: "Old",
+            houses: null,
+            certificates: "",
+            certificatesList: [],
+            caste: "",
+            listOfDocuments: null,
+            attached: false,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [],
+            studentTransport: [],
+            studentAadharCard: null,
+            fatherAadharCard: null,
+            motherAadharCard: null,
+            studentImage: null,
+            fatherImage: null,
+            motherImage: null,
+            guardianImage: null,
+            birthCertificate: null,
+            classSectionUid: "e0a623e9-7e4c-4030-bdbb-458ee665aa3b",
+            aluminiProof: null,
+            siblingProof: null,
+            residenceProof: null,
+            firstBornChildProof: null,
+            medicalFitnessCertificate: null,
+            fatherQualificationProof: null,
+            motherQualificationProof: null,
+            casteCertificate: null,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createddate: "2024-02-15 16:02:46.452137",
+            editeddate: "2024-02-15 16:02:46.452137",
+            permanentEducationNumber: null,
+            studentAddressResponse: {
+              uid: "5b686ded-8ae7-45fe-86de-7d31445b9a96",
+              houseNo: null,
+              area: "Sector-24, Rohini",
+              landmark: null,
+              city: "Delhi",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 110085,
+              street: "186/187, Pocket-9",
+              userName: "DIPS653_20130046",
+              createdDate: "15-02-2024 09:32 PM",
+              editedDate: "15-02-2024 09:32 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            fatherAddressResponse: {
+              uid: "04f341b7-7dc8-4a2e-90d3-7bf5386c7624",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "15-02-2024 09:32 PM",
+              editedDate: "15-02-2024 09:32 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            motherAddressResponse: {
+              uid: "486f4146-4c43-463f-a7d2-7c6a10002e05",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "15-02-2024 09:32 PM",
+              editedDate: "15-02-2024 09:32 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            guardianAddressResponse: null,
+            correspondenceAddressResponse: null,
+          },
+        ],
+        classTeacher: "",
+        classTeacherUserName: "",
+        permanentEducationNumber: null,
+        school: {
+          uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+          apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+          schoolName: "DE INDIAN PUBLIC SCHOOL",
+          schoolAbb: "DIPS",
+          educationBoard: "Central Board of Secondary Education (CBSE)",
+          registrationNo: "1412743",
+          plotNumber: "POCKET-11",
+          area: "SECTOR-24,ROHINI",
+          city: "DELHI",
+          pincode: "110085",
+          state: "Delhi",
+          phoneNo1: "1127050252",
+          phoneNo2: "1127050253",
+          contactName: "DIPS",
+          contactMobile: null,
+          contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "dips",
+          website: "WWW.DIPSROHINI.IN",
+          schemaPrefix: null,
+          editedDate: "20-07-2024 04:14 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+      },
+      markData: {
+        academicSession: "2024-25",
+        admissionNo: "20120048",
+        studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+        studentName: "Dhairya Grover",
+        rollNo: 0,
+        fatherName: "Mr. Harish Grover",
+        className: "XI",
+        sectionName: "A",
+        terms: "MID TERM",
+        markSheetName: "TERM-I",
+        overAllRank: "1",
+        markSheetTerms: [
+          {
+            id: 610,
+            headerName: "PERIODIC TEST",
+            subHeaderName: "(30)",
+            priority: 1,
+            bestOf: 0,
+            decimalPlaces: 1,
+            weightage: 30,
+            terms: ["PERIODIC TEST-1"],
+          },
+          {
+            id: 611,
+            headerName: "MID TERM",
+            subHeaderName: "(100)",
+            priority: 2,
+            bestOf: 0,
+            decimalPlaces: 2,
+            weightage: 100,
+            terms: ["MID TERM"],
+          },
+        ],
+        subjectWiseMarkSheetReportResponses: [
+          {
+            subjectUid: "9e004a4a-0ea6-45f3-a809-fd2c6eeb9361",
+            subjectName: "ENGLISH",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "9e004a4a-0ea6-45f3-a809-fd2c6eeb9361",
+                subjectName: "ENGLISH",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 30,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "English",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "9e004a4a-0ea6-45f3-a809-fd2c6eeb9361",
+                subjectName: "ENGLISH",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "English",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 110,
+            total: 110,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 1,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "d7427a30-f8af-4578-9aec-293777c6bdc6",
+            subjectName: "ENGLISH PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "d7427a30-f8af-4578-9aec-293777c6bdc6",
+                subjectName: "ENGLISH PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 20,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "English",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 20,
+            total: 20,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 2,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "3e328902-3195-4b3f-8cb0-d2ba3a810788",
+            subjectName: "HINDI",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "3e328902-3195-4b3f-8cb0-d2ba3a810788",
+                subjectName: "HINDI",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 0,
+                grade: "E",
+                status: "Absent",
+                markSheetName: "TERM-I",
+                attachmentName: "Hindi",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: false,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "3e328902-3195-4b3f-8cb0-d2ba3a810788",
+                subjectName: "HINDI",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Hindi",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 80,
+            total: 110,
+            percentage: 72.7,
+            grade: "B1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 3,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "8a2b440a-f72b-470e-807b-cf5e8d97e60e",
+            subjectName: "HINDI PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "8a2b440a-f72b-470e-807b-cf5e8d97e60e",
+                subjectName: "HINDI PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 0,
+                grade: "E",
+                status: "Absent",
+                markSheetName: "TERM-I",
+                attachmentName: "Hindi",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: false,
+              },
+            ],
+            marksObtained: 0,
+            total: 20,
+            percentage: 0,
+            grade: "E",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 4,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "c9b92c06-4c88-424a-a9b3-95b2e03e399b",
+            subjectName: "MATHEMATICS",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "c9b92c06-4c88-424a-a9b3-95b2e03e399b",
+                subjectName: "MATHEMATICS",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 30,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Maths",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "c9b92c06-4c88-424a-a9b3-95b2e03e399b",
+                subjectName: "MATHEMATICS",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Maths",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 110,
+            total: 110,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 5,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "f3d29081-16b7-4649-bd00-01c3def05461",
+            subjectName: "MATHEMATICS PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "f3d29081-16b7-4649-bd00-01c3def05461",
+                subjectName: "MATHEMATICS PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 20,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Maths",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 20,
+            total: 20,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 6,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "65e41231-6f40-4265-a722-690fc92a8bbe",
+            subjectName: "PHYSICS",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "65e41231-6f40-4265-a722-690fc92a8bbe",
+                subjectName: "PHYSICS",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 30,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Physics",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "65e41231-6f40-4265-a722-690fc92a8bbe",
+                subjectName: "PHYSICS",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Physics",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 110,
+            total: 110,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 7,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "760303e3-aa31-4106-beec-7c343d996847",
+            subjectName: "PHYSICS PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "760303e3-aa31-4106-beec-7c343d996847",
+                subjectName: "PHYSICS PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 20,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Physics",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 20,
+            total: 20,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 8,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "0c7997f5-ec71-447f-97bb-6e815a12252d",
+            subjectName: "CHEMISTRY",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "0c7997f5-ec71-447f-97bb-6e815a12252d",
+                subjectName: "CHEMISTRY",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 0,
+                grade: "E",
+                status: "Absent",
+                markSheetName: "TERM-I",
+                attachmentName: "Chemistry",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: false,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "0c7997f5-ec71-447f-97bb-6e815a12252d",
+                subjectName: "CHEMISTRY",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Chemistry",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 80,
+            total: 110,
+            percentage: 72.7,
+            grade: "B1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 9,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "ad6a98c8-ec69-4edf-a812-7a9f4cbe38f7",
+            subjectName: "CHEMISTRY PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "ad6a98c8-ec69-4edf-a812-7a9f4cbe38f7",
+                subjectName: "CHEMISTRY PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 20,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Chemistry",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 20,
+            total: 20,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 10,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "05b34a52-dd01-411b-bda8-9aab3e6a8c79",
+            subjectName: "Biology",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "05b34a52-dd01-411b-bda8-9aab3e6a8c79",
+                subjectName: "Biology",
+                subjectNature: "THEORY",
+                max: 30,
+                obtained: 30,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Biology",
+                session: "2024-25",
+                decimalPlaces: 1,
+                markSheetTermResponse: {
+                  id: 610,
+                  headerName: "PERIODIC TEST",
+                  subHeaderName: "(30)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 1,
+                  weightage: 30,
+                  terms: ["PERIODIC TEST-1"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "05b34a52-dd01-411b-bda8-9aab3e6a8c79",
+                subjectName: "Biology",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 80,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Biology",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 110,
+            total: 110,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 11,
+            decimalPlaces: 1,
+            visible: false,
+          },
+          {
+            subjectUid: "8bb386b9-6dc3-48a9-b154-7c9b23dd8683",
+            subjectName: "BIOLOGY PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "7d973e2b-158d-4924-b2cf-572ba790c75c",
+                admissionNo: "20120048",
+                studentName: "Dhairya Grover",
+                rollNo: 0,
+                fatherName: "Mr. Harish Grover",
+                className: "XI",
+                sectionName: "A",
+                classSectionUid: "8b84f045-cc19-4934-a312-18db071db83a",
+                terms: "MID TERM",
+                subjectUid: "8bb386b9-6dc3-48a9-b154-7c9b23dd8683",
+                subjectName: "BIOLOGY PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 20,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "Biology",
+                session: "2024-25",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 611,
+                  headerName: "MID TERM",
+                  subHeaderName: "(100)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 100,
+                  terms: ["MID TERM"],
+                },
+                visible: false,
+                graded: false,
+                pass: true,
+              },
+            ],
+            marksObtained: 20,
+            total: 20,
+            percentage: 100,
+            grade: "A1",
+            className: "XI",
+            sectionName: "A",
+            terms: "MID TERM",
+            markSheetName: "TERM-I",
+            subjectPrt: 12,
+            decimalPlaces: 2,
+            visible: false,
+          },
+        ],
+        marksObtained: 700,
+        total: 780,
+        percentage: 89.7,
+        overAllGrade: "A2",
+        visible: false,
+      },
+      remarks: {
+        uid: null,
+        terms: null,
+        studentId: null,
+        studentName: null,
+        rollNumber: 0,
+        classSectionUid: null,
+        classSection: null,
+        description: null,
+        fields: null,
+        status: false,
+        createdUser: null,
+        editedUser: null,
+        createdDate: null,
+        editedDate: null,
+      },
+      baseTermData: {
+        studentAcademic: {
+          dob: "03-10-2010",
+          admissionNo: "20130046",
+          studentName: "Manya Jindal",
+          className: "IX",
+          sectionName: "B",
+          rollNo: 0,
+          fatherName: "Mr. Sandeep Jindal",
+          motherName: "Mrs. Rakhi Jindal",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 262859,
+              userUid: "b0653df5-ba94-421f-8a4e-b2ff83caa0c3",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "587e956f-484c-4af4-b0e0-2ad35b130e4f",
+              studentId: "20130046",
+              exAdmissionNo: null,
+              studentName: "Manya Jindal",
+              fatherName: "Mr. Sandeep Jindal",
+              motherName: "Mrs. Rakhi Jindal",
+              dob: "03-10-2010",
+              gender: "Female",
+              studentAdhaarcard: "",
+              joiningClass: "VIII",
+              joiningSections: "B",
+              joiningDate: "25-02-2013",
+              plotNumber: "",
+              area: "Sector-24, Rohini",
+              city: "Delhi",
+              state: "NA",
+              pincode: "110085",
+              phone1: null,
+              rollNo: 0,
+              emergencyNumber: "9999757151",
+              mobileNumber: "9891148990",
+              studentEmail: null,
+              religion: "",
+              category: "General",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "IX",
+              classUid: null,
+              sections: "B",
+              group: "IST 2019-20",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-25",
+              joiningStatus: "Old",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "e0a623e9-7e4c-4030-bdbb-458ee665aa3b",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-02-15 16:02:46.452137",
+              editeddate: "2024-02-15 16:02:46.452137",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "5b686ded-8ae7-45fe-86de-7d31445b9a96",
+                houseNo: null,
+                area: "Sector-24, Rohini",
+                landmark: null,
+                city: "Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110085,
+                street: "186/187, Pocket-9",
+                userName: "DIPS653_20130046",
+                createdDate: "15-02-2024 09:32 PM",
+                editedDate: "15-02-2024 09:32 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "04f341b7-7dc8-4a2e-90d3-7bf5386c7624",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:32 PM",
+                editedDate: "15-02-2024 09:32 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "486f4146-4c43-463f-a7d2-7c6a10002e05",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:32 PM",
+                editedDate: "15-02-2024 09:32 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+            schoolName: "DE INDIAN PUBLIC SCHOOL",
+            schoolAbb: "DIPS",
+            educationBoard: "Central Board of Secondary Education (CBSE)",
+            registrationNo: "1412743",
+            plotNumber: "POCKET-11",
+            area: "SECTOR-24,ROHINI",
+            city: "DELHI",
+            pincode: "110085",
+            state: "Delhi",
+            phoneNo1: "1127050252",
+            phoneNo2: "1127050253",
+            contactName: "DIPS",
+            contactMobile: null,
+            contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "dips",
+            website: "WWW.DIPSROHINI.IN",
+            schemaPrefix: null,
+            editedDate: "20-07-2024 04:14 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        subject: [
+          {
+            subjectAllResponse: {
+              uid: "9e004a4a-0ea6-45f3-a809-fd2c6eeb9361",
+              subjectName: "ENGLISH",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: true,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-04-18 10:32:33.143815",
+              editeddate: "2024-04-18 10:32:33.143033",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "English",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "3e328902-3195-4b3f-8cb0-d2ba3a810788",
+              subjectName: "HINDI",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: true,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-04-18 10:32:42.67631",
+              editeddate: "2024-04-18 10:32:42.675236",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Hindi",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "c9b92c06-4c88-424a-a9b3-95b2e03e399b",
+              subjectName: "MATHEMATICS",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: true,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-04-18 10:32:51.58182",
+              editeddate: "2024-07-03 10:43:01.092989",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Maths",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "cb374bd7-c0c5-4cfb-b307-cc9e1c89749e",
+              subjectName: "MUSIC",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-12 07:25:22.644989",
+              editeddate: "2024-07-30 05:49:07.227508",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "00d080dc-e75d-40fb-939a-19192933e011",
+              subjectName: "DANCE",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-12 07:25:30.225965",
+              editeddate: "2024-07-30 05:49:14.905763",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "002c09c5-6f0d-48b6-afb0-a9c4c1348806",
+              subjectName: "BASKETBALL",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-12 07:25:38.333056",
+              editeddate: "2024-07-30 05:49:21.996641",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "2ef48349-219d-49fd-913d-d89c7109d192",
+              subjectName: "ATTENDANCE",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:08:45.648897",
+              editeddate: "2024-08-27 09:40:27.695379",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "6c23762d-5187-43be-bb58-89ef6ca99c8b",
+              subjectName: "SEWA PROJECT",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:28:52.623856",
+              editeddate: "2024-08-27 09:43:33.673019",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "8a4ad9bf-2905-476c-b631-3e1c5283f4fe",
+              subjectName: "GENERAL STUDIES",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:35:35.252732",
+              editeddate: "2024-08-27 09:44:03.145611",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "fdc4935c-2d1a-4f19-a451-1f4069931e82",
+              subjectName: "CREATIVITY",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:35:49.239379",
+              editeddate: "2024-08-27 09:41:21.143299",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "ba6a70b4-60aa-4a00-b0d4-08d761fc2b3c",
+              subjectName: "ATTITUDE TOWARDS TEACHERS",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:02.262317",
+              editeddate: "2024-08-27 09:41:38.126928",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 0,
+            percentage: 0,
+            grade: "E",
+            remarkStatus: "Absent",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "210888c1-bc50-48d5-8fee-96bc89b52553",
+              subjectName: "HABIT OF CLEANLINESS",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:15.306993",
+              editeddate: "2024-08-27 09:41:45.517537",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "ef5b88b2-35e8-4dc5-b0c0-e5e77d51dffa",
+              subjectName: "GENERAL CONDUCT",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:23.648019",
+              editeddate: "2024-08-27 09:41:56.90146",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 0,
+            percentage: 0,
+            grade: "E",
+            remarkStatus: "Absent",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "a4a77275-b9fd-49ec-ba56-2c1f72850c8f",
+              subjectName: "DILIGENCE",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:31.999506",
+              editeddate: "2024-08-27 09:42:05.367016",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "02699dee-3c16-4272-b6eb-376ee123d71a",
+              subjectName: "TEAM SPIRIT",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:39.469194",
+              editeddate: "2024-08-27 09:42:16.614656",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "7af6b898-66df-4f97-aa00-0d499a6ac0b8",
+              subjectName: "CONFIDENCE",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:47.916454",
+              editeddate: "2024-08-27 09:42:27.543982",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 0,
+            percentage: 0,
+            grade: "E",
+            remarkStatus: "Absent",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "6a7d263e-8244-459c-81a7-07d54b50086a",
+              subjectName: "RESPONSIBILITY",
+              nature: "3A LIFE SKILLS",
+              natureUid: "aebe02ca-f40b-4b5e-8a35-7e72dd8eb41f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:36:57.331842",
+              editeddate: "2024-08-27 09:42:32.705593",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 0,
+            percentage: 0,
+            grade: "E",
+            remarkStatus: "Absent",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "35447d78-e1e2-44bb-987f-c3d48d272e51",
+              subjectName: "WORK EDUCATION",
+              nature: "2ALIFE-SKILLS",
+              natureUid: "91948fff-e27a-4f90-a47d-aed95be1eab4",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "QuickCampus",
+              createddate: "2024-07-15 09:39:20.96685",
+              editeddate: "2024-08-27 09:44:11.808729",
+            },
+            termName: "MID TERM",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "05b34a52-dd01-411b-bda8-9aab3e6a8c79",
+              subjectName: "Biology",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-15 11:34:00.992822",
+              editeddate: "2024-07-15 11:34:00.991671",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Biology",
+            additional: true,
+            added: false,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "65e41231-6f40-4265-a722-690fc92a8bbe",
+              subjectName: "PHYSICS",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-15 11:45:59.536659",
+              editeddate: "2024-07-15 11:45:59.532715",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Physics",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "0c7997f5-ec71-447f-97bb-6e815a12252d",
+              subjectName: "CHEMISTRY",
+              nature: "THEORY",
+              natureUid: "1adf767b-ed53-48bc-8ca9-f3627dc09c2f",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-15 11:47:12.629083",
+              editeddate: "2024-07-15 11:47:12.627926",
+            },
+            termName: "MID TERM",
+            max: 80,
+            markObtained: 80,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Chemistry",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "d7427a30-f8af-4578-9aec-293777c6bdc6",
+              subjectName: "ENGLISH PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 04:37:05.709905",
+              editeddate: "2024-07-16 04:37:05.708884",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 20,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "English",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "8a2b440a-f72b-470e-807b-cf5e8d97e60e",
+              subjectName: "HINDI PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 04:58:58.509029",
+              editeddate: "2024-07-16 04:58:58.507976",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 0,
+            percentage: 0,
+            grade: "E",
+            remarkStatus: "Absent",
+            attachmentName: "Hindi",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "8bb386b9-6dc3-48a9-b154-7c9b23dd8683",
+              subjectName: "BIOLOGY PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 04:59:27.482988",
+              editeddate: "2024-07-16 04:59:27.481968",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 20,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Biology",
+            additional: true,
+            added: false,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "ad6a98c8-ec69-4edf-a812-7a9f4cbe38f7",
+              subjectName: "CHEMISTRY PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 04:59:38.141274",
+              editeddate: "2024-07-16 04:59:38.140221",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 20,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Chemistry",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "760303e3-aa31-4106-beec-7c343d996847",
+              subjectName: "PHYSICS PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 05:00:17.122428",
+              editeddate: "2024-07-16 05:00:17.121033",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 20,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Physics",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "f3d29081-16b7-4649-bd00-01c3def05461",
+              subjectName: "MATHEMATICS PR.",
+              nature: "PRACTICAL",
+              natureUid: "7b67b4f7-aa94-44a4-a70c-7fd48ba4403d",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "DIPS_429963",
+              editedUser: "DIPS_429963",
+              createddate: "2024-07-16 05:00:45.752099",
+              editeddate: "2024-07-16 05:00:45.751051",
+            },
+            termName: "MID TERM",
+            max: 20,
+            markObtained: 20,
+            percentage: 100,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "Maths",
+            additional: false,
+            added: true,
+            scholastic: true,
+          },
+        ],
+        remarksEntry: {
+          uid: null,
+          terms: null,
+          studentId: null,
+          studentName: null,
+          rollNumber: 0,
+          classSectionUid: null,
+          classSection: null,
+          description: null,
+          fields: null,
+          status: false,
+          createdUser: null,
+          editedUser: null,
+          createdDate: null,
+          editedDate: null,
+        },
+        school: {
+          uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+          apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+          schoolName: "DE INDIAN PUBLIC SCHOOL",
+          schoolAbb: "DIPS",
+          educationBoard: "Central Board of Secondary Education (CBSE)",
+          registrationNo: "1412743",
+          plotNumber: "POCKET-11",
+          area: "SECTOR-24,ROHINI",
+          city: "DELHI",
+          pincode: "110085",
+          state: "Delhi",
+          phoneNo1: "1127050252",
+          phoneNo2: "1127050253",
+          contactName: "DIPS",
+          contactMobile: null,
+          contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "dips",
+          website: "WWW.DIPSROHINI.IN",
+          schemaPrefix: null,
+          editedDate: "20-07-2024 04:14 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+        promotedClass: null,
+        promotedSection: null,
+        perSignedUrlResponse: {
+          url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIPS/student-info/20130046/student/images/20130046.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240823T153243Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240823%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=ff02e0db1ba1eaf1998f92ad49b7830497e8ddb268fdc849b3c2ed46d7f0e5f1",
+          fileName: "20130046.png",
+        },
+        pass: false,
+        status_code: 200,
+      },
+      header: "",
+      footer:
+        '<div style="padding:0mm;width:100%;" width="100%" align="left" valign="top">\n <strong>Note</strong>: This is a computer generated report and does not require signatures.\n</div>',
+    },
+  ]);
+</script>
+
+</html>

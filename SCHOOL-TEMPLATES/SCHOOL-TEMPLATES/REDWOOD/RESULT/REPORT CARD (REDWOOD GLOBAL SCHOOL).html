@@ -1,0 +1,3569 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actual Template</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        console.log(dataList)
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+        };
+
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+
+              remarks: data?.baseTermData || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+          const mainResult = v?.studentResponse ?? [];
+          const studentDetails = v.studentInfo;
+          const studentRemarks = v?.remarks;
+          const tempRemarks = v?.remarks?.remarksEntry?.fields;
+          const studentRemarksObject = {
+            attendance:
+              tempRemarks?.find((v) => v?.title == "PRESENT DAYS")?.value +
+              "/" +
+              tempRemarks?.find((v) => v?.title == "WORKING DAYS")?.value,
+            behavior: tempRemarks?.find((v) => v?.title == "BEHAVIOUR")?.value,
+            neatAndClean: tempRemarks?.find(
+              (v) => v?.title == "NEAT & CLEANNESS"
+            )?.value,
+            percentage:
+              (Number(
+                tempRemarks?.find((v) => v?.title == "PRESENT DAYS")?.value
+              ) *
+                100) /
+              Number(
+                tempRemarks?.find((v) => v?.title == "WORKING DAYS")?.value
+              ),
+          };
+
+          console.log(v, studentRemarksObject, "ddddd");
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `
+          <style type="text/css">
+@page {
+size: A4
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+}
+td {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top: 2mm;
+	padding-bottom:2mm;
+	font-size: 9pt;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top:1mm;
+	padding-bottom: 1mm;
+	background: #e7e7e7;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.bgcol{
+background-color: #999;
+}
+
+@media print {
+@page {
+margin:auto;
+size: A4
+}
+}
+</style>
+
+<page orientation="portrait" format="A4" margin="0">
+	<table cellspacing="10" cellpadding="10" style="width: 100%; border: solid 0.264583333mm #000000;">
+  		<tr valign="top">
+    	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+		<!-- logo and Name section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/RGS117/school-logo.png" /></td>
+				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+					<span style="color:#0089e0; font-size:24pt; text-transform:uppercase; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">Redwoods Global School</span>
+					<br/><span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Chakmal, Pokhraira Chowk, Muzaffarpur, Bihar-843106<br>
+					www.redwoodsglobals.com | Email: redwoodsglobals@gmail.com</span>
+					
+					</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<col style="width: 10%"/>
+				<col style="width: 80%"/>
+				<col style="width: 10%"/>
+				<tr>
+					<td style="width:10%;">&nbsp;</td>
+					<td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt;">Student Report Card : ${
+            mainResult?.academicSession
+          }</td>
+					<td style="width:10%;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>	
+		<!--// logo and Name section -->
+		
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Basic Details -->	
+        <table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+        <tr>
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" >
+                <tr>
+                    <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.studentName
+                    }</td>
+                </tr>
+            </table>
+        </td>
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.admissionNo
+                    }</td>
+                </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.fatherName
+                    }</td>
+                </tr>
+            </table>
+        </td>
+
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS/SECTION</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails.className
+                    }-${studentDetails.sectionName}</td>
+                </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.motherName
+                    }</td>
+                </tr>
+            </table>
+        </td>
+
+        <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.rollNo
+                    }</td>
+                </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+        <td style="width:50%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentDetails?.dob
+                    }</td>
+                </tr>
+            </table>
+        </td>
+
+        <td style="width:50%; border-left: solid 0.264583333mm #000000;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
+                    <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                      studentRemarksObject.attendance
+                    }</td>
+                </tr>
+            </table>
+        </td>
+        </tr>
+        </table>
+		<!--// Basic Details -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:left; font-size:11pt; font-weight:bold; color:#000000;">Student Report Chart:</td>
+			</tr>
+		</table>
+		<!--// Term -->
+			
+		<!-- Main Subject Table -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+          	<tr style="background-color:#e7e7e7;">
+              <td rowspan="2" align="center" style="width:20%; font-weight:bold; font-size:10pt;">SUBJECT<br>PAPERS</td>
+              <td colspan="4" align="center" style="width:24%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Term-I</td>
+              <td colspan="4" align="center" style="width:24%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Term-II</td>
+
+              <td rowspan="2" align="center" style="width:8%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Gross<br>Marks</td>
+              <td rowspan="2" align="center" style="width:8%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Total<br>Obtained</td>
+              <td rowspan="2" align="center" style="width:8%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Per.<br>%</td>
+              <td rowspan="2" align="center" style="width:8%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Grade</td>
+          	</tr>
+          	<tr style="background-color:#e7e7e7;">
+
+              ${mainResult?.markSheetTerms
+                ?.map(
+                  (val) => `
+                <td align="center" style="width:5%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                  <div style="height:6mm; text-align:center; width:100%; font-size:6pt; line-height:130%; font-weight:bold;">${val?.headerName}</div>
+                  <div style=" width:100%; text-align:center; font-size:8pt; font-weight:bold;">${val.subHeaderName}</div>
+                  </td>
+                  `
+                )
+                .join("")}
+            </tr>
+				
+		
+
+      ${mainResult?.subjectWiseMarkSheetReportResponses
+        ?.map(
+          (value) => `
+        <tr>
+				<td align="center" style="width:24%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+          value?.subjectName
+        }</td>
+          ${value?.markSheetReport
+            ?.map(
+              (val) => `
+            <td align="center" style="width:5%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val?.obtained}</td>
+            `
+            )
+            .join("")}
+
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          value?.total
+        }</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          value?.marksObtained
+        }</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          value?.percentage
+        }%</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          value?.grade
+        }</td>
+			</tr>
+        `
+        )
+        .join("")}
+		
+		</table>
+		<!--// Main Subject Table -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Result -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">	
+				<tr>
+					<td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+					<td align="left" style="width:6%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Result:</td>
+					<td align="left" style="width:24%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            studentRemarks?.pass
+              ? `Passed (${studentRemarks?.promotedClass})`
+              : `Failed (${studentRemarks?.promotedClass})`
+          }</td>
+					
+					<td style="width:6%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Marks:</td>
+					<td style="width:9%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            mainResult?.marksObtained
+          }</td>
+					
+					<td style="width:6%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Grade:</td>
+					<td style="width:9%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            mainResult?.overAllGrade
+          }</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Result -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- performance -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:left; font-size:11pt; font-weight:bold; color:#000000;">Overall Performance:</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+          	<tr style="background-color:#e7e7e7;">
+              <td align="center" style="width:33%; font-weight:bold;">Attendance %</td>
+              <td align="center" style="width:34%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Behaviour</td>
+              <td align="center" style="width:33%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Neat & Cleanness</td>
+            </tr>
+				
+			<tr>
+				<td align="center" style="width:33%; border-top: solid 0.264583333mm #000000;">${studentRemarksObject?.percentage?.toFixed(
+          2
+        )} %</td>
+				<td align="center" style="width:34%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          studentRemarksObject.behavior
+        }</td>
+				<td align="center" style="width:33%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          studentRemarksObject.neatAndClean
+        }</td>
+			</tr>	
+		</table>
+		<!--// performance -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- teacher remarks -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:18%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Teacher's Remarks:</td>
+					<td align="left" style="width:82%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${
+            studentRemarks?.remarksEntry?.description || ""
+          }</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// teacher remarks -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- bottom grades -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+					<!-- start grades table -->
+					<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+						<tr style="background:#e7e7e7;">
+							<td align="center" style="width:33; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Grades</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Range</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; font-size:7pt;"><strong>Remarks</strong></td>
+						</tr>
+
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A+</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>90%-100%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Outstanding</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>75%-89%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Excellent</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>B</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>56%-74%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Very Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>C</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>35%-55%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>D</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>Below 35%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Scope for improvement</strong></td>
+						</tr>
+						
+						</table>	
+						<!--// end grades table -->
+						</td>
+						<td align="left" style="width:3%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:3mm; padding-bottom:0mm;">
+							<h2 style="font-size:12pt; font-family: 'Courier New', monospace; font-style: italic;">Wishing you all the best for your bright future.</h2></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// bottom grades -->
+		
+		<!-- Sign. section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:36%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:32%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">School Authorities</strong></td>
+						<td valign="top" align="center" style="width:32%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Class Teacher</strong></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Sign. section -->
+			
+		<!-- copyright -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&#169; Redwoods Global School</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// copyright -->
+		</td>
+  		</tr>
+		</table>	
+	
+</page>
+`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          baseTermData: {
+            studentAcademic: {
+              dob: "14-03-2014",
+              admissionNo: "101",
+              studentName: "Mohammad Sufiyan",
+              className: "I",
+              sectionName: "A",
+              rollNo: 10,
+              fatherName: "ABDUL RAHMAN",
+              motherName: "",
+              attendance: "140.0/183",
+              boardRollNumber: "",
+              studentInfoResponse: [
+                {
+                  id: 74597,
+                  userUid: "6b8d1e1e-4eb7-4187-b8b7-dc1a132a3f53",
+                  userName: null,
+                  fatherUserName: null,
+                  motherUserName: null,
+                  guardianUserName: null,
+                  uid: "372974c1-6c17-429d-bfe5-cdfb4b6171a5",
+                  studentId: "101",
+                  studentName: "Mohammad Sufiyan",
+                  fatherName: "ABDUL RAHMAN",
+                  motherName: "",
+                  dob: "14-03-2014",
+                  gender: "Male",
+                  studentAdhaarcard: "",
+                  joiningClass: "UKG",
+                  joiningSections: "A",
+                  joiningDate: "01-01-2022",
+                  plotNumber: "",
+                  area: "VILL-CHAKMAL, POST-GIDDHA, PS-SARAIYA",
+                  city: "",
+                  state: "",
+                  pincode: "843106",
+                  phone1: "",
+                  rollNo: 10,
+                  emergencyNumber: "",
+                  mobileNumber: "8651086091",
+                  studentEmail: null,
+                  religion: "",
+                  category: "",
+                  minority: "",
+                  motherTongue: "",
+                  idMark: "",
+                  height: "",
+                  weight: "",
+                  physicalDisability: "",
+                  bloodGroup: "",
+                  healthRemark: "",
+                  siblingDetails: "",
+                  alumni: "",
+                  siblingResponse: [
+                    {
+                      uid: "346dd4c6-eeb5-4833-a4ab-a82ffa925af9",
+                      siblingUid: "1d485a72-3029-45a9-86dc-444623041897",
+                      admissionNo: "100",
+                      siblingName: "Altamash Rahamani",
+                      siblingClassSection: "V-A",
+                    },
+                  ],
+                  fatherOccupation: "",
+                  fatherQualification: "",
+                  fatherOrganization: "",
+                  fatherDesignation: "",
+                  fatherIncome: "",
+                  fatherArea: "",
+                  fatherCity: "",
+                  fatherState: "",
+                  fatherPincode: null,
+                  fatherPhone: "",
+                  fatherMobile: "8651086091",
+                  fatherEmail: null,
+                  fatherAdhaarNumber: "",
+                  schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                  motherQualification: "",
+                  motherOccupation: "",
+                  motherOrganization: "",
+                  motherDesignation: "",
+                  motherIncome: "",
+                  motherArea: "",
+                  motherCity: "",
+                  motherState: "",
+                  motherPincode: null,
+                  motherPhone: "",
+                  motherMobile: "",
+                  motherEmail: null,
+                  motherAdhaarNumber: "",
+                  guardianName: null,
+                  relation: null,
+                  guardianOccupation: null,
+                  guardianPhone: null,
+                  guardianMobile: null,
+                  guardianEmail: null,
+                  guardianAddress: null,
+                  leavingDate: null,
+                  previousSchoolName: "",
+                  otp: "UJhU8f",
+                  schoolName: "Demo Public School",
+                  remark: "",
+                  classTeacher: null,
+                  classTeacherUserName: null,
+                  classes: "I",
+                  classUid: null,
+                  sections: "A",
+                  group: null,
+                  wing: "NA",
+                  status: "Studying",
+                  academicSession: "2023-2024",
+                  joiningStatus: "Old",
+                  houses: null,
+                  certificates: "",
+                  certificatesList: [],
+                  caste: "",
+                  listOfDocuments: null,
+                  attached: false,
+                  required: false,
+                  submitted: false,
+                  studentHostel: [],
+                  studentConcession: [],
+                  studentTransport: [],
+                  studentAadharCard: null,
+                  fatherAadharCard: null,
+                  motherAadharCard: null,
+                  studentImage: null,
+                  fatherImage: null,
+                  motherImage: null,
+                  guardianImage: null,
+                  birthCertificate: null,
+                  classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                  aluminiProof: null,
+                  siblingProof: null,
+                  residenceProof: null,
+                  firstBornChildProof: null,
+                  medicalFitnessCertificate: null,
+                  fatherQualificationProof: null,
+                  motherQualificationProof: null,
+                  casteCertificate: null,
+                  createdUser: "QuickCampus",
+                  editedUser: "RGSADMIN",
+                  createddate: "2023-04-04 04:44:13.331425",
+                  editeddate: "2024-01-25 08:19:17.062602",
+                  studentAddressResponse: {
+                    uid: "2b6e2241-878c-4f63-923f-84d0dd9ef4c8",
+                    houseNo: null,
+                    area: "VILL-CHAKMAL, POST-GIDDHA, PS-SARAIYA",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: 843106,
+                    street: "",
+                    userName: "RGS117_101",
+                    createdDate: "25-09-2023 05:17 PM",
+                    editedDate: "25-01-2024 01:49 PM",
+                    createdBy: "QuickCampus",
+                    editedBy: "RGSADMIN",
+                  },
+                  fatherAddressResponse: {
+                    uid: "dcb07733-40b5-4636-9869-6baa78532ddd",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: null,
+                    userName: null,
+                    createdDate: "25-01-2024 01:49 PM",
+                    editedDate: "25-01-2024 01:49 PM",
+                    createdBy: "RGSADMIN",
+                    editedBy: "RGSADMIN",
+                  },
+                  motherAddressResponse: {
+                    uid: "3e31c08c-f971-4e19-9e63-b78f6913911c",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: null,
+                    userName: null,
+                    createdDate: "25-01-2024 01:49 PM",
+                    editedDate: "25-01-2024 01:49 PM",
+                    createdBy: "RGSADMIN",
+                    editedBy: "RGSADMIN",
+                  },
+                  guardianAddressResponse: null,
+                  correspondenceAddressResponse: {
+                    uid: "5ca5b8a2-7f00-4be4-8d89-559ffff63401",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "RGS117_101",
+                    createdDate: "25-01-2024 01:49 PM",
+                    editedDate: "25-01-2024 01:49 PM",
+                    createdBy: "RGSADMIN",
+                    editedBy: "RGSADMIN",
+                  },
+                },
+              ],
+              classTeacher: "",
+              classTeacherUserName: "",
+              school: {
+                uid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                apikey: "Fmiji8zVez6WfMHEY2_6-SUVWNrIt8zx",
+                schoolName: "REDWOODS GLOBAL SCHOOL",
+                schoolAbb: "RGS",
+                educationBoard: "Central Board of Secondary Education (CBSE)",
+                registrationNo: null,
+                plotNumber: "Chakmal, Pokhraira, Post- Giddha",
+                area: "P.S- Saraiya",
+                city: "Dist- Muzaffarpur",
+                pincode: "843106",
+                state: "Bihar",
+                phoneNo1: "62233231455",
+                phoneNo2: "8678862234",
+                contactName: "Sk Paswan",
+                contactMobile: "8678862234",
+                contactEmail: "redwoodsglobals@gmail.com",
+                schoolCode: null,
+                pfCode: null,
+                societyManagement: "Redwoods Educational Trust",
+                language: null,
+                schoolLogo: null,
+                schoolFavicon: null,
+                enabled: true,
+                subDomain: null,
+                website: "www.redwoodsglobals.com",
+                schemaPrefix: null,
+                editedDate: "28-03-2024 11:42 AM",
+                editedUser: "QuickCampus",
+                visitorSchool: false,
+                clientSchoolId: null,
+                cscId: null,
+                onlinePaymentEnabled: false,
+                registrationSeries: null,
+                underTakingDetails: null,
+                formNumberStart: null,
+                sessionResponse: null,
+                schoolLogoUrl: null,
+                printAcknowledge: false,
+                loanEnabled: false,
+                whatsAppEnabled: false,
+                smsenabled: false,
+                notificationEnabled: true,
+              },
+            },
+            subject: [
+              {
+                subjectAllResponse: {
+                  uid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                  subjectName: "2nd Language (English)",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "RGSADMIN",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-06-01 04:54:13.744469",
+                  editeddate: "2023-11-23 08:59:45.508943",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 8,
+                percentage: 80,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                  subjectName: "1st Language (Hindi)",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "RGSADMIN",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-09 07:18:48.792603",
+                  editeddate: "2023-11-23 08:59:51.069072",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 9,
+                percentage: 90,
+                grade: "A+",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                  subjectName: "Mathematics",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "RGSADMIN",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-09 07:19:16.358782",
+                  editeddate: "2023-11-23 06:51:08.094959",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 8,
+                percentage: 80,
+                grade: "A",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                  subjectName: "Computer",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-23 06:51:20.873573",
+                  editeddate: "2023-11-23 06:51:20.865669",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 0,
+                percentage: 0,
+                grade: "D",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "78908300-faa6-45cc-b944-961993709c07",
+                  subjectName: "Science",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-23 06:51:53.403012",
+                  editeddate: "2023-11-23 06:51:53.402292",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 10,
+                percentage: 100,
+                grade: "A+",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                  subjectName: "General Knowledge",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-23 06:52:37.085001",
+                  editeddate: "2023-11-23 06:52:37.080979",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 9,
+                percentage: 90,
+                grade: "A+",
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                  subjectName: "Art & Crafts",
+                  nature: "Theory",
+                  natureUid: "4373247e-f4c5-4df8-b444-341e1ff4d5af",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2023-11-23 08:57:37.519934",
+                  editeddate: "2023-11-23 08:57:37.51961",
+                },
+                termName: "Viva/Oral-II",
+                max: 10,
+                markObtained: 8,
+                percentage: 80,
+                grade: "A",
+                scholastic: true,
+              },
+            ],
+            remarksEntry: {
+              uid: "3d58e67f-f3c5-4a6e-b161-f3ea5e40562f",
+              terms: ["Viva/Oral-II"],
+              studentId: "101",
+              studentName: "Mohammad Sufiyan",
+              rollNumber: 10,
+              classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+              classSection: "I-A",
+              description: "All the best.",
+              fields: [
+                {
+                  uid: "0491acae-c781-48b8-b221-afe60e90caf9",
+                  title: "BEHAVIOUR",
+                  type: "ALPHABETS",
+                  value: "Good",
+                  masterUid: "683dce72-7b02-4fd1-9f71-9a9d9f98b506",
+                  masterName: "STUDENT PERSONALITY",
+                },
+                {
+                  uid: "4ef315f2-5830-4390-ae63-ca73f97c9bd8",
+                  title: "NEAT & CLEANNESS",
+                  type: "ALPHABETS",
+                  value: "Good",
+                  masterUid: "683dce72-7b02-4fd1-9f71-9a9d9f98b506",
+                  masterName: "STUDENT PERSONALITY",
+                },
+                {
+                  uid: "0b639c2e-6b86-42da-97fe-549cb14eebfa",
+                  title: "PRESENT DAYS",
+                  type: "NUMERIC",
+                  value: "165",
+                  masterUid: "8173df04-92d4-4190-b0cd-d4deb8e39c4b",
+                  masterName: "ATTENDANCE",
+                },
+                {
+                  uid: "c7a98563-914e-495a-9310-6845ef23d784",
+                  title: "WORKING DAYS",
+                  type: "NUMERIC",
+                  value: "185",
+                  masterUid: "8173df04-92d4-4190-b0cd-d4deb8e39c4b",
+                  masterName: "ATTENDANCE",
+                },
+              ],
+              status: true,
+              createdUser: "SujitGope_80923",
+              editedUser: "SujitGope_80923",
+              createdDate: "27-03-2024 06:47 PM",
+              editedDate: "27-03-2024 06:47 PM",
+            },
+            school: {
+              uid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+              apikey: "Fmiji8zVez6WfMHEY2_6-SUVWNrIt8zx",
+              schoolName: "REDWOODS GLOBAL SCHOOL",
+              schoolAbb: "RGS",
+              educationBoard: "Central Board of Secondary Education (CBSE)",
+              registrationNo: null,
+              plotNumber: "Chakmal, Pokhraira, Post- Giddha",
+              area: "P.S- Saraiya",
+              city: "Dist- Muzaffarpur",
+              pincode: "843106",
+              state: "Bihar",
+              phoneNo1: "62233231455",
+              phoneNo2: "8678862234",
+              contactName: "Sk Paswan",
+              contactMobile: "8678862234",
+              contactEmail: "redwoodsglobals@gmail.com",
+              schoolCode: null,
+              pfCode: null,
+              societyManagement: "Redwoods Educational Trust",
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: null,
+              website: "www.redwoodsglobals.com",
+              schemaPrefix: null,
+              editedDate: "28-03-2024 11:42 AM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: false,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              loanEnabled: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+              notificationEnabled: true,
+            },
+            promotedClass: "II",
+            promotedSection: "A",
+            perSignedUrlResponse: {
+              url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/RGS117/student-info/101/student/images/101.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240328T151840Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240328%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=de3954d0ea6950b7194234df4dcf251db76732e48f3ee3717446890093784168",
+              fileName: "101.png",
+            },
+            pass: true,
+          },
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2023-2024",
+            admissionNo: "66",
+            studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+            studentName: "Bishnu Kumar",
+            rollNo: 15,
+            fatherName: "RAJENDAR MAHTO",
+            className: "I",
+            sectionName: "A",
+            terms: "Viva/Oral-II",
+            markSheetName: "Term-II",
+            markSheetTerms: [
+              {
+                id: 146,
+                headerName: "Ass-I",
+                subHeaderName: "(20M)",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 20,
+                terms: ["Assessment-I"],
+              },
+              {
+                id: 147,
+                headerName: "Ass-II",
+                subHeaderName: "(30M)",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 30,
+                terms: ["Assessment-II"],
+              },
+              {
+                id: 148,
+                headerName: "Eva-I",
+                subHeaderName: "(40M)",
+                priority: 3,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 40,
+                terms: ["Evaluation-I"],
+              },
+              {
+                id: 149,
+                headerName: "Vi/Or",
+                subHeaderName: "(10M)",
+                priority: 4,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 10,
+                terms: ["Viva/Oral"],
+              },
+              {
+                id: 150,
+                headerName: "Ass-III",
+                subHeaderName: "(20M)",
+                priority: 5,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 20,
+                terms: ["Assessment-III"],
+              },
+              {
+                id: 151,
+                headerName: "Ass-IV",
+                subHeaderName: "(30M)",
+                priority: 6,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 30,
+                terms: ["Assessment-IV"],
+              },
+              {
+                id: 152,
+                headerName: "Eva-II",
+                subHeaderName: "(40M)",
+                priority: 7,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 40,
+                terms: ["Evaluation-II"],
+              },
+              {
+                id: 153,
+                headerName: "Vi/Or-II",
+                subHeaderName: "(10M)",
+                priority: 8,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 10,
+                terms: ["Viva/Oral-II"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                subjectName: "1st Language (Hindi)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 30,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 19,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 25,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 29,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "e056dfd7-8301-460e-a16c-e4fffefd8482",
+                    subjectName: "1st Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 10,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 113,
+                total: 200,
+                percentage: 56.5,
+                grade: "B",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 1,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                subjectName: "2nd Language (English)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 23,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 19,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 29,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 35,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "b2682416-fd32-4f98-9086-58018ff485a2",
+                    subjectName: "2nd Language (English)",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 9,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 115,
+                total: 200,
+                percentage: 57.5,
+                grade: "B",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 2,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                subjectName: "Mathematics",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 30,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 40,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 16,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 29,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 40,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c03b7f64-59ed-4e1b-86dd-36c464a4d026",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 10,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 165,
+                total: 200,
+                percentage: 82.5,
+                grade: "A",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 3,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                subjectName: "Science",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 24,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 20,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 18,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 29,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 38,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "78908300-faa6-45cc-b944-961993709c07",
+                    subjectName: "Science",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 9,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 138,
+                total: 200,
+                percentage: 69,
+                grade: "B",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 4,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                subjectName: "Computer",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 23,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 18,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 29,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 39,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "eb8c3f46-47bc-474b-aa1f-8a4f68ed36ab",
+                    subjectName: "Computer",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                ],
+                marksObtained: 109,
+                total: 200,
+                percentage: 54.5,
+                grade: "C",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 5,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                subjectName: "General Knowledge",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 12,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 30,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 18,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 28,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 37,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "4e3de758-6183-44be-80cb-e91b9e3acb3a",
+                    subjectName: "General Knowledge",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 9,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 134,
+                total: 200,
+                percentage: 67,
+                grade: "B",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 6,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                subjectName: "Art & Crafts",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 146,
+                      headerName: "Ass-I",
+                      subHeaderName: "(20M)",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 25,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 147,
+                      headerName: "Ass-II",
+                      subHeaderName: "(30M)",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 37,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 148,
+                      headerName: "Eva-I",
+                      subHeaderName: "(40M)",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-I"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 0,
+                    grade: "D",
+                    status: "Absent",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 149,
+                      headerName: "Vi/Or",
+                      subHeaderName: "(10M)",
+                      priority: 4,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 19,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 150,
+                      headerName: "Ass-III",
+                      subHeaderName: "(20M)",
+                      priority: 5,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20,
+                      terms: ["Assessment-III"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 30,
+                    obtained: 27,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 151,
+                      headerName: "Ass-IV",
+                      subHeaderName: "(30M)",
+                      priority: 6,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 30,
+                      terms: ["Assessment-IV"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 40,
+                    obtained: 37,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 152,
+                      headerName: "Eva-II",
+                      subHeaderName: "(40M)",
+                      priority: 7,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 40,
+                      terms: ["Evaluation-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "bccb78e9-b4cc-40fe-bbc0-48e1f7d10f53",
+                    admissionNo: "66",
+                    studentName: "Bishnu Kumar",
+                    rollNo: 15,
+                    fatherName: "RAJENDAR MAHTO",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                    terms: "Viva/Oral-II",
+                    subjectUid: "c5999666-4ae7-4975-9cd2-d2c8a4d2fd4a",
+                    subjectName: "Art & Crafts",
+                    subjectNature: "Theory",
+                    max: 10,
+                    obtained: 8,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "Term-II",
+                    attachmentName: "",
+                    session: "2023-2024",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 153,
+                      headerName: "Vi/Or-II",
+                      subHeaderName: "(10M)",
+                      priority: 8,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 10,
+                      terms: ["Viva/Oral-II"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 153,
+                total: 200,
+                percentage: 76.5,
+                grade: "A",
+                className: "I",
+                sectionName: "A",
+                terms: "Viva/Oral-II",
+                markSheetName: "Term-II",
+                subjectPrt: 7,
+                decimalPlaces: 2,
+                visible: false,
+              },
+            ],
+            marksObtained: 927,
+            total: 1400,
+            percentage: 66.21,
+            overAllGrade: "B",
+            visible: false,
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+            	<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/RGS117/school-logo.png" /></td>
+				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+					<span style="color:#0089e0; font-size:24pt; text-transform:uppercase; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">Redwoods Global School</span>
+					<br/><span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Chakmal, Pokhraira Chowk, Muzaffarpur, Bihar-843106<br>
+					www.redwoodsglobals.com | Email: redwoodsglobals@gmail.com</span>
+					
+					</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<col style="width: 10%"/>
+				<col style="width: 80%"/>
+				<col style="width: 10%"/>
+				<tr>
+					<td style="width:10%;">&nbsp;</td>
+					<td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt;">Student Report Card : 2023-2024</td>
+					<td style="width:10%;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>`,
+          footer: `
+            <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+
+    <!-- bottom grades -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+					<!-- start grades table -->
+					<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+						<tr style="background:#e7e7e7;">
+							<td align="center" style="width:33; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Grades</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-right:solid 0.264583333mm #000000; font-size:7pt;"><strong>Range</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; font-size:7pt;"><strong>Remarks</strong></td>
+						</tr>
+
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A+</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>90%-100%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Outstanding</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>A</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>75%-89%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Excellent</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>B</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>56%-74%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Very Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>C</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>35%-55%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Good</strong></td>
+						</tr>
+						<tr>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>D</strong></td>
+							<td align="center" style="width:34%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; border-right:solid 0.264583333mm #000000; font-size:6pt;"><strong>Below 35%</strong></td>
+							<td align="center" style="width:33%; padding-top:1mm; padding-bottom:1mm; border-top:solid 0.264583333mm #000000; font-size:6pt;"><strong>Scope for improvement</strong></td>
+						</tr>
+						
+						</table>	
+						<!--// end grades table -->
+						</td>
+						<td align="left" style="width:3%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:3mm; padding-bottom:0mm;">
+							<h2 style="font-size:12pt; font-family: 'Courier New', monospace; font-style: italic;">Wishing you all the best for your bright future.</h2></td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// bottom grades -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Sign. section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:36%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+						<td valign="top" align="center" style="width:64%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold; font-size:10pt;">This is a computer-generated document. No signature is required.</td>					
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Sign. section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+			
+		<!-- copyright -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&#169; Redwoods Global School</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// copyright -->`,
+        },
+      ]);
+    </script>
+  </body>
+</html>

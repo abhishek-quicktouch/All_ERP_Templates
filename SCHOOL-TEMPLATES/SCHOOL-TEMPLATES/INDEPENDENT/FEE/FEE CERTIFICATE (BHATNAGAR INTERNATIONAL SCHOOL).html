@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OXFORD || FEE CERTIFICATE</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        console.log(dataList, "sssssssssssssss");
+        const multipleStudents = dataList;
+
+        //number to words
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        //today date function
+        const todayDate = () => {
+          const monthName = {
+            1: "Jan",
+            2: "Feb",
+            3: "Mar",
+            4: "Apr",
+            5: "May",
+            6: "Jun",
+            7: "Jul",
+            8: "Aug",
+            9: "Sep",
+            10: "Oct",
+            11: "Nov",
+            12: "Dec",
+          };
+          const today = new Date();
+
+          const day = today.getDate();
+          const month = today.getMonth() + 1;
+          const year = today.getFullYear();
+
+          const formattedDate =
+            (day < 10 ? "0" : "") + day + "-" + monthName[month] + "-" + year;
+
+          return formattedDate;
+        };
+
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        multipleStudents?.forEach((element) => {
+          const feeDetails = element?.contentRequest;
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `
+
+          <style type="text/css">
+@page {
+size: A4
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+}
+td {
+	padding-left: 2mm;
+	padding-right: 2mm;
+	padding-top: 2mm;
+	padding-bottom: 2mm;
+	font-size: 10pt;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	padding-left: 2mm;
+	padding-right: 2mm;
+	padding-top: 2mm;
+	padding-bottom: 2mm;
+	font-size: 10pt;
+	background: #e7e7e7;
+	color: #000000;
+	text-transform:uppercase;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+ @media print {
+@page {
+margin:auto;
+size: A4;
+}
+
+}
+</style>
+          
+          <page orientation="portrait" format="A4" margin="0">
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:35mm;">&nbsp;</div></td>
+		</tr>
+	</table>
+	
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td align="right" style="width:100%; font-size:10pt; font-weight:bold;">${todayDate()}</td>
+		</tr>
+	</table>
+  <table cellspacing="0" style="width:100%;"> 
+  
+  <tr>
+  <td align="center" style="width:100%; font-size:22pt; font-weight:550; text-transform:uppercase; padding-top:3mm;">BHATNAGAR INTERNATIONAL SCHOOL
+  </td>
+  </tr>
+  <tr>
+  <td align="center" style="width:100%;"><span style="text-transform:uppercase; line-height: 100%; font-weight:600;">(Sr. Secondary & Affiliated to CBSE)
+  </span></td>
+  </tr>
+  <tr>
+  <td align="center" style="width:100%; padding:0; margin:0; font-weight:600;">Pocket-B-4, Sector-11, Rohini Delhi-110085</td>
+  </tr>
+  <tr>
+  <td align="center" style="width:100%; font-weight:600;">Email Id: happyhome.rohini@gmail.com</td>
+  </tr>
+  <tr>
+  <td align="center" style="width:100%; font-weight:600; padding:0;">School website: www.happyhomepublicschool.com</td>
+  </tr>
+  <tr>
+  <td align="left" style="width:100%; font-weight:600; padding-left:0;">School ID: - 1413204
+</td>
+  </tr>
+  <tr>
+  <td align="left" style="width:100%; font-weight:600; padding:0;">School Affiliation No: - 2730336
+</td>
+  </tr>
+  
+  
+  </table>
+  <table cellspacing="0" style="width:100%;">
+		
+		<tr>
+			<td align="center" style="width:100%; font-size:14pt; font-weight:bold;"><u>TO WHOM IT MAY CONCERN</u></td>
+		</tr>
+	</table>
+  
+				
+    <table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td align="left" style="width:100%; font-size:12pt; line-height:160%;">This is to certify that <span style="text-transform:uppercase;">${
+        feeDetails.studentName
+      }</span> (Admission No. ${
+            feeDetails.studentId
+          }) S/o. <span style="text-transform:uppercase;">${
+            feeDetails.fatherName
+          }</span> is/was studying in - [${feeDetails.studentClass}, ${
+            feeDetails.studentSection
+          }]</td>
+		</tr>
+		<tr>
+			<td align="left" style="width:100%; font-size:12pt; line-height:160%;">During the Financial Year - ${
+        feeDetails.session
+      } a sum of Rs. ${feeDetails.totalAmount} (${convertNumberToWords(
+            feeDetails.totalAmount
+          )}), is/was paid as per details as under :</td>
+		</tr>
+	</table>
+	
+	<table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+		<tr>
+			<th align="left" style="width:25;">MONTHS</th>
+			<th align="left" style="width:25%; border-left: solid 0.25mm #000000;">COMPONENT</th>
+			<th align="right" style="width:25%; border-left: solid 0.25mm #000000;">AMOUNT (Rs.)</th>
+			<th align="left" style="width:25%; border-left: solid 0.25mm #000000;">DATE OF PAYMENT</th>
+		</tr>
+
+    ${feeDetails.studentFeeCertificateInstallmentResponse
+      .map(
+        (val) => `
+      <tr>
+			<td align="left" style="width:25%; text-transform:uppercase; border-top: solid 0.25mm #000000;">${
+        val.installmentName
+      }</td>
+			<td align="left" style="width:25%; text-transform:uppercase; border-top: solid 0.25mm #000000; border-left: solid 0.25mm #000000;">${
+        feeDetails.componentName
+      }</td>
+			<td align="right" style="width:25%; text-transform:uppercase; border-top: solid 0.25mm #000000; border-left: solid 0.25mm #000000;">${
+        val.amount
+      }</td>
+			<td align="left" style="width:25%; text-transform:uppercase; border-top: solid 0.25mm #000000; border-left: solid 0.25mm #000000;">${new Date(
+        val.feeDate
+      ).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}</td>
+		</tr>`
+      )
+      .join("")}
+	</table>
+	
+	<table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td colspan="2" style="width:50%;">&nbsp;</td>
+			<td align="right" style="width:25%; font-size:12pt; font-weight: bold;">Total Rs: ${
+        feeDetails.totalAmount
+      }</td>
+			<td align="left" style="width:25%;">&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td align="left" style="width:100%; font-size:12pt; line-height:160%;">This certificate is being issued to <span style="text-transform:uppercase;">${
+        feeDetails.fatherName
+      }</span> for claiming rebate under the provision of Income Tax Act, 1961 / reimbursement from the concerned department.</td>
+		</tr>
+	</table>
+	
+	<table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:25mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<table cellspacing="0" style="width:100%;">
+		<tr>
+			<td align="left" style="width:80%;">&nbsp;</td>
+			<td align="center" style="width:20%; font-size:12pt;"></td>
+		</tr>
+		<tr>
+			<td align="left" style="width:80%;">&nbsp;</td>
+			<td align="center" style="width:20%; font-size:12pt; font-weight: bold;">A.O./PRINCIPAL</td>
+		</tr>
+	</table>	
+</page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          contentRequest: {
+            studentId: "1855",
+            studentName: "Chahak",
+            studentClass: "IX",
+            studentSection: "A",
+            fatherName: "Sandeep Mittal",
+            motherName: "Sonia Mittal",
+            componentName: "'Annual fee','Monthly Fee'",
+            session: "2024-2025",
+            gender: "Female",
+            studentFeeCertificateInstallmentResponse: [
+              {
+                installmentName: "January",
+                amount: 150.0,
+                feeDate: "2024-02-20",
+              },
+            ],
+            totalAmount: 150.0,
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

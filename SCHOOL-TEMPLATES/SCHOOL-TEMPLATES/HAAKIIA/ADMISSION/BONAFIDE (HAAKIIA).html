@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bonafide</title>
+</head>
+
+<body>
+    <div id="studentsList">Student Bonafide</div>
+    <script>
+        window.SetTemplateData = function (dataList) {
+            const basicDetails = {
+                place: "Delhi",
+                date: new Date().toLocaleDateString("en-GB", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                }),
+                principal: "O. V. SHARMA",
+            };
+            const multipleStudents = dataList;
+            const studentHtml = document.getElementById("studentsList");
+            studentHtml.innerHTML = "";
+            multipleStudents?.forEach((element, index) => {
+                const convertDateFormat = (date)=>{
+                    console.log(date)
+                    if(date)
+                    { 
+                        const [year,month,day] = date.split("-")
+                        return `${day}-${month}-${year}`
+                    }
+                    return date
+                }
+                function formatDateToText(dateString) {
+                    // Define arrays for text representation
+                    const monthsText = [
+                        "ZERO",
+                        "JANUARY",
+                        "FEBRUARY",
+                        "MARCH",
+                        "APRIL",
+                        "MAY",
+                        "JUNE",
+                        "JULY",
+                        "AUGUST",
+                        "SEPTEMBER",
+                        "OCTOBER",
+                        "NOVEMBER",
+                        "DECEMBER",
+                    ];
+
+                    // Split the date string into year, month, and day
+                    const [year, month, day] = dateString.split("-");
+
+                    // Convert year, month, and day to text representation
+                    const yearText = convertToText(Number(year));
+                    const monthText = monthsText[Number(month)];
+                    const dayText = convertToText(Number(day));
+
+                    // Combine the text representation
+                    const result = `${dayText} ${monthText} ${yearText}`;
+                    console.log(result);
+                    return result;
+                }
+
+                // Helper function to convert a number to text representation
+                function convertToText(number) {
+                    const digitsText = [
+                        "ZERO",
+                        "ONE",
+                        "TWO",
+                        "THREE",
+                        "FOUR",
+                        "FIVE",
+                        "SIX",
+                        "SEVEN",
+                        "EIGHT",
+                        "NINE",
+                    ];
+
+                    if (number < 10) {
+                        return digitsText[number];
+                    } else if (number >= 10 && number < 20) {
+                        // Special cases for teens
+                        const teensText = [
+                            "TEN",
+                            "ELEVEN",
+                            "TWELVE",
+                            "THIRTEEN",
+                            "FOURTEEN",
+                            "FIFTEEN",
+                            "SIXTEEN",
+                            "SEVENTEEN",
+                            "EIGHTEEN",
+                            "NINETEEN",
+                        ];
+                        return teensText[number - 10];
+                    } else if (number < 100) {
+                        const tensText = [
+                            "",
+                            "",
+                            "TWENTY",
+                            "THIRTY",
+                            "FORTY",
+                            "FIFTY",
+                            "SIXTY",
+                            "SEVENTY",
+                            "EIGHTY",
+                            "NINETY",
+                        ];
+
+                        const ten = Math.floor(number / 10);
+                        const unit = number % 10;
+
+                        return `${tensText[ten]} ${digitsText[unit]}`;
+                    } else if (number < 1000) {
+                        const hundred = Math.floor(number / 100);
+                        const remainder = number % 100;
+
+                        if (remainder === 0) {
+                            return `${digitsText[hundred]} HUNDRED`;
+                        } else {
+                            return `${digitsText[hundred]} HUNDRED ${convertToText(
+                                remainder
+                            )}`;
+                        }
+                    } else {
+                        // Handle thousands
+                        const thousand = Math.floor(number / 1000);
+                        const remainder = number % 1000;
+
+                        if (remainder === 0) {
+                            return `${digitsText[thousand]} THOUSAND`;
+                        } else {
+                            return `${digitsText[thousand]} THOUSAND ${convertToText(
+                                remainder
+                            )}`;
+                        }
+                    }
+                }
+
+                //single student details
+                const contentData = element?.contentRequest;
+
+                const singleStudentHtml = document.createElement("div");
+                singleStudentHtml.style.pageBreakAfter = "always";
+                singleStudentHtml.innerHTML =
+                    (element?.header || "") +
+                    `<div style="font-family: Arial, sans-serif; padding:5px 10px; border:1px solid; font-size: 11pt;">
+  <h3 style="text-align: center; font-size: 13pt;">BONAFIDE CERTIFICATE FROM THE HEAD OF INSTITUTION/SCHOOL</h3>
+  <table style="width:100%;">
+    <tbody>
+        <tr>
+            <td style="width:55%;padding-top:2mm; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">This is to certify that Master/Baby/Mr./Miss </span>
+            </td>
+            <td style="border-bottom:1px solid; width:45%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.studentName}</span>
+            </td>
+        </tr>
+    </tbody>  
+  </table>
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:33%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">Son/ daughter of Sri/Smt.</span>
+            </div>
+            <div style="border-bottom:1px solid; width:37%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.fatherInformation?.name || contentData?.motherInformation?.name || "-"}</span>
+            </div>
+            <div style="width:15%;padding-bottom:1mm; margin-left:30px;">
+            <span style="font-size:15pt; font-family: ui-monospace;">Roll No.</span>
+            </div>
+            <div style="border-bottom:1px solid; width:15%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.rollNo || "-"}</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:21%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">Admission No.</span>
+            </div>
+            <div style="border-bottom:1px solid; width:18%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.admissionNo || "-"}</span>
+            </div>
+            <div style="width:61%;padding-bottom:1mm; margin-left:30px;">
+            <span style="font-size:15pt; font-family: ui-monospace;"> is a bonafide student of this school and studied in</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:10%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">Class</span>
+            </div>
+            <div style="border-bottom:1px solid; width:30%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.className|| ""}-${contentData?.sectionName || ""}</span>
+            </div>
+            <div style="width:35%;padding-bottom:1mm; margin-left:10px;">
+            <span style="font-size:15pt; font-family: ui-monospace;">during the academic year</span>
+            </div>
+            <div style="border-bottom:1px solid; width:15%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.session || "-"}</span>
+            </div>
+            <div style="width:15%;padding-bottom:1mm; margin-left:30px;">
+            <span style="font-size:15pt; font-family: ui-monospace;">and as per</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:50%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">School records his/her date of birth is</span>
+            </div>
+            <div style="border-bottom:1px solid; width:50%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${convertDateFormat(contentData?.dob) || "-"}</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;margin-top: 20px;">
+            <div style="width:100%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">** This is further certified that during the year Master/Baby/Mr./Miss</span>
+            </div>
+        </div>
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="border-bottom:1px solid; width:50%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">${contentData?.studentName}</span>
+            </div>
+            <div style="width:50%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace; margin-left:20px">had resided in the residential complex</span>
+            </div>
+        </div>
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:60%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">(Hostel) of the school and paid amount of Rs</span>
+            </div>
+            <div style="border-bottom:1px solid; width:30%;">
+                <span style="font-size:15pt; font-family: ui-monospace;"></span>
+            </div>
+            <div style="width:10%;padding-bottom:1mm; margin-left:30px;">
+            <span style="font-size:15pt; font-family: ui-monospace;">towards</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:100%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">boarding and lodging in the residential complex.</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;margin-top: 20px;">
+            <div style="width:65%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">This Institution/School is affiliated to/ recognized by</span>
+            </div>
+            <div style="border-bottom:1px solid; width:35%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">JK BOSE</span>
+            </div>
+        </div>
+
+        <div style="width:100%; display:flex;padding:10px 2px 0px 2px;">
+            <div style="width:45%; padding-bottom:1mm;">
+            <span style="font-size:15pt; font-family: ui-monospace;">vide affiliation/recognition Number</span>
+            </div>
+            <div style="border-bottom:1px solid; width:35%;">
+                <span style="font-size:15pt; font-family: ui-monospace;">CEO/P/PVT-3000-02</span>
+            </div>
+        </div>
+
+  <div style="font-family: ui-monospace;font-size:15pt;">
+    <p style="margin-top: 15pt;">Dated:<br>Place:</p>
+  <p style="text-align: right; margin-top: 10pt;">Signature Head of the<br>Institution/School<br>(With Stamp Seal)</p>
+  <p style="font-size: 10pt; margin-top: 10pt;">**(Strike out it if not applicable)</p>    
+</div>
+
+</div>`
+
+                studentHtml.appendChild(singleStudentHtml);
+            });
+        };
+    </script>
+    <script>
+        window.SetTemplateData([
+            {
+                contentRequest: {
+                    uid: "f78379ef-7e9a-47e2-ad6f-23f63a53bddb",
+                    admissionNo: "20230001",
+                    studentName: "Naysha Bansa",
+                    className: "PRE SCHOOL",
+                    sectionName: "A",
+                    joiningStatus: "New",
+                    joiningDate: "2023-12-28",
+                    gender: "NA",
+                    certificate: null,
+                    joiningClassName: "PRE SCHOOL",
+                    joiningSectionName: "A",
+                    group: null,
+                    status: "Studying",
+                    caste: null,
+                    wing: "NA",
+                    house: null,
+                    dob: "2019-05-19",
+                    rollNo: 15,
+                    session: "2023-24",
+                    fatherInformation: {
+                        name: "Mr. Amit Bansal",
+                        qualification: null,
+                        occupation: null,
+                        yearlyIncome: null,
+                        email: null,
+                    },
+                    motherInformation: {
+                        name: "Mrs. Chinki Devi",
+                        qualification: null,
+                        occupation: null,
+                        yearlyIncome: null,
+                        email: null,
+                    },
+                    permanentAddress: {
+                        houseNo: null,
+                        area: "Phase-1",
+                        street: "L-1/22, Budh Vihar",
+                        city: "Delhi",
+                        pincode: "110086",
+                        state: "NA",
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "1111111111",
+                    },
+                    correspondanceAddress: {
+                        houseNo: null,
+                        area: null,
+                        street: null,
+                        city: null,
+                        pincode: null,
+                        state: null,
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "1111111111",
+                    },
+                    officialAddress: {
+                        houseNo: "NA",
+                        area: null,
+                        street: null,
+                        city: null,
+                        pincode: null,
+                        state: null,
+                        emergencyNo: "",
+                        phoneNo: null,
+                        mobileNo: "",
+                    },
+                    guardianInformation: {
+                        guradianName: null,
+                        guradianRelation: null,
+                        guradianOccupation: null,
+                        guradianEmail: null,
+                        guradianMobileNo: null,
+                    },
+                    characterCertificateDetail: {
+                        uid: "84164f89-4b4e-4edf-8997-9155b3674021",
+                        type: "GOOD",
+                        issueDate: "2024-02-12",
+                    },
+                    transportDetails: {
+                        circleName: null,
+                        routeName: null,
+                        pickUp: null,
+                        drop: null,
+                    },
+                    certificateList: [],
+                    status_code: 200,
+                },
+                header: `
+          <table cellspacing="0" style="width:100%;">
+             <tr>
+                <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+                   <div style="height:10mm;">&nbsp;</div>
+                </td>
+             </tr>
+          </table>
+    `,
+                footer:
+                    '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+            },
+        ]);
+    </script>
+</body>
+
+</html>

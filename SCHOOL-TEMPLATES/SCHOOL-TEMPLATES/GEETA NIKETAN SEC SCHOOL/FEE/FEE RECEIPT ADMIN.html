@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fee Receipt</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        console.log(dataList)
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        const installmentStartEndDate = (val) => {
+          const obj = {
+            JAN: "31-JAN-2024",
+            FEB: "28-FEB-2024",
+            MAR: "31-MAR-2024",
+            APR: "30-APR-2023",
+            MAY: "31-MAY-2023",
+            JUN: "30-JUN-2023",
+            JUL: "31-JUL-2023",
+            AUG: "31-AUG-2023",
+            SEP: "30-SEP-2023",
+            OCT: "31-OCT-2023",
+            NOV: "30-NOV-2023",
+            DEC: "31-DEC-2023",
+          };
+          const obj2 = {
+            JAN: "2024",
+            FEB: "2024",
+            MAR: "2024",
+          };
+          const installments = val.split(",");
+
+          const string = `01-${installments[0]}-${
+            obj2[installments[0]] ?? "2023"
+          } TO ${obj[installments[installments.length - 1]]}`;
+
+          return string;
+        };
+
+        const paymentMonth = (dateString) => {
+          const [day, month, year] = dateString.split("-");
+
+          const date = new Date(year, month - 1, day);
+
+          const monthNames = [
+            "JAN",
+            "FEB",
+            "MAR",
+            "APR",
+            "MAY",
+            "JUN",
+            "JUL",
+            "AUG",
+            "SEP",
+            "OCT",
+            "NOV",
+            "DEC",
+          ];
+
+          const paymentMonth = monthNames[date.getMonth()];
+
+          return paymentMonth;
+        };
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        multipleStudents?.forEach((element) => {
+          const basicDetails = {
+            academicSession:
+              element?.student?.studentInfoResponse?.[0]?.academicSession,
+            admissionNo: element?.contentRequest?.admissionNo,
+            // rollNo:
+            studentName: element?.contentRequest?.studentName,
+            fatherName: element?.student?.fatherName,
+            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+            address: `${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.houseNo
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.houseNo + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.street
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.street + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.landmark
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.landmark + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.area
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.area + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.city
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.city + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.district
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.district + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.pincode
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.pincode
+                : ""
+            }`,
+          };
+          
+          const feeDetails = element?.contentRequest;
+          const studentDetails = element?.student;
+          const componentTotal = (component) => {
+            return feeDetails?.studentFeeCollectionReceiptList?.reduce(
+              (prev, current) => prev + Number(current[component]),
+              0
+            );
+          };
+
+          console.log(
+            element,
+            basicDetails,
+            feeDetails,
+            dataList,
+            "ddddddddddddd"
+          );
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `<style type="text/css">
+   @page {
+   size: A4
+   }
+   * {
+   margin: 0px;
+   padding: 0px;
+   color: #000;
+   }
+   td {
+   padding-left: 2mm;
+   padding-right: 2mm;
+   padding-top: 0.8mm;
+   padding-bottom: 0.8mm;
+   font-size: 9pt;
+   color: #000000;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   th {
+   padding-left: 2mm;
+   padding-right: 2mm;
+   padding-top: 0.8mm;
+   padding-bottom: 0.8mm;
+   font-size: 11pt;
+   background: #000000;
+   color: #fcfcfc;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   @media print {
+   @page {
+   margin:5mm;
+   size: A4 landscape;
+   }
+   }
+</style>
+<page orientation="landscape" format="A4" margin="0">
+   <table style="width:100%;" cellspacing="0" cellpadding="0">
+      <tr>
+         <td valign="top" align="left" style="width: 48%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+            <!-- start left Student Copy -->
+            <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
+               <tr>
+                   <td style="width: 15%; align="left" >
+
+                    <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-16T11_44_56_392422796.png"/>
+
+                    </td>
+                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">GEETA NIKETAN SR SEC SCHOOL</span>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;">ARAINPURA ROAD, CHAURA, Haryana, 132114<br>
+                        9896930052 | 
+                        GEETANIKETANCHAURA@GMAIL.COM
+                        
+                        </span>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <th align="center" style="width:100%; font-weight:bold; text-transform:uppercase;">Fee Receipt</th>
+               </tr>
+               <tr>
+                  <td align="center" style="width:100%; font-size:12pt; font-weight:bold;"><u>Student Copy</u></td>
+               </tr>
+            </table>
+            <table style="width:100%;" cellspacing="0" cellpadding="0">
+               <tbody>
+                  <tr>
+                     <td align="left" valign="bottom" style="padding-top:0mm; padding-bottom:0mm;">
+                        <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:10pt; line-height: 140%; font-weight: bold;">Receipt Number: 
+                        </span>${feeDetails?.receiptNo}
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- student basic details -->
+            <table cellspacing="0" style="width: 100%;">
+               <tr>
+                  <td style="width:60%;">
+                     <table width="100%" border="0" cellspacing="0" >
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.studentName
+                           } (${basicDetails?.admissionNo})</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:60%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Month</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${paymentMonth(
+                             feeDetails?.feeDate
+                           )}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.fatherName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.classSection
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.userName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Id</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.feeMode == "ONLINE"
+                               ? feeDetails?.feeUid
+                               : ""
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.feeModeRemark ?? ""
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  ${
+                    feeDetails?.feeMode != "CASH"
+                      ? ` <td style="width:50%;">
+                        <table
+                          width="100%"
+                          border="0"
+                          cellspacing="0"
+                          cellpadding="0"
+                        >
+                          <tr>
+                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              ${feeDetails?.feeMode} Number
+                            </td>
+                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              : $
+                              {feeDetails?.feeModeNumber ?? feeDetails?.modeNo}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>`
+                      : ""
+                  }
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.paidInstallmentsName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  ${
+                    feeDetails?.feeMode != "CASH"
+                      ? `  <td style="width:50%;">
+                        <table
+                          width="100%"
+                          border="0"
+                          cellspacing="0"
+                          cellpadding="0"
+                        >
+                          <tr>
+                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              ${feeDetails?.feeMode} Date
+                            </td>
+                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              : $
+                              {feeDetails?.feeModeDate ?? feeDetails?.modeDate}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>`
+                      : ""
+                  }
+               </tr>
+            </table>
+            <!--// student basic details -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- Main Table -->
+            <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+               <tr>
+                  <td align="center" style="width:10%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">S.No.</td>
+                  <td align="left" style="width:40%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Description</td>
+                  <td align="right" style="width:30%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Due ₹</td>
+                  <td align="right" style="width:20%; border-bottom: solid 0.264583333mm #000000; font-weight:bold;">Paid ₹</td>
+               </tr>
+              ${feeDetails?.studentFeeCollectionReceiptList
+                ?.map(
+                  (val, ind) => `
+               <tr>
+                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${
+                    ind + 1
+                  }</td>
+                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${
+                    val.componentName
+                  }</td>
+                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${
+                    val.componentAmount
+                  }</td>
+                  <td align="right" style="width:20%;">${
+                    val.componentReceived
+                  }</td>
+               </tr>
+               `
+                )
+                .join("")}
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Payment Mode</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${
+                    feeDetails.feeMode
+                  }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total Received</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
+                    feeDetails.netReceived
+                  }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
+                    feeDetails?.netAmount ? feeDetails?.netAmount-feeDetails.netReceived : feeDetails?.totalAmount-feeDetails.netReceived
+                  }</td>
+               </tr>
+            </table>
+            <!--// Main Table -->
+            <table cellspacing="0" style="width:100%;">
+               <div style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-align:right; font-family: math; display:flex; justify-content:space-between;">
+                  <div style="padding:0px 5px;text-align:left;margin-top:2mm;">
+                     <p style="margin-bottom:3px;">Date: ${feeDetails?.feeDate} </p>
+                     <p>Time: ${feeDetails?.feeTime}</p>   
+                  </div>
+                  <div style="margin-top:10mm;">Fee Clerk Signature</div>
+               </div>
+            </table>
+            <table cellspacing="0" cellpadding="0" style="width:100%;">
+               <tr>
+                  <td width="100%" align="center" valign="top" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-weight:bold; text-align: center;">Note: It is an e-generated receipt.</td>
+               </tr>
+            </table>
+            <!--// Important Note -->
+            <!-- <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:15mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table> -->
+            <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
+               <tr>
+                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T05_12_54_680261904.jpeg" style="width: 80px;"> <br><strong>Payment QR</strong></td>
+                  <td align="center" style="width:34%;">&nbsp;</td>
+                  <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
+               </tr>
+            </table>
+            <!--// end left Student Copy -->
+         </td>
+
+         <td valign="top" align="left" style="width: 2%; padding-left:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+         <td valign="top" align="left" style="width: 2%; padding-left:0mm; padding-top:0mm; padding-bottom:0mm; border-left: dashed 0.264583333mm #000000;">&nbsp;</td>
+         <td valign="top" align="left" style="width: 48%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+            <!-- start left Student Copy -->
+            <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
+               <tr>
+                   <td style="width: 15%; align="left" >
+
+                    <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-16T11_44_56_392422796.png"/>
+
+                    </td>
+                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">GEETA NIKETAN SR SEC SCHOOL</span>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;">ARAINPURA ROAD, CHAURA, Haryana, 132114<br>
+                        9896930052 | 
+                        GEETANIKETANCHAURA@GMAIL.COM
+                        
+                        </span>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <th align="center" style="width:100%; font-weight:bold; text-transform:uppercase;">Fee Receipt</th>
+               </tr>
+               <tr>
+                  <td align="center" style="width:100%; font-size:12pt; font-weight:bold;"><u>Office Copy</u></td>
+               </tr>
+            </table>
+            <table style="width:100%;" cellspacing="0" cellpadding="0">
+               <tbody>
+                  <tr>
+                     <td align="left" valign="bottom" style="padding-top:0mm; padding-bottom:0mm;">
+                        <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:10pt; line-height: 140%; font-weight: bold;">Receipt Number: 
+                        </span>${feeDetails?.receiptNo}
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- student basic details -->
+            <table cellspacing="0" style="width: 100%;">
+               <tr>
+                  <td style="width:60%;">
+                     <table width="100%" border="0" cellspacing="0" >
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.studentName
+                           } (${basicDetails?.admissionNo})</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:60%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Month</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${paymentMonth(
+                             feeDetails?.feeDate
+                           )}</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.fatherName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             basicDetails.classSection
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.userName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Id</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.feeMode == "ONLINE"
+                               ? feeDetails?.feeUid
+                               : ""
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.feeModeRemark ?? ""
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  ${
+                    feeDetails?.feeMode != "CASH"
+                      ? ` <td style="width:50%;">
+                        <table
+                          width="100%"
+                          border="0"
+                          cellspacing="0"
+                          cellpadding="0"
+                        >
+                          <tr>
+                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              ${feeDetails?.feeMode} Number
+                            </td>
+                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              : $
+                              {feeDetails?.feeModeNumber ?? feeDetails?.modeNo}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>`
+                      : ""
+                  }
+               </tr>
+               <tr>
+                  <td style="width:50%;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                             feeDetails?.paidInstallmentsName
+                           }</td>
+                        </tr>
+                     </table>
+                  </td>
+                  ${
+                    feeDetails?.feeMode != "CASH"
+                      ? `  <td style="width:50%;">
+                        <table
+                          width="100%"
+                          border="0"
+                          cellspacing="0"
+                          cellpadding="0"
+                        >
+                          <tr>
+                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              ${feeDetails?.feeMode} Date
+                            </td>
+                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                              : $
+                              {feeDetails?.feeModeDate ?? feeDetails?.modeDate}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>`
+                      : ""
+                  }
+               </tr>
+            </table>
+            <!--// student basic details -->
+            <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:2mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table>
+            <!-- Main Table -->
+            <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+               <tr>
+                  <td align="center" style="width:10%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">S.No.</td>
+                  <td align="left" style="width:40%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Description</td>
+                  <td align="right" style="width:30%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Due ₹</td>
+                  <td align="right" style="width:20%; border-bottom: solid 0.264583333mm #000000; font-weight:bold;">Paid ₹</td>
+               </tr>
+              ${feeDetails?.studentFeeCollectionReceiptList
+                ?.map(
+                  (val, ind) => `
+               <tr>
+                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${
+                    ind + 1
+                  }</td>
+                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${
+                    val.componentName
+                  }</td>
+                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${
+                    val.componentAmount
+                  }</td>
+                  <td align="right" style="width:20%;">${
+                    val.componentReceived
+                  }</td>
+               </tr>
+               `
+                )
+                .join("")}
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Payment Mode</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${
+                    feeDetails.feeMode
+                  }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total Received</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
+                    feeDetails.netReceived
+                  }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
+                    feeDetails?.netAmount ? feeDetails?.netAmount-feeDetails.netReceived : feeDetails?.totalAmount-feeDetails.netReceived
+                  }</td>
+               </tr>
+            </table>
+            <!--// Main Table -->
+            <table cellspacing="0" style="width:100%;">
+               <div style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-align:right; font-family: math; display:flex; justify-content:space-between;">
+                  <div style="padding:0px 5px;text-align:left;margin-top:2mm;">
+                     <p style="margin-bottom:3px;">Date: ${feeDetails?.feeDate} </p>
+                     <p>Time: ${feeDetails?.feeTime}</p>   
+                  </div>
+                  <div style="margin-top:10mm;">Fee Clerk Signature</div>
+               </div>
+            </table>
+            <table cellspacing="0" cellpadding="0" style="width:100%;">
+               <tr>
+                  <td width="100%" align="center" valign="top" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-weight:bold; text-align: center;">Note: It is an e-generated receipt.</td>
+               </tr>
+            </table>
+            <!--// Important Note -->
+            <!-- <table cellspacing="0" style="width:100%;">
+               <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                     <div style="height:15mm;">&nbsp;</div>
+                  </td>
+               </tr>
+            </table> -->
+            <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
+               <tr>
+                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T05_12_54_680261904.jpeg" style="width: 80px;"> <br><strong>Payment QR</strong></td>
+                  <td align="center" style="width:34%;">&nbsp;</td>
+                  <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
+               </tr>
+            </table>
+            <!--// end left Student Copy -->
+         </td>
+      </tr>
+   </table>
+</page>
+      `;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+                  "dob": "22-04-2015",
+                  "admissionNo": "27",
+                  "studentName": "SONALI PRIYA",
+                  "className": "I",
+                  "sectionName": "A",
+                  "rollNo": 4,
+                  "fatherName": "PRMANAND KUMAR",
+                  "motherName": "NA",
+                  "attendance": "162.0/183",
+                  "boardRollNumber": "",
+                  "studentInfoResponse": [
+                      {
+                          "id": 74538,
+                          "userUid": "cc729b6e-177d-436e-b6c7-4ef3b5d5e757",
+                          "userName": null,
+                          "fatherUserName": null,
+                          "motherUserName": null,
+                          "guardianUserName": null,
+                          "uid": "e37455db-bcea-4272-b2a5-05303b8f0a2a",
+                          "studentId": "27",
+                          "studentName": "SONALI PRIYA",
+                          "fatherName": "PRMANAND KUMAR",
+                          "motherName": "",
+                          "dob": "22-04-2015",
+                          "gender": "Female",
+                          "studentAdhaarcard": "",
+                          "joiningClass": "UKG",
+                          "joiningSections": "A",
+                          "joiningDate": "01-01-2022",
+                          "plotNumber": "",
+                          "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
+                          "city": "",
+                          "state": "",
+                          "pincode": "843106",
+                          "phone1": null,
+                          "rollNo": 4,
+                          "emergencyNumber": null,
+                          "mobileNumber": "9430005360",
+                          "studentEmail": null,
+                          "religion": "",
+                          "category": "",
+                          "minority": "",
+                          "motherTongue": "",
+                          "idMark": "",
+                          "height": "",
+                          "weight": "",
+                          "physicalDisability": "",
+                          "bloodGroup": "",
+                          "healthRemark": "",
+                          "siblingDetails": "",
+                          "alumni": "",
+                          "siblingResponse": [],
+                          "fatherOccupation": "",
+                          "fatherQualification": "",
+                          "fatherOrganization": "",
+                          "fatherDesignation": "",
+                          "fatherIncome": "",
+                          "fatherArea": "",
+                          "fatherCity": "",
+                          "fatherState": "",
+                          "fatherPincode": null,
+                          "fatherPhone": null,
+                          "fatherMobile": "9771553300",
+                          "fatherEmail": null,
+                          "fatherAdhaarNumber": null,
+                          "schoolUid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                          "motherQualification": "",
+                          "motherOccupation": "",
+                          "motherOrganization": "",
+                          "motherDesignation": "",
+                          "motherIncome": "",
+                          "motherArea": "",
+                          "motherCity": "",
+                          "motherState": "",
+                          "motherPincode": null,
+                          "motherPhone": null,
+                          "motherMobile": null,
+                          "motherEmail": null,
+                          "motherAdhaarNumber": null,
+                          "guardianName": null,
+                          "relation": null,
+                          "guardianOccupation": null,
+                          "guardianPhone": null,
+                          "guardianMobile": null,
+                          "guardianEmail": null,
+                          "guardianAddress": null,
+                          "leavingDate": null,
+                          "previousSchoolName": null,
+                          "otp": "mmBSc0",
+                          "schoolName": "Demo Public School",
+                          "remark": null,
+                          "classTeacher": null,
+                          "classTeacherUserName": null,
+                          "classes": "I",
+                          "classUid": null,
+                          "sections": "A",
+                          "group": null,
+                          "wing": "NA",
+                          "status": "Studying",
+                          "academicSession": "2023-2024",
+                          "joiningStatus": "Old",
+                          "houses": null,
+                          "certificates": "",
+                          "certificatesList": [],
+                          "caste": "",
+                          "listOfDocuments": null,
+                          "attached": false,
+                          "required": false,
+                          "submitted": false,
+                          "studentHostel": [],
+                          "studentConcession": [],
+                          "studentTransport": [],
+                          "studentAadharCard": null,
+                          "fatherAadharCard": null,
+                          "motherAadharCard": null,
+                          "studentImage": null,
+                          "fatherImage": null,
+                          "motherImage": null,
+                          "guardianImage": null,
+                          "birthCertificate": null,
+                          "classSectionUid": "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                          "aluminiProof": null,
+                          "siblingProof": null,
+                          "residenceProof": null,
+                          "firstBornChildProof": null,
+                          "medicalFitnessCertificate": null,
+                          "fatherQualificationProof": null,
+                          "motherQualificationProof": null,
+                          "casteCertificate": null,
+                          "createdUser": "quickadmin",
+                          "editedUser": "quickadmin",
+                          "createddate": "2023-04-04 04:44:13.227069",
+                          "editeddate": "2023-04-04 04:44:13.227069",
+                          "studentAddressResponse": {
+                              "uid": "74e0cbe4-ccf0-4506-8cd0-3e5ddbba84b0",
+                              "houseNo": null,
+                              "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
+                              "landmark": null,
+                              "city": "",
+                              "district": null,
+                              "state": "",
+                              "poPs": null,
+                              "pincode": 843106,
+                              "street": "",
+                              "userName": null,
+                              "createdDate": "25-09-2023 05:17 PM",
+                              "editedDate": "25-09-2023 05:17 PM",
+                              "createdBy": "quickadmin",
+                              "editedBy": "quickadmin"
+                          },
+                          "fatherAddressResponse": null,
+                          "motherAddressResponse": null,
+                          "guardianAddressResponse": null,
+                          "correspondenceAddressResponse": null
+                      }
+                  ],
+                  "classTeacher": "",
+                  "classTeacherUserName": "",
+                  "school": {
+                      "uid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                      "apikey": "Fmiji8zVez6WfMHEY2_6-SUVWNrIt8zx",
+                      "schoolName": "REDWOODS GLOBAL SCHOOL",
+                      "schoolAbb": "RGS",
+                      "educationBoard": "Central Board of Secondary Education (CBSE)",
+                      "registrationNo": null,
+                      "plotNumber": "Chakmal, Pokhraira, Post- Giddha",
+                      "area": "P.S- Saraiya",
+                      "city": "Dist- Muzaffarpur",
+                      "pincode": "843106",
+                      "state": "Bihar",
+                      "phoneNo1": "62233231455",
+                      "phoneNo2": "8678862234",
+                      "contactName": "Sk Paswan",
+                      "contactMobile": "8678862234",
+                      "contactEmail": "redwoodsglobals@gmail.com",
+                      "schoolCode": null,
+                      "pfCode": null,
+                      "societyManagement": "Redwoods Educational Trust",
+                      "language": null,
+                      "schoolLogo": null,
+                      "schoolFavicon": null,
+                      "enabled": true,
+                      "subDomain": null,
+                      "website": "www.redwoodsglobals.com",
+                      "schemaPrefix": null,
+                      "editedDate": "07-05-2024 06:38 PM",
+                      "editedUser": "quickadmin",
+                      "visitorSchool": false,
+                      "clientSchoolId": null,
+                      "cscId": null,
+                      "onlinePaymentEnabled": false,
+                      "registrationSeries": null,
+                      "underTakingDetails": null,
+                      "formNumberStart": null,
+                      "sessionResponse": null,
+                      "schoolLogoUrl": null,
+                      "printAcknowledge": false,
+                      "notificationEnabled": true,
+                      "loanEnabled": false,
+                      "whatsAppEnabled": false,
+                      "smsenabled": false
+                  }
+              },
+
+          contentRequest: {
+            feeUid: "8e3fa9de-df3c-41b2-ad1f-707ae32ccd57",
+            receiptNo: "1",
+            admissionNo: "176",
+            studentName: "Tannu",
+            studentClass: "TENTH",
+            studentSection: "A",
+            paidInstallmentsName: "JAN",
+            feeDate: "29-01-2024",
+            feeTime: "12:13:15",
+            userName: "SANDEEPGARG_403245",
+            feeMode: "CASH",
+            feeModeNumber: "-",
+            modeBank: "-",
+            modeBranch: "-",
+            feeModeDate: "-",
+            feeModeRemark: null,
+            feeDeleteRemark: null,
+            isBounced: "0",
+            bouncedDate: "-",
+            // totalAmount: "1900.00",
+            excessPaid: "0.00",
+            excessUsed: "0.00",
+            excessBalance: "0.0",
+            netAmount: "2000",
+            netReceived: "1900.00",
+            studentFeeCollectionReceiptList: [
+              {
+                componentName: "TUITION FEE",
+                componentAmount: "1600.00",
+                componentType: "",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                accountName: "ACCOUNT 1",
+                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                componentReceived: "1600.00",
+              },
+              {
+                componentName: "EXAM FEE",
+                componentAmount: "300.00",
+                componentType: "",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                accountName: "ACCOUNT 1",
+                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                componentReceived: "300.00",
+              },
+              {
+                componentName: "FINE",
+                componentAmount: "50.00",
+                componentType: "FINE",
+                componentConcession: "0.00",
+                componentDiscount: "50.00",
+                accountName: "ACCOUNT 1",
+                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                componentReceived: "0.00",
+              },
+            ],
+          },
+
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

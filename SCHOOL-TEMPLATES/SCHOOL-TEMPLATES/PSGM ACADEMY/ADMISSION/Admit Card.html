@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admit Card</title>
+
+</head>
+
+<body>
+
+  <div id="studentsList">ffffff</div>
+
+  <script>
+  window.SetTemplateData = function (data) {
+    const dataList = Array.isArray(data) ? data : [data];
+    const viewTemplate = dataList[0]?.viewTemplate;
+    const staticData = [{
+      "school": {
+        "uid": "36ecc460-7970-49fe-adbc-3ab07f1e30bb",
+        "apikey": "XnlKPMf7TEELc-Z42eWG0IAlS1gduT7N",
+        "schoolName": "QuickCampus QT School",
+        "schoolAbb": "QC",
+        "educationBoard": "Central Board of Secondary Education (CBSE)",
+        "registrationNo": "6578",
+        "plotNumber": "23/1",
+        "area": "BU Block,Pitampura",
+        "city": "New-Delhi",
+        "pincode": "110034",
+        "state": "Delhi",
+        "phoneNo1": null,
+        "phoneNo2": null,
+        "contactName": null,
+        "contactMobile": null,
+        "contactEmail": null,
+        "schoolCode": "4561",
+        "pfCode": "QC0001",
+        "societyManagement": null,
+        "language": "English",
+        "schoolLogo": null,
+        "schoolFavicon": null,
+        "enabled": true,
+        "subDomain": "qc",
+        "website": null,
+        "schemaPrefix": null,
+        "editedDate": "06-08-2024 05:49 PM",
+        "editedUser": "quickadmin",
+        "visitorSchool": false,
+        "clientSchoolId": null,
+        "cscId": null,
+        "onlinePaymentEnabled": true,
+        "registrationSeries": null,
+        "underTakingDetails": null,
+        "formNumberStart": null,
+        "sessionResponse": null,
+        "schoolLogoUrl": null,
+        "printAcknowledge": false,
+        "notificationEnabled": true,
+        "loanEnabled": false,
+        "whatsAppEnabled": true,
+        "smsenabled": true
+      },
+      "contentRequest": {
+        "id": 285326,
+        "uid": "386f669d-b04d-4fe6-8b4c-d47769b28466",
+        "admissionNo": "2234",
+        "studentName": "Karamjot Kaur Static",
+        "className": "XI",
+        "sectionName": "A",
+        "joiningStatus": "Old",
+        "joiningDate": "2011-01-04",
+        "gender": "Female",
+        "certificate": null,
+        "joiningClassName": "XI",
+        "joiningSectionName": "A",
+        "group": null,
+        "status": "Studying",
+        "caste": "Brahmins",
+        "wing": "Senior",
+        "house": null,
+        "dob": "2007-08-07",
+        "rollNo": 8,
+        "session": "2024-2025",
+        "permanentEducationNumber": null,
+        "preSignedUrlResponse": {
+          "url": "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/QC/student-info/2234/student/images/2234.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240808T065653Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240808%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=21b1d9f626760d8e00270150120dd107b059d3c6df3c8feade65d48d5b988c0a",
+          "fileName": "2234.png"
+        },
+        "fatherInformation": {
+          "name": "Trilok Singh",
+          "qualification": null,
+          "occupation": null,
+          "yearlyIncome": null,
+          "email": "avinash.jha@quicktouch.co.in"
+        },
+        "motherInformation": {
+          "name": "Manmeet Kaur",
+          "qualification": null,
+          "occupation": null,
+          "yearlyIncome": null,
+          "email": "subham.panda@quicktouch.co.in"
+        },
+        "permanentAddress": {
+          "houseNo": null,
+          "area": "Prashant Vihar Pitam Pura",
+          "street": "B-337",
+          "city": "Delhi",
+          "pincode": "110088",
+          "state": "Delhi",
+          "emergencyNo": "",
+          "phoneNo": null,
+          "mobileNo": "9909120170"
+        },
+        "correspondanceAddress": {
+          "houseNo": null,
+          "area": null,
+          "street": null,
+          "city": null,
+          "pincode": null,
+          "state": null,
+          "emergencyNo": "",
+          "phoneNo": null,
+          "mobileNo": "9909120170"
+        },
+        "officialAddress": {
+          "houseNo": "NA",
+          "area": null,
+          "street": null,
+          "city": null,
+          "pincode": null,
+          "state": null,
+          "emergencyNo": "",
+          "phoneNo": null,
+          "mobileNo": "9717707780"
+        },
+        "guardianInformation": {
+          "guradianName": null,
+          "guradianRelation": null,
+          "guradianOccupation": null,
+          "guradianEmail": null,
+          "guradianMobileNo": null
+        },
+        "characterCertificateDetail": null,
+        "transportDetails": {
+          "circleName": "Upto 2km",
+          "routeName": "RN103",
+          "pickUp": "Rohini",
+          "drop": "Rohini"
+        },
+        "certificateList": [],
+        "bloodGroup": "A+",
+        "status_code": 200
+      },
+      "header": "",
+      "footer": "",
+      "student": {},
+      "selectedDatesheet": [
+        {
+          "uid": "b68e0657-0f63-4ac7-8cb8-d01826f730c1",
+          "datesheetName": "Mid Term Examination",
+          "termUid": "94002c19-c957-43d1-8395-48056a0f3c1f",
+          "termName": "SA 2",
+          "classes": "XI",
+          "sections": [
+            "A"
+          ],
+          "classSectionUids": [
+            "8fda6aec-4db2-4c0b-93b9-d450334bc0b2"
+          ],
+          "startDate": "01-08-2024",
+          "endDate": "08-08-2024",
+          "academicSession": "2024-2025",
+          "dateSheetSettingResponseList": [
+            {
+              "subject": "English",
+              "examDate": "01-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-01T10:00",
+              "endTime": "2024-08-01T13:00",
+              "description": null,
+              "subjectUid": "f1ccd8c9-f859-46e3-a9f0-1e5282f7b055"
+            },
+            {
+              "subject": "Hindi",
+              "examDate": "02-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-02T10:00",
+              "endTime": "2024-08-02T13:00",
+              "description": null,
+              "subjectUid": "befe99e6-99e7-4d8f-ba4c-df3341e4db4c"
+            },
+            {
+              "subject": "Mathematics",
+              "examDate": "03-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-03T10:00",
+              "endTime": "2024-08-03T13:00",
+              "description": null,
+              "subjectUid": "82b2bf17-2fbd-46ec-b6ba-f27fdf271353"
+            },
+            {
+              "subject": "Science",
+              "examDate": "04-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-04T10:00",
+              "endTime": "2024-08-04T13:00",
+              "description": null,
+              "subjectUid": "391cf59b-4716-4d3e-9894-359ce1dc78e8"
+            },
+            {
+              "subject": "Social Studies",
+              "examDate": "05-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-05T10:00",
+              "endTime": "2024-08-05T13:00",
+              "description": null,
+              "subjectUid": "48b9820c-7594-495b-b867-1793cdb0e8f5"
+            },
+            {
+              "subject": "Accounts",
+              "examDate": "07-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-07T10:00",
+              "endTime": "2024-08-07T13:00",
+              "description": null,
+              "subjectUid": "08850fd8-9f2a-44ee-9fee-fdd9dc03f2bd"
+            },
+            {
+              "subject": "Economics",
+              "examDate": "08-08-2024",
+              "maxMarks": 80,
+              "startTime": "2024-08-08T10:00",
+              "endTime": "2024-08-08T13:00",
+              "description": null,
+              "subjectUid": "5b5f9c9b-f03a-4acb-bc60-db98fb96cefd"
+            }
+          ],
+          "enabled": false
+        }
+      ]
+    }
+    ]
+  
+    const container = document.getElementById('studentsList');
+    container.innerHTML = '';
+
+    let multipleData = viewTemplate ? staticData : dataList
+    multipleData?.forEach((student, index) => {
+      const admitCardHtml = document.createElement("div")
+      const unqData = student?.selectedDatesheet?.map(el=>{
+          return {...el,dateSheetSettingResponseList:handleUpdate(el?.dateSheetSettingResponseList)}
+      })
+      function handleUpdate(val){
+          const e = JSON.stringify(val)
+          const data=JSON.parse(e)
+
+          return data?.reduce((acc,curr)=>{
+              let temp = acc?.find(d=>d?.examDate==curr?.examDate)
+              if(temp){
+                  temp.subject = `${temp.subject}/${curr.subject}`
+              }
+              else{
+                  acc.push(curr)
+              }
+              return acc
+          },[])
+      }
+
+      admitCardHtml.innerHTML = `
+      <style type="text/css">
+         @page {
+    size: A4;
+    margin: 1mm;
+  }
+
+  @media print {}
+
+  body {
+
+    margin: 0;
+    padding: 0;
+  }
+
+  .header {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    width:100%;
+  }
+
+  .header img {
+    width: 100px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .header p {
+    margin: 0 0;
+  }
+
+  .details {
+    display: flex;
+    align-items:start;
+  }
+
+  .details p {
+    margin:  0;
+  }
+
+  .details img {
+    width: 100px;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .table,
+  .table th,
+  .table td {
+    border: 1px solid #000;
+  }
+
+  .table th,
+  .table td {
+    padding: 1px;
+    text-align: center;
+    font-size: 12px;
+    width: 50px;
+  }
+
+  .instructions h3 {
+    font-size: 15px;
+    padding: 1px;
+    margin: 1px;
+  }
+
+  .instructions ol {
+    margin: 1px;
+    font-size: 12px;
+  }
+
+  /* Page break style */
+  .admit-card-container {
+    border: 1px solid #000;
+    margin-bottom: 5px;
+    padding: 1mm;
+    page-break-inside: avoid;
+  }
+    li{
+          font-size:10px;
+    }
+
+  h4 {
+    margin: 0;
+  }
+        </style>
+        <div class="admit-card-container">
+          <div class="admit-card">
+            <div class="header">
+              <div style="width:15%; text-align:left; ">
+                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/gallery/images/UploadFile2024-07-29T09_43_58_550056657.jpeg" alt="School Logo">  
+              </div>
+              <div style="width:70%"; margin:auto;>
+                <p style="font-size:18pt;font-weight:bold;">PSGM ACACADMY KATKUT</p>
+                <p>ENGLISH MEDIUM | CBSE PATTERN</p>
+                <p>101, Opposite Dangi Tyre Showroom, Katkut, Barwaha - 451115</p>
+                <p> 9009804541, psgmpricipal2@gmail.com</p>
+                <h3 style="margin-top: 5px; margin-bottom: 5px;">ADMIT CARD (${student?.selectedDatesheet[0]?.academicSession})</h3>
+                <h3 style="margin-top: 5px; margin-bottom: 5px;">${student?.selectedDatesheet[0]?.termName}</h3>
+              </div>
+              <div style="width:15%;"></div>
+            </div>
+            <div class="content">
+              <div class="details" style="width:100%;">
+
+                <div style="width:40%;">
+                  <p><strong>Admission No : </strong> ${student?.contentRequest?.admissionNo || "-"}</p>
+                  <p><strong>Student Name : </strong>  ${student?.contentRequest?.studentName || "-"}</p>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content:end; width:50%;">
+                  <p style="text-align:left; font-weight: bold; font-size: 14px;">Examination Roll no : ${student?.contentRequest?.rollNo || "-"}</p>
+                  <p><strong>Class-Section : </strong> ${student?.contentRequest?.className || "-"} - ${student?.contentRequest?.sectionName || "-"}</p>
+                </div>
+
+                <div style="border: 1px solid #000; width: 100px; height: 100px; object-fit: contain; overflow:hidden; ">
+                  <img style="width: 100%;" src="${student?.contentRequest?.preSignedUrlResponse?.url || ""}" alt="Student Photo">
+                </div>
+
+              </div>
+              
+
+
+              <div style="width: 100%; height: 250px; display: flex; justify-content: space-between">
+                <img style="width: 20%;" src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-12T12_53_32_622176725.png" alt="School Logo"/>
+                <div style="width: 78%; ">
+                
+               
+              <table class="table">
+                <tr>
+                  <th>DATE</th>
+                  <th>DAY</th>
+                  <th>SUBJECT</th>
+                  <th>T.SIGN</th>
+                </tr>
+                ${unqData?.map(datesheet =>
+        datesheet.dateSheetSettingResponseList?.map(subject =>{
+          return `<tr>
+                        <td>${subject.examDate || "-"}</td>
+                        <td>${new Date(subject.examDate.split("-").reverse().join("-")).toLocaleDateString('en-US', { weekday: 'long' }) || "-"}</td>
+                        <td>${subject.subject || "-"}</td>
+                        <td>${subject.time || ""}</td>
+                      </tr>`}
+        ).join("")
+      ).join("")
+        }
+              </table>
+              <div class="instructions">
+                <h3>Instructions</h3>
+                <ol>
+                  ${(student?.contentRequest?.className=="NURSERY" || student?.contentRequest?.className=="PREP I" ||student?.contentRequest?.className=="PREP II") ? "<li>EXAMINATION TIMINGS WILL BE 9:00am TO 11:30am.  FOR CLASS NURSERY TO PREP-II.</li>" :  "<li>EXAMINATION TIMINGS WILL BE 10:00am TO 12:00pm. FOR CLASS 1st TO 12th.</li>"}
+                  <li>ADMIT CARD IS NECESSARY THROUGHOUT THE EXAM.</li>
+                  <li>A FINE OF RS.50/- WILL BE CHARGED IN CASE OF LOSS OF IT.</li>
+                </ol>
+              </div>
+              </div>
+              
+            </div>
+              <div style="display: flex; justify-content: space-around;margin-top: 55px ">
+                <h4>(Class Teacher)</h4>
+                <h4>(Exam Incharge)</h4>
+                <h4>(Principal)</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+
+      container.append(admitCardHtml);
+
+      // Add a page break after every two students
+      if ((index + 1) % 2 === 0 && index + 1 < dataList.length) {
+        admitCardHtml.innerHTML += `<div class="page-break"></div>`;
+      }
+    });
+  }
+  </script>
+
+
+  <script>
+    window.SetTemplateData([
+    {
+        "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "12-08-2024 10:24 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+        },
+        "contentRequest": {
+            "id": 290744,
+            "uid": "b888ae7f-756c-47bf-b245-1b109ee9c4ce",
+            "admissionNo": "20180158",
+            "studentName": "Sidharth Sharma",
+            "className": "III",
+            "sectionName": "A",
+            "joiningStatus": "Old",
+            "joiningDate": "2018-06-27",
+            "gender": "Male",
+            "certificate": "",
+            "joiningClassName": "III",
+            "joiningSectionName": "A",
+            "group": "III",
+            "status": "Studying",
+            "caste": "",
+            "wing": "NA",
+            "house": null,
+            "dob": "2015-06-26",
+            "rollNo": 19,
+            "session": "2024-2025",
+            "permanentEducationNumber": "",
+            "preSignedUrlResponse": {
+                "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20180158/student/images/20180158.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240814T093709Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240814%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=35547d4fbecf0a40ce3fe615da268762722a953d97464d74a349475494dda194",
+                "fileName": "20180158.png"
+            },
+            "fatherInformation": {
+                "name": "Mr. Gopinath",
+                "qualification": null,
+                "occupation": "",
+                "yearlyIncome": "",
+                "email": ""
+            },
+            "motherInformation": {
+                "name": "Mrs. Rekha Sharma",
+                "qualification": null,
+                "occupation": "",
+                "yearlyIncome": "",
+                "email": ""
+            },
+            "permanentAddress": {
+                "houseNo": null,
+                "area": "Faridabad",
+                "street": "NA",
+                "city": "Na",
+                "pincode": "121006",
+                "state": "Haryana",
+                "emergencyNo": "",
+                "phoneNo": "",
+                "mobileNo": "9899051830"
+            },
+            "correspondanceAddress": {
+                "houseNo": null,
+                "area": "",
+                "street": "",
+                "city": "",
+                "pincode": null,
+                "state": "",
+                "emergencyNo": "",
+                "phoneNo": "",
+                "mobileNo": "9899051830"
+            },
+            "officialAddress": {
+                "houseNo": "",
+                "area": "NA",
+                "street": null,
+                "city": "NA",
+                "pincode": "0",
+                "state": "NA",
+                "emergencyNo": "",
+                "phoneNo": "",
+                "mobileNo": ""
+            },
+            "guardianInformation": {
+                "guradianName": null,
+                "guradianRelation": null,
+                "guradianOccupation": null,
+                "guradianEmail": null,
+                "guradianMobileNo": null
+            },
+            "characterCertificateDetail": null,
+            "transportDetails": {
+                "circleName": null,
+                "routeName": null,
+                "pickUp": null,
+                "drop": null
+            },
+            "certificateList": null,
+            "bloodGroup": ""
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+            {
+                "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+                "datesheetName": "SA-I",
+                "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+                "termName": "HALF YEARLY",
+                "classes": "III",
+                "sections": [
+                    "A"
+                ],
+                "classSectionUids": [
+                    "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+                ],
+                "startDate": "11-09-2024",
+                "endDate": "25-09-2024",
+                "academicSession": "2024-2025",
+                "dateSheetSettingResponseList":[
+    {
+        "subject": "ART EDUCATION",
+        "examDate": "11-09-2024",
+        "maxMarks": 0,
+        "startTime": "2024-09-11T08:00",
+        "endTime": "2024-09-11T11:30",
+        "description": null,
+        "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+    },
+    {
+        "subject": "G.K.",
+        "examDate": "11-09-2024",
+        "maxMarks": 0,
+        "startTime": "2024-09-11T08:00",
+        "endTime": "2024-09-11T11:30",
+        "description": null,
+        "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+    },
+    {
+        "subject": "COMPUTER",
+        "examDate": "13-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-13T08:00",
+        "endTime": "2024-09-13T11:30",
+        "description": null,
+        "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+    },
+    {
+        "subject": "SCIENCE",
+        "examDate": "16-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-16T08:00",
+        "endTime": "2024-09-16T11:30",
+        "description": null,
+        "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+    },
+    {
+        "subject": "Hindi",
+        "examDate": "18-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-18T08:00",
+        "endTime": "2024-09-18T11:30",
+        "description": null,
+        "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+    },
+    {
+        "subject": "ENGLISH",
+        "examDate": "20-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-20T08:00",
+        "endTime": "2024-09-20T11:30",
+        "description": null,
+        "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+    },
+    {
+        "subject": "MATHEMATICS",
+        "examDate": "23-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-23T08:00",
+        "endTime": "2024-09-23T11:30",
+        "description": null,
+        "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+    },
+    {
+        "subject": "SOCIAL SCIENCE",
+        "examDate": "25-09-2024",
+        "maxMarks": 80,
+        "startTime": "2024-09-25T08:00",
+        "endTime": "2024-09-25T11:30",
+        "description": null,
+        "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+    }
+],
+                "enabled": false
+            }
+        ]
+    },
+    {
+        "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "12-08-2024 10:24 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+        },
+        "contentRequest": {
+            "id": 290746,
+            "uid": "e7cab49d-700c-4176-be8f-f3682b1d0630",
+            "admissionNo": "20190058",
+            "studentName": "Payal",
+            "className": "III",
+            "sectionName": "A",
+            "joiningStatus": "Old",
+            "joiningDate": "2019-04-03",
+            "gender": "Female",
+            "certificate": null,
+            "joiningClassName": "III",
+            "joiningSectionName": "A",
+            "group": "III",
+            "status": "Studying",
+            "caste": null,
+            "wing": "NA",
+            "house": null,
+            "dob": "2015-06-30",
+            "rollNo": 11,
+            "session": "2024-2025",
+            "permanentEducationNumber": null,
+            "preSignedUrlResponse": {
+                "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20190058/student/images/20190058.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240814T093709Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240814%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=006a6c08216a3b95cae6cd95be1ade4bd628e8b4380ddd2fa5697c16ef4f2fc3",
+                "fileName": "20190058.png"
+            },
+            "fatherInformation": {
+                "name": "Raj Kumar",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "motherInformation": {
+                "name": "Gyanwati",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "permanentAddress": {
+                "houseNo": null,
+                "area": "Faridabad",
+                "street": "NA",
+                "city": "Faridabad",
+                "pincode": null,
+                "state": "Haryana",
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "7303255174"
+            },
+            "correspondanceAddress": {
+                "houseNo": null,
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "7303255174"
+            },
+            "officialAddress": {
+                "houseNo": "NA",
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": ""
+            },
+            "guardianInformation": {
+                "guradianName": null,
+                "guradianRelation": null,
+                "guradianOccupation": null,
+                "guradianEmail": null,
+                "guradianMobileNo": null
+            },
+            "characterCertificateDetail": null,
+            "transportDetails": {
+                "circleName": null,
+                "routeName": null,
+                "pickUp": null,
+                "drop": null
+            },
+            "certificateList": null,
+            "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+            {
+                "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+                "datesheetName": "SA-I",
+                "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+                "termName": "HALF YEARLY",
+                "classes": "III",
+                "sections": [
+                    "A"
+                ],
+                "classSectionUids": [
+                    "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+                ],
+                "startDate": "11-09-2024",
+                "endDate": "25-09-2024",
+                "academicSession": "2024-2025",
+                "dateSheetSettingResponseList": [
+                    {
+                        "subject": "ART EDUCATION",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+                    },
+                    {
+                        "subject": "G.K.",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+                    },
+                    {
+                        "subject": "COMPUTER",
+                        "examDate": "13-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-13T08:00",
+                        "endTime": "2024-09-13T11:30",
+                        "description": null,
+                        "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+                    },
+                    {
+                        "subject": "SCIENCE",
+                        "examDate": "16-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-16T08:00",
+                        "endTime": "2024-09-16T11:30",
+                        "description": null,
+                        "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+                    },
+                    {
+                        "subject": "Hindi",
+                        "examDate": "18-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-18T08:00",
+                        "endTime": "2024-09-18T11:30",
+                        "description": null,
+                        "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+                    },
+                    {
+                        "subject": "ENGLISH",
+                        "examDate": "20-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-20T08:00",
+                        "endTime": "2024-09-20T11:30",
+                        "description": null,
+                        "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+                    },
+                    {
+                        "subject": "MATHEMATICS",
+                        "examDate": "23-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-23T08:00",
+                        "endTime": "2024-09-23T11:30",
+                        "description": null,
+                        "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+                    },
+                    {
+                        "subject": "SOCIAL SCIENCE",
+                        "examDate": "25-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-25T08:00",
+                        "endTime": "2024-09-25T11:30",
+                        "description": null,
+                        "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+                    }
+                ],
+                "enabled": false
+            }
+        ]
+    },
+    {
+        "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "12-08-2024 10:24 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+        },
+        "contentRequest": {
+            "id": 290747,
+            "uid": "8c38a40b-339f-4e0e-89d7-9553b1654e02",
+            "admissionNo": "20190072",
+            "studentName": "Mishika Bhati",
+            "className": "III",
+            "sectionName": "A",
+            "joiningStatus": "Old",
+            "joiningDate": "2019-04-08",
+            "gender": "Female",
+            "certificate": null,
+            "joiningClassName": "III",
+            "joiningSectionName": "A",
+            "group": "III",
+            "status": "Studying",
+            "caste": null,
+            "wing": "NA",
+            "house": null,
+            "dob": "2016-01-16",
+            "rollNo": 7,
+            "session": "2024-2025",
+            "permanentEducationNumber": null,
+            "preSignedUrlResponse": {
+                "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20190072/student/images/20190072.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240814T093709Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240814%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=dd79329b0c024bbac12a68f32c119549cb3508866d434fd006b696fc9374710a",
+                "fileName": "20190072.png"
+            },
+            "fatherInformation": {
+                "name": "Rajkumar",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "motherInformation": {
+                "name": "Anju Bhati",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "permanentAddress": {
+                "houseNo": null,
+                "area": "Faridabad",
+                "street": "NA",
+                "city": "Faridabad",
+                "pincode": null,
+                "state": "Haryana",
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "8130977706"
+            },
+            "correspondanceAddress": {
+                "houseNo": null,
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "8130977706"
+            },
+            "officialAddress": {
+                "houseNo": "NA",
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": ""
+            },
+            "guardianInformation": {
+                "guradianName": null,
+                "guradianRelation": null,
+                "guradianOccupation": null,
+                "guradianEmail": null,
+                "guradianMobileNo": null
+            },
+            "characterCertificateDetail": null,
+            "transportDetails": {
+                "circleName": null,
+                "routeName": null,
+                "pickUp": null,
+                "drop": null
+            },
+            "certificateList": null,
+            "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+            {
+                "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+                "datesheetName": "SA-I",
+                "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+                "termName": "HALF YEARLY",
+                "classes": "III",
+                "sections": [
+                    "A"
+                ],
+                "classSectionUids": [
+                    "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+                ],
+                "startDate": "11-09-2024",
+                "endDate": "25-09-2024",
+                "academicSession": "2024-2025",
+                "dateSheetSettingResponseList": [
+                    {
+                        "subject": "ART EDUCATION",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+                    },
+                    {
+                        "subject": "G.K.",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+                    },
+                    {
+                        "subject": "COMPUTER",
+                        "examDate": "13-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-13T08:00",
+                        "endTime": "2024-09-13T11:30",
+                        "description": null,
+                        "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+                    },
+                    {
+                        "subject": "SCIENCE",
+                        "examDate": "16-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-16T08:00",
+                        "endTime": "2024-09-16T11:30",
+                        "description": null,
+                        "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+                    },
+                    {
+                        "subject": "Hindi",
+                        "examDate": "18-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-18T08:00",
+                        "endTime": "2024-09-18T11:30",
+                        "description": null,
+                        "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+                    },
+                    {
+                        "subject": "ENGLISH",
+                        "examDate": "20-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-20T08:00",
+                        "endTime": "2024-09-20T11:30",
+                        "description": null,
+                        "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+                    },
+                    {
+                        "subject": "MATHEMATICS",
+                        "examDate": "23-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-23T08:00",
+                        "endTime": "2024-09-23T11:30",
+                        "description": null,
+                        "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+                    },
+                    {
+                        "subject": "SOCIAL SCIENCE",
+                        "examDate": "25-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-25T08:00",
+                        "endTime": "2024-09-25T11:30",
+                        "description": null,
+                        "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+                    }
+                ],
+                "enabled": false
+            }
+        ]
+    },
+    {
+        "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "12-08-2024 10:24 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+        },
+        "contentRequest": {
+            "id": 290748,
+            "uid": "f6d755ee-70c6-4172-b35b-cb883bd99d33",
+            "admissionNo": "20190078",
+            "studentName": "Parineet Kaur",
+            "className": "III",
+            "sectionName": "A",
+            "joiningStatus": "Old",
+            "joiningDate": "2019-04-08",
+            "gender": "Female",
+            "certificate": null,
+            "joiningClassName": "III",
+            "joiningSectionName": "A",
+            "group": "III",
+            "status": "Studying",
+            "caste": null,
+            "wing": "NA",
+            "house": null,
+            "dob": "2016-11-26",
+            "rollNo": 10,
+            "session": "2024-2025",
+            "permanentEducationNumber": null,
+            "preSignedUrlResponse": {
+                "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20190078/student/images/20190078.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240814T093709Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240814%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=de785c4a98174cf5a4678b2a2abd19cfd421b6d9b58a81887b61477f57096755",
+                "fileName": "20190078.png"
+            },
+            "fatherInformation": {
+                "name": "Harpreet Singh",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "motherInformation": {
+                "name": "Jaswinder Kaur",
+                "qualification": null,
+                "occupation": null,
+                "yearlyIncome": null,
+                "email": null
+            },
+            "permanentAddress": {
+                "houseNo": null,
+                "area": "Sector-8",
+                "street": "NA",
+                "city": "Faridabad",
+                "pincode": null,
+                "state": "Haryana",
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "9518213846"
+            },
+            "correspondanceAddress": {
+                "houseNo": null,
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": "9518213846"
+            },
+            "officialAddress": {
+                "houseNo": "NA",
+                "area": null,
+                "street": null,
+                "city": null,
+                "pincode": null,
+                "state": null,
+                "emergencyNo": "",
+                "phoneNo": null,
+                "mobileNo": ""
+            },
+            "guardianInformation": {
+                "guradianName": null,
+                "guradianRelation": null,
+                "guradianOccupation": null,
+                "guradianEmail": null,
+                "guradianMobileNo": null
+            },
+            "characterCertificateDetail": null,
+            "transportDetails": {
+                "circleName": "SLAB-3",
+                "routeName": "BUS-5",
+                "pickUp": "SEC-8 MARKET",
+                "drop": "SEC-8 MARKET"
+            },
+            "certificateList": null,
+            "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+            {
+                "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+                "datesheetName": "SA-I",
+                "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+                "termName": "HALF YEARLY",
+                "classes": "III",
+                "sections": [
+                    "A"
+                ],
+                "classSectionUids": [
+                    "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+                ],
+                "startDate": "11-09-2024",
+                "endDate": "25-09-2024",
+                "academicSession": "2024-2025",
+                "dateSheetSettingResponseList": [
+                    {
+                        "subject": "ART EDUCATION",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+                    },
+                    {
+                        "subject": "G.K.",
+                        "examDate": "11-09-2024",
+                        "maxMarks": 0,
+                        "startTime": "2024-09-11T08:00",
+                        "endTime": "2024-09-11T11:30",
+                        "description": null,
+                        "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+                    },
+                    {
+                        "subject": "COMPUTER",
+                        "examDate": "13-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-13T08:00",
+                        "endTime": "2024-09-13T11:30",
+                        "description": null,
+                        "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+                    },
+                    {
+                        "subject": "SCIENCE",
+                        "examDate": "16-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-16T08:00",
+                        "endTime": "2024-09-16T11:30",
+                        "description": null,
+                        "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+                    },
+                    {
+                        "subject": "Hindi",
+                        "examDate": "18-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-18T08:00",
+                        "endTime": "2024-09-18T11:30",
+                        "description": null,
+                        "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+                    },
+                    {
+                        "subject": "ENGLISH",
+                        "examDate": "20-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-20T08:00",
+                        "endTime": "2024-09-20T11:30",
+                        "description": null,
+                        "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+                    },
+                    {
+                        "subject": "MATHEMATICS",
+                        "examDate": "23-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-23T08:00",
+                        "endTime": "2024-09-23T11:30",
+                        "description": null,
+                        "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+                    },
+                    {
+                        "subject": "SOCIAL SCIENCE",
+                        "examDate": "25-09-2024",
+                        "maxMarks": 80,
+                        "startTime": "2024-09-25T08:00",
+                        "endTime": "2024-09-25T11:30",
+                        "description": null,
+                        "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+                    }
+                ],
+                "enabled": false
+            }
+        ]
+    }
+])
+    </script>
+
+
+  <!-- <script>
+
+    window.SetTemplateData({ viewTemplate: true, header: "", footer: "" });
+  </script> -->
+
+
+</html>

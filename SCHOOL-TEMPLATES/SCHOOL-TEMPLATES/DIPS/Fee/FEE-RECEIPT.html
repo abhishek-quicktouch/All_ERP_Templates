@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fee Receipt</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((element) => {
+          const basicDetails = {
+            academicSession: "2023-2024",
+            admissionNo: element?.contentRequest?.admissionNo,
+            studentName: element?.contentRequest?.studentName,
+            fatherName: element?.student?.fatherName,
+            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+            address: `${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.houseNo
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.houseNo + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.street
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.street + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.landmark
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.landmark + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.area
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.area + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.city
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.city + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.district
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.district + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.pincode
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.pincode
+                : ""
+            }`,
+          };
+
+          const feeDetails = element?.contentRequest;
+
+          console.log(element, basicDetails, "ddddddddddddd");
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML =
+            (element?.header || "") +
+            `<page orientation="portrait" format="A4" margin="0">
+              <style type="text/css">
+               @page {
+               size: A4
+               }
+               * {
+               margin: 0px;
+               padding: 0px;
+               color: #000;
+               }
+               td {
+               padding-left: 1mm;
+               padding-right: 1mm;
+               padding-top: 0.8mm;
+               padding-bottom: 0.8mm;
+               font-size: 9pt;
+               color: #000000;
+               font-family: Arial, Helvetica, sans-serif;
+               }
+               th {
+               padding-left: 1mm;
+               padding-right: 1mm;
+               padding-top: 2mm;
+               padding-bottom: 2mm;
+               background: #e7e7e7;
+               font-family: Arial, Helvetica, sans-serif;
+               }
+               .signImg {
+               width: 150px;
+               height: auto;
+               }
+               @media print {
+               @page {
+               margin:5mm;
+               size: A4
+               }
+               .signImg {
+               width: 150px;
+               height: auto;
+               }
+               }
+            </style>
+              <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <div style="height:5mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </table>
+
+               <!-- Student | Receipt Details -->
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center" valign="top" style="width:60%; padding-left: 0mm; padding-right: 0mm; font-weight:bold; padding-top: 0.5mm; padding-bottom: 0.5mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:60%; font-weight:bold;">
+                                       <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                                          <tbody>
+                                             <tr>
+                                                <td align="center" style="width:60%; font-weight:bold; font-size:14pt">Students Details</td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center" style="width:60%;">
+                                       <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                                          <tbody>
+                                             <tr>
+                                                <td align="center" style="width:60%; font-weight:bold;">
+                                                   <table cellspacing="0" style="width: 100%; ">
+                                                      <tbody>
+                                                         <tr>
+                                                            <td style="width: 60%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Admission No</td>
+                                                                        <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : <strong>${
+                                                                          basicDetails?.admissionNo
+                                                                        }</strong></td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                            <td style="width: 40%;">
+                                                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
+                                                                        <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          basicDetails?.classSection
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 60%;">
+                                                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                                                                           Student's Name
+                                                                        </td>
+                                                                        <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : <strong>${
+                                                                          basicDetails?.studentName
+                                                                        }</strong></td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                            <td style="width: 40%;">
+                                                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:34%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Tel&nbsp;(R)</td>
+                                                                        <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          basicDetails?.phoneNo
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 60%;">
+                                                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                                                                           Father's Name
+                                                                        </td>
+                                                                        <td style="width:66%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          basicDetails?.fatherName
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td rowspan="2" colspan="2" style="width: 60%;" valign="top">
+                                                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td valign="top" style="width:20%; padding-left:0mm; padding-right:0mm;">
+                                                                           Address
+                                                                        </td>
+                                                                        <td style="width:80%; padding-left:0mm; padding-right:0mm; text-transform: uppercase;"> : ${
+                                                                          basicDetails?.address
+                                                                        } </td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                      </tbody>
+                                                   </table>
+                                                </td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td align="center" valign="top" style="width:40%; padding-left: 0mm; padding-right: 0mm; font-weight:bold; padding-top: 0.5mm; padding-bottom: 0.5mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:40%; font-weight:bold;">
+                                       <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                                          <tbody>
+                                             <tr>
+                                                <td align="center" style="width:40%; font-weight:bold; font-size:14pt">Receipt Details</td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center" style="width:40%;">
+                                       <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                                          <tbody>
+                                             <tr>
+                                                <td align="center" style="width:40%; font-weight:bold;">
+                                                   <table cellspacing="0" style="width: 100%; ">
+                                                      <tbody>
+                                                         <tr>
+                                                            <td style="width: 100%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Receipt No</td>
+                                                                        <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          feeDetails?.receiptNo
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 100%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Receipt Date</td>
+                                                                        <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          feeDetails?.feeDate
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 100%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Period</td>
+                                                                        <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          feeDetails?.paidInstallmentsName
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 100%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Academic Year</td>
+                                                                        <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          basicDetails?.academicSession
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="width: 100%;">
+                                                               <table width="100%" border="0" cellspacing="0">
+                                                                  <tbody>
+                                                                     <tr>
+                                                                        <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Net Payment Paid</td>
+                                                                        <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase;"> : ${
+                                                                          feeDetails?.netReceived
+                                                                        }</td>
+                                                                     </tr>
+                                                                  </tbody>
+                                                               </table>
+                                                            </td>
+                                                         </tr>
+                                                      </tbody>
+                                                   </table>
+                                                </td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+
+               <!-- Student | Receipt Details -->
+
+               <!-- FEE DETAILS -->
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="left" style="width:40%; font-weight:bold;">Fee Heads</td>
+                                    <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Fee&nbsp;Due</td>
+                                    <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Concession</td>
+                                    <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Amount&nbsp;(Rs.)</td>
+                                 </tr>
+
+                                 ${feeDetails?.studentFeeCollectionReceiptList
+                                   ?.map(
+                                     (val) => `
+                                               <tr>
+                                                 <td align="left" style="width:40%; border-top: solid 0.264583333mm #000000; text-transform: uppercase;">${val?.componentName}</td>
+                                                 <td align="right" style="width:20%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.componentAmount}</td>
+                                                 <td align="right" style="width:20%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.componentConcession}</td>
+                                                 <td align="right" style="width:20%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val.componentReceived}</td>
+                                              </tr>
+                                             `
+                                   )
+                                   .join("")}
+
+                                   <table cellspacing="0" style="width:100%;">
+                                      <tbody>
+                                         <tr>
+                                            <td align="center">
+                                               <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                                                  <tbody>
+                                                     <tr>
+                                                        <td align="left" style="width:40%; font-weight:bold;">Total Fee:</td>
+                                                        <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">${
+                                                          feeDetails?.netAmount
+                                                        }</td>
+                                                        <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">${feeDetails?.studentFeeCollectionReceiptList?.reduce(
+                                                          (prev, curr) =>
+                                                            prev +
+                                                            Number(
+                                                              curr?.componentConcession
+                                                            ),
+                                                          0
+                                                        )}</td>
+                                                        <td align="right" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">${
+                                                          feeDetails?.netReceived
+                                                        }</td>
+                                                     </tr>
+                                                  </tbody>
+                                               </table>
+                                            </td>
+                                         </tr>
+                                      </tbody>
+                                   </table>
+
+                             
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                     <tr>
+                        <td align="center" style="width:20%; font-weight:bold;">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:20%; font-weight:bold;">Mode :</td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center" style="width:20%; border-top: solid 0.264583333mm #000000; text-transform: uppercase;">${
+                                      feeDetails?.feeMode
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td align="center" style="width:20%; font-weight:bold;">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:20%; font-weight:bold;">Mode No:</td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center" style="width:20%; border-top: solid 0.264583333mm #000000; text-transform: uppercase;">${
+                                      feeDetails?.modeNo || "-"
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td align="center" style="width:20%; font-weight:bold;">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:20%; font-weight:bold;">Mode Dated:</td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center" style="width:20%; border-top: solid 0.264583333mm #000000;">${
+                                      feeDetails?.feeModeDate
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td align="center" style="width:20%; font-weight:bold;">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:20%; font-weight:bold;">Amount Received</td>
+                                 </tr>
+                                 <tr>
+                                    <td align="right" style="width:20%; border-top: solid 0.264583333mm #000000; text-transform: uppercase;">${
+                                      feeDetails?.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td align="center" style="width:20%; font-weight:bold;">
+                           <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                              <tbody>
+                                 <tr>
+                                    <td align="center" style="width:20%; font-weight:bold;">Fee Balance</td>
+                                 </tr>
+                                 <tr>
+                                    <td align="right" style="width:20%; border-top: solid 0.264583333mm #000000; text-transform: uppercase;">${
+                                      feeDetails?.netAmount -
+                                      feeDetails?.netReceived
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+
+               <table cellspacing="0">
+                  <tr>
+                     <td style="width: 100%; padding-bottom:0mm;" valign="top" align="left">
+                        <div style="width:100%; padding-bottom:0mm; text-align:center; font-size:11pt; color:#000; font-weight:bold;">Please note :</div>
+                     </td>
+                  </tr>
+               </table>
+               <!-- SCHOLASTIC GRADING SCALE -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="width:100%; font-size:11pt">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:100%; text-align: left;">1. Fee is to be paid through pay order/cheque in favour of De Indian Public School. 
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">2. Name, Class, Section, Admission No. of the student should be written on the back side of the cheque/pay order. 
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">3. Fee can also be transferred through NEFT. Details are given below:- Name:- DE INDIAN PUBLIC SCHOOL, Bank name:- AXIS BANK, Branch:- Sector-24, Rohini, A/c no. :- 912010062634282,IFSC-UTIB0001655 
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">4. Fee can also be paid through Debit/Credit card.All Master/Visa cards are accepted.
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">5. The school fee is payable quarterly by 10th of the first month of each quarter between 9:am. and 3:00 pm. on all working days.
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">6. A fine of Rs 20 shall be levied from the 11th of the month in which the fee is to be paid till 30th. After that, the name of the child will be struck off and re-admission will be done. 
+                              </td>
+                           </tr>
+                           <tr>
+                              <td style="width:100%; text-align: left;">7. Cheques returned by bank will be treated as non payment and Rs. 500/- will be charged. In such cases, the fee is to be paid in cheque/pay order along with corredponding late fee. 
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+               </table>
+            
+            </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "fewfef",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "fef",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+
+          contentRequest: {
+            feeUid: "1cd4d7e1-f6cb-4f8f-9b58-5ed9a267c785",
+            receiptNo: "5",
+            admissionNo: "7189",
+            studentName: "CHIRAG BANSAL",
+            studentClass: "PRE SCHOOL",
+            studentSection: "JASMINE",
+            paidInstallmentsName: "JAN",
+            feeDate: "12-04-2023",
+            feeTime: "13:03:05",
+            userName: "user_89019",
+            feeMode: "CHEQUE",
+            feeModeNumber: "777777",
+            modeBank: "-",
+            modeBranch: "-",
+            feeModeDate: "0001-01-01",
+            feeModeRemark: "",
+            feeDeleteRemark: null,
+            isBounced: "0",
+            bouncedDate: "-",
+            totalAmount: "16840.00",
+            excessPaid: "0.00",
+            excessUsed: "0.00",
+            excessBalance: "0.0",
+            netReceived: "16000.00",
+            studentFeeCollectionReceiptList: [
+              {
+                componentName: "TUITION FEE",
+                componentAmount: "5000.00",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                componentReceived: "5000.00",
+              },
+              {
+                componentName: "ANNUAL FEE",
+                componentAmount: "10000.00",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                componentReceived: "10000.00",
+              },
+              {
+                componentName: "FINE",
+                componentAmount: "1840.00",
+                componentConcession: "0.00",
+                componentDiscount: "0.00",
+                componentReceived: "1000.00",
+              },
+            ],
+          },
+          header: `
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                        <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                           <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                           <br>
+                           <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                        </td>
+                        <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                           <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                                 <tr>
+                                    <td style="width:10%;">&nbsp;</td>
+                                    <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                       <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                       27050252 <br>
+                                       www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                    </td>
+                                    <td style="width:10%;">&nbsp;</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>

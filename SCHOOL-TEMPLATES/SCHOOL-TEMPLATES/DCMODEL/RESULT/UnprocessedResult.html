@@ -4,399 +4,307 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Processed Dynamic School Report Generator Script</title>
+    <title>Student Report Card</title>
+
 </head>
 
 <body>
-    <div id="studentsList">
-        Processed Dynamic School Report Generator Script
-    </div>
+    <div id="studentsList">Student Report Card</div>
 </body>
 <script>
-    window.SetTemplateData = function (data) {
-
-
-        console.log(data[0]?.student, "ddddddddddddddddddd data.student");
-
-
-
-        const config = {
-            schoolLogo:
-                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_24_05_218290156.png",
-            schoolName: "SREEJI SCHOOL",
-            schoolAddress: `<h5 >Affiliated to CBSE vide Aff No. 530531</h5>
-                <h5>Sector-9, Faridabad, (Haryana) India-121006</h5>
-                <h5 >Email Id : dcmodelfaridabad@gmail.com Help Desk : +91-129-2226000, 9871583000</h5>`,
-            studentInfoFields: [
-                {
-                    label: "NAME OF THE STUDENT",
-                    key: "studentName",
-                    additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
-                },
-                {
-                    label: "FATHER'S NAME",
-                    key: "fatherName",
-                    additionalInfo: { label: "ROLL NO.", key: "rollNo" },
-                },
-                {
-                    label: "MOTHER'S NAME",
-                    key: "motherName",
-                    additionalInfo: { label: "CLASS & SECTION", key: "className" },
-                },
-            ],
-            gradingScale: "on 8-point (A1-E) Grading Scale",
-            gradeScale: [
-                { minPercentage: 91, grade: "A1" },
-                { minPercentage: 81, grade: "A2" },
-                { minPercentage: 71, grade: "B1" },
-                { minPercentage: 61, grade: "B2" },
-                { minPercentage: 51, grade: "C1" },
-                { minPercentage: 41, grade: "C2" },
-                { minPercentage: 33, grade: "D" },
-                { minPercentage: 0, grade: "E" },
-            ],
-            scholasticConfig: {
-                nature: "THEORY",
-            },
-            coScholasticConfig: {
-                nature: "2A LIFE-SKILLS",
-            },
-            coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
-            signatures: ["CLASS TEACHER", "HEADMISTRESS", "PARENT/GUARDIAN"],
-            footnotes: [
-                "*S.E.A - Subject Enrichment Activity",
-                "*M.A - Multiple Assessment",
-            ],
-            styles: `
-            @page { size: A4; margin: 10mm; }
-            @media print { @page { margin: auto; size: A4; } }
-            body { font-family: Arial, sans-serif; }
-            .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-            .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
-            .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; } 
-            .header img { max-width: 500px; }
-            .section { margin-bottom: 20px; }
-            .section table { width: 100%; border-collapse: collapse; }
-            .section table, .section th, .section td { border: 1px solid #000; }
-            .section td { padding: 2px; text-align: left; font-size: 14px; margin: 0px; }
-            .section h4, .section th { padding: 2px; text-align: center; font-size: 14px; margin: 0px; }
-            .remarks { margin-bottom: 20px; }
-            .signatures { display: flex; justify-content: space-between; }
-            .signatures div { font-size: 14px; margin: 0px; padding: 0px; width: 30%; text-align: center; }
-            .signatures p { margin: 0px; font-weight: bold; }
-        `,
-        };
-
-        const dataList = Array.isArray(data) ? data : [data];
-        const viewTemplate = dataList[0]?.viewTemplate;
-        const staticData = []// Function to return attendance/mark based on status
-        function getAttendanceOrMark(status, mark) {
-            const attendanceValue = {
-                Absent: "AB",
-                Medical: "M",
-                Sports: "S",
-                Leave: "L",
-                "Late Admission": "LA",
-                Exempted: "EX",
-                NA: "NA",
-            };
-            return attendanceValue[status] || mark || "-";
+    window.SetTemplateData = function (dataList) {
+        function formatDate(date) {
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = String(date.getFullYear());
+          return `${day}/${month}/${year}`;
         }
-
-        // Calculate grade based on percentage
-        function calculateGrade(percentage) {
-            for (const grade of config.gradeScale) {
-                if (percentage >= grade.minPercentage) {
-                    return grade.grade;
-                }
-            }
-            return "F";
-        }
-
-        // Generate scholastic table
-        function generateScholasticTable(subjects, termConfig) {
-            let totalMarksObtained = 0;
-            let totalPossibleMarks = 0;
-
-            const scholasticSubjects = subjects?.filter(
-                (subject) => subject?.subjectNature === config.scholasticConfig.nature
-            );
-            const rows = scholasticSubjects
-                ?.map((subject) => {
-                    let subjectTotal = 0;
-                    let subjectMaxTotal = 0;
-                    const marks = {};
-
-                    subject?.markSheetReport?.forEach((report) => {
-                        const termName = report?.markSheetTermResponse?.subHeaderName;
-                        marks[termName] = {
-                            obtained: getAttendanceOrMark(report?.status, report?.obtained), // Use getAttendanceOrMark function
-                            max: report?.max || "-",
-                        };
-                        subjectTotal += Number(report?.obtained) || 0;
-                        subjectMaxTotal += Number(report?.max) || 0;
-                    });
-
-                    totalMarksObtained += subjectTotal;
-                    totalPossibleMarks += subjectMaxTotal;
-
-                    const percentage = (subjectTotal / subjectMaxTotal) * 100;
-                    const grade = calculateGrade(percentage);
-
-                    return `
-                <tr>
-                    <td style="font-weight:bold">${subject?.subjectName}</td>
-                    ${termConfig
-                            .map(
-                                (term) => `<td style="font-weight:${isNaN(marks[term]?.obtained) ? "bold" : "normal"
-                                    };
-                    text-align:center">${marks[term]?.obtained || "-"}/${marks[term]?.max || "-"
-                                    }</td>`
-                            )
-                            .join("")}
-                    <td style="text-align:center">${subjectTotal}/${subjectMaxTotal}</td>
-                    <td style="text-align:center">${percentage.toFixed(2)}%</td>
-                    <td style="text-align:center">${grade}</td>
-                </tr>
-            `;
-                })
-                .join("");
-
-            const overallPercentage =
-                (totalMarksObtained / totalPossibleMarks) * 100;
-            const overallGrade = calculateGrade(overallPercentage);
-
-            return `
-            <table>
-                <tr>
-                    <th colspan="${termConfig.length + 4}">
-                        <div style="text-align: center; justify-content: space-between; display: flex;">
-                            <span>SCHOLASTIC AREAS</span>
-                            <span style="margin-left: auto;">${config.gradingScale
-                }</span>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th style="text-align: center; width: 16%;">SUBJECT</th>
-                    ${termConfig
-                    .map(
-                        (term) =>
-                            `<th style="text-align: center; width: 12%;">${term}</th>`
-                    )
-                    .join("")}
-                    <th style="text-align: center;width: 12%;">TOTAL MARKS</th>
-                    <th style="text-align: center;width: 12%;">PERCENTAGE</th>
-                    <th style="text-align: center; width: 12%;">GRADE</th>
-                </tr>
-                ${rows}
-                <tr>
-                    <td colspan="${termConfig.length + 1
-                }"><strong>OVERALL PERFORMANCE</strong></td>
-                    <td style="text-align:center"><strong>${totalMarksObtained}/${totalPossibleMarks}</strong></td>
-                    <td style="text-align:center"><strong>${overallPercentage.toFixed(
-                    2
-                )}%</strong></td>
-                    <td style="text-align:center"><strong>${overallGrade}</strong></td>
-                </tr>
-            </table>
-        `;
-        }
-
-        // Generate co-scholastic table
-        function generateCoScholasticTable(subjects) {
-            console.log(subjects, "fffffffffffffff subjects");
-            const coScholasticSubjects = subjects?.filter(
-                (subject) =>
-                    subject?.subjectNature === config.coScholasticConfig.nature
-            );
-            const halfLength = Math.ceil(coScholasticSubjects.length / 2);
-            let tableContent = "";
-            console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
-            for (let i = 0; i < halfLength; i++) {
-                const leftSubject = coScholasticSubjects[i];
-                const rightSubject = coScholasticSubjects[i + halfLength];
-
-                tableContent += `
-                <tr>
-                    <td style="width: 30%;">${leftSubject?.subjectName || ""
-                    }</td>
-                    <td style="width: 20%; text-align: center">${leftSubject?.grade || ""
-                    }</td>
-                    <td style="width: 30%;">${rightSubject?.subjectName || ""
-                    }</td>
-                    <td style="width: 20%; text-align: center">${rightSubject?.grade || ""
-                    }</td>
-                </tr>
-            `;
-            }
-
-            return `
-            <table>
-                <tr>
-                    <th colspan="4" style="border: none;">
-                        <div style="text-align: center; justify-content: space-between; display: flex;">
-                            <span>CO-SCHOLASTIC COMPETENCIES</span>
-                            <span style="margin-left: auto;">${config.coScholasticGradingScale}</span>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th>PARTICULAR</th>
-                    <th>GRADE</th>
-                    <th>PARTICULAR</th>
-                    <th>GRADE</th>
-                </tr>
-                ${tableContent}
-            </table>
-        `;
-        }
-
-        // Set student data
-        const multipleStudents = viewTemplate ? staticData : dataList;
+        const multipleStudents = dataList;
         const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+          console.log(v);
+          const student = v.student;
+          const markData = v.markData.termWiseSubjectResponse?.[0];
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `
+                             <style type="text/css">
+                   @page {
+                   size: A4
+                   }
+                   * {
+                   	margin: 0px;
+                   	padding: 0px;
+                   	color: #000;
+                   }
+                   td {
+                   	padding-left: 1mm;
+                   	padding-right: 1mm;
+                   	padding-top: 2mm;
+                   	padding-bottom:2mm;
+                   	font-size: 9pt;
+                   	color: #000000;
+                   	font-family: Arial, Helvetica, sans-serif;
+                     font-size:16px;
+                   }
+                   th {
+                   	padding-left: 1mm;
+                   	padding-right: 1mm;
+                   	padding-top:1mm;
+                   	padding-bottom: 1mm;
+                   	background: #e7e7e7;
+                   	font-family: Arial, Helvetica, sans-serif;
+                   }
+                   .bgcol{
+                   background-color: #999;
+                   }
 
-        multipleStudents?.forEach((element) => {
-            const singleStudentHtml = document.createElement("div");
-            singleStudentHtml.style.pageBreakAfter = "always";
+                   @media print {
+                   @page {
+                   margin:auto;
+                   size: A4
+                   }
+                   }
+                   </style>
 
-            const termConfig =
-                element?.markData?.markSheetTerms?.map(
-                    (term) => term.subHeaderName
-                ) || [];
+                   <page orientation="portrait" format="A4" margin="0">
+                      <div
+             style="
+               font-size: 16px;
+               margin-bottom: 20px;
+               display: flex;
+               justify-content: space-between;
+               align-items:center;
+             "
+           >
+             <img
+               src="data:image/png;base64,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"
+               uploadprocessed="true"
+             />
+             <div>
+               <div style="font-size: 30px;text-align:center;"
+                 ><strong>D.C. Model Sr. Sec. School</strong></div
+               >
+               <div style="text-align:center;font-size: 24px"> <strong>(Where Excellence Begin)</strong></div>
+               <div style="font-size: 22px;">
+                 <strong>
+                   Sector-9, Near Church, Faridabad, Haryana, 121006<br />
+                   </strong>
+                 </div>
+                 <div style="text-align:center;font-size: 22px"> <strong> PHONE NO: 0129 222 6000
+                    </strong></div>
 
-            singleStudentHtml.innerHTML = `
-            <style type="text/css">${config.styles}</style>
-            <page orientation="portrait" format="A4" margin="0">
-                <div class="container">
-                    <div class="header">
-            
-${element.header
-                    ? element.header
-                    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
-              <div style="text-align:center">
-                        <h1 >${config.schoolName}</h1>
-                        <div >${config.schoolAddress}</div>
-                        <h4 style="margin:5px" >ACADEMIC SESSION-${element?.markData?.academicSession || ""
-                    }, ${element?.markData?.markSheetName || ""}</h4> 
-                
-              </div>
-              <img src="${config.schoolLogo}" alt="School Logo"/> 
-            `
-                }
+             </div>
+      <img style="height:82px;" src="data:image/jpeg;base64,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"/>
+           </div>
 
-             
-</div>
-<div class="section">
-                        <table>
-                            ${config.studentInfoFields
-                    .map(
-                        (field) => `
-                                <tr>
-                                    <th style="width: 25%; text-align: left">${field.label
-                            }</th>
-                                    <td style="width: 25%;">${element?.student?.[field.key] || ""
-                            }</td>
-                                    ${field.additionalInfo
-                                ? `
-                                        <th style="width: 25%;text-align: left">${field.additionalInfo.label
-                                }</th>
-                                        <td style="width: 25%;">${element?.student?.[
-                                field.additionalInfo.key
-                                ] || ""
-                                }</td>
-                                    `
-                                : ""
+               		<tr valign="top">
+                 	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                   		<!-- Basic Details -->
+                           <table cellspacing="0" style="width: 100%; margin:auto; border: solid 0.264583333mm #000000;">
+                           <tr>
+                         <div style="text-align:center;margin:4px 0;font-weight:bold;font-size:24px;text-transform:uppercase"> ${
+                           markData?.termName
+                         } Performance
+                           </div>
+                            <div style="text-align:center;margin:2px 0;font-weight:bold;font-size:24px;margin-bottom:1.5rem;">Session - ${
+                              v?.markData?.academicSession
                             }
-                                </tr>
-                            `
-                    )
-                    .join("")}
-                        </table>
-                    </div>
+                           </div>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" >
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student?.studentName
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student?.admissionNo
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">:  ${
+                                         student?.fatherName
+                                           ? `MR. ${student?.fatherName}`
+                                           : " - "
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
 
-                    <div class="section">
-                        <h3 style="text-align: center; font-size: 14px;">ACADEMIC PERFORMANCE</h3>
-                        ${generateScholasticTable(
-                        element?.markData
-                            ?.subjectWiseMarkSheetReportResponses,
-                        termConfig
-                    )}
-                    </div>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student.className
+                                       }-${student.sectionName}</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student?.motherName
+                                           ? `MRS. ${student?.motherName}`
+                                           : " - "
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
 
-                    <div class="section">
-                        ${generateCoScholasticTable(
-                        element?.markData?.subjectWiseMarkSheetReportResponses
-                    )}
-                    </div>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student?.rollNo
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         student?.dob
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
 
-                    <div class="section">
-                        <table>
-                            <tr>
-                                <td><strong>ATTENDANCE:</strong> ${element?.student?.attendance || ""
-                }</td>
-                            </tr>
-                            <tr>
-                                <td><strong>REMARKS:</strong> ${element?.baseTermData?.remarksEntry
-                    ?.description || "___"
-                }</td>
-                            </tr>
-                        </table>
-                    </div>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                         v?.remarks?.details?.[0]?.fields?.[0]
+                                           ?.value ?? ""
+                                       }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           </table>
+                   		<!--// Basic Details -->
 
-                    <div class="signatures">
-                        ${config.signatures
-                    .map(
-                        (sig) => `
-                            <div>
-                                <p>_____________</p>
-                                <p>${sig}</p>
-                            </div>
-                        `
-                    )
-                    .join("")}
-                    </div>
+                   		<table cellspacing="0" style="width:100%; margin:auto">
+                   			<tr>
+                   				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+                   			</tr>
+                   		</table>
 
-                    <div>
-                        ${element.footer
-                    ? element.footer
-                    : config.footnotes
-                        .map(
-                            (note) => `
-                            <p style="font-size: 12px;">${note}</p>
-                        `
-                        )
-                        .join("")
-                }
-                    </div>
-                </div>
-            </page>
-        `;
+                   		<!-- Term-->
+                   		<table style="width:100%;border:1px solid;" cellspacing="0" cellpadding="0">
+                   			<tr>
+                   				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:18px; font-weight:bold; color:#000000;">SCHOLASTIC AREA</td>
+                   			</tr>
+                   		</table>
 
-            studentHtml.appendChild(singleStudentHtml);
+                   		<!-- Main Subject Table -->
+             <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+               <tr style="background-color:#e7e7e7;">
+                 <td  style="font-size:18px;border-bottom:1px solid;font-weight:bold" rowspan="1" align="left" style="width:16%; font-weight:bold; font-size:10pt;">SUBJECT</td>
+                 <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid;font-weight:bold" colspan="1" align="center" style="width:14%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">MAX MARKS</td>
+                 <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid;font-weight:bold" colspan="1" align="center" style="width:14%; border-left: solid 0.264583333mm #000000;border-right: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">OBTD. MARKS</td>
+               </tr>
+
+               ${markData?.subjectMarksEntryRequests
+                 ?.map(
+                   (subject) => `
+                   <tr >
+                     <td style="font-size:18px;border-bottom:1px solid;" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${subject.subjectName}</td>
+                     <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.max}</td>
+                     <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.status || subject.marks}</td>
+                   </tr>
+                   `
+                 )
+                 .join("")}
+
+               <tr>
+                 <td style="font-size:18px;font-weight:bold" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">GRAND TOTAL</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                   markData?.totalMarks
+                 }</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                   markData?.totalObtained
+                 }</td>
+               </tr>
+               <tr>
+                 <td  align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;font-size:18px">OVERALL PERCENTAGE</td>
+                 <td colspan="2" align="center" style="font-size:18px;width:28%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalPercentage.toFixed(
+                   2
+                 )}%</td>
+               </tr>
+
+
+             </table>
+
+             <!--// Main Subject Table -->
+             <div>
+             <div style=" margin-top:1rem">Remarks: ${
+               v?.remarks?.details?.[0]?.description ?? "-"
+             }</div>
+
+             </div>
+             </div>
+             <div style="display: flex; justify-content: space-between; margin-top:2rem">
+             <div>Date : ${formatDate(new Date())}</div>
+             <div>Place : Faridabad</div>
+           </div>
+
+           <div style="display: flex; justify-content: space-between; margin-top:2rem">
+             <div>Class Teacher</div>
+             <div>Wing Incharge</div>
+             <div>Principal</div>
+           </div>
+           <div style="margin-top:1rem">
+
+             ${v?.footer ?? ""}
+             </div>
+              </page>
+                   `;
+
+          studentHtml.appendChild(singleStudentHtml);
         });
-    };
+      };
 </script>
-
-<script>
-
-
-
-
-
-
-
-
-
-
-</script>
-
-<script>
+ <script>
     window.SetTemplateData([
         {
-            header: ``,
-            footer: ``,
+            header: `< div style = "display: flex; align-items: center; justify-content:center; margin: 0px; padding: 0px;" >
+        <img src="school_logo_url" alt="School Logo" class="logo">
+            <div>
+                <h1 style="margin: 0px;">DE INDIAN</h1>
+                <h2 style="margin: 0px;">PUBLIC SCHOOL</h2>
+                <p style="margin: 0px;">GIVE WINGS TO YOUR DREAMS</p>
+                <p style="margin: 0px;">A Senior Secondary School, Affiliated to CBSE</p>
+            </div>
+            <img src="school_logo_url" alt="School Logo" class="logo">
+            </div>`,
+            footer: `<p style="font-size: 0.8em; margin-top: 20px;">Note: This is a computer generated Report Card. It does not need any signature. In case of any typing error or discrepancy please contact the Class Teacher.</p>`,
             student: {
                 dob: "06-01-2016",
                 admissionNo: "20220146",
@@ -2019,7 +1927,7 @@ ${element.header
                     {
                         subjectUid: "ba147ef7-a9e6-48e0-8d80-e09e09230ec2",
                         subjectName: "ART & WORK EDUCATION",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2033,7 +1941,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "ba147ef7-a9e6-48e0-8d80-e09e09230ec2",
                                 subjectName: "ART & WORK EDUCATION",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2072,7 +1980,7 @@ ${element.header
                     {
                         subjectUid: "cb374bd7-c0c5-4cfb-b307-cc9e1c89749e",
                         subjectName: "MUSIC",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2086,7 +1994,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "cb374bd7-c0c5-4cfb-b307-cc9e1c89749e",
                                 subjectName: "MUSIC",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2125,7 +2033,7 @@ ${element.header
                     {
                         subjectUid: "00d080dc-e75d-40fb-939a-19192933e011",
                         subjectName: "DANCE",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2139,7 +2047,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "00d080dc-e75d-40fb-939a-19192933e011",
                                 subjectName: "DANCE",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2178,7 +2086,7 @@ ${element.header
                     {
                         subjectUid: "002c09c5-6f0d-48b6-afb0-a9c4c1348806",
                         subjectName: "BASKETBALL",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2192,7 +2100,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "002c09c5-6f0d-48b6-afb0-a9c4c1348806",
                                 subjectName: "BASKETBALL",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2231,7 +2139,7 @@ ${element.header
                     {
                         subjectUid: "affce34f-bde9-47a5-ae7d-b34ef66b263e",
                         subjectName: "SKATING",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2245,7 +2153,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "affce34f-bde9-47a5-ae7d-b34ef66b263e",
                                 subjectName: "SKATING",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2284,7 +2192,7 @@ ${element.header
                     {
                         subjectUid: "d0e3438d-0f07-4a04-8e9c-c5e3162d0027",
                         subjectName: "SWIMMING & YOGA",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2298,7 +2206,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d0e3438d-0f07-4a04-8e9c-c5e3162d0027",
                                 subjectName: "SWIMMING & YOGA",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2337,7 +2245,7 @@ ${element.header
                     {
                         subjectUid: "d14b068c-2e95-4d43-8135-b8645e4eeae8",
                         subjectName: "NUTRITIVE DEVELOPMENT",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2351,7 +2259,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d14b068c-2e95-4d43-8135-b8645e4eeae8",
                                 subjectName: "NUTRITIVE DEVELOPMENT",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2390,7 +2298,7 @@ ${element.header
                     {
                         subjectUid: "fa39debf-1696-4c49-9393-dc5f1e62e514",
                         subjectName: "COURTEOUSNESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2404,7 +2312,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "fa39debf-1696-4c49-9393-dc5f1e62e514",
                                 subjectName: "COURTEOUSNESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2443,7 +2351,7 @@ ${element.header
                     {
                         subjectUid: "900b7869-e0cb-4400-ba13-24aab0681eb2",
                         subjectName: "ATTENTIVENESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2457,7 +2365,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "900b7869-e0cb-4400-ba13-24aab0681eb2",
                                 subjectName: "ATTENTIVENESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 0,
                                 grade: "D",
@@ -2496,7 +2404,7 @@ ${element.header
                     {
                         subjectUid: "544c45c0-1559-4e87-8e03-0210918ae7dd",
                         subjectName: "PERSONAL CLEANLINESS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2510,7 +2418,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "544c45c0-1559-4e87-8e03-0210918ae7dd",
                                 subjectName: "PERSONAL CLEANLINESS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2549,7 +2457,7 @@ ${element.header
                     {
                         subjectUid: "f7d8cdf7-02ea-49b6-b550-f012428c2090",
                         subjectName: "CONFIDENCE AND INITIATIVE",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2563,7 +2471,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "f7d8cdf7-02ea-49b6-b550-f012428c2090",
                                 subjectName: "CONFIDENCE AND INITIATIVE",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2602,7 +2510,7 @@ ${element.header
                     {
                         subjectUid: "43621d59-abbe-4f2a-be20-2e5f34367345",
                         subjectName: "INTRAPERSONAL SKILLS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2616,7 +2524,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "43621d59-abbe-4f2a-be20-2e5f34367345",
                                 subjectName: "INTRAPERSONAL SKILLS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2655,7 +2563,7 @@ ${element.header
                     {
                         subjectUid: "13380468-c78d-4043-919b-738b35a859ad",
                         subjectName: "INTERPERSONAL SKILLS",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2669,7 +2577,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "13380468-c78d-4043-919b-738b35a859ad",
                                 subjectName: "INTERPERSONAL SKILLS",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 27,
                                 grade: "A+",
@@ -2708,7 +2616,7 @@ ${element.header
                     {
                         subjectUid: "d88ddcf7-5f3d-4cd4-b561-6e30484d29a0",
                         subjectName: "SHARING AND CARING",
-                        subjectNature: "2A LIFE-SKILLS",
+                        subjectNature: "THEORY",
                         markSheetReport: [
                             {
                                 studentInfoUid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
@@ -2722,7 +2630,7 @@ ${element.header
                                 terms: "MID TERM",
                                 subjectUid: "d88ddcf7-5f3d-4cd4-b561-6e30484d29a0",
                                 subjectName: "SHARING AND CARING",
-                                subjectNature: "2A LIFE-SKILLS",
+                                subjectNature: "THEORY",
                                 max: 30,
                                 obtained: 0,
                                 grade: "D",
@@ -2765,8 +2673,6 @@ ${element.header
                 overAllGrade: "B2",
                 visible: false,
             },
-
-
             remarks: {
                 uid: null,
                 terms: null,
@@ -4047,6 +3953,6 @@ ${element.header
             },
         },
     ]);
-</script>
+</script> 
 
 </html>
