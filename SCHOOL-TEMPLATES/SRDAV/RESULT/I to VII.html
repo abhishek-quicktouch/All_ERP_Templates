@@ -105,7 +105,14 @@
                 return "F";
             },
         };
-
+        function handleGetDate() {
+            let date = new Date(Date.now())
+            console.log(date.getUTCMonth())
+            let day = date.getDate().toString().padStart(2, "0")
+            let month = (date.getMonth() + 1).toString().padStart(2, "0")
+            let year = date.getFullYear()
+            return `${day}-${month}-${year}`
+        }
         const generateStudentInfoTable = (studentInfoFields, student) => {
 
             const [presentDay, totalDay] = student["attendance"].split("/")
