@@ -213,6 +213,15 @@ Processed
 
 
 
+        function handleGetDate() {
+            let date = new Date(Date.now())
+            console.log(date.getUTCMonth())
+            let day = date.getDate().toString().padStart(2, "0")
+            let month = (date.getMonth() + 1).toString().padStart(2, "0")
+            let year = date.getFullYear()
+            return `${day}-${month}-${year}`
+        }
+
         function generateCoScholasticRows(subjects) {
             const coScholasticSubjects = subjects?.filter(
                 (subject) => subject?.subjectAllResponse?.nature === "1B Scholastic"
@@ -471,8 +480,8 @@ ${element.student.studentInfoResponse[0]?.state}</td>
              
                <th>${scholasticResult.totalPossibleMarks}</th>
                                 
-                                <tH >${scholasticResult.totalMarksObtained
-                }</tH>
+                                <tH >${scholasticResult.totalMarksObtained.toFixed(1)}
+                </tH>
                                 </tr>
                                  
                                 <tr>
@@ -512,7 +521,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                      
                          <td style="white-space: nowrap;" >
                             
-                                <strong>ATTENDANCE:</strong> ${element.student.attendance || ""
+                                <strong>ATTENDANCE:</strong> ${element?.remarks?.fields.find(e => e.title.toLowerCase() === "attendance")?.value || ""
                 }    
                             </td >
                         </tr >
@@ -526,14 +535,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                     <table style="border: none;
     margin-top: 10px;">
                         <tr style="border-top: none">
-                            <th style="width: 30%; text-align: left">DATE: ${element.baseTermData?.remarksEntry?.createdDate ||
-                    viewTemplate
-                    ? "__________"
-                    : new Date().toLocaleDateString("en-GB", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })
+                            <th style="width: 30%; text-align: left">DATE: ${element?.printDate || handleGetDate()
                 }</th>
                             <td style="width: 30%; text-align: left ; border-top: none ; border-bottom: none"></td>
                             <th style="width: 30%; text-align: left">PLACE:${element.baseTermData?.school?.city || "______"
@@ -548,9 +550,9 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                             <p style=" height: 60px" ></p>
                             <p>CLASS TEACHER</p>
                         </div>
-                        <div>
-                            <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_22_114274846.png" alt="School Logo" class="logo"/>
-                            <p>WING INCHARGE</p>
+                                             <div>
+                            <img style="width: 120px; height: 60px " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_35_704961643.png" alt="School Logo" class="logo"/>
+                            <p>Academic Co ordinator</p>
                         </div>
                         <div>
                             <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_23_07_369478690.png" alt="School Logo" class="logo"/>
@@ -581,6 +583,9 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             studentHtml.appendChild(singleStudentHtml);
         });
     };
+
+
+
 </script>
 
 <!-- <script>

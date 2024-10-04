@@ -14,21 +14,31 @@
 <script>
     window.SetTemplateData = function (dataList) {
         function formatDate(date) {
-          const day = String(date.getDate()).padStart(2, "0");
-          const month = String(date.getMonth() + 1).padStart(2, "0");
-          const year = String(date.getFullYear());
-          return `${day}/${month}/${year}`;
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = String(date.getFullYear());
+            return `${day}/${month}/${year}`;
         }
+
+        function handleGetDate() {
+            let date = new Date(Date.now())
+            console.log(date.getUTCMonth())
+            let day = date.getDate().toString().padStart(2, "0")
+            let month = (date.getMonth() + 1).toString().padStart(2, "0")
+            let year = date.getFullYear()
+            return `${day}-${month}-${year}`
+        }
+
         const multipleStudents = dataList;
         const studentHtml = document.getElementById("studentsList");
         studentHtml.innerHTML = "";
         multipleStudents?.forEach((v) => {
-          console.log(v);
-          const student = v.student;
-          const markData = v.markData.termWiseSubjectResponse?.[0];
-          const singleStudentHtml = document.createElement("div");
-          singleStudentHtml.style.pageBreakAfter = "always";
-          singleStudentHtml.innerHTML = `
+            console.log(v);
+            const student = v.student;
+            const markData = v.markData.termWiseSubjectResponse?.[0];
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakAfter = "always";
+            singleStudentHtml.innerHTML = `
                              <style type="text/css">
                    @page {
                    size: A4
@@ -104,21 +114,18 @@
                    		<!-- Basic Details -->
                            <table cellspacing="0" style="width: 100%; margin:auto; border: solid 0.264583333mm #000000;">
                            <tr>
-                         <div style="text-align:center;margin:4px 0;font-weight:bold;font-size:24px;text-transform:uppercase"> ${
-                           markData?.termName
-                         } Performance
+                         <div style="text-align:center;margin:4px 0;font-weight:bold;font-size:24px;text-transform:uppercase"> ${markData?.termName
+                } Performance
                            </div>
-                            <div style="text-align:center;margin:2px 0;font-weight:bold;font-size:24px;margin-bottom:1.5rem;">Session - ${
-                              v?.markData?.academicSession
-                            }
+                            <div style="text-align:center;margin:2px 0;font-weight:bold;font-size:24px;margin-bottom:1.5rem;">Session - ${v?.markData?.academicSession
+                }
                            </div>
                            <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
                                <table width="100%" border="0" cellspacing="0" >
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student?.studentName
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.studentName
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -126,9 +133,8 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student?.admissionNo
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.admissionNo
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -138,11 +144,10 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">:  ${
-                                         student?.fatherName
-                                           ? `MR. ${student?.fatherName}`
-                                           : " - "
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">:  ${student?.fatherName
+                    ? `MR. ${student?.fatherName}`
+                    : " - "
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -151,9 +156,8 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student.className
-                                       }-${student.sectionName}</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student.className
+                }-${student.sectionName}</td>
                                    </tr>
                                </table>
                            </td>
@@ -163,11 +167,10 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student?.motherName
-                                           ? `MRS. ${student?.motherName}`
-                                           : " - "
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.motherName
+                    ? `MRS. ${student?.motherName}`
+                    : " - "
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -176,9 +179,8 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student?.rollNo
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.rollNo
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -188,9 +190,8 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         student?.dob
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.dob
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -199,10 +200,9 @@
                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                    <tr>
                                        <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
-                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                                         v?.remarks?.details?.[0]?.fields?.[0]
-                                           ?.value ?? ""
-                                       }</td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${v?.remarks?.details?.[0]?.fields?.[0]
+                    ?.value ?? ""
+                }</td>
                                    </tr>
                                </table>
                            </td>
@@ -232,31 +232,29 @@
                </tr>
 
                ${markData?.subjectMarksEntryRequests
-                 ?.map(
-                   (subject) => `
+                    ?.map(
+                        (subject) => `
                    <tr >
                      <td style="font-size:18px;border-bottom:1px solid;" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${subject.subjectName}</td>
                      <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.max}</td>
                      <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.status || subject.marks}</td>
                    </tr>
                    `
-                 )
-                 .join("")}
+                    )
+                    .join("")}
 
                <tr>
                  <td style="font-size:18px;font-weight:bold" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">GRAND TOTAL</td>
-                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
-                   markData?.totalMarks
-                 }</td>
-                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
-                   markData?.totalObtained
-                 }</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalMarks
+                }</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalObtained
+                }</td>
                </tr>
                <tr>
                  <td  align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;font-size:18px">OVERALL PERCENTAGE</td>
                  <td colspan="2" align="center" style="font-size:18px;width:28%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalPercentage.toFixed(
-                   2
-                 )}%</td>
+                    2
+                )}%</td>
                </tr>
 
 
@@ -264,14 +262,14 @@
 
              <!--// Main Subject Table -->
              <div>
-             <div style=" margin-top:1rem">Remarks: ${
-               v?.remarks?.details?.[0]?.description ?? "-"
-             }</div>
+             <div style=" margin-top:1rem">Remarks: ${v?.remarks?.details?.[0]?.description ?? "-"
+                }</div>
 
              </div>
              </div>
              <div style="display: flex; justify-content: space-between; margin-top:2rem">
-             <div>Date : ${formatDate(new Date())}</div>
+             <div>Date :${v?.printDate || handleGetDate()
+                }</div>
              <div>Place : Faridabad</div>
            </div>
 
@@ -287,11 +285,11 @@
               </page>
                    `;
 
-          studentHtml.appendChild(singleStudentHtml);
+            studentHtml.appendChild(singleStudentHtml);
         });
-      };
+    };
 </script>
- <script>
+<script>
     window.SetTemplateData([
         {
             header: `< div style = "display: flex; align-items: center; justify-content:center; margin: 0px; padding: 0px;" >
@@ -3953,6 +3951,6 @@
             },
         },
     ]);
-</script> 
+</script>
 
 </html>

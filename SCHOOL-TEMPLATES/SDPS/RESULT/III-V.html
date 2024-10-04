@@ -49,7 +49,7 @@
               str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
                 }</td>${d.markSheetReport
                   .map((v) => {
-                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ?"bold;":""} font-size:11pt;">${attendanceValue[v?.status] || Math.round(v?.obtained)
+                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""} font-size:11pt;">${attendanceValue[v?.status] || Math.round(v?.obtained)
                       }</td>`;
                   })
                   .join(
@@ -63,7 +63,7 @@
               totalStr += `<tr>
       
                    <td style="text-align:left;font-weight:bold; border:none;">Total : ${Math.round(marksData?.markData?.marksObtained)}</td> 
-                   <td colspan=5 style="text-align:left;font-weight:bold;  border:none;"></td> 
+                   <td colspan=${marksData?.markData?.markSheetTerms.length} style="text-align:left;font-weight:bold;  border:none;"></td> 
                    <td colspan=2 style="text-align:right;font-weight:bold; border:none; " >Percentage : ${Math.round(marksData?.markData?.percentage)}%</td>
                   </td>
              </tr>
@@ -88,7 +88,7 @@
 
       subjects.forEach((sub) => {
         str += `<tr><td class="align-left" colspan="10" style="padding-left: 0.3rem;">${sub?.subjectAllResponse?.subjectName}</td>
-              <td align="center" style="font-weight:${sub?.remarkStatus ?"bold" :""}">${attendanceValue[sub?.remarkStatus] || sub?.grade}</td></tr> `;
+              <td align="center" style="font-weight:${sub?.remarkStatus ? "bold" : ""}">${attendanceValue[sub?.remarkStatus] || sub?.grade}</td></tr> `;
       });
 
       return str;
@@ -279,7 +279,7 @@
           <div style="margin: 4px 0;text-align: center;font-size:14px;font-weight:bold;margin-top:8px;">CO-SCHOLASTIC AREAS</div>
           <tr style="margin-top:4px;">
               <th class="alignLeft" colspan="10" style="padding-left: 0.3rem;">SUBJECTS</th>
-              <th style="min-width:78px;">GRADE</th>
+              <th style="min-width:100px;">GRADE</th>
           </tr>
         ${getCoScholasticSub(st)}
 
