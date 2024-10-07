@@ -66,6 +66,19 @@
             styles: `
             @page { size: A4; margin: 10mm; }
             @media print { @page { margin: auto; size: A4; } }
+              body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png') no-repeat center;
+                background-size: 80%;
+                opacity: 0.1;
+                z-index: -1;
+                pointer-events: none;
+            }
             body { font-family: Arial, sans-serif; }
             strong{ font-size: 12px; }
             .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
@@ -115,34 +128,43 @@
         }
         const generateStudentInfoTable = (studentInfoFields, student) => {
 
-            const [presentDay, totalDay] = student["attendance"].split("/")
+            const [presentDay, totalDay] = student["attendance"] ? student["attendance"].split("/") : [null, null];
 
             return `
-            <div class="section">
-                <table>
-                    ${studentInfoFields
+    <div class="section">
+        <table>
+            ${studentInfoFields
                     .map(
                         (field) => `
-                            <tr>
-                                <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"
-                            }">${field.label}</th>
-                                <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"
-                            }">: ${student[field.key] || ""}</td>
-                                ${field.additionalInfo
+
+                    <tr>
+                        <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"}">
+                            ${field.label}
+                        </th>
+                        <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"}">
+                            : ${field.key === "className" ? student[field.key] + " - " + student["sectionName"] : student[field.key] || ""}
+                        </td>
+
+                        ${field.additionalInfo
                                 ? `
-                                    <th style="text-align:left;border-right:none;width: 20%">${field.additionalInfo.label}</th>
-
-                                    <td style="text-align:left;border-left:none">: ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"] : field.additionalInfo.key === "attendance" ? Number(presentDay).toFixed(0) + "/" + Number(totalDay).toFixed(0) : student[field.additionalInfo.key] || ""}</td>`
+                            <th style="text-align:left;border-right:none;width: 20%">
+                                ${field.additionalInfo.label}
+                            </th>
+                            <td style="text-align:left;border-left:none">
+                                : ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"]
+                                    : field.additionalInfo.key === "attendance" ?
+                                        Number(presentDay).toFixed(0) + "/" + Number(totalDay).toFixed(0) +
+                                        " (" + Number((presentDay / totalDay) * 100).toFixed(0) + "%)"
+                                        : student[field.additionalInfo.key] || ""}
+                            </td>`
                                 : ""}
-                            </tr>
-                          `
-
+                    </tr>
+                `
                     )
                     .join("")}
-                </table>
-            </div>
-        `;
-
+        </table>
+    </div>
+`;
         };
 
         const generateScholasticTable = (subjects, termConfig) => {
@@ -333,7 +355,7 @@
                         }">
                 <tr>
 
-                    <th colspan="4" style="text-align:center;">${mainSubject === "ENGLISH" || mainSubject === "HINDI" || mainSubject === "SANSKRIT" ? `LANGUAGE ${["I", "II", "III"][index]} (${mainSubject}) ` : mainSubject}</th>
+                    <th colspan="4" style="text-align:center;">${mainSubject === "ENGLISH" ? `LANGUAGE I (${mainSubject}) ` : mainSubject === "HINDI" ? `LANGUAGE II (${mainSubject}) ` : mainSubject === "SANSKRIT" ? `LANGUAGE III (${mainSubject}) ` : mainSubject}</th>
                     
 
                 </tr>
@@ -532,7 +554,7 @@
             <div style="line-height: 100%; padding-bottom:0mm; text-align:center; font-size:10pt; color:#000; font-weight:bold; text-decoration: underline; text-underline-offset: 3px;">TEACHER REMARKS</div>
             <div>
                 <div style="width: 100%; margin-top: 5px;border-bottom: solid 0.3mm #000000;">${remarks || "--"}</div>
-                <div style="display: flex;justify-content: space-between;">
+                <div style="display: flex;justify-content: space-between; margin-top: 20px;">
                     <div style="margin-top:30px">  
                         <p>${classTeacher || ""}</p>
                         <strong>CLASS TEACHER</strong>
@@ -571,7 +593,11 @@
                 </div>
                 ${generateStudentInfoTable(config.studentInfoFields1, student.student)}
                 <div class="section">
-                    <h4 style="text-align:center">SCHOLASTIC AREAS</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="width: 40%;"></div>
+                        <h4>SCHOLASTIC AREAS</h4>
+                        <span style="text-align:right ; font-size:9pt">(Grading on 8 point scale-  A1,A2,B1,B2,C1,C2,D,E )</span>
+                    </div>
                     ${generateScholasticTable(student?.markData?.subjectWiseMarkSheetReportResponses, termConfig)}
                 </div>
                 <div class="section">
@@ -607,8 +633,8 @@
 
 <table>
                 <tr>
-                    <td colspan="4" style="text-align:left ; border-right:none">${student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.subjectAllResponse?.subjectName} </td>
-                    <td style="text-align:right; border-left:none"> [Grading 4 points scale (A, B, C, D)]</td>
+                    <td colspan="4" style="text-align:left ; border-right:none">${student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.subjectAllResponse?.subjectName} <strong style="margin-left: 10px">     [Grading 4 points scale (A, B, C, D)]</strong></td>
+                    
                     <td style="width: 20%; text-align:center ; font-weight:${student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.status ? "bold" : "normal"}" >${student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.status ?
                     student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.status :
                     student?.baseTermData?.subject.filter((s) => s.subjectAllResponse?.nature === "MINOR").find((s) => s?.subjectAllResponse?.subjectName === "NAITIK SHIKSHA")?.grade

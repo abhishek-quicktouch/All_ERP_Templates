@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+    <div style="margin: 20px" id="studentarr">
+        Something went wrong. Please try again later.
+    </div>
+</body>
+<script>
+    window.SetTemplateData = function (dataarr) {
+        const perToGrade = (per) => {
+            if (per >= 91 && per <= 100) {
+                return "A1";
+            } else if (per >= 81 && per <= 90) {
+                return "A2";
+            } else if (per >= 71 && per <= 80) {
+                return "B1";
+            } else if (per >= 61 && per <= 70) {
+                return "B2";
+            } else if (per >= 51 && per <= 60) {
+                return "C1";
+            } else if (per >= 41 && per <= 50) {
+                return "C2";
+            } else if (per >= 33 && per <= 40) {
+                return "D";
+            } else if (per >= 0 && per < 33) {
+                return "E";
+            }
+        };
+
+        const InstructionsMarks = [
+            {
+                key: "Marks Range",
+                value: "Grade",
+            },
+            {
+                key: "91-100",
+                value: "A1",
+            },
+            {
+                key: "81-90",
+                value: "A2",
+            },
+            {
+                key: "71-80",
+                value: "B1",
+            },
+            {
+                key: "61-70",
+                value: "B2",
+            },
+            {
+                key: "51-60",
+                value: "C1",
+            },
+            {
+                key: "41-50",
+                value: "C2",
+            },
+            {
+                key: "33-40",
+                value: "D",
+            },
+            {
+                key: "32 & Below",
+                value: "E (Needs Improvement)",
+            },
+        ];
+
+        let monthsList = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
+
+        const handleGenerateAttendance = (dataarr) => {
+            const output = dataarr?.map((el) => {
+                const attendanceFromRemark = el?.remarks?.details[0]?.fields;
+                const attendance = el?.student?.attendance;
+                const temp = attendanceFromRemark?.find(
+                    (v) => v.title.toLowerCase() === "present days"
+                );
+                const temp2 = attendanceFromRemark?.find(
+                    (v) => v.title.toLowerCase() === "working days"
+                );
+                const temp3 = attendanceFromRemark?.find(
+                    (v) => v.title.toLowerCase() === "attendance record"
+                );
+
+                const currentYear = new Date();
+                const Year = currentYear?.getFullYear();
+                const months = monthsList[currentYear.getMonth()];
+                if (attendanceFromRemark?.length && temp && temp2) {
+                    const totalDays = +temp2?.value || "-";
+                    const present = +temp?.value || "-";
+                    const remarks = temp3?.value || "-";
+                    return {
+                        totalDays,
+                        present,
+                        percentage:
+                            ((present / totalDays) * 100).toFixed(0) !== "NaN"
+                                ? `${((present / totalDays) * 100).toFixed(0)}%`
+                                : 0,
+                        remarks:
+                            remarks != "-"
+                                ? remarks
+                                : `Attendance Record upto ${months + " " + Year}`,
+                        description: el?.remarks?.details[0]?.description || "",
+                    };
+                } else {
+                    if (attendance) {
+                        const temp = attendance?.split("/");
+                        const totalDays = +temp[1] || "-";
+                        const present = +temp[0] || "-";
+                        const remarks = temp3?.value || "-";
+                        return {
+                            totalDays,
+                            present,
+                            percentage:
+                                ((present / totalDays) * 100).toFixed(0) !== "NaN"
+                                    ? `${((present / totalDays) * 100).toFixed(0)}%`
+                                    : 0,
+                            remarks:
+                                remarks != "-"
+                                    ? remarks
+                                    : `Attendance Record upto ${months + " " + Year}`,
+                            description: el?.remarks?.details[0]?.description || "",
+                        };
+                    } else {
+                        return {
+                            remarks: `Attendance Record upto ${months + " " + Year}`,
+                            description: el?.remarks?.details[0]?.description || "",
+                        };
+                    }
+                }
+            });
+            return output[0];
+        };
+
+        const convertData = (dataarr) => {
+            const res = dataarr?.map((data) => {
+                const address = `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.houseNo
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.houseNo}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.street
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.street}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                        ?.landmark
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.landmark}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.area
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.area}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                        ?.district
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.district}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.city
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.city}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.state
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.state}, `
+                        : ""
+                    }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.pincode
+                        ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.pincode}`
+                        : ""
+                    }`;
+                return {
+                    academicSession: {
+                        year: data?.markData?.academicSession || "",
+                        reportName:
+                            data?.markData?.termWiseSubjectResponse[0]?.termName || "",
+                        class: data?.markData?.className || "",
+                        classTeacher: "",
+                    },
+                    studentInfo: [
+                        {
+                            key: "STUDENT'S NAME",
+                            value: data?.markData?.studentName || "",
+                        },
+                        {
+                            key: "ADMISSION NO.",
+                            value: data?.markData?.admissionNo || "",
+                        },
+                        {
+                            key: "CLASS / SECTION",
+                            value: `${data?.markData?.className || ""}-${data?.markData?.sectionName || ""
+                                }`,
+                        },
+                        { key: "ROLL NO.", value: data?.markData?.rollNo || 0 },
+
+                        {
+                            key: "FATHER'S NAME",
+                            value: data?.student?.fatherName || "",
+                        },
+                        {
+                            key: "MOTHER'S NAME",
+                            value: data?.student?.motherName || "",
+                        },
+                        {
+                            key: "PHONE NUMBER",
+                            value: data?.student?.studentInfoResponse[0]?.mobileNumber || "",
+                        },
+                        {
+                            key: "DATE OF BIRTH",
+                            value: data?.student?.dob || "",
+                        },
+                        {
+                            key: "ADDRESS",
+                            value: address || "",
+                        },
+                    ],
+
+                    studentResult: attachments(data),
+                    studentFinalResult:
+                        data?.markData?.termWiseSubjectResponse?.[0]?.totalPercentage ?? 0,
+
+                    remarks: handleGenerateAttendance([data]),
+                    header: data?.header || "",
+                    footer: data?.footer || "",
+                };
+            });
+            return res;
+        };
+
+        const attachments = (data) => {
+            let attachment = [];
+            let subjects = [];
+            data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+                v.subjectMarksEntryRequests.forEach((val) => {
+                    if (!attachment?.find((v) => v == val.attachmentName))
+                        attachment.push(val.attachmentName);
+                })
+            );
+            const res1 = attachment
+                ?.filter((v) => v)
+                ?.map((val) => {
+                    let value = [];
+                    let total = {
+                        theory: 0,
+                        practical: 0,
+                    };
+                    data?.markData?.termWiseSubjectResponse?.forEach((element) => {
+                        let final = {
+                            theory: 0,
+                            practical: 0,
+                            max: 0,
+                            pass: 0,
+                            total: 0,
+                            grade: "A1",
+                        };
+
+                        data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+                            v.subjectMarksEntryRequests.forEach((el) => {
+                                if (val === el.attachmentName) {
+                                    if (el.subjectNature == "THEORY") {
+                                        final.theory = el.marks;
+                                        final.max = final.max + el?.max;
+                                        final.pass = final.pass + el?.min;
+                                        final.total = final.practical + el?.marks;
+                                    }
+                                    if (el.subjectNature == "PRACTICAL") {
+                                        final.practical = el.marks;
+                                        final.max = final.max + el?.max;
+                                        final.pass = final.pass + el?.min;
+                                        final.total = final.theory + el?.marks;
+                                    }
+                                }
+                            })
+                        );
+                        value.push(
+                            final.max || 0,
+                            final.pass || 0,
+                            final.theory !== "Infinity" ? final.theory : 0,
+                            final.practical !== "Infinity" ? final.practical : 0,
+                            final.total || 0,
+                            perToGrade((final.total / final.max) * 100)
+                        );
+                    });
+
+                    return {
+                        key: val,
+                        value,
+                    };
+                });
+
+            data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+                v.subjectMarksEntryRequests.forEach((val) => {
+                    if (!subjects?.find((v) => v == val.subjectName))
+                        if (!val?.attachmentName) {
+                            subjects.push(val.subjectName);
+                        }
+                })
+            );
+            const res2 = subjects
+                ?.filter((v) => v)
+                ?.map((val) => {
+                    let value = [];
+                    let total = {
+                        theory: 0,
+                        practical: 0,
+                    };
+                    data?.markData?.termWiseSubjectResponse?.forEach((element) => {
+                        let final = {
+                            theory: 0,
+                            practical: 0,
+                            max: 0,
+                            pass: 0,
+                            total: 0,
+                            grade: "",
+                        };
+
+                        data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+                            v.subjectMarksEntryRequests.forEach((el) => {
+                                if (val === el?.subjectName) {
+                                    if (val?.toUpperCase() === "DRAWING") {
+                                        if (el.subjectNature == "THEORY") {
+                                            final.theory = "-";
+                                            final.max = "-";
+                                            final.pass = "-";
+                                            final.total = "-";
+                                            (final.practical = "-"), (final.grade = el?.grade);
+                                        }
+                                    } else {
+                                        if (el.subjectNature == "THEORY") {
+                                            final.theory = el.marks;
+                                            final.max = final.max + el?.max;
+                                            final.pass = final.pass + el?.min;
+                                            final.total = final.practical + el?.marks;
+                                        }
+                                    }
+                                }
+                            })
+                        );
+                        value.push(
+                            final.max || 0,
+                            final.pass || 0,
+                            final.theory !== "Infinity" ? final.theory : 0,
+                            final.practical !== "Infinity" ? final.practical : 0,
+                            final.total || 0,
+                            final?.grade || perToGrade((final.total / final.max) * 100)
+                        );
+                    });
+
+                    return {
+                        key: val,
+                        value,
+                    };
+                });
+            return [...res1, ...res2];
+        };
+
+        const termSubHeading = (header, data) => {
+            let value = [];
+            let marks = {
+                theory: 0,
+                practical: 0,
+            };
+            data?.markData?.subjectWiseMarkSheetReportResponses?.forEach((v) => {
+                v.markSheetReport.forEach((val) => {
+                    if (
+                        val.markSheetTermResponse.headerName == header &&
+                        !marks.theory &&
+                        val.subjectNature == "THEORY"
+                    ) {
+                        marks.theory = val.max;
+                    }
+                    if (
+                        val.markSheetTermResponse.headerName == header &&
+                        !marks.practical &&
+                        val.subjectNature == "PRACTICAL"
+                    ) {
+                        marks.practical = val.max;
+                    }
+                });
+            });
+            value.push(marks.theory, marks.practical, marks.theory + marks.practical);
+            return value;
+        };
+
+        const varr = convertData(dataarr);
+
+        const studallhtml = document.getElementById("studentarr");
+        studallhtml.innerHTML = "";
+        varr?.forEach((v) => {
+            const studhtml = document.createElement("div");
+            studhtml.style.pageBreakAfter = "always";
+            studhtml.className = `${v.studentInfo[1].value}-mainBody`
+            studhtml.innerHTML =
+                `<div style="margin-top: 20px">${v?.header || ""}</div>` +
+                `<page orientation="portrait" format="A4" margin="0">
+          <style type="text/css">
+            @page {
+              size: A4;
+            }
+
+            .${v.studentInfo[1].value}-mainBody{
+                position: relative;
+                z-index: 1;
+                padding: 20px;
+                font-size: 16px;
+            }
+
+            * {
+              margin: 0px;
+              padding: 0px;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+
+            td {
+              padding-left: 1mm;
+              padding-right: 1mm;
+              padding-top: 1mm;
+              padding-bottom: 1mm;
+              font-size: 9pt;
+              color: #000000;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+
+            th {
+              padding-left: 1mm;
+              padding-right: 1mm;
+              padding-top: 1mm;
+              padding-bottom: 1mm;
+              background: #e7e7e7;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .signImg {
+              width: 150px;
+              height: auto;
+            }
+
+            @media print {
+              @page {
+                margin: 5mm;
+                size: A4;
+              }
+
+              .signImg {
+                width: 150px;
+                height: auto;
+              }
+            
+               body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-04T06_12_48_971819461.png') no-repeat center;
+                background-size: 80%;
+                opacity: 0.1;
+                z-index: -1;
+                pointer-events: none;
+            }
+            }
+          </style>
+          <table style="width: 100%;">
+            <tr>
+              <td
+                style="width: 100%;"
+                valign="top"
+                align="center"
+              >
+                <div
+                  style="
+                    width: 100%;
+                    line-height: 130%;
+                    padding-bottom: 0mm;
+                    text-align: center;
+                    font-size: 11pt;
+                    color: #000;
+                    font-weight: bold;
+                  "
+                  id=${v.studentInfo[1].value}-AcademicSession
+                ></div>
+              </td>
+            </tr>
+          </table>
+
+          <div
+            style="
+              width: 100%;
+              border: solid 0.264583333mm #000000;
+              padding-top: 8px;
+            "
+            id=${v.studentInfo[1].value}-studentInfo
+          ></div>
+
+          <table
+            cellspacing="0"
+            style="
+              width: 100%;
+              border: solid 0.264583333mm #000000;
+              margin-top: 16px;
+            "
+            id=${v.studentInfo[1].value}-studentResult
+          ></table>
+
+          <table cellspacing="0" style="width: 100%">
+            <tr>
+              <td
+                style="
+                  padding-left: 0mm;
+                  padding-right: 0mm;
+                  padding-top: 0mm;
+                  padding-bottom: 0mm;
+                "
+              >
+                <div style="height: 3mm">&nbsp;</div>
+              </td>
+            </tr>
+          </table>
+
+          <table cellspacing="0" style="width: 100%" id=${v.studentInfo[1].value}-remarks></table>
+
+          <table cellspacing="0" style="width: 100%" id=${v.studentInfo[1].value}-sign></table>
+          <table cellspacing="0" style="width: 100%" id=${v.studentInfo[1].value}-footer></table>
+        </page>`;
+
+            studallhtml.appendChild(studhtml);
+            if (v) {
+                // Academic session Part
+                const academicSessionEle = document.getElementById(
+                    `${v.studentInfo[1].value}-AcademicSession`
+                );
+                if (academicSessionEle) {
+                    if (v.academicSession) {
+                        academicSessionEle.innerHTML = `Academic Session : ${v.academicSession.year} <br />${v.academicSession.reportName}<br />`;
+                    } else {
+                        academicSessionEle.innerHTML =
+                            "Academic Session : 2023-2024<br />Annual Report Card<br />";
+                    }
+                }
+
+                // student details part
+                const studentInfoEle = document.getElementById(
+                    `${v.studentInfo[1].value}-studentInfo`
+                );
+                if (studentInfoEle) {
+                    let studentArr = v.studentInfo;
+                    if (!studentArr) studentArr = v?.studentInfo;
+
+                    let studentInfoHtml = "";
+
+                    studentArr.forEach((v, i) => {
+                        // let style = false;
+                        // if (i % 2 === 0) {
+                        //   style = true;
+                        // }
+
+                        studentInfoHtml =
+                            studentInfoHtml +
+                            `<div style="display: flex; margin-bottom: 2px; margin-left: 5px">
+                <div
+                  style="
+                    width: 17%;
+                    text-transform: uppercase;
+                    padding-left: 0mm;
+                    padding-right: 0mm;
+                    padding-top: 0mm;
+                    padding-bottom: 0mm;
+                    font-size: 12px
+                  "
+                >
+                  <strong>${v.key}</strong>
+                </div>
+                <div
+                  style="
+                    width: 83%;
+                    padding-left: 0mm;
+                    padding-right: 0mm;
+                    padding-top: 0mm;
+                    padding-bottom: 0mm;
+                    font-size: 12px
+                  "
+                >
+                  : ${v.value}
+                </div>
+              </div>`;
+                        studentInfoEle.innerHTML = studentInfoHtml;
+                    });
+                }
+
+                // student result part with subject
+
+                const StudentResultEle = document.getElementById(
+                    `${v.studentInfo[1].value}-studentResult`
+                );
+                if (StudentResultEle) {
+                    let StudentResultInnerHtml = ``;
+                    let StudentAttandenceHtml = `
+        <!-- Result -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:5mm;">
+				<table cellspacing="0" style="width:100%;">	
+				<tr>
+					<td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+					
+					<td style="width:10%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Percentage:</td>
+					<td style="width:10%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; text-align: center; padding-bottom:0mm; border-bottom: solid 0.264583333mm #000000;">${v?.studentFinalResult?.toFixed(2)
+                        }%</td>
+					
+					<td style="width:5%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&nbsp;</td>
+					<td style="width:5%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Result -->
+
+          <div style="display:flex;
+          border: solid 0.264583333mm #000000;
+          text-align:center;
+          ">
+            <div style="border-right:solid 0.264583333mm #000000;width:33.33%; display:flex; justify-content:center;align-items:center;">
+              <p>${v?.remarks?.remarks || "-"}</p>  
+            </div>
+
+            <div style="border-right:solid 0.264583333mm #000000;width:33.33%">
+              <div style="border-bottom:solid 0.264583333mm #000000; font-family: Arial, Helvetica, sans-serif; font-weight:550; font-size:11pt; padding:5px;">
+                <p>Total Working Days</p> 
+              </div>
+              <div style="border-bottom:solid 0.264583333mm #000000; padding:3px;font-size:10pt;">
+                ${v?.remarks?.totalDays || "-"}
+              </div>
+              <div style="padding:3px;font-size:10pt;font-weight:550">
+                <p>Percentage</p>   
+              </div>
+            </div>
+
+            <div style=" width:33.33%;">
+              <div style="border-bottom:solid 0.264583333mm #000000;font-family: Arial, Helvetica, sans-serif;font-weight:550; font-size:11pt; padding:5px;">
+                <p>Attendance</p> 
+              </div>
+
+              <div style="border-bottom:solid 0.264583333mm #000000; padding:3px;font-size:10pt;">
+                ${v?.remarks?.present || "-"}
+              </div>
+
+              <div style="padding:3px; font-size:10pt;">
+                ${v?.remarks?.percentage || "-"}
+              </div>
+            </div>
+          </div>`;
+
+                    let StudentResultArr = v.studentResult;
+                    if (!StudentResultArr) StudentResultArr = v.studentResult;
+
+                    let termArray = v.termArray;
+                    if (!termArray) {
+                        termArray = v.termArray;
+                    }
+
+                    StudentResultInnerHtml =
+                        StudentResultInnerHtml +
+                        `<tr>
+          <th
+            align="left"
+            style="
+              width: 18.8%;
+              font-size: 9pt;
+              font-weight: bold;
+              border-bottom: solid 0.264583333mm #000000;
+            "
+          >
+            SUBJECT
+          </th>
+          ${[
+                            "MAX MARKS",
+                            "PASS MARKS",
+                            "THEORY",
+                            "PRACTICAL",
+                            "TOTAL MARKS",
+                            "GRADE",
+                        ]
+                            ?.map((el) => {
+                                return `<th
+            align="center"
+            style="
+              width: 13.7%;
+              font-size: 9pt;
+              font-weight: bold;
+              border-left: solid 0.264583333mm #000000;
+            "
+          >
+            ${el}
+          </th>`;
+                            })
+                            .join("")}
+        </tr>`;
+
+                    StudentResultInnerHtml =
+                        StudentResultInnerHtml +
+                        `<tr>
+          `;
+
+                    StudentResultArr.forEach((v, i) => {
+                        StudentResultInnerHtml =
+                            StudentResultInnerHtml +
+                            `<tr>
+            <td
+            align="left"
+            valign="middle"
+            style="width: 26%; border-top: ${i === 0 ? "none" : "solid 0.264583333mm #000000"
+                            }"
+          >
+            ${v.key}
+          </td>
+          ${v.value
+                                ?.map(
+                                    (el) =>
+                                        ` <td
+            valign="top"
+            align="center"
+            style="
+              width: 8%;
+              border-left: solid 0.264583333mm #000000;
+              border-top: solid 0.264583333mm #000000;
+            "
+          >
+           ${el}
+          </td>`
+                                )
+                                .join("")}
+        </tr>`;
+                    });
+
+                    let StudentInstructionTable = `
+          <div style="text-align:center">
+           <div>
+            <h3 style="margin-top: 20px">Instructions</h3>
+            <div style="display: flex; margin-top:10px;margin-bottom:10px">
+              ${InstructionsMarks?.map((el, i) => {
+                        return `<div 
+                style="width:${i === 0 ? "15%" : i === 8 ? "25%" : "10%"};
+                font-size:10pt;
+                font-weight:${i === 0 ? "550" : "500"};
+                ">
+
+                <div 
+                style="border-top:1px solid;
+                padding:5px;
+                border-left: 1px solid;
+                border-bottom: 1px solid;
+                border-right:${i === 8 ? "1px solid" : "none"}
+                " >${el.key}</div>
+
+                <div style="padding:5px;
+                border-left: 1px solid;
+                border-bottom: 1px solid;
+                border-right:${i === 8 ? "1px solid" : "none"}
+                ">${el.value}</div>
+                </div>`;
+                    }).join("")}
+            </div>  
+          </div>
+          </div>
+          `;
+
+                    let StudentResultTotal = v.StudentResultTotal;
+                    if (!StudentResultTotal)
+                        StudentResultTotal = { number: "385.2", percentage: "77.1" };
+
+                    StudentResultEle.innerHTML = StudentResultInnerHtml;
+
+                    const StudentRemarks = document.getElementById(
+                        `${v.studentInfo[1].value}-remarks`
+                    );
+                    let remarks = v?.remarks;
+                    if (!remarks) {
+                        remarks = v.remarks;
+                    }
+                    StudentRemarks.innerHTML =
+                        StudentAttandenceHtml +
+                        StudentInstructionTable +
+                        `<tr>
+                  <td style="width: 100%; font-size: 11pt">
+                    <table width="100%" border="0" cellspacing="5" cellpadding="0">
+                      <tr>
+                        <td
+                          style="
+                            width: 22%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                            padding-right: 1pt;
+                          "
+                        >
+                          <strong>Class Teacher's Remarks </strong>
+                        </td>
+                        <td
+                          style="
+                            width: 90%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                          "
+                        >
+                          : ${remarks?.description}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style="
+                            width: 22%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                            padding-right: 1pt;
+                          "
+                        >
+                          <strong>Place </strong>
+                        </td>
+                        <td
+                          style="
+                            width: 90%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                          "
+                        >
+                          : ${"Banaso"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style="
+                            width: 22%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                            padding-right: 1pt;
+                          "
+                        >
+                          <strong>Date </strong>
+                        </td>
+                        <td
+                          style="
+                            width: 90%;
+                            padding-left: 0mm;
+                            padding-right: 0mm;
+                            padding-top: 0mm;
+                            padding-bottom: 0mm;
+                          "
+                        >
+                          :
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>`;
+
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
+
+                    const SignDate = document.getElementById(
+                        `${v.studentInfo[1].value}-sign`
+                    );
+
+                    SignDate.innerHTML = `<tr>
+                  <td
+                    style="
+                      padding-left: 0mm;
+                      padding-right: 0mm;
+                      padding-top: 0mm;
+                      padding-bottom: 0mm;
+                    "
+                  >
+                    <div style="height: 10mm">&nbsp;</div>
+                  </td>
+                </tr>
+              </table>
+
+              <table cellspacing="0" style="width: 100%" id="dateSign">
+                <tr>
+                  <td
+                    align="left"
+                    valign="bottom"
+                    style="
+                      padding-left: 0mm;
+                      width: 33%;
+                      height: 17mm;
+                      padding-right: 0mm;
+                      padding-top: 0mm;
+                      padding-bottom: 0mm;
+                      line-height: 130%;
+                      font-size: 10pt;
+                      text-align: left;
+                    "
+                  >
+                  <strong>Parent's Signature</strong>
+                  </td>
+                  <td
+                    align="center"
+                    valign="bottom"
+                    style="
+                      padding-left: 0mm;
+                      width: 34%;
+                      height: 17mm;
+                      padding-right: 0mm;
+                      padding-top: 0mm;
+                      padding-bottom: 0mm;
+                      line-height: 130%;
+                      font-size: 10pt;
+                      text-align: center;
+                    "
+                  >
+                    <strong>Class Teacher's Signature</strong>
+                  </td>
+
+                  <td
+                    align="right"
+                    valign="bottom"
+                    style="
+                      padding-left: 0mm;
+                      width: 33%;
+                      height: 17mm;
+                      padding-right: 0mm;
+                      padding-top: 0mm;
+                      padding-bottom: 0mm;
+                      line-height: 130%;
+                      font-size: 10pt;
+                      text-align: right;
+                    "
+                  >
+                    <strong>Principal Signature</strong>
+                  </td>
+                </tr>`;
+
+                    const footer = document.getElementById(
+                        `${v.studentInfo[1].value}-footer`
+                    );
+
+                    footer.innerHTML = v.footer || "";
+                }
+            }
+        });
+    };
+</script>
+
+<script>
+    window.SetTemplateData([
+        {
+            student: {
+                dob: "19-04-2014",
+                admissionNo: "1319",
+                studentName: "Chandan Kumar",
+                className: "I",
+                sectionName: "A",
+                rollNo: 11,
+                fatherName: "Raj Kishor Das",
+                motherName: "Basanti Devi",
+                attendance: "0.0/0",
+                boardRollNumber: "",
+                studentInfoResponse: [
+                    {
+                        id: 192080,
+                        userUid: "4fe12802-da29-465c-858a-3b40dd6f2909",
+                        userName: null,
+                        fatherUserName: null,
+                        motherUserName: null,
+                        guardianUserName: null,
+                        uid: "e472272b-749d-49d0-bf2c-9fcfa8c0016f",
+                        studentId: "1319",
+                        exAdmissionNo: null,
+                        studentName: "Chandan Kumar",
+                        fatherName: "Raj Kishor Das",
+                        motherName: "Basanti Devi",
+                        dob: "19-04-2014",
+                        gender: "Male",
+                        studentAdhaarcard: "",
+                        joiningClass: "UKG",
+                        joiningSections: "C",
+                        joiningDate: "09-04-2020",
+                        plotNumber: "",
+                        area: "Nawatand ,Bishnugarh",
+                        city: "Hazaribagh ",
+                        state: "Jharkhand",
+                        pincode: null,
+                        phone1: "",
+                        rollNo: 11,
+                        emergencyNumber: "",
+                        mobileNumber: "8828368772",
+                        studentEmail: null,
+                        religion: "",
+                        category: "",
+                        minority: "",
+                        motherTongue: "",
+                        idMark: "",
+                        height: "",
+                        weight: "",
+                        physicalDisability: "",
+                        bloodGroup: "",
+                        healthRemark: "",
+                        siblingDetails: "",
+                        alumni: "",
+                        siblingResponse: [],
+                        fatherOccupation: "",
+                        fatherQualification: "",
+                        fatherOrganization: "",
+                        fatherDesignation: "",
+                        fatherIncome: "",
+                        fatherArea: "",
+                        fatherCity: "",
+                        fatherState: "",
+                        fatherPincode: null,
+                        fatherPhone: "",
+                        fatherMobile: "8828368772",
+                        fatherEmail: null,
+                        fatherAdhaarNumber: "",
+                        schoolUid: "ce825547-bea5-403c-a521-e2c3acd76471",
+                        motherQualification: "",
+                        motherOccupation: "",
+                        motherOrganization: "",
+                        motherDesignation: "",
+                        motherIncome: "",
+                        motherArea: "",
+                        motherCity: "",
+                        motherState: "",
+                        motherPincode: null,
+                        motherPhone: "",
+                        motherMobile: "8828368772",
+                        motherEmail: null,
+                        motherAdhaarNumber: "",
+                        guardianName: "",
+                        relation: "",
+                        guardianOccupation: "",
+                        guardianPhone: "",
+                        guardianMobile: "",
+                        guardianEmail: null,
+                        guardianAddress: "",
+                        leavingDate: null,
+                        previousSchoolName: "",
+                        otp: null,
+                        schoolName: "Demo Public School",
+                        remark: "",
+                        classTeacher: "",
+                        classTeacherUserName: "",
+                        classes: "I",
+                        classUid: null,
+                        sections: "A",
+                        group: null,
+                        wing: "NA",
+                        status: "Studying",
+                        academicSession: "2024-25",
+                        joiningStatus: "Old",
+                        houses: null,
+                        certificates: "",
+                        certificatesList: [],
+                        caste: "",
+                        listOfDocuments: null,
+                        attached: false,
+                        required: false,
+                        submitted: false,
+                        studentHostel: [],
+                        studentConcession: [],
+                        studentTransport: [],
+                        studentAadharCard: null,
+                        fatherAadharCard: null,
+                        motherAadharCard: null,
+                        studentImage: null,
+                        fatherImage: null,
+                        motherImage: null,
+                        guardianImage: null,
+                        birthCertificate: null,
+                        classSectionUid: "5b8d5e82-a601-43a3-a8a8-ef9e0abd1d32",
+                        aluminiProof: null,
+                        siblingProof: null,
+                        residenceProof: null,
+                        firstBornChildProof: null,
+                        medicalFitnessCertificate: null,
+                        fatherQualificationProof: null,
+                        motherQualificationProof: null,
+                        casteCertificate: null,
+                        createdUser: "RajuMahto_358738",
+                        editedUser: "Ashok Kumarmahto_349084",
+                        createddate: "2023-11-09 04:21:38.681706",
+                        editeddate: "2023-11-15 06:14:20.435069",
+                        permanentEducationNumber: null,
+                        studentAddressResponse: {
+                            uid: "b34dcea8-0b6e-4bb4-a821-870f55d9ea15",
+                            houseNo: null,
+                            area: "Nawatand ,Bishnugarh",
+                            landmark: null,
+                            city: "Hazaribagh ",
+                            district: null,
+                            state: "Jharkhand",
+                            poPs: null,
+                            pincode: null,
+                            street: "",
+                            userName: "DAV278_1319",
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        fatherAddressResponse: {
+                            uid: "6c96c82f-6e65-492a-bd06-cbee6a0cdee3",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        motherAddressResponse: {
+                            uid: "1bf97ebc-79db-45a8-88e1-229c3d2f4b61",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "09-11-2023 09:51 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "RajuMahto_358738",
+                        },
+                        guardianAddressResponse: {
+                            uid: "18cc17c9-ac55-4304-bdd9-573eb4928286",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: null,
+                            district: null,
+                            state: null,
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        correspondenceAddressResponse: {
+                            uid: "6e555c60-9454-4ddc-b941-cc2ea7fe17cb",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: "",
+                            userName: "DAV278_1319",
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                    },
+                ],
+                classTeacher: "",
+                classTeacherUserName: "",
+                permanentEducationNumber: null,
+                school: {
+                    uid: "ce825547-bea5-403c-a521-e2c3acd76471",
+                    apikey: "Oh0iIQGsW9F5cPAvf2tIS-hZRt6vFT3e",
+                    schoolName: "D.A.V Public School Banaso",
+                    schoolAbb: "DAV",
+                    educationBoard: "Central Board of Secondary Education (CBSE)",
+                    registrationNo: "",
+                    plotNumber: "",
+                    area: "At Banaso bishnugarh",
+                    city: "Hazaribagh",
+                    pincode: "825312",
+                    state: "Jharkhand",
+                    phoneNo1: "",
+                    phoneNo2: "",
+                    contactName: "Ashok K mahto",
+                    contactMobile: "9811010368",
+                    contactEmail: "ashok.mahto@gmail.com",
+                    schoolCode: "",
+                    pfCode: "",
+                    societyManagement: "Demia Ashavikas welfare society",
+                    language: "Hindi and English",
+                    schoolLogo: null,
+                    schoolFavicon: null,
+                    enabled: true,
+                    subDomain: "",
+                    website: "",
+                    schemaPrefix: null,
+                    editedDate: "04-10-2024 08:25 AM",
+                    editedUser: "Ashok Kumarmahto_349084",
+                    visitorSchool: false,
+                    clientSchoolId: null,
+                    cscId: null,
+                    onlinePaymentEnabled: false,
+                    registrationSeries: null,
+                    underTakingDetails: null,
+                    formNumberStart: null,
+                    sessionResponse: null,
+                    schoolLogoUrl: null,
+                    printAcknowledge: false,
+                    whatsAppEnabled: false,
+                    smsenabled: false,
+                    notificationEnabled: true,
+                    loanEnabled: false,
+                },
+            },
+            markData: {
+                admissionNo: "1319",
+                permanentEducationNumber: null,
+                studentName: "Chandan Kumar",
+                className: "I",
+                sectionName: "A",
+                classSectionUid: "5b8d5e82-a601-43a3-a8a8-ef9e0abd1d32",
+                academicSession: "2024-25",
+                fatherName: "Raj Kishor Das",
+                uid: "e472272b-749d-49d0-bf2c-9fcfa8c0016f",
+                attendanceResponse: null,
+                pass: false,
+                rollNo: 11,
+                termWiseSubjectResponse: [
+                    {
+                        totalMarks: 600,
+                        totalObtained: 366,
+                        overAllGrade: "B2",
+                        totalPercentage: 61,
+                        termName: "Half Yearly",
+                        termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                        pass: true,
+                        subjectMarksEntryRequests: [
+                            {
+                                marks: 35,
+                                description: "",
+                                status: "",
+                                subject: "9f81989e-ba17-4fc2-8bf7-c2e8f9fb1eeb",
+                                subjectName: "English",
+                                scholastic: true,
+                                max: 80,
+                                priority: 1,
+                                min: 27,
+                                attachmentName: "English",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C2",
+                                percentage: 43.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "9bc8bda9-3cb4-4c9f-8fc1-c6370d3200b9",
+                                subjectName: "English PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 2,
+                                min: 7,
+                                attachmentName: "English",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 35,
+                                description: "",
+                                status: "",
+                                subject: "c6708eb1-0b05-4519-bd8b-4e0ecd681e97",
+                                subjectName: "Hindi",
+                                scholastic: true,
+                                max: 80,
+                                priority: 3,
+                                min: 27,
+                                attachmentName: "Hindi",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C2",
+                                percentage: 43.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "5bac24fe-ecee-445c-9a46-ccb9821bd40a",
+                                subjectName: "Hindi PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 4,
+                                min: 7,
+                                attachmentName: "Hindi",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 41,
+                                description: "",
+                                status: "",
+                                subject: "685254ac-a95d-4d19-82a7-9941eada2893",
+                                subjectName: "Maths",
+                                scholastic: true,
+                                max: 80,
+                                priority: 5,
+                                min: 27,
+                                attachmentName: "Maths",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 51.24999999999999,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "19e3fd27-0bcd-4144-a355-5bad5694a842",
+                                subjectName: "Maths PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 6,
+                                min: 7,
+                                attachmentName: "Maths",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 43,
+                                description: "",
+                                status: "",
+                                subject: "d7a03ab6-bc4a-46b4-a6c4-676c3ee9efdd",
+                                subjectName: "Science",
+                                scholastic: true,
+                                max: 80,
+                                priority: 7,
+                                min: 27,
+                                attachmentName: "Science",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 53.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "401a1121-d960-4682-a597-73c3d65c4a25",
+                                subjectName: "Science PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 8,
+                                min: 7,
+                                attachmentName: "Science",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 42,
+                                description: "",
+                                status: "",
+                                subject: "1900add5-3100-4fbc-95b9-316db07bf604",
+                                subjectName: "Social Science",
+                                scholastic: true,
+                                max: 80,
+                                priority: 9,
+                                min: 27,
+                                attachmentName: "Social Science",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 52.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "752be316-3810-4516-8190-c15e36c8448d",
+                                subjectName: "Social Science PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 10,
+                                min: 7,
+                                attachmentName: "Social Science",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 25,
+                                description: "",
+                                status: "",
+                                subject: "eed877ad-4041-4950-9f0d-ee300b954fbd",
+                                subjectName: "Computer",
+                                scholastic: true,
+                                max: 40,
+                                priority: 11,
+                                min: 13,
+                                attachmentName: "Computer",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "B2",
+                                percentage: 62.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 10,
+                                description: "",
+                                status: "",
+                                subject: "4bc7945a-b249-48d7-b72a-43c7df803b21",
+                                subjectName: "Computer PR",
+                                scholastic: true,
+                                max: 10,
+                                priority: 12,
+                                min: 3,
+                                attachmentName: "Computer",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 25,
+                                description: "",
+                                status: "",
+                                subject: "f4e3c9a8-ecdb-4dab-93bb-11d995103a14",
+                                subjectName: "General Knowledge",
+                                scholastic: true,
+                                max: 40,
+                                priority: 13,
+                                min: 13,
+                                attachmentName: "General Knowledge",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "B2",
+                                percentage: 62.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 10,
+                                description: "",
+                                status: "",
+                                subject: "25bcdcd7-08d4-4773-a302-3fa2a9000c17",
+                                subjectName: "General Knowledge PR",
+                                scholastic: true,
+                                max: 10,
+                                priority: 14,
+                                min: 3,
+                                attachmentName: "General Knowledge",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                        ],
+                    },
+                ],
+            },
+            remarks: {
+                "classSection": "II-A",
+                "totalNumber": 1,
+                "termName": "Half Yearly",
+                "details": [
+                    {
+                        "uid": "ee9a6a9a-1042-4b62-a79a-29da6534c0c4",
+                        "terms": [
+                            "Half Yearly"
+                        ],
+                        "studentId": "47",
+                        "studentName": "Akram Ansari",
+                        "rollNumber": 1,
+                        "classSectionUid": "0026531d-49b7-4b79-8dd0-6ac7aa530e68",
+                        "classSection": "II-A",
+                        "description": "Very Good ",
+                        "fields": [
+                            {
+                                "uid": "70e30517-48db-4f0d-8cf9-ef9c4c5ddf85",
+                                "title": "Attendance Record",
+                                "type": "ALPHA_NUMERIC",
+                                "value": "April to August",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            },
+                            {
+                                "uid": "f8dcf438-2321-4381-9180-292e2323f55d",
+                                "title": "Present Days",
+                                "type": "NUMERIC",
+                                "value": "44",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            },
+                            {
+                                "uid": "7a9a3709-849c-440b-a645-f7c7da23ab05",
+                                "title": "Working Days",
+                                "type": "NUMERIC",
+                                "value": "90",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            }
+                        ],
+                        "status": true,
+                        "createdUser": "RajuMahto_358738",
+                        "editedUser": "NehaKumari_529168",
+                        "createdDate": "03-10-2024 11:24 AM",
+                        "editedDate": "04-10-2024 10:24 AM"
+                    }
+                ]
+            },
+            header: `<div>
+                <table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      			<td align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/cbse-logo.png" /></td>
+      			<td style="width:70%; line-height: 140%; padding-top:6mm; padding-bottom:2mm; text-align:center; font-size:11pt;" valign="top" align="center">
+      			<span style="color:#53395c; font-size:16pt; font-weight:bold;">SACHDEVA PUBLIC SCHOOL</span><br/>
+      			<span style="color:#53395c; font-size:11pt; padding-top:5mm;">Maurya Enclave, Pitampura<br />
+      			Delhi - 110088</span>
+      			</td>
+      			<td style="width:15%;" valign="top" align="right"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/school-logo.png" /></td>
+      			</tr>
+      		</table>
+
+         </div>`,
+            footer:
+                '<page_footer>\n <table cellspacing="0" cellpadding="0" style="\n        padding-left: 0mm;\n        padding-right: 0mm;\n        padding-top: 2mm;\n        padding-bottom: 0mm;\n      ">\n  <tbody>\n   <tr>\n    <td width="100%" align="left" valign="top" style="\n            width: 100%;\n            padding-left: 0mm;\n            padding-right: 0mm;\n            padding-top: 0mm;\n            padding-bottom: 0mm;\n          "><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table> \n</page_footer>',
+        },
+        {
+            student: {
+                dob: "19-04-2014",
+                admissionNo: "1319",
+                studentName: "Chandan Kumar",
+                className: "I",
+                sectionName: "A",
+                rollNo: 11,
+                fatherName: "Raj Kishor Das",
+                motherName: "Basanti Devi",
+                attendance: "0.0/0",
+                boardRollNumber: "",
+                studentInfoResponse: [
+                    {
+                        id: 192080,
+                        userUid: "4fe12802-da29-465c-858a-3b40dd6f2909",
+                        userName: null,
+                        fatherUserName: null,
+                        motherUserName: null,
+                        guardianUserName: null,
+                        uid: "e472272b-749d-49d0-bf2c-9fcfa8c0016f",
+                        studentId: "1319",
+                        exAdmissionNo: null,
+                        studentName: "Chandan Kumar",
+                        fatherName: "Raj Kishor Das",
+                        motherName: "Basanti Devi",
+                        dob: "19-04-2014",
+                        gender: "Male",
+                        studentAdhaarcard: "",
+                        joiningClass: "UKG",
+                        joiningSections: "C",
+                        joiningDate: "09-04-2020",
+                        plotNumber: "",
+                        area: "Nawatand ,Bishnugarh",
+                        city: "Hazaribagh ",
+                        state: "Jharkhand",
+                        pincode: null,
+                        phone1: "",
+                        rollNo: 11,
+                        emergencyNumber: "",
+                        mobileNumber: "8828368772",
+                        studentEmail: null,
+                        religion: "",
+                        category: "",
+                        minority: "",
+                        motherTongue: "",
+                        idMark: "",
+                        height: "",
+                        weight: "",
+                        physicalDisability: "",
+                        bloodGroup: "",
+                        healthRemark: "",
+                        siblingDetails: "",
+                        alumni: "",
+                        siblingResponse: [],
+                        fatherOccupation: "",
+                        fatherQualification: "",
+                        fatherOrganization: "",
+                        fatherDesignation: "",
+                        fatherIncome: "",
+                        fatherArea: "",
+                        fatherCity: "",
+                        fatherState: "",
+                        fatherPincode: null,
+                        fatherPhone: "",
+                        fatherMobile: "8828368772",
+                        fatherEmail: null,
+                        fatherAdhaarNumber: "",
+                        schoolUid: "ce825547-bea5-403c-a521-e2c3acd76471",
+                        motherQualification: "",
+                        motherOccupation: "",
+                        motherOrganization: "",
+                        motherDesignation: "",
+                        motherIncome: "",
+                        motherArea: "",
+                        motherCity: "",
+                        motherState: "",
+                        motherPincode: null,
+                        motherPhone: "",
+                        motherMobile: "8828368772",
+                        motherEmail: null,
+                        motherAdhaarNumber: "",
+                        guardianName: "",
+                        relation: "",
+                        guardianOccupation: "",
+                        guardianPhone: "",
+                        guardianMobile: "",
+                        guardianEmail: null,
+                        guardianAddress: "",
+                        leavingDate: null,
+                        previousSchoolName: "",
+                        otp: null,
+                        schoolName: "Demo Public School",
+                        remark: "",
+                        classTeacher: "",
+                        classTeacherUserName: "",
+                        classes: "I",
+                        classUid: null,
+                        sections: "A",
+                        group: null,
+                        wing: "NA",
+                        status: "Studying",
+                        academicSession: "2024-25",
+                        joiningStatus: "Old",
+                        houses: null,
+                        certificates: "",
+                        certificatesList: [],
+                        caste: "",
+                        listOfDocuments: null,
+                        attached: false,
+                        required: false,
+                        submitted: false,
+                        studentHostel: [],
+                        studentConcession: [],
+                        studentTransport: [],
+                        studentAadharCard: null,
+                        fatherAadharCard: null,
+                        motherAadharCard: null,
+                        studentImage: null,
+                        fatherImage: null,
+                        motherImage: null,
+                        guardianImage: null,
+                        birthCertificate: null,
+                        classSectionUid: "5b8d5e82-a601-43a3-a8a8-ef9e0abd1d32",
+                        aluminiProof: null,
+                        siblingProof: null,
+                        residenceProof: null,
+                        firstBornChildProof: null,
+                        medicalFitnessCertificate: null,
+                        fatherQualificationProof: null,
+                        motherQualificationProof: null,
+                        casteCertificate: null,
+                        createdUser: "RajuMahto_358738",
+                        editedUser: "Ashok Kumarmahto_349084",
+                        createddate: "2023-11-09 04:21:38.681706",
+                        editeddate: "2023-11-15 06:14:20.435069",
+                        permanentEducationNumber: null,
+                        studentAddressResponse: {
+                            uid: "b34dcea8-0b6e-4bb4-a821-870f55d9ea15",
+                            houseNo: null,
+                            area: "Nawatand ,Bishnugarh",
+                            landmark: null,
+                            city: "Hazaribagh ",
+                            district: null,
+                            state: "Jharkhand",
+                            poPs: null,
+                            pincode: null,
+                            street: "",
+                            userName: "DAV278_1319",
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        fatherAddressResponse: {
+                            uid: "6c96c82f-6e65-492a-bd06-cbee6a0cdee3",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        motherAddressResponse: {
+                            uid: "1bf97ebc-79db-45a8-88e1-229c3d2f4b61",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "09-11-2023 09:51 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "RajuMahto_358738",
+                        },
+                        guardianAddressResponse: {
+                            uid: "18cc17c9-ac55-4304-bdd9-573eb4928286",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: null,
+                            district: null,
+                            state: null,
+                            poPs: null,
+                            pincode: null,
+                            street: null,
+                            userName: null,
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                        correspondenceAddressResponse: {
+                            uid: "6e555c60-9454-4ddc-b941-cc2ea7fe17cb",
+                            houseNo: null,
+                            area: "",
+                            landmark: null,
+                            city: "",
+                            district: null,
+                            state: "",
+                            poPs: null,
+                            pincode: null,
+                            street: "",
+                            userName: "DAV278_1319",
+                            createdDate: "09-11-2023 09:51 AM",
+                            editedDate: "15-11-2023 11:44 AM",
+                            createdBy: "RajuMahto_358738",
+                            editedBy: "Ashok Kumarmahto_349084",
+                        },
+                    },
+                ],
+                classTeacher: "",
+                classTeacherUserName: "",
+                permanentEducationNumber: null,
+                school: {
+                    uid: "ce825547-bea5-403c-a521-e2c3acd76471",
+                    apikey: "Oh0iIQGsW9F5cPAvf2tIS-hZRt6vFT3e",
+                    schoolName: "D.A.V Public School Banaso",
+                    schoolAbb: "DAV",
+                    educationBoard: "Central Board of Secondary Education (CBSE)",
+                    registrationNo: "",
+                    plotNumber: "",
+                    area: "At Banaso bishnugarh",
+                    city: "Hazaribagh",
+                    pincode: "825312",
+                    state: "Jharkhand",
+                    phoneNo1: "",
+                    phoneNo2: "",
+                    contactName: "Ashok K mahto",
+                    contactMobile: "9811010368",
+                    contactEmail: "ashok.mahto@gmail.com",
+                    schoolCode: "",
+                    pfCode: "",
+                    societyManagement: "Demia Ashavikas welfare society",
+                    language: "Hindi and English",
+                    schoolLogo: null,
+                    schoolFavicon: null,
+                    enabled: true,
+                    subDomain: "",
+                    website: "",
+                    schemaPrefix: null,
+                    editedDate: "04-10-2024 08:25 AM",
+                    editedUser: "Ashok Kumarmahto_349084",
+                    visitorSchool: false,
+                    clientSchoolId: null,
+                    cscId: null,
+                    onlinePaymentEnabled: false,
+                    registrationSeries: null,
+                    underTakingDetails: null,
+                    formNumberStart: null,
+                    sessionResponse: null,
+                    schoolLogoUrl: null,
+                    printAcknowledge: false,
+                    whatsAppEnabled: false,
+                    smsenabled: false,
+                    notificationEnabled: true,
+                    loanEnabled: false,
+                },
+            },
+            markData: {
+                admissionNo: "13199",
+                permanentEducationNumber: null,
+                studentName: "Chandan Kumar",
+                className: "I",
+                sectionName: "A",
+                classSectionUid: "5b8d5e82-a601-43a3-a8a8-ef9e0abd1d32",
+                academicSession: "2024-25",
+                fatherName: "Raj Kishor Das",
+                uid: "e472272b-749d-49d0-bf2c-9fcfa8c0016f",
+                attendanceResponse: null,
+                pass: false,
+                rollNo: 11,
+                termWiseSubjectResponse: [
+                    {
+                        totalMarks: 600,
+                        totalObtained: 366,
+                        overAllGrade: "B2",
+                        totalPercentage: 61,
+                        termName: "Half Yearly",
+                        termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                        pass: true,
+                        subjectMarksEntryRequests: [
+                            {
+                                marks: 35,
+                                description: "",
+                                status: "",
+                                subject: "9f81989e-ba17-4fc2-8bf7-c2e8f9fb1eeb",
+                                subjectName: "English",
+                                scholastic: true,
+                                max: 80,
+                                priority: 1,
+                                min: 27,
+                                attachmentName: "English",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C2",
+                                percentage: 43.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "9bc8bda9-3cb4-4c9f-8fc1-c6370d3200b9",
+                                subjectName: "English PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 2,
+                                min: 7,
+                                attachmentName: "English",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 35,
+                                description: "",
+                                status: "",
+                                subject: "c6708eb1-0b05-4519-bd8b-4e0ecd681e97",
+                                subjectName: "Hindi",
+                                scholastic: true,
+                                max: 80,
+                                priority: 3,
+                                min: 27,
+                                attachmentName: "Hindi",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C2",
+                                percentage: 43.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "5bac24fe-ecee-445c-9a46-ccb9821bd40a",
+                                subjectName: "Hindi PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 4,
+                                min: 7,
+                                attachmentName: "Hindi",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 41,
+                                description: "",
+                                status: "",
+                                subject: "685254ac-a95d-4d19-82a7-9941eada2893",
+                                subjectName: "Maths",
+                                scholastic: true,
+                                max: 80,
+                                priority: 5,
+                                min: 27,
+                                attachmentName: "Maths",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 51.24999999999999,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "19e3fd27-0bcd-4144-a355-5bad5694a842",
+                                subjectName: "Maths PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 6,
+                                min: 7,
+                                attachmentName: "Maths",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 43,
+                                description: "",
+                                status: "",
+                                subject: "d7a03ab6-bc4a-46b4-a6c4-676c3ee9efdd",
+                                subjectName: "Science",
+                                scholastic: true,
+                                max: 80,
+                                priority: 7,
+                                min: 27,
+                                attachmentName: "Science",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 53.75,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "401a1121-d960-4682-a597-73c3d65c4a25",
+                                subjectName: "Science PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 8,
+                                min: 7,
+                                attachmentName: "Science",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 42,
+                                description: "",
+                                status: "",
+                                subject: "1900add5-3100-4fbc-95b9-316db07bf604",
+                                subjectName: "Social Science",
+                                scholastic: true,
+                                max: 80,
+                                priority: 9,
+                                min: 27,
+                                attachmentName: "Social Science",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "C1",
+                                percentage: 52.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 20,
+                                description: "",
+                                status: "",
+                                subject: "752be316-3810-4516-8190-c15e36c8448d",
+                                subjectName: "Social Science PR",
+                                scholastic: true,
+                                max: 20,
+                                priority: 10,
+                                min: 7,
+                                attachmentName: "Social Science",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 25,
+                                description: "",
+                                status: "",
+                                subject: "eed877ad-4041-4950-9f0d-ee300b954fbd",
+                                subjectName: "Computer",
+                                scholastic: true,
+                                max: 40,
+                                priority: 11,
+                                min: 13,
+                                attachmentName: "Computer",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "B2",
+                                percentage: 62.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 10,
+                                description: "",
+                                status: "",
+                                subject: "4bc7945a-b249-48d7-b72a-43c7df803b21",
+                                subjectName: "Computer PR",
+                                scholastic: true,
+                                max: 10,
+                                priority: 12,
+                                min: 3,
+                                attachmentName: "Computer",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 25,
+                                description: "",
+                                status: "",
+                                subject: "f4e3c9a8-ecdb-4dab-93bb-11d995103a14",
+                                subjectName: "General Knowledge",
+                                scholastic: true,
+                                max: 40,
+                                priority: 13,
+                                min: 13,
+                                attachmentName: "General Knowledge",
+                                subjectNature: "THEORY",
+                                parent: [],
+                                grade: "B2",
+                                percentage: 62.5,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                            {
+                                marks: 10,
+                                description: "",
+                                status: "",
+                                subject: "25bcdcd7-08d4-4773-a302-3fa2a9000c17",
+                                subjectName: "General Knowledge PR",
+                                scholastic: true,
+                                max: 10,
+                                priority: 14,
+                                min: 3,
+                                attachmentName: "General Knowledge",
+                                subjectNature: "PRACTICAL",
+                                parent: [],
+                                grade: "A1",
+                                percentage: 100,
+                                term: "Half Yearly",
+                                termUid: "143c4995-4ec9-4efa-a390-f47f1eb937f8",
+                                pass: true,
+                                gradePattern: "Grade Pattern",
+                                graded: false,
+                            },
+                        ],
+                    },
+                ],
+            },
+            remarks: {
+                "classSection": "II-A",
+                "totalNumber": 1,
+                "termName": "Half Yearly",
+                "details": [
+                    {
+                        "uid": "ee9a6a9a-1042-4b62-a79a-29da6534c0c4",
+                        "terms": [
+                            "Half Yearly"
+                        ],
+                        "studentId": "47",
+                        "studentName": "Akram Ansari",
+                        "rollNumber": 1,
+                        "classSectionUid": "0026531d-49b7-4b79-8dd0-6ac7aa530e68",
+                        "classSection": "II-A",
+                        "description": "Very Good ",
+                        "fields": [
+                            {
+                                "uid": "70e30517-48db-4f0d-8cf9-ef9c4c5ddf85",
+                                "title": "Attendance Record",
+                                "type": "ALPHA_NUMERIC",
+                                "value": "April to August",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            },
+                            {
+                                "uid": "f8dcf438-2321-4381-9180-292e2323f55d",
+                                "title": "Present Days",
+                                "type": "NUMERIC",
+                                "value": "44",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            },
+                            {
+                                "uid": "7a9a3709-849c-440b-a645-f7c7da23ab05",
+                                "title": "Working Days",
+                                "type": "NUMERIC",
+                                "value": "90",
+                                "masterUid": "972fd151-8ee8-4857-9fe1-dfe049a363cb",
+                                "masterName": "Attendance"
+                            }
+                        ],
+                        "status": true,
+                        "createdUser": "RajuMahto_358738",
+                        "editedUser": "NehaKumari_529168",
+                        "createdDate": "03-10-2024 11:24 AM",
+                        "editedDate": "04-10-2024 10:24 AM"
+                    }
+                ]
+            },
+            header: `<div>
+                <table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      			<td align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/cbse-logo.png" /></td>
+      			<td style="width:70%; line-height: 140%; padding-top:6mm; padding-bottom:2mm; text-align:center; font-size:11pt;" valign="top" align="center">
+      			<span style="color:#53395c; font-size:16pt; font-weight:bold;">SACHDEVA PUBLIC SCHOOL</span><br/>
+      			<span style="color:#53395c; font-size:11pt; padding-top:5mm;">Maurya Enclave, Pitampura<br />
+      			Delhi - 110088</span>
+      			</td>
+      			<td style="width:15%;" valign="top" align="right"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/school-logo.png" /></td>
+      			</tr>
+      		</table>
+
+         </div>`,
+            footer:
+                '<page_footer>\n <table cellspacing="0" cellpadding="0" style="\n        padding-left: 0mm;\n        padding-right: 0mm;\n        padding-top: 2mm;\n        padding-bottom: 0mm;\n      ">\n  <tbody>\n   <tr>\n    <td width="100%" align="left" valign="top" style="\n            width: 100%;\n            padding-left: 0mm;\n            padding-right: 0mm;\n            padding-top: 0mm;\n            padding-bottom: 0mm;\n          "><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table> \n</page_footer>',
+        },
+    ]);
+</script>
+
+</html>

@@ -2,199 +2,518 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>UNPROCESSED Dynamic School Report Generator Script</title>
 </head>
 
 <body>
-    <div>Your able make your json clean here for UnProcessed report card</div>
-</body>
+    <div id="studentsList">
+        UNPROCESSED Dynamic School Report Generator Script
+    </div>
+    <script>
+        // Main function to set template data
+        window.SetTemplateData = function (dataList) {
 
-</html>
-<script>
+            function cleanedUnProcessData(data, props) {
 
+                let subjectNatures = [...new Set(data[0].markData.termWiseSubjectResponse[0].subjectMarksEntryRequests.map(subject => subject.subjectNature))];
 
+                // Function to clean markData and categorize by subjectNature
+                function cleanMarkData(markData, subjectNatureProps) {
+                    const mainKeys = ['admissionNo', 'studentName', 'className', 'fatherName', 'academicSession', 'termWiseSubjectResponse'];
 
-    function cleanedUnProcessData(data, props) {
-
-        let subjectNatures = [...new Set(data[0].markData.termWiseSubjectResponse[0].subjectMarksEntryRequests.map(subject => subject.subjectNature))];
-
-        // Function to clean markData and categorize by subjectNature
-        function cleanMarkData(markData, subjectNatureProps) {
-            const mainKeys = ['admissionNo', 'studentName', 'className', 'fatherName', 'academicSession', 'termWiseSubjectResponse'];
-
-            // Clean main data
-            let cleanedMarkData = {};
-            for (let key of mainKeys) {
-                cleanedMarkData[key] = markData[key] || null;
-            }
-
-            // Process term-wise subject responses
-            cleanedMarkData.termWiseSubjectResponse = markData.termWiseSubjectResponse.map(term => {
-                const categorizedSubjects = {};
-                const childSubjects = [];
-                const subChildSubjects = [];
-
-                // Initialize categories for each subjectNature in props
-                subjectNatureProps?.forEach(nature => {
-                    categorizedSubjects[nature] = [];
-                });
-
-                term.subjectMarksEntryRequests.forEach(subject => {
-                    if (subject.parent.length === 0) {
-                        // Categorize subjects based on dynamic subjectNature from props
-                        const subjectNature = subject.subjectNature.toLowerCase();
-                        const matchedCategory = subjectNatureProps.find(nature => nature.toLowerCase() === subjectNature);
-
-                        if (matchedCategory) {
-                            categorizedSubjects[matchedCategory].push(subject);
-                        } else {
-                            // If the subject doesn't match any provided category, add it to "others"
-                            if (!categorizedSubjects.others) {
-                                categorizedSubjects.others = [];
-                            }
-                            categorizedSubjects.others.push(subject);
-                        }
-                    } else if (subject.parent.length === 1) {
-                        childSubjects.push(subject); // Child subjects
-                    } else if (subject.parent.length > 1) {
-                        subChildSubjects.push(subject); // Sub-child subjects
+                    // Clean main data
+                    let cleanedMarkData = {};
+                    for (let key of mainKeys) {
+                        cleanedMarkData[key] = markData[key] || null;
                     }
-                });
 
-                // Build hierarchical structure for subjects
-                const organizedSubjects = Object.values(categorizedSubjects).flat().map(mainSubject => {
-                    // Find child subjects that have this main subject as their parent
-                    const children = childSubjects.filter(child => child.parent.includes(mainSubject.subjectName));
+                    // Process term-wise subject responses
+                    cleanedMarkData.termWiseSubjectResponse = markData.termWiseSubjectResponse.map(term => {
+                        const categorizedSubjects = {};
+                        const childSubjects = [];
+                        const subChildSubjects = [];
 
-                    // For each child, find sub-child subjects that have this child as their parent
-                    const childrenWithSubChildren = children.map(child => {
-                        const subChildren = subChildSubjects.filter(subChild => subChild.parent.includes(child.subjectName));
+                        // Initialize categories for each subjectNature in props
+                        subjectNatureProps?.forEach(nature => {
+                            categorizedSubjects[nature] = [];
+                        });
+
+                        term.subjectMarksEntryRequests.forEach(subject => {
+                            if (subject.parent.length === 0) {
+                                // Categorize subjects based on dynamic subjectNature from props
+                                const subjectNature = subject.subjectNature.toLowerCase();
+                                const matchedCategory = subjectNatureProps.find(nature => nature.toLowerCase() === subjectNature);
+
+                                if (matchedCategory) {
+                                    categorizedSubjects[matchedCategory].push(subject);
+                                } else {
+                                    // If the subject doesn't match any provided category, add it to "others"
+                                    if (!categorizedSubjects.others) {
+                                        categorizedSubjects.others = [];
+                                    }
+                                    categorizedSubjects.others.push(subject);
+                                }
+                            } else if (subject.parent.length === 1) {
+                                childSubjects.push(subject); // Child subjects
+                            } else if (subject.parent.length > 1) {
+                                subChildSubjects.push(subject); // Sub-child subjects
+                            }
+                        });
+
+                        // Build hierarchical structure for subjects
+                        const organizedSubjects = Object.values(categorizedSubjects).flat().map(mainSubject => {
+                            // Find child subjects that have this main subject as their parent
+                            const children = childSubjects.filter(child => child.parent.includes(mainSubject.subjectName));
+
+                            // For each child, find sub-child subjects that have this child as their parent
+                            const childrenWithSubChildren = children.map(child => {
+                                const subChildren = subChildSubjects.filter(subChild => subChild.parent.includes(child.subjectName));
+                                return {
+                                    ...child,
+                                    subChildren: subChildren // Attach sub-children to the child subject
+                                };
+                            });
+
+                            // Return the main subject with its children and sub-children nested
+                            return {
+                                ...mainSubject,
+                                children: childrenWithSubChildren
+                            };
+                        });
+
                         return {
-                            ...child,
-                            subChildren: subChildren // Attach sub-children to the child subject
+                            totalMarks: term.totalMarks,
+                            totalObtained: term.totalObtained,
+                            overAllGrade: term.overAllGrade,
+                            totalPercentage: term.totalPercentage,
+                            termName: term.termName,
+                            subjects: {
+                                categorizedSubjects, // Categorized subjects
+                                organizedSubjects // Hierarchical structure including children and sub-children
+                            }
                         };
                     });
 
-                    // Return the main subject with its children and sub-children nested
+                    return cleanedMarkData;
+                }
+
+                // Function to clean and process student data
+                function cleanStudentData(student) {
+                    function buildFullAddress(info) {
+                        let addressParts = [];
+                        if (info.area && info.area !== "NA") addressParts.push(info.area);
+                        if (info.landmark && info.landmark !== "NA") addressParts.push(info.landmark);
+                        if (info.city && info.city !== "NA") addressParts.push(info.city);
+                        if (info.state && info.state !== "NA") addressParts.push(info.state);
+                        if (info.pincode && info.pincode !== "NA") addressParts.push(info.pincode);
+                        return addressParts.length ? addressParts.join(", ") : "";
+                    }
+
+                    const studentInfo = student?.studentInfoResponse?.[0] || {};
+
                     return {
-                        ...mainSubject,
-                        children: childrenWithSubChildren
+                        studentName: student.studentName,
+                        className: student.className,
+                        sectionName: student.sectionName,
+                        classAndSection: `${student.className}-${student.sectionName}`,
+                        rollNo: student.rollNo,
+                        fatherName: student.fatherName,
+                        motherName: student.motherName,
+                        dob: student.dob,
+                        attendance: student.attendance
+                            ? {
+                                presentDay: +student.attendance.split("/")[0],
+                                totalDay: +student.attendance.split("/")[1],
+                                attendancePercentage: parseFloat(
+                                    (+student.attendance.split("/")[0] / +student.attendance.split("/")[1]) * 100
+                                ).toFixed(2),
+                                attendanceRow: student.attendance,
+                            }
+                            : {},
+                        admissionNo: student.admissionNo,
+                        gender: studentInfo.gender || "",
+                        houses: studentInfo.houses || "",
+                        mobileNumber: studentInfo.mobileNumber || "",
+                        fatherMobile: studentInfo.fatherMobile || "",
+                        height: studentInfo.height || "",
+                        weight: studentInfo.weight || "",
+                        bloodGroup: studentInfo.bloodGroup || "",
+                        classTeacher: student.classTeacher || "",
+
+                        address: {
+                            area: studentInfo.area || "",
+                            city: studentInfo.city || "",
+                            pincode: studentInfo.pincode || "",
+                            landmark: studentInfo.landmark || "",
+                            state: studentInfo.state || "",
+                        },
+                        fullAddress: buildFullAddress(studentInfo),
+                    };
+                }
+
+                function cleanTeacherRemarks(remark) {
+                    return remark;
+                }
+
+                // Function to fetch extra fields
+                function fetchExtraFields(hallData, props) {
+                    const extraFields = {};
+                    // Only include fields specified in props
+                    props?.forEach(key => {
+                        if (hallData[key] !== undefined) {
+                            extraFields[key] = hallData[key];
+                        }
+                    });
+
+                    return extraFields;
+                }
+
+                // Process each data item in the list
+                const cleanedDataList = data.map((data) => {
+                    const cleanedStudentData = cleanStudentData(data?.student);
+                    const cleanStudentMarkData = cleanMarkData(data?.markData, subjectNatures); // Pass subjectNatures to the function
+                    const cleanedTeacherRemarks = cleanTeacherRemarks(data?.remarks);
+                    const extraFields = fetchExtraFields(data?.markData, props); // Fetch specific extra fields
+
+                    return {
+                        header: data?.header || '',
+                        studentInfo: cleanedStudentData,
+                        markData: cleanStudentMarkData,
+                        remarks: cleanedTeacherRemarks,
+                        extraFields: extraFields // Include only the extra fields specified
                     };
                 });
 
-                return {
-                    totalMarks: term.totalMarks,
-                    totalObtained: term.totalObtained,
-                    overAllGrade: term.overAllGrade,
-                    totalPercentage: term.totalPercentage,
-                    termName: term.termName,
-                    subjects: {
-                        categorizedSubjects, // Categorized subjects
-                        organizedSubjects // Hierarchical structure including children and sub-children
-                    }
-                };
-            });
-
-            return cleanedMarkData;
-        }
-
-        // Function to clean and process student data
-        function cleanStudentData(student) {
-            function buildFullAddress(info) {
-                let addressParts = [];
-                if (info.area && info.area !== "NA") addressParts.push(info.area);
-                if (info.landmark && info.landmark !== "NA") addressParts.push(info.landmark);
-                if (info.city && info.city !== "NA") addressParts.push(info.city);
-                if (info.state && info.state !== "NA") addressParts.push(info.state);
-                if (info.pincode && info.pincode !== "NA") addressParts.push(info.pincode);
-                return addressParts.length ? addressParts.join(", ") : "";
+                return cleanedDataList;
             }
 
-            const studentInfo = student?.studentInfoResponse?.[0] || {};
 
-            return {
-                studentName: student.studentName,
-                className: student.className,
-                sectionName: student.sectionName,
-                classAndSection: `${student.className}-${student.sectionName}`,
-                rollNo: student.rollNo,
-                fatherName: student.fatherName,
-                motherName: student.motherName,
-                dob: student.dob,
-                attendance: student.attendance
-                    ? {
-                        presentDay: +student.attendance.split("/")[0],
-                        totalDay: +student.attendance.split("/")[1],
-                        attendancePercentage: parseFloat(
-                            (+student.attendance.split("/")[0] / +student.attendance.split("/")[1]) * 100
-                        ).toFixed(2),
-                        attendanceRow: student.attendance,
-                    }
-                    : {},
-                admissionNo: student.admissionNo,
-                gender: studentInfo.gender || "",
-                houses: studentInfo.houses || "",
-                mobileNumber: studentInfo.mobileNumber || "",
-                fatherMobile: studentInfo.fatherMobile || "",
-                height: studentInfo.height || "",
-                weight: studentInfo.weight || "",
-                bloodGroup: studentInfo.bloodGroup || "",
-                classTeacher: student.classTeacher || "",
-
-                address: {
-                    area: studentInfo.area || "",
-                    city: studentInfo.city || "",
-                    pincode: studentInfo.pincode || "",
-                    landmark: studentInfo.landmark || "",
-                    state: studentInfo.state || "",
-                },
-                fullAddress: buildFullAddress(studentInfo),
-            };
-        }
-
-        function cleanTeacherRemarks(remark) {
-            return remark;
-        }
-
-        // Function to fetch extra fields
-        function fetchExtraFields(hallData, props) {
-            const extraFields = {};
-            // Only include fields specified in props
-            props?.forEach(key => {
-                if (hallData[key] !== undefined) {
-                    extraFields[key] = hallData[key];
+            // CSS Styles
+            const styles = `
+        <style type="text/css">
+            body {
+                font-family: Arial, sans-serif;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid black; 
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 2px;
+                text-align: left;
+                font-size: 12px;
+            }
+            h3 {
+                margin: 3px 0px;
+                padding: 0px;
+                font-size: 13px;
+            }
+            h5 {
+                padding: 0px;
+                margin: 5px;
+            }
+            .header {
+                text-align: center;
+                font-weight: bold;
+                margin: 5px 0;
+            }
+            .page {
+                page-break-after: always;
+                break-after: page;
+            }
+            .section {
+                margin-bottom: 10px;
+            }
+            @media print {
+                @page {
+                    margin: auto;
+                    size: A4;
+                    margin: 2mm;
                 }
-            });
+                .page {
+                    page-break-after: always;
+                }
+            }
+        </style>`;
 
-            return extraFields;
-        }
-
-        // Process each data item in the list
-        const cleanedDataList = data.map((data) => {
-            const cleanedStudentData = cleanStudentData(data?.student);
-            const cleanStudentMarkData = cleanMarkData(data?.markData, subjectNatures); // Pass subjectNatures to the function
-            const cleanedTeacherRemarks = cleanTeacherRemarks(data?.remarks);
-            const extraFields = fetchExtraFields(data?.markData, props); // Fetch specific extra fields
-
-            return {
-                header: data?.header || '',
-                studentInfo: cleanedStudentData,
-                markData: cleanStudentMarkData,
-                remarks: cleanedTeacherRemarks,
-                extraFields: extraFields // Include only the extra fields specified
+            const config = {
+                schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-07T10_48_06_661575730.png",
+                schoolAddress: "123 School Street, City, Country",
+                schoolPlace: "City Name",
+                scholasticType: "Theory",
+                coScholasticType: "1B Scholastic",
+                computerScienceSubject: "COMPUTER SCIENCE",
+                subParentGrade: [
+                    "LISTENING SKILLS",
+                    "Activity",
+                    "Mental Maths",
+                    "Unit I",
+                    "Unit II",
+                    "Activity Project",
+                    "Group Discussion",
+                ],
+                attendanceValues: {
+                    Absent: "AB",
+                    Medical: "M",
+                    Sports: "S",
+                    Leave: "L",
+                    "Late Admission": "LA",
+                    Exempted: "EX",
+                    NA: "NA",
+                },
+                showMarks: false, // Set to true if you want to display marks instead of grades
             };
-        });
 
-        return cleanedDataList;
-    }
+            const cleanedData = cleanedUnProcessData(dataList);
 
-    // Example usage
+            console.log(cleanedData, "ffffffffffffffffff cleanedData")
+            // Function to process subjects from the new cleaned structure
+            function processSubjectData(data, subjectType) {
+                let subjects = {
+                    main: [],
+                    sub: {},
+                    children: {},
+                };
+                let terms = [];
+
+                data.forEach((el) => {
+                    el?.markData?.termWiseSubjectResponse?.forEach((term) => {
+                        terms.push(term.termName);
+                        const subjectsByType = term.subjects.categorizedSubjects[subjectType] || [];
+                        subjectsByType.forEach((subject) => {
+                            processSubject(subject, term.termName, subjects);
+                        });
+                    });
+                });
+
+                return { subjects, terms: [...new Set(terms)] };
+            }
+
+            // Helper function to process individual subjects
+            function processSubject(s, termName, subjects) {
+                if (!s.parent || s.parent.length === 0) {
+                    addSubject(subjects.main, s, termName);
+                } else if (s.parent.length === 1) {
+                    if (!subjects.sub[s.parent[0]]) subjects.sub[s.parent[0]] = [];
+                    addSubject(subjects.sub[s.parent[0]], s, termName);
+                } else if (s.parent.length > 1) {
+                    const key = `${s.parent[1]}-${s.parent[0]}`;
+                    if (!subjects.children[key]) subjects.children[key] = [];
+                    addSubject(subjects.children[key], s, termName);
+                }
+            }
+
+            // Helper function to add or update a subject
+            function addSubject(array, s, termName) {
+                let subject = array.find((item) => item.subjectName === s.subjectName);
+                if (!subject) {
+                    subject = {
+                        subjectName: s.subjectName,
+                        grade: {},
+                        status: {},
+                        marks: {},
+                    };
+                    array.push(subject);
+                }
+                subject.grade[termName] = s.grade;
+                subject.status[termName] = s.status;
+                subject.marks[termName] = s.marks;
+            }
+
+            const scholasticData = processSubjectData(cleanedData, config.scholasticType);
+            const coScholasticData = processSubjectData(cleanedData, config.coScholasticType);
+
+            // Generate HTML for subjects
+            function generateSubjectHTML(subjectData, isScholastic) {
+                let html = "";
+                subjectData.subjects.main.forEach((main, i) => {
+                    html += `
+                    <div class="section">
+                        <table>
+                            <tr>
+                                <th colspan="2" style="text-align:left;">${main.subjectName}</th>
+                                ${subjectData.terms.map(
+                        (t) => `
+                                    <th style="width: 100px; text-align:center;">${isScholastic ? "GRADE" : main.subjectName === config.computerScienceSubject ? main.grade[t] : "GRADE"}</th>
+                                `
+                    ).join("")}
+                            </tr>
+                            ${generateSubSubjectsHTML(subjectData.subjects.sub[main.subjectName], subjectData.subjects.children, main.subjectName, subjectData.terms, isScholastic)}
+                        </table>
+                    </div>`;
+                });
+                return html;
+            }
+
+            // Generate HTML for sub-subjects and their children
+            function generateSubSubjectsHTML(subSubjects, children, parentSubject, terms, isScholastic) {
+                let html = "";
+                (subSubjects || []).forEach((sub, index) => {
+                    html += `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold">${index + 1}</td>
+                        <td><strong>${sub.subjectName}</strong></td>
+                        ${terms.map(
+                        (t) => `
+                            <td style="width: 100px; text-align:center;">${renderGradeOrStatus(sub, t, isScholastic)}</td>
+                        `
+                    ).join("")}
+                    </tr>`;
+                    html += generateChildSubjectsHTML(children[`${parentSubject}-${sub.subjectName}`], terms, isScholastic);
+                });
+                return html;
+            }
+
+            // Generate HTML for child subjects
+            function generateChildSubjectsHTML(childSubjects, terms, isScholastic) {
+                return (childSubjects || []).map(
+                    (child) => `
+                <tr>
+                    <td style="text-align:center;"></td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;*${child.subjectName}</td>
+                    ${terms.map(
+                        (t) => `
+                        <td style="text-align:center; width: 100px;">${renderGradeOrStatus(child, t, isScholastic)}</td>
+                    `
+                    ).join("")}
+                </tr>`
+                ).join("");
+            }
+
+            // Helper function to render grade or status
+            function renderGradeOrStatus(subject, term, isScholastic) {
+                if (subject.status[term]) {
+                    const status = config.attendanceValues[subject.status[term]] || "-";
+                    return status === "-" ? status : `<strong>${status}</strong>`;
+                }
+                return config.showMarks ? subject.marks[term] || "-" : subject.grade[term] || "-";
+            }
+
+            // Generate HTML for the header
+            function generateHeaderHTML(markData, student) {
+                return `
+                <div class="header">
+                    <div style="height:60px;">
+                        <img src="${config.schoolLogo}" alt="School Logo" style="height:100%;">  
+                    </div>
+                    <p style="font-size:12px; margin-top:-2px">${config.schoolAddress}</p>
+                    <p style="font-size:13px; margin-top:-10px">ACADEMIC SESSION-${markData.academicSession}</p> 
+                    <p style="font-size:13px; margin-top:-10px">${markData.termWiseSubjectResponse[0].termName}</p> 
+                    <p style="font-size:13px; margin-top:-15px">GRADE: ${student.className}</p>
+                </div>`;
+            }
+
+            // Generate HTML for student information
+            function generateStudentInfoHTML(student) {
+                return `
+                <table class="section" style="margin-top: -10px;">
+                    <tr>
+                        <td style="width: 25%; font-weight:bold;">NAME</td>
+                        <td style="width: 25%;">${student.studentName || "-"}</td>
+                        <td style="width: 25%; font-weight:bold;">CLASS-SECTION</td>
+                        <td style="width: 25%;">${student.classAndSection || "-"}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:bold;">FATHER NAME</td>
+                        <td>${student.fatherName || "-"}</td>
+                        <td style="font-weight:bold;">ADMISSION NO.</td>
+                        <td>${student.admissionNo || "-"}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:bold;">MOTHER'S NAME</td>
+                        <td>${student.motherName || "-"}</td>
+                        <td style="font-weight:bold;">DATE OF BIRTH</td>
+                        <td>${student.dob || "-"}</td>
+                    </tr>
+                </table>`;
+            }
+
+            // Generate HTML for remarks
+            function generateRemarks(studentData) {
+                return `
+                <p style="margin-top: 2px; font-weight: bold; margin-bottom:0; font-size: 12px">SPECIFIC PARTICIPATION:</p>
+                <div style="padding: 5px; border: 1px solid black; height: 20px;"></div>
+                <p style="margin-top: 2px; font-weight: bold; margin-bottom:0; font-size: 12px">GENERAL REMARKS:</p>
+                <div style="padding: 5px; border: 1px solid black; height: 20px; font-size: 12px">
+                    ${studentData.remarks || ""}
+                </div>`;
+            }
+
+            // Generate HTML for the footer
+            function generateFooter(student) {
+                return `
+                <div style="display:flex; justify-content: space-between; margin-top: 10px">
+                    <div style="display: flex;width: 30%; justify-content: space-left; border: 1px solid black;font-size:12px; padding: 2px;">
+                        <span style="font-size:12px; font-weight:bold">ATTENDANCE:&nbsp;</span>${student.attendance || ""}
+                    </div>
+                    <div style="display: flex;width: 30%; justify-content: left; border: 1px solid black;font-size:12px; padding: 2px;">
+                        <span style="font-size:12px;font-weight:bold">DATE:&nbsp;</span>${new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
+                    </div>
+                    <div style="display: flex;width: 30%; justify-content: left; border: 1px solid black;font-size:12px; padding: 2px;">
+                        <span style="font-size:12px;font-weight:bold">PLACE:&nbsp;</span>${config.schoolPlace}
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 20px; font-size: 13px; margin-bottom: 0px">
+                    <div>
+                        <p>__________</p>
+                        <p style="font-weight:bold">Class Incharge</p>
+                    </div>
+                    <div>
+                        <p>__________</p>
+                        <p style="font-weight:bold">Headmistress</p>
+                    </div>
+                    <div>
+                        <p>__________</p>
+                        <p style="font-weight:bold">Parent</p>
+                    </div>
+                </div>`;
+            }
+
+            // Generate HTML for the entire report
+            function generateReportHTML(studentData) {
+                const student = studentData.studentInfo;
+                return `
+                <div class="page">
+                    ${styles}
+                    ${generateHeaderHTML(studentData.markData, student)}
+                    ${generateStudentInfoHTML(student)}
+                    <h5>SCHOLASTIC AREAS</h5>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; grid-gap: 10px;">
+                        ${generateSubjectHTML(scholasticData, true)}
+                    </div>
+                    <h5>CO-SCHOLASTIC AREAS</h5>
+                    ${generateSubjectHTML(coScholasticData, false)}
+                    ${generateRemarks(studentData)}
+                    ${generateFooter(student)}
+                </div>`;
+            }
+
+            // Render the report for each student
+            const studentsList = document.getElementById("studentsList");
+            studentsList.innerHTML = "";
+            cleanedData.forEach((studentData) => {
+                let singleStudentHtml = document.createElement("div");
+                singleStudentHtml.style.pageBreakBefore = "always";
+                singleStudentHtml.innerHTML = generateReportHTML(studentData);
+                studentsList.append(singleStudentHtml);
+            });
+        };
+    </script>
 
 
+</body>
 
-    const studentData = [
+<!-- Grade added data -->
+
+<!-- marck added data -->
+
+<script>
+    window.SetTemplateData([
         {
             student: {
                 "dob": "20-12-2018",
@@ -2056,16 +2375,7 @@
 
          </div>`,
         },]
-
-
-    // Example usage
-    const cleanStudentData = cleanedUnProcessData(studentData
-        // Define keys for extra fields
     );
-
-    console.log(cleanStudentData, "ffffffffffffffffff cleanStudentData")
-    console.log(studentData, "ffffffffffffff studentData")
-
-
-
 </script>
+
+</html>
