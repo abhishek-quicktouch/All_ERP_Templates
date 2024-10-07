@@ -1032,6 +1032,7 @@
 `;
 
           const subjectData = subjectDataFun([markData]);
+          let count=0
           console.log(subjectData)
           let childGrades = markData.termWiseSubjectResponse
             .flatMap((item) => item.subjectMarksEntryRequests)
@@ -1079,11 +1080,13 @@
     <tbody>
       ${subjectData.mainParent
         .map(
-          (main, mainIndex) => `
+          (main, mainIndex) => {
+            subjectData.subParent[main]?.length && count++
+        return`
         <tr>
          ${ subjectData.subParent[main]?.length ? `
           <td class="text-center" style="text-align:center;">${
-            mainIndex + 1
+            count
           }</td>
          <td style="text-align:center;"><strong>${main}</strong></td>
           <td></td>`:""}
@@ -1101,7 +1104,7 @@
           `;
           })
           .join("")}
-      `
+      `}
         )
         .join("")}
     </tbody>
