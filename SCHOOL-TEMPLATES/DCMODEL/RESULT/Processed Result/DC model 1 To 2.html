@@ -225,7 +225,6 @@
 
     function handleGetDate() {
       let date = new Date(Date.now())
-      console.log(date.getUTCMonth())
       let day = date.getDate().toString().padStart(2, "0")
       let month = (date.getMonth() + 1).toString().padStart(2, "0")
       let year = date.getFullYear()
@@ -259,7 +258,6 @@
     const studentHtml = document.getElementById("studentsList");
     studentHtml.innerHTML = ``;
     multipleStudents?.forEach((element) => {
-      console.log(element, "fffffffff");
       const singleStudentHtml = document.createElement("div");
       singleStudentHtml.style.pageBreakBefore = "always";
 
