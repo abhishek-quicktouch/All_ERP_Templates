@@ -1107,30 +1107,28 @@
     </tbody>
   </table>
 </div>
+<div class="signatures" style="display: flex;
+            justify-content: space-between; margin-top:10px;">
+                        <div>
+                            <p style=" height: 60px" ></p>
+                            <p>CLASS TEACHER</p>
+                        </div>
+ ${studentData.student.className === "VI" || studentData.student.className === "VII" ? `  <div>
+ <img style="width: 120px; height: 60px " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_35_704961643.png" alt="School Logo" class="logo"/>
+                            <p>Academic Co ordinator</p>
+                        </div>
+` : `  <div>
+                            <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_22_114274846.png" alt="School Logo" class="logo"/>
+                            <p>WING INCHARGE</p>
+                        </div>
+`}
+                      
 
-<h4 style="text-align:left; padding:5px; margin:0px;">CO-SCHOLASTIC AREA</h4>
-<div class="section">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th class="text-center" style="text-align:left; width:85%;">SUBJECT</th>
-        <th class="text-center" style="text-align:center;width:15%;"></th>
-      </tr>
-    </thead>
-    <tbody>
-      ${coScholasticSubjects.map(
-          (main, mainIndex) => `
-        <tr>
-          <td style="text-align:left;">${main?.subjectName}</td>
-           <td style="text-align:center;">${ main?.status ? attendanceValue[main?.status] ? attendanceValue[main?.status] : main?.status : main.grade || "-"
-            }</td>
-        </tr>
-      ` ).join("")}
-    </tbody>
-  </table>
-</div>
-
-
+                        <div>
+                            <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_23_07_369478690.png" alt="School Logo" class="logo"/>
+                            <p>PRINCIPAL</p>
+                        </div>
+                    </div>
          
         
      </page>
