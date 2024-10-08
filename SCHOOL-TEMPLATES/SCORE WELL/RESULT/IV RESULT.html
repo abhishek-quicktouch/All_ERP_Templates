@@ -422,7 +422,7 @@
     `;
 
 
-        const generateTeacherRemarks = (remarks, classTeacher) => `
+        const generateTeacherRemarks = (remarks, classTeacher, printDate) => `
       <div class="section">
           <div style="display: flex; justify-content: space-between;  text-align: left; border: 1px solid #000; height: 30px;padding: 5px">
     Teacher Remarks:
@@ -438,7 +438,7 @@
               <div style="display: flex;justify-content: space-between;">
                 <div style="margin-top:30px">
                       <p></p>
-                      <p>Date: ${new Date().toLocaleDateString()} </p>
+                      <p>Date: ${printDate || new Date().toLocaleDateString()} </p>
                   </div>
                   <div style="margin-top:30px">  
                       <p>${classTeacher || ""}</p>
@@ -485,7 +485,7 @@
 
 
               <div class="section" style="margin-top: 10px">
-                ${generateTeacherRemarks(student?.baseTermData?.remarksEntry?.description)}
+                ${generateTeacherRemarks(student?.baseTermData?.remarksEntry?.description, student?.baseTermData?.classTeacher, student?.printDate)}
 </div>
 
 
@@ -502,7 +502,7 @@
         const dataList = Array.isArray(data) ? data : [data];
         const viewTemplate = dataList[0]?.viewTemplate;
 
-        const staticData = [  {
+        const staticData = [{
             student: {
                 dob: "16-06-2016",
                 admissionNo: "1903244",
@@ -2649,7 +2649,7 @@
                 pass: true,
             },
         },
-]
+        ]
         const studentHtml = document.getElementById("studentsList");
         studentHtml.innerHTML = "";
 

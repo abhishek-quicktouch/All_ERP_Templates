@@ -58,6 +58,21 @@
             styles: `
            @page { size: A4; margin: 10mm; }
             @media print { @page { margin: auto; size: A4; } }
+
+ body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png') no-repeat center;
+                background-size: 80%;
+                opacity: 0.1;
+                z-index: -1;
+                pointer-events: none;
+            }
+
             body { font-family: Arial, sans-serif; }
             
             .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
@@ -72,7 +87,7 @@
             .remarks { margin-bottom: 20px; }
             .signatures { display: flex; justify-content: space-between; }
             .signatures div { font-size: 12px; margin: 0px; padding: 0px; width: 30%; text-align: center; }
-            .signatures p { margin: 0px; font-weight: bold; }
+            .signatures p { margin: 0px; font-weight: bold;font-size: 13px; }
         `,
         };
 
@@ -107,34 +122,45 @@
             return `${day}-${month}-${year}`
         }
         const generateStudentInfoTable = (studentInfoFields, student) => {
+
+            const [presentDay, totalDay] = student["attendance"] ? student["attendance"].split("/") : [null, null];
+
             return `
-            <div class="section">
-                <table>
-                    ${studentInfoFields
+<div class="section">
+<table>
+${studentInfoFields
                     .map(
                         (field) => `
-                            <tr>
-                                <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"
-                            }">${field.label}</th>
-                                <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"
-                            }">: ${student[field.key] || ""}</td>
-                                ${field.additionalInfo
+
+<tr>
+<th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"}">
+    ${field.label}
+</th>
+<td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"}">
+    : ${field.key === "className" ? student[field.key] + " - " + student["sectionName"] : student[field.key] || ""}
+</td>
+
+${field.additionalInfo
                                 ? `
-                                    <th style="text-align:left;border-right:none;width: 20%">${field.additionalInfo.label}</th>
-                                    <td style="text-align:left;border-left:none">: ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"] : student[field.additionalInfo.key] || ""
-                                }</td>
-                                `
-                                : ""
-                            }
-                            </tr>
-                        `
+    <th style="text-align:left;border-right:none;width: 20%">
+        ${field.additionalInfo.label}
+    </th>
+    <td style="text-align:left;border-left:none">
+        : ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"]
+                                    : field.additionalInfo.key === "attendance" ?
+                                        Number(presentDay).toFixed(0) + "/" + Number(totalDay).toFixed(0) +
+                                        " (" + Number((presentDay / totalDay) * 100).toFixed(0) + "%)"
+                                        : student[field.additionalInfo.key] || ""}
+    </td>`
+                                : ""}
+</tr>
+`
                     )
                     .join("")}
-                </table>
-            </div>
-        `;
+</table>
+</div>
+`;
         };
-
 
         const generateScholasticTable = (subjects, termConfig) => {
             let totalMarksObtained = 0;
@@ -254,14 +280,14 @@ OBTAINED</br>(${totalSubheader})</th>
         };
 
         const generateTeacherRemarks = (remarks) => `
-        <div class="section" style="border: 1px solid #000; height: 50px;padding: 5px">
+        <div class="section" style="border: 1px solid #000; height: 50px;padding: 5px; font-size: 12px;">
             <strong style="font-size: 12px">Class Teacher Remarks:</strong>
             ${remarks || "-"}
         </div>
     `;
 
         const generateSignatures = () => `
-        <div class="section" style="display: flex; justify-content: space-between;">
+        <div class="signatures" style="display: flex; justify-content: space-between; margin-top: 50px;">
             <div>
                 <p>CLASS TEACHER</p>
                 
@@ -1591,7 +1617,7 @@ OBTAINED</br>(${totalSubheader})</th>
                 rollNumber: 0,
                 classSectionUid: null,
                 classSection: null,
-                description: null,
+                description: "sdjkahfskjasfkj safkjhafsjk",
                 fields: null,
                 status: false,
                 createdUser: null,
@@ -2139,7 +2165,7 @@ OBTAINED</br>(${totalSubheader})</th>
                     rollNumber: 0,
                     classSectionUid: null,
                     classSection: null,
-                    description: null,
+                    description: "as,jasf sdfjhsfdkjhkjsdf jhjhjh",
                     fields: null,
                     status: false,
                     createdUser: null,
