@@ -43,7 +43,7 @@
                 {
                     label: "DATE OF BIRTH",
                     key: "dob",
-                    additionalInfo: { label: "ATTENDANCE", key: "attendance" },
+                    additionalInfo: { label: "CBSE REG NO.", key: "boardRollNumber" },
                 },
             ],
 
@@ -203,7 +203,8 @@
                 })
                 .join("");
 
-            const overallPercentage = (totalMarksObtained / totalPossibleMarks) * 100;
+            const overallPercentage = (parseFloat(totalMarksObtained) / totalPossibleMarks) * 100;
+            console.log(totalMarksObtained, totalPossibleMarks, "fffffffffff totalMarksObtained")
             const overallGrade = utils.calculateGrade(overallPercentage);
 
             return `
@@ -298,9 +299,12 @@
     `;
 
 
-        const generateParticipationStaticTable = (coScholastic, student) => {
+        const generateParticipationStaticTable = (coScholastic, student, remark) => {
             console.log(student, "fffffffffffff student")
-            const [presentDay, totalDay] = student?.attendance.split("/");
+            const totalDay = remark?.fields?.find((item) => item.title === "Total Days")?.value || "0"
+
+
+            const presentDay = remark?.fields?.find((item) => item.title === "Working Days")?.value || "0"
             const percentage = parseFloat((+presentDay / +totalDay) * 100).toFixed(2);
             return `
         
@@ -967,9 +971,9 @@
 
                  <strong> PERCENTAGE: ${(
                     (totalMarksObj.OVERALL_TOTAL /
-                        (subjectList?.length * 130)) *
+                        totalMarksObj.OVERALL_MAX_TOTAL) *
                     100
-                ).toFixed(1)}%
+                ).toFixed(2)}%
                  </strong>
                 </div>
                             
@@ -1039,7 +1043,7 @@
                
 
               <div class="participation">
-                   ${generateParticipationStaticTable(element?.baseTermData?.subject.filter((item) => item?.subjectAllResponse?.nature?.toLowerCase() === "1b scholastic"), element?.student)}
+                   ${generateParticipationStaticTable(element?.baseTermData?.subject.filter((item) => item?.subjectAllResponse?.nature?.toLowerCase() === "1b scholastic"), element?.student, element?.baseTermData?.remarksEntry)}
                 
 </div>
 
@@ -1128,7 +1132,7 @@
                 fatherName: "Mr. Bhupender Singh",
                 motherName: "Mrs. Sadhna Singh",
                 attendance: "20.1/360",
-                boardRollNumber: "",
+                boardRollNumber: "321",
                 studentInfoResponse: [
                     {
                         id: 262207,
@@ -1359,19 +1363,19 @@
             },
             markData: {
                 "academicSession": "2024-25",
-                "admissionNo": "16712",
-                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                "studentName": "Divyansh Balooni",
-                "rollNo": 39,
-                "fatherName": "Mr. Harish Balooni",
-                "className": "XII",
+                "admissionNo": "17816",
+                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                "studentName": "Angel Verma",
+                "rollNo": 1,
+                "fatherName": "Mr. Pushpendra Kumar Verma",
+                "className": "XI",
                 "sectionName": "A",
                 "terms": "HALF YEARLY",
                 "markSheetName": "TERM-I",
                 "overAllRank": "1",
                 "markSheetTerms": [
                     {
-                        "id": 949,
+                        "id": 932,
                         "headerName": "UT-I",
                         "subHeaderName": "25",
                         "priority": 1,
@@ -1379,11 +1383,11 @@
                         "decimalPlaces": 2,
                         "weightage": 25,
                         "terms": [
-                            "UT-I"
+                            "UT-1"
                         ]
                     },
                     {
-                        "id": 950,
+                        "id": 933,
                         "headerName": "HALF YEARLY",
                         "subHeaderName": "80",
                         "priority": 2,
@@ -1402,28 +1406,28 @@
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
                                 "subjectName": "ENGLISH",
                                 "subjectNature": "THEORY",
                                 "max": 25,
-                                "obtained": 23,
-                                "grade": "A1",
+                                "obtained": 20,
+                                "grade": "B1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 949,
+                                    "id": 932,
                                     "headerName": "UT-I",
                                     "subHeaderName": "25",
                                     "priority": 1,
@@ -1431,36 +1435,36 @@
                                     "decimalPlaces": 2,
                                     "weightage": 25,
                                     "terms": [
-                                        "UT-I"
+                                        "UT-1"
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
                                 "subjectName": "ENGLISH",
                                 "subjectNature": "THEORY",
                                 "max": 80,
-                                "obtained": 64,
-                                "grade": "B1",
+                                "obtained": 50,
+                                "grade": "B2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -1472,15 +1476,15 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 87,
+                        "marksObtained": 70,
                         "total": 105,
-                        "percentage": 82.86,
-                        "grade": "A2",
-                        "className": "XII",
+                        "percentage": 66.67,
+                        "grade": "B2",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
@@ -1494,28 +1498,28 @@
                         "subjectNature": "PRACTICAL",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "53519901-2f62-41a6-9409-a9fae30ca498",
                                 "subjectName": "ASSESSMENT",
                                 "subjectNature": "PRACTICAL",
                                 "max": 20,
-                                "obtained": 17.5,
+                                "obtained": 17,
                                 "grade": "A2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -1527,313 +1531,19 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 17.5,
+                        "marksObtained": 17,
                         "total": 20,
-                        "percentage": 87.5,
+                        "percentage": 85,
                         "grade": "A2",
-                        "className": "XII",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
                         "subjectPrt": 2,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
-                        "subjectName": "PHYSICS",
-                        "subjectNature": "THEORY",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
-                                "subjectName": "PHYSICS",
-                                "subjectNature": "THEORY",
-                                "max": 25,
-                                "obtained": 22.5,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 949,
-                                    "headerName": "UT-I",
-                                    "subHeaderName": "25",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 25,
-                                    "terms": [
-                                        "UT-I"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            },
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
-                                "subjectName": "PHYSICS",
-                                "subjectNature": "THEORY",
-                                "max": 70,
-                                "obtained": 49,
-                                "grade": "B2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 950,
-                                    "headerName": "HALF YEARLY",
-                                    "subHeaderName": "80",
-                                    "priority": 2,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 80,
-                                    "terms": [
-                                        "HALF YEARLY"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 71.5,
-                        "total": 95,
-                        "percentage": 75.26,
-                        "grade": "B1",
-                        "className": "XII",
-                        "sectionName": "A",
-                        "terms": "HALF YEARLY",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 3,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "0fb1ac3a-8292-4176-8e14-904594fce7c0",
-                        "subjectName": "PHYSICS PR",
-                        "subjectNature": "PRACTICAL",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "0fb1ac3a-8292-4176-8e14-904594fce7c0",
-                                "subjectName": "PHYSICS PR",
-                                "subjectNature": "PRACTICAL",
-                                "max": 30,
-                                "obtained": 26,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 950,
-                                    "headerName": "HALF YEARLY",
-                                    "subHeaderName": "80",
-                                    "priority": 2,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 80,
-                                    "terms": [
-                                        "HALF YEARLY"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 26,
-                        "total": 30,
-                        "percentage": 86.67,
-                        "grade": "A2",
-                        "className": "XII",
-                        "sectionName": "A",
-                        "terms": "HALF YEARLY",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 4,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
-                        "subjectName": "CHEMISTRY",
-                        "subjectNature": "THEORY",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
-                                "subjectName": "CHEMISTRY",
-                                "subjectNature": "THEORY",
-                                "max": 25,
-                                "obtained": 16.5,
-                                "grade": "B2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 949,
-                                    "headerName": "UT-I",
-                                    "subHeaderName": "25",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 25,
-                                    "terms": [
-                                        "UT-I"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            },
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
-                                "subjectName": "CHEMISTRY",
-                                "subjectNature": "THEORY",
-                                "max": 70,
-                                "obtained": 59,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 950,
-                                    "headerName": "HALF YEARLY",
-                                    "subHeaderName": "80",
-                                    "priority": 2,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 80,
-                                    "terms": [
-                                        "HALF YEARLY"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 75.5,
-                        "total": 95,
-                        "percentage": 79.47,
-                        "grade": "B1",
-                        "className": "XII",
-                        "sectionName": "A",
-                        "terms": "HALF YEARLY",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 5,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "5395da58-503d-44c4-a9f4-6bccf60f8230",
-                        "subjectName": "CHEMISTRY PR",
-                        "subjectNature": "PRACTICAL",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
-                                "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
-                                "terms": "HALF YEARLY",
-                                "subjectUid": "5395da58-503d-44c4-a9f4-6bccf60f8230",
-                                "subjectName": "CHEMISTRY PR",
-                                "subjectNature": "PRACTICAL",
-                                "max": 30,
-                                "obtained": 26,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-25",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 950,
-                                    "headerName": "HALF YEARLY",
-                                    "subHeaderName": "80",
-                                    "priority": 2,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 80,
-                                    "terms": [
-                                        "HALF YEARLY"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 26,
-                        "total": 30,
-                        "percentage": 86.67,
-                        "grade": "A2",
-                        "className": "XII",
-                        "sectionName": "A",
-                        "terms": "HALF YEARLY",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 6,
                         "decimalPlaces": 2,
                         "visible": false
                     },
@@ -1843,28 +1553,28 @@
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
                                 "subjectName": "MATHEMATICS",
                                 "subjectNature": "THEORY",
                                 "max": 25,
-                                "obtained": 23,
-                                "grade": "A1",
+                                "obtained": 10,
+                                "grade": "D",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHEMATICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 949,
+                                    "id": 932,
                                     "headerName": "UT-I",
                                     "subHeaderName": "25",
                                     "priority": 1,
@@ -1872,36 +1582,36 @@
                                     "decimalPlaces": 2,
                                     "weightage": 25,
                                     "terms": [
-                                        "UT-I"
+                                        "UT-1"
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
                                 "subjectName": "MATHEMATICS",
                                 "subjectNature": "THEORY",
                                 "max": 80,
-                                "obtained": 77,
-                                "grade": "A1",
+                                "obtained": 31,
+                                "grade": "D",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHEMATICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -1913,19 +1623,19 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 100,
+                        "marksObtained": 41,
                         "total": 105,
-                        "percentage": 95.24,
-                        "grade": "A1",
-                        "className": "XII",
+                        "percentage": 39.05,
+                        "grade": "D",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
-                        "subjectPrt": 9,
+                        "subjectPrt": 3,
                         "decimalPlaces": 2,
                         "visible": false
                     },
@@ -1935,28 +1645,28 @@
                         "subjectNature": "PRACTICAL",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "5a581497-5949-423d-a58a-fcd0d4c53f52",
                                 "subjectName": "MATHEMATICS  PR",
                                 "subjectNature": "PRACTICAL",
                                 "max": 20,
-                                "obtained": 19,
-                                "grade": "A1",
+                                "obtained": 14,
+                                "grade": "B2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHEMATICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -1968,50 +1678,50 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 19,
+                        "marksObtained": 14,
                         "total": 20,
-                        "percentage": 95,
-                        "grade": "A1",
-                        "className": "XII",
+                        "percentage": 70,
+                        "grade": "B2",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
-                        "subjectPrt": 10,
+                        "subjectPrt": 4,
                         "decimalPlaces": 2,
                         "visible": false
                     },
                     {
-                        "subjectUid": "c818c256-50d1-4386-8f5c-1d29cad0da5f",
-                        "subjectName": "ARTIFICIAL INTELLIGENCE",
-                        "subjectNature": "ADDITIONAL",
+                        "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
+                        "subjectName": "PHYSICS",
+                        "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
-                                "subjectUid": "c818c256-50d1-4386-8f5c-1d29cad0da5f",
-                                "subjectName": "ARTIFICIAL INTELLIGENCE",
-                                "subjectNature": "ADDITIONAL",
+                                "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
+                                "subjectName": "PHYSICS",
+                                "subjectNature": "THEORY",
                                 "max": 25,
-                                "obtained": 20,
-                                "grade": "B1",
+                                "obtained": 12.5,
+                                "grade": "C2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 949,
+                                    "id": 932,
                                     "headerName": "UT-I",
                                     "subHeaderName": "25",
                                     "priority": 1,
@@ -2019,36 +1729,36 @@
                                     "decimalPlaces": 2,
                                     "weightage": 25,
                                     "terms": [
-                                        "UT-I"
+                                        "UT-1"
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
-                                "subjectUid": "c818c256-50d1-4386-8f5c-1d29cad0da5f",
-                                "subjectName": "ARTIFICIAL INTELLIGENCE",
-                                "subjectNature": "ADDITIONAL",
-                                "max": 50,
-                                "obtained": 44.5,
-                                "grade": "A2",
+                                "subjectUid": "9669d890-f6c3-4696-9c2a-fa8c2b31c4d6",
+                                "subjectName": "PHYSICS",
+                                "subjectNature": "THEORY",
+                                "max": 70,
+                                "obtained": 13.5,
+                                "grade": "E",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -2060,50 +1770,50 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": false,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 64.5,
-                        "total": 75,
-                        "percentage": 86,
-                        "grade": "A2",
-                        "className": "XII",
+                        "marksObtained": 26,
+                        "total": 95,
+                        "percentage": 27.37,
+                        "grade": "E",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
-                        "subjectPrt": 17,
+                        "subjectPrt": 5,
                         "decimalPlaces": 2,
                         "visible": false
                     },
                     {
-                        "subjectUid": "dfbce6dd-b3c9-447c-b3ba-b5b1a0187d73",
-                        "subjectName": "ARTIFICIAL INTELLIGENCE PR",
+                        "subjectUid": "0fb1ac3a-8292-4176-8e14-904594fce7c0",
+                        "subjectName": "PHYSICS PR",
                         "subjectNature": "PRACTICAL",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "c07c3292-ea56-4d06-b3e5-dd6975277c0e",
-                                "admissionNo": "16712",
-                                "studentName": "Divyansh Balooni",
-                                "rollNo": 39,
-                                "fatherName": "Mr. Harish Balooni",
-                                "className": "XII",
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
                                 "sectionName": "A",
-                                "classSectionUid": "251c2659-f7f6-48df-b956-2b1a46b656ae",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
                                 "terms": "HALF YEARLY",
-                                "subjectUid": "dfbce6dd-b3c9-447c-b3ba-b5b1a0187d73",
-                                "subjectName": "ARTIFICIAL INTELLIGENCE PR",
+                                "subjectUid": "0fb1ac3a-8292-4176-8e14-904594fce7c0",
+                                "subjectName": "PHYSICS PR",
                                 "subjectNature": "PRACTICAL",
-                                "max": 50,
-                                "obtained": 27,
-                                "grade": "C1",
+                                "max": 30,
+                                "obtained": 22,
+                                "grade": "B1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-25",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
-                                    "id": 950,
+                                    "id": 933,
                                     "headerName": "HALF YEARLY",
                                     "subHeaderName": "80",
                                     "priority": 2,
@@ -2115,27 +1825,321 @@
                                     ]
                                 },
                                 "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 27,
-                        "total": 50,
-                        "percentage": 54,
-                        "grade": "C1",
-                        "className": "XII",
+                        "marksObtained": 22,
+                        "total": 30,
+                        "percentage": 73.33,
+                        "grade": "B1",
+                        "className": "XI",
                         "sectionName": "A",
                         "terms": "HALF YEARLY",
                         "markSheetName": "TERM-I",
-                        "subjectPrt": 18,
+                        "subjectPrt": 6,
+                        "decimalPlaces": 2,
+                        "visible": false
+                    },
+                    {
+                        "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
+                        "subjectName": "CHEMISTRY",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
+                                "subjectName": "CHEMISTRY",
+                                "subjectNature": "THEORY",
+                                "max": 25,
+                                "obtained": 9,
+                                "grade": "D",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "CHEMISTRY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 932,
+                                    "headerName": "UT-I",
+                                    "subHeaderName": "25",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 25,
+                                    "terms": [
+                                        "UT-1"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": true,
+                                "graded": false
+                            },
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "6836565c-feb5-4d6b-a097-619253f5d068",
+                                "subjectName": "CHEMISTRY",
+                                "subjectNature": "THEORY",
+                                "max": 70,
+                                "obtained": 20,
+                                "grade": "E",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "CHEMISTRY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 933,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "80",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 80,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": false,
+                                "graded": false
+                            }
+                        ],
+                        "marksObtained": 29,
+                        "total": 95,
+                        "percentage": 30.53,
+                        "grade": "E",
+                        "className": "XI",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 7,
+                        "decimalPlaces": 2,
+                        "visible": false
+                    },
+                    {
+                        "subjectUid": "5395da58-503d-44c4-a9f4-6bccf60f8230",
+                        "subjectName": "CHEMISTRY PR",
+                        "subjectNature": "PRACTICAL",
+                        "markSheetReport": [
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "5395da58-503d-44c4-a9f4-6bccf60f8230",
+                                "subjectName": "CHEMISTRY PR",
+                                "subjectNature": "PRACTICAL",
+                                "max": 30,
+                                "obtained": 19,
+                                "grade": "B2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "CHEMISTRY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 933,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "80",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 80,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": true,
+                                "graded": false
+                            }
+                        ],
+                        "marksObtained": 19,
+                        "total": 30,
+                        "percentage": 63.33,
+                        "grade": "B2",
+                        "className": "XI",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 8,
+                        "decimalPlaces": 2,
+                        "visible": false
+                    },
+                    {
+                        "subjectUid": "5d95c005-f3e6-48a7-a0a3-b194f4cf73a4",
+                        "subjectName": "BIOLOGY",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "5d95c005-f3e6-48a7-a0a3-b194f4cf73a4",
+                                "subjectName": "BIOLOGY",
+                                "subjectNature": "THEORY",
+                                "max": 25,
+                                "obtained": 12,
+                                "grade": "C2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "BIOLOGY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 932,
+                                    "headerName": "UT-I",
+                                    "subHeaderName": "25",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 25,
+                                    "terms": [
+                                        "UT-1"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": true,
+                                "graded": false
+                            },
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "5d95c005-f3e6-48a7-a0a3-b194f4cf73a4",
+                                "subjectName": "BIOLOGY",
+                                "subjectNature": "THEORY",
+                                "max": 70,
+                                "obtained": 23.5,
+                                "grade": "D",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "BIOLOGY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 933,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "80",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 80,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": true,
+                                "graded": false
+                            }
+                        ],
+                        "marksObtained": 35.5,
+                        "total": 95,
+                        "percentage": 37.37,
+                        "grade": "D",
+                        "className": "XI",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 9,
+                        "decimalPlaces": 2,
+                        "visible": false
+                    },
+                    {
+                        "subjectUid": "e5006dc7-1185-491c-a5b9-fad799514714",
+                        "subjectName": "BIOLOGY PR",
+                        "subjectNature": "PRACTICAL",
+                        "markSheetReport": [
+                            {
+                                "studentInfoUid": "df8ab1e4-dac3-4cc8-8025-b5e393f9e5b6",
+                                "admissionNo": "17816",
+                                "studentName": "Angel Verma",
+                                "rollNo": 1,
+                                "fatherName": "Mr. Pushpendra Kumar Verma",
+                                "className": "XI",
+                                "sectionName": "A",
+                                "classSectionUid": "1f99ba7e-0a19-48d5-9bda-c2e6a0187bb8",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "e5006dc7-1185-491c-a5b9-fad799514714",
+                                "subjectName": "BIOLOGY PR",
+                                "subjectNature": "PRACTICAL",
+                                "max": 30,
+                                "obtained": 28,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "BIOLOGY",
+                                "session": "2024-25",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 933,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "80",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 80,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
+                                },
+                                "visible": false,
+                                "pass": true,
+                                "graded": false
+                            }
+                        ],
+                        "marksObtained": 28,
+                        "total": 30,
+                        "percentage": 93.33,
+                        "grade": "A1",
+                        "className": "XI",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 10,
                         "decimalPlaces": 2,
                         "visible": false
                     }
                 ],
-                "marksObtained": 514,
+                "marksObtained": 301.5,
                 "total": 625,
-                "percentage": 82.24,
-                "overAllGrade": "A2",
+                "percentage": 48.24,
+                "overAllGrade": "C2",
                 "visible": false
             },
             remarks: {
@@ -2687,21 +2691,41 @@
                     }
                 ],
                 remarksEntry: {
-                    uid: null,
-                    terms: null,
-                    studentId: null,
-                    studentName: null,
-                    rollNumber: 0,
-                    classSectionUid: null,
-                    classSection: null,
-                    description: null,
-                    fields: null,
-                    status: false,
-                    createdUser: null,
-                    editedUser: null,
-                    createdDate: null,
-                    editedDate: null,
+                    "uid": "9b2c9e50-001e-4c1e-be5a-012842ee95fd",
+                    "terms": [
+                        "HALF YEARLY"
+                    ],
+                    "studentId": "18493",
+                    "studentName": "Naisha Jain",
+                    "rollNumber": 27,
+                    "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                    "classSection": "III-A",
+                    "description": "KEEP IT UP.",
+                    "fields": [
+                        {
+                            "uid": "58864e43-32da-476f-8266-aa60073120c5",
+                            "title": "Total Days",
+                            "type": "OPEN",
+                            "value": "109",
+                            "masterUid": "46604011-6dd7-46fb-aea5-755d2b5243e8",
+                            "masterName": "Remarks"
+                        },
+                        {
+                            "uid": "88c16538-fa6d-4882-b1b3-d5b1a706fc03",
+                            "title": "Working Days",
+                            "type": "OPEN",
+                            "value": "92",
+                            "masterUid": "46604011-6dd7-46fb-aea5-755d2b5243e8",
+                            "masterName": "Remarks"
+                        }
+                    ],
+                    "status": true,
+                    "createdUser": "Reena_487422",
+                    "editedUser": "NEETUNAIR_501967",
+                    "createdDate": "07-10-2024 12:46 PM",
+                    "editedDate": "08-10-2024 01:01 PM"
                 },
+
                 school: {
                     uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
                     apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",

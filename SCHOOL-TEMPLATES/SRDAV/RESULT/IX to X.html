@@ -122,44 +122,48 @@
             },
         };
 
-        const generateStudentInfoTable = (studentInfoFields, student) => {
-            const [presentDay, totalDay] = student["attendance"]?.split("/");
+        const generateStudentInfoTable = (studentInfoFields, student, remark) => {
+            console.log(remark, "fffffffff remark")
+
+            const totalDay = remark?.fields?.find((item) => item.title === "Total Days")?.value || "0"
+
+
+            const presentDay = remark?.fields?.find((item) => item.title === "Working Days")?.value || "0"
             return `
-            <div class="section">
-                <table>
-                    ${studentInfoFields
+<div class="section">
+<table>
+${studentInfoFields
                     .map(
                         (field) => `
-                            <tr>
-                                <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"
-                            }">${field.label}</th>
-                                <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"
-                            }">: ${student[field.key] || ""}</td>
-                                ${field.additionalInfo
+
+        <tr>
+            <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"}">
+                ${field.label}
+            </th>
+            <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"}">
+                : ${field.key === "className" ? student[field.key] + " - " + student["sectionName"] : student[field.key] || ""}
+            </td>
+
+            ${field.additionalInfo
                                 ? `
-                                    <th style="text-align:left;border-right:none;width: 20%">${field.additionalInfo.label
-                                }</th>
-                                    <td style="text-align:left;border-left:none">: ${field.additionalInfo.key === "className"
-                                    ? student[field.additionalInfo.key] +
-                                    " - " +
-                                    student["sectionName"]
-                                    : field.additionalInfo.key ===
-                                        "attendance"
-                                        ? Number(presentDay).toFixed(0) +
-                                        "/" +
-                                        Number(totalDay).toFixed(0)
-                                        : student[field.additionalInfo.key] ||
-                                        ""
-                                }</td>`
-                                : ""
-                            }
-                            </tr>
-                          `
+                <th style="text-align:left;border-right:none;width: 20%">
+                    ${field.additionalInfo.label}
+                </th>
+                <td style="text-align:left;border-left:none">
+                    : ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"]
+                                    : field.additionalInfo.key === "attendance" ?
+                                        presentDay + "/" + totalDay +
+                                        " (" + Number((presentDay / totalDay) * 100).toFixed(0) + "%)"
+                                        : student[field.additionalInfo.key] || ""}
+                </td>`
+                                : ""}
+        </tr>
+    `
                     )
                     .join("")}
-                </table>
-            </div>
-        `;
+</table>
+</div>
+`;
         };
 
         const generateScholasticTable = (subjects, termConfig) => {
@@ -375,7 +379,9 @@
                     <div class="section">
                         ${generateStudentInfoTable(
                     config.studentInfoFields,
-                    element?.student
+                    element?.student,
+                    element?.baseTermData?.remarksEntry
+
                 )}
                     </div>
                     <div class="section">

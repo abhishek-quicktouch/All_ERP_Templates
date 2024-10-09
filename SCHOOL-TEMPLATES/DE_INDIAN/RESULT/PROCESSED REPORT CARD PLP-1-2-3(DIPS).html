@@ -403,7 +403,7 @@
       );
 
       studhtml.innerHTML =
-        
+
         `<page orientation="portrait" format="A4" margin="0"><style type="text/css">
  body {
             font-family: Arial, sans-serif;
@@ -587,11 +587,15 @@ ${studentData?.header}
                   term?.subHeaderName?.replace(/[()]/g, "")
                 ) || 0;
               totalHeaderName += headerValue;
-              return `<th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;"><h4 style="margin-top: -1px; margin-bottom: 2px">${term?.headerName} </h4> ${term?.subHeaderName}</th>`;
+              return `<th style="text-align: center; font-size: 11px; padding: 4px; margin: 0; height: 20px">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column;justify-content: space-between">
+                  <h4 style="margin-top: -1px; margin-bottom: 2px">${term?.headerName} </h4> <p style="margin: 0px;"> ${term?.subHeaderName} </p>
+                  </div>
+                </th>`;
             })
             .join("");
         })()}
-                        <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;"><h4 style="margin-top: -1px; margin-bottom: 2px"> TOTAL MARKS OBTAINED </h4> (${totalHeaderName})</th>
+                        <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;"><h4 style="margin-top: -1px; margin-bottom: 2px"> TOTAL MARKS OBTAINED </h4> <p style="vertical-align: text-bottom;"> (${totalHeaderName})</p></th>
                         <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;">% AGE</th>
                         <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;">GRADE</th>
                     </tr>

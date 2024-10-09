@@ -20,8 +20,8 @@
             schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png",
             schoolName: "SRDAV PUBLIC SCHOOL",
             schoolAddress: `<h5>DAYANAND VIHAR,DELHI-110092</h5>
-            <h5>(ANNUAL PROGRESS REPORT) </h5>`,
-            reportTitle: "(ANNUAL PROGRESS REPORT)",
+            <h5>(HALF YEARLY PROGRESS REPORT) </h5>`,
+            reportTitle: "(HALF YEAR PROGRESS REPORT)",
             studentInfoFields: [
                 {
                     label: "STUDENT'S NAME",
@@ -121,10 +121,11 @@
             let year = date.getFullYear()
             return `${day}-${month}-${year}`
         }
-        const generateStudentInfoTable = (studentInfoFields, student) => {
+        const generateStudentInfoTable = (studentInfoFields, student, remark) => {
+            console.log(remark, "fffffffff remark")
 
-            const [presentDay, totalDay] = student["attendance"] ? student["attendance"].split("/") : [null, null];
-
+            const totalDay = remark?.fields?.find((item) => item.title === "Total Days")?.value || "0"
+            const presentDay = remark?.fields?.find((item) => item.title === "Working Days")?.value || "0"
             return `
 <div class="section">
 <table>
@@ -132,29 +133,29 @@ ${studentInfoFields
                     .map(
                         (field) => `
 
-<tr>
-<th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"}">
-    ${field.label}
-</th>
-<td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"}">
-    : ${field.key === "className" ? student[field.key] + " - " + student["sectionName"] : student[field.key] || ""}
-</td>
+        <tr>
+            <th style="text-align:left; border-right:none;width: ${field.additionalInfo ? "20%" : "50%"}">
+                ${field.label}
+            </th>
+            <td style="text-align:left ;border-left:none;width: ${field.additionalInfo ? "30%" : "50%"}">
+                : ${field.key === "className" ? student[field.key] + " - " + student["sectionName"] : student[field.key] || ""}
+            </td>
 
-${field.additionalInfo
+            ${field.additionalInfo
                                 ? `
-    <th style="text-align:left;border-right:none;width: 20%">
-        ${field.additionalInfo.label}
-    </th>
-    <td style="text-align:left;border-left:none">
-        : ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"]
+                <th style="text-align:left;border-right:none;width: 20%">
+                    ${field.additionalInfo.label}
+                </th>
+                <td style="text-align:left;border-left:none">
+                    : ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"]
                                     : field.additionalInfo.key === "attendance" ?
-                                        Number(presentDay).toFixed(0) + "/" + Number(totalDay).toFixed(0) +
+                                        presentDay + "/" + totalDay +
                                         " (" + Number((presentDay / totalDay) * 100).toFixed(0) + "%)"
                                         : student[field.additionalInfo.key] || ""}
-    </td>`
+                </td>`
                                 : ""}
-</tr>
-`
+        </tr>
+    `
                     )
                     .join("")}
 </table>
@@ -318,11 +319,11 @@ OBTAINED</br>(${totalSubheader})</th>
                         <div style="text-align:center;margin-bottom:10px">
                             <h2>${config.schoolName}</h2>
                             <div>${config.schoolAddress}</div>
-                            <h5>ACADEMIC SESSION : ${element?.markData?.academicSession || ""}</br>Comprehensive Progress Report : ${element?.markData?.markSheetName || ""}</h5>
+                            <h5>ACADEMIC SESSION : ${element?.markData?.academicSession || ""}</br>Comprehensive Progress Report </h5>
                         </div>
                     </div>
                     <div class="section">
-                        ${generateStudentInfoTable(config.studentInfoFields, element?.student)}
+                        ${generateStudentInfoTable(config.studentInfoFields, element?.student, element?.baseTermData?.remarksEntry)}
                     </div>
                     <div class="section">
                         ${generateScholasticTable(element?.markData?.subjectWiseMarkSheetReportResponses, termConfig)}
