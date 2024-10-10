@@ -22,29 +22,25 @@
       NA: "NA",
     };
 
-    const CalculateAverage=(arr,data,key)=>{
-      let sum = 0
-       arr.forEach(el=>{
-        if(data[el])
-        {
-          sum+= data[el]["ASSESSMENT"]["obt"] + data[el]["EXAM"]["obt"]
-        }
-       })
-       arr.forEach((el,i)=>{
-        if(data[el] && i==0)
-        {
-         data[el]["AVG"] = Math.round(sum/arr?.length)
-         data[el]["SPAN"] = arr?.length
-        }
-        else{
-         delete data[el]["TOTAL"]
-        }
-       })
-       return data
-    }
+    const CalculateAverage = (arr, data, key) => {
+        let sum = 0;
+        arr.forEach((el) => {
+          if (data[el]) {
+            sum += (data[el]["ASSESSMENT"] ? (data[el]["ASSESSMENT"]["obt"] || 0) : 0) +  (data[el]["EXAM"] ? (data[el]["EXAM"]["obt"] || 0) : 0);
+          }
+        });
+        arr.forEach((el, i) => {
+          if (data[el] && i == 0) {
+            data[el]["AVG"] = Math.round(sum / arr?.length);
+            data[el]["SPAN"] = arr?.length;
+          } else {
+            delete data[el]["TOTAL"];
+          }
+        });
+        return data;
+      };
 
     function ConvertData(data) {
-        console.log(data)
       let allSubjects = [];
       let subjectData = {};
       let allTotal = {};
@@ -271,18 +267,25 @@
             </div>
             <div style="width: 25%; border:1.5px solid black; flex-grow: 1; min-height:100%; font-size:12px; font-weight:bold;">
                 <div style="height:60px; border-bottom:1.5px solid black; display:flex; justify-content:center; align-items:center; text-align:center;">CLASS TEACHER'S REMARK</div>
-                <div style="height:80%; display:flex; justify-content:center; align-items:center;">${data?.remarks?.description || ""}</div>
+                 <div style="height: calc(100% - 63px); display:flex; justify-content:center; align-items:center; text-align:center; padding:0px 1px;">${
+                  st?.remarks?.description || ""
+                }</div>
             </div>   
         </div>
-        <div style="margin-top:40px; border:1.5px solid black; width:28%; text-align:center; font-weight:bold;">
-            <p>RESULT</p>    
-        </div>
+        
+        <table style="margin-top:10px; border:1.5px solid black; width:100%; text-align:center;">
+            <tr>
+              <th rowspan="2">ATTENDANCE</th>  
+              <th>WORKING DAYS</th> 
+              <th>PRESENT DAYS</th>
+            </tr>
+            <tr>
+              <td>${st?.remarks?.fields?.find(f=>f?.title == "WORKING DAYS")?.value || "-"}</td>
+              <td>${st?.remarks?.fields?.find(f=>f?.title == "PRESENT DAYS")?.value || "-"}</td> 
+            </tr>   
+        </table>
 
-        <div style="margin-top:40px;">
-            <p>This is to certify that <span style="font-weight:bold; font-size:14px; text-decoration:underline;">${st?.student?.studentName}</span> has been  <span style="font-weight:bold; font-size:14px;">promoted to / detained in /</span> class ____________</p>    
-        </div>
-
-        <div style="margin-top:70px; display:flex; justify-content:space-between; align-items:center; ">
+        <div style="margin-top:200px; display:flex; justify-content:space-between; align-items:center; ">
             <div style="width:fit-content; margin-top:auto;">
             <p style="text-align:center;">_________________________</p>  
             <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
