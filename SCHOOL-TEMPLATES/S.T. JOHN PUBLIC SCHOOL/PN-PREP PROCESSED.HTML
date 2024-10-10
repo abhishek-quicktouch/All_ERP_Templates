@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="student"></div>
+  </body>
+  <script>
+    window.SetTemplateData = function (data) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "ML",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+      };
+
+      const CalculateAverage = (arr, data, key) => {
+        let sum = 0;
+        arr.forEach((el) => {
+          if (data[el]) {
+            sum +=
+              (data[el]["ASSESSMENT"]
+                ? data[el]["ASSESSMENT"]["obt"] || 0
+                : 0) + (data[el]["EXAM"] ? data[el]["EXAM"]["obt"] || 0 : 0);
+          }
+        });
+        arr.forEach((el, i) => {
+          if (data[el] && i == 0) {
+            data[el]["AVG"] = Math.round(sum / arr?.length);
+            data[el]["SPAN"] = arr?.length;
+          } else {
+            delete data[el]["TOTAL"];
+          }
+        });
+        return data;
+      };
+
+      function ConvertData(data) {
+        let allSubjects = [];
+        let subjectData = {};
+        let allTotal = {};
+        let rowSpan = {};
+        let overallTotal = 0;
+        let overallTotalMax = 0;
+        let terms = data?.markSheetTerms?.map((el) => {
+          return {
+            headerName: el?.headerName,
+            subHeaderName: el?.subHeaderName,
+          };
+        });
+        data?.subjectWiseMarkSheetReportResponses?.map((el, ind) => {
+          let markSheet = el?.markSheetReport;
+          subjectData[el?.subjectName] = {};
+          markSheet?.forEach((t) => {
+            if (t?.attachmentName && !rowSpan[t?.attachmentName]) {
+              rowSpan[t?.attachmentName] = [];
+            }
+
+            t?.attachmentName &&
+              !rowSpan[t?.attachmentName]?.includes(el?.subjectName) &&
+              rowSpan[t?.attachmentName].push(el?.subjectName);
+            allTotal[t?.markSheetTermResponse?.headerName] = {
+              max: t?.graded
+                ? allTotal[t?.markSheetTermResponse?.headerName]?.max
+                : t?.max +
+                  (allTotal[t?.markSheetTermResponse?.headerName]?.max || 0),
+              obt: t?.graded
+                ? allTotal[t?.markSheetTermResponse?.headerName]?.obt
+                : t?.obtained +
+                  (allTotal[t?.markSheetTermResponse?.headerName]?.obt || 0),
+            };
+            subjectData[el?.subjectName][t?.markSheetTermResponse?.headerName] =
+              {
+                status: t?.status,
+                max: t?.max,
+                obt: t?.grade,
+                grade: t?.graded ? t?.grade : "",
+              };
+            if (t?.graded) {
+              subjectData[el?.subjectName]["GRADE"] = el?.grade;
+            } else {
+              subjectData[el?.subjectName]["TOTAL"] = el?.grade || 0;
+            }
+          });
+          allSubjects.push(el?.subjectName);
+        });
+
+        for (let key in rowSpan) {
+          subjectData = CalculateAverage(rowSpan[key], subjectData, key);
+        }
+
+        for (let k in subjectData) {
+          overallTotal += subjectData[k]["AVG"] || subjectData[k]["TOTAL"] || 0;
+          if (subjectData[k]["AVG"] || subjectData[k]["TOTAL"]) {
+            overallTotalMax += 100;
+          }
+        }
+
+        return {
+          terms,
+          allSubjects,
+          subjectData,
+          allTotal,
+          rowSpan,
+          overallTotal,
+          overallTotalMax,
+        };
+      }
+
+      const student = document.getElementById("student");
+
+      student.innerHTML = `
+           <style>
+            body{
+                font-family: arial;
+                color: #1f497d;
+                margin:0px;
+                padding:5px;
+                box-sizing:border-box;
+            }
+            #student{
+            padding:1.2rem;
+            }
+
+            p {
+            margin: 4px 0;
+            font-size: small;
+            }
+            table,
+            th,
+            td {
+            border-collapse: collapse;
+            border: 1.5px solid black;
+            padding:2px;
+            font-size:12px;
+            }
+            .paddingLeft {
+            padding-left: 2rem;
+            }
+            @media print {
+              @page {
+                margin: 0.5mm;
+                size: A4;
+              }
+
+               body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_228266413.png') no-repeat center;
+                background-size: 80%;
+                opacity: 0.1;
+                z-index: -1;
+                pointer-events: none;
+            }
+            }
+      </style>`;
+
+      data?.forEach((st, index) => {
+        const {
+          terms,
+          allSubjects,
+          subjectData,
+          allTotal,
+          rowSpan,
+          overallTotal,
+          overallTotalMax,
+        } = ConvertData(st?.markData);
+        let total = 0;
+        let termTotal = 0;
+        student.innerHTML += `<div style="page-break-before: always;"></div>
+    <page orientation="portrait" format="A4" margin="0" style=" position: relative; z-index: 1; font-size: 16px;">
+        <div style="border:2px solid black; padding:10px; margin-top:${
+          index !== 0 ? "20px;" : ""
+        }">
+      <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div style="width:12%;">
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_228266413.png" alt="" style="width:100%;"/>
+      </div>
+      <div style="width:76%; text-align:center;">
+       <p style="font-size:30px; font-weight:bold;">ST. JOHN'S CO-ED SCHOOL</p>
+       <p style="font-size:14px;">558, R. K. PURAM, MAWAIYA ROAD, NAINI, PRAYAGRAJ</p>
+      </div>
+      <div style="width:12%; ">
+      </div>
+      
+      </div>
+      <div style="text-align: center; font-weight: bold; margin-bottom:10px;">
+          <p style="font-size:15px; padding:0px; margin:0px;">PROGRESS REPORT : ${
+            st?.markData?.academicSession
+          }</p>
+        </div>
+
+<table style="width: 100%; border-collapse: collapse; ">
+  <tr>
+    <td style="text-align: left; color:black; padding-left: 0.3rem; padding-right: 10px; border-right:none; width: 30%;">
+      <strong>NAME</strong>
+    </td>
+    <td style="text-align: left; color:black;  border-left:none; ">: ${
+      st?.student?.studentName
+    }</td>
+    <td style="text-align: left; color:black; padding-left: 0.3rem; padding-right: 10px;border-right:none; width: 30%;">
+      <strong>CLASS & SECTION</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${
+      st?.student?.className + "-" + st?.student?.sectionName
+    }</td>
+  </tr>
+  <tr>
+    <td style="text-align: left;color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+      <strong>FATHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${
+      st?.student?.fatherName
+    }</td>
+    <td style="text-align: left;color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+      <strong>D.O.B</strong> 
+    </td>
+    <td style="text-align: left; color:black;  border-left:none;">: ${
+      st?.student.studentInfoResponse?.[0]?.dob
+    }</td>
+  </tr>
+  <tr>
+    <td style="text-align: left; color:black;padding-left: 0.3rem;   padding-right: 10px;border-right:none">
+      <strong>MOTHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${
+      st?.student?.motherName
+    }</td>
+    <td style="text-align: left; color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none ; width: 20%">
+      <strong>ADM. NUMBER</strong> 
+    </td>
+    <td style="text-align: left;  border-left:none; color:black;">: ${
+      st?.student?.admissionNo
+    }</td>
+  </tr>
+</table>
+
+        <div style="width: 100%; display:flex; justify-content:space-between; margin-top:1rem; height:fit-content; gap:10px; border:1px solid;">
+            <div style="width: 70%;">
+                <table style="width: 100%; border:none; ">
+                    <tr style="text-align:center; height:60px;">
+                      <th style="width:40%; font-size:12px;">SUBJECTS</th>
+                       ${terms
+                         ?.map(
+                           (
+                             el,
+                             i
+                           ) => `<th style="text-align:center;font-size:12px; width:20%;border-right:${
+                             i == 0 ? "1.5px solid black;" : null
+                           }">
+                            ${el?.headerName}</br>(${el?.subHeaderName})
+                            </th>`
+                         )
+                         .join("")}
+                      <th style="text-align:center; font-size:12px;">TOTAL</br>(100)</th>
+                    </tr>
+                    ${allSubjects
+                      ?.map((el) => {
+                        return `<tr>
+                                <td style="font-size:12px;">${el}</td>
+                                 ${terms
+                                   ?.map((t, i) => {
+                                     return `<td style="text-align:center; font-weight: ${
+                                       subjectData[el][t?.headerName]?.status
+                                         ? "bold;"
+                                         : ""
+                                     }">${
+                                       subjectData?.[el]?.[t?.headerName]
+                                         ? attendanceValue[
+                                             subjectData[el][t?.headerName]
+                                               ?.status
+                                           ] ||
+                                           subjectData[el][t?.headerName]
+                                             ?.status ||
+                                           subjectData[el][t?.headerName]
+                                             ?.obt ||
+                                           "-"
+                                         : "-"
+                                     }</td>`;
+                                   })
+                                   .join("")}
+                                ${(() => {
+                                  if (subjectData[el]["SPAN"]) {
+                                    return `<td style="text-align:center; background-color:${
+                                      subjectData[el]["AVG"] < 35
+                                        ? "#ffc7ce;"
+                                        : ""
+                                    } color:${
+                                      subjectData[el]["AVG"] < 35
+                                        ? "#a51218;"
+                                        : ""
+                                    }" rowspan=${
+                                      subjectData[el]["SPAN"] || 1
+                                    }>${subjectData[el]["AVG"]}</td>`;
+                                  } else if (subjectData[el]["GRADE"]) {
+                                    return `<td style="text-align:center;">${subjectData[el]["GRADE"]}</td>`;
+                                  } else if (subjectData[el]["TOTAL"]) {
+                                    return `<td style="text-align:center;  background-color:${
+                                      subjectData[el]["TOTAL"] < 35
+                                        ? "#ffc7ce;"
+                                        : ""
+                                    } color:${
+                                      subjectData[el]["TOTAL"] < 35
+                                        ? "#a51218;"
+                                        : ""
+                                    }">${subjectData[el]["TOTAL"]}</td>`;
+                                  } else {
+                                    return "";
+                                  }
+                                })()}
+                            </tr>`;
+                      })
+                      .join("")}
+                    <tr>
+                         <td style="font-size:12px; font-weight:bold;">TOTAL</td>
+                         ${terms
+                           ?.map((el) => {
+                             total += allTotal[el?.headerName]?.obt;
+                             termTotal += allTotal[el?.headerName]?.max;
+
+                             return `<td style="font-size:12px; font-weight:bold; text-align:center;">${
+                               allTotal[el?.headerName]?.obt
+                             }</td>`;
+                           })
+                           .join("")}
+                        <td style="font-size:12px; font-weight:bold; text-align:center;">${total}</td>
+                           
+                    </tr>
+                    <tr>
+                        <td style="font-size:12px; font-weight:bold;">PERCENTAGE</td>
+                        ${terms
+                          ?.map((el) => {
+                            return `<td style="font-size:12px; font-weight:bold; text-align:center;">${
+                              (allTotal[el?.headerName]?.obt /
+                                allTotal[el?.headerName]?.max) *
+                              100
+                            }</td>`;
+                          })
+                          .join("")}
+                        <td style="font-size:12px; font-weight:bold; text-align:center;">${(
+                          (total / termTotal) *
+                          100
+                        ).toFixed(2)}</td>
+                           
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 25%; border:1.5px solid black; flex-grow: 1; min-height:100%; font-size:12px; font-weight:bold;">
+                <div style="height:60px; border-bottom:1.5px solid black; display:flex; justify-content:center; align-items:center; text-align:center;">CLASS TEACHER'S REMARK</div>
+                 <div style="height: calc(100% - 63px); display:flex; justify-content:center; align-items:center; text-align:center; padding:0px 1px;">${
+                   st?.remarks?.description || ""
+                 }</div>
+            </div>   
+        </div>
+        
+        <table style="margin-top:10px; border:1.5px solid black; width:100%; text-align:center;">
+            <tr>
+              <th rowspan="2">ATTENDANCE</th>  
+              <th>WORKING DAYS</th> 
+              <th>PRESENT DAYS</th>
+            </tr>
+            <tr>
+              <td>${
+                st?.remarks?.fields?.find((f) => f?.title == "WORKING DAYS")
+                  ?.value || "-"
+              }</td>
+              <td>${
+                st?.remarks?.fields?.find((f) => f?.title == "PRESENT DAYS")
+                  ?.value || "-"
+              }</td> 
+            </tr>   
+        </table>
+
+        <div style="margin-top:200px; display:flex; justify-content:space-between; align-items:center; ">
+            <div style="width:fit-content; margin-top:auto;">
+            <p style="text-align:center;">_________________________</p>  
+            <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
+        </div>
+        <div style="width:fit-content; text-align:center; margin-right:-35px;">
+            <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_233337673.png" style="width:50%;margin-bottom:-15px;"/>
+            <p style="text-align:center;">_________________________</p>  
+            <p style="font-weight:bold;text-align:center; font-size:14px;">PRINCIPAL'S SIGNATURE</p>  
+        </div>
+        </div>
+        </div>
+    </page>`;
+      });
+    };
+  </script>
+  <script>
+    window.SetTemplateData([
+      {
+        student: {
+          dob: "23-08-2018",
+          admissionNo: "20222286",
+          studentName: "Jaitvik Jaiswal",
+          className: "I",
+          sectionName: "A",
+          rollNo: 1111,
+          fatherName: "Anshul Jaiswal",
+          motherName: "Anu Jaiswal",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 281665,
+              userUid: "a7b5c1a0-2e28-4a95-b06a-14c5b7785b83",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "df5df604-f5a4-4b7b-aad9-fa370100a3ef",
+              studentId: "20222286",
+              exAdmissionNo: null,
+              studentName: "Jaitvik Jaiswal",
+              fatherName: "Anshul Jaiswal",
+              motherName: "Anu Jaiswal",
+              dob: "23-08-2018",
+              gender: "Male",
+              studentAdhaarcard: "",
+              joiningClass: "I",
+              joiningSections: "A",
+              joiningDate: "19-04-2024",
+              plotNumber: "",
+              area: "Tri Nagar",
+              city: "New Delhi",
+              state: "NA",
+              pincode: "110035",
+              phone1: null,
+              rollNo: 1111,
+              emergencyNumber: "",
+              mobileNumber: "7557564755",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "8882972149",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "I",
+              classUid: null,
+              sections: "A",
+              group: "I-IV",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-2025",
+              joiningStatus: "Old",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-04-19 12:21:38.822751",
+              editeddate: "2024-04-19 12:21:38.822751",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "b0121e3e-9df6-4fb9-aec2-9c745623f563",
+                houseNo: null,
+                area: "Tri Nagar",
+                landmark: null,
+                city: "New Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110035,
+                street: "1185/80 Shanti Nagar",
+                userName: "SPB303_20222286",
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "d11175eb-abb7-4fdf-9721-a7a740a46982",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "6e10df62-8520-472d-87bc-fdda2dc2922a",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "13-09-2024 10:57 AM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        markData: {
+          academicSession: "2024-25",
+          admissionNo: "4155",
+          studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+          studentName: "Divyansh Sethi",
+          rollNo: 10,
+          fatherName: "Ashish Sethi",
+          className: "PRE NURSERY",
+          sectionName: "A",
+          terms: "EXAM - I",
+          markSheetName: "TERM - I",
+          overAllRank: "11",
+          markSheetTerms: [
+            {
+              id: 1059,
+              headerName: "ASSESSMENT - I",
+              subHeaderName: "TOTAL MARKS 400",
+              priority: 1,
+              bestOf: 0,
+              decimalPlaces: 2,
+              weightage: 100.0,
+              terms: ["ASSESSMENT - I"],
+            },
+            {
+              id: 1060,
+              headerName: "EXAM - I",
+              subHeaderName: "TOTAL MARKS 500",
+              priority: 2,
+              bestOf: 0,
+              decimalPlaces: 2,
+              weightage: 100.0,
+              terms: ["EXAM - I"],
+            },
+          ],
+          subjectWiseMarkSheetReportResponses: [
+            {
+              subjectUid: "c283e85c-3883-4c59-b16e-86179bae6ad0",
+              subjectName: "ENGLISH",
+              subjectNature: "THEORY",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "c283e85c-3883-4c59-b16e-86179bae6ad0",
+                  subjectName: "ENGLISH",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 60.0,
+                  grade: "C",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1059,
+                    headerName: "ASSESSMENT - I",
+                    subHeaderName: "TOTAL MARKS 400",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["ASSESSMENT - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "c283e85c-3883-4c59-b16e-86179bae6ad0",
+                  subjectName: "ENGLISH",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 72.5,
+                  grade: "B",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 132.5,
+              total: 200.0,
+              percentage: 66.25,
+              grade: "B",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 1,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "c9394c42-ce9f-4184-8238-a9a00d386a17",
+              subjectName: "HINDI",
+              subjectNature: "THEORY",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "c9394c42-ce9f-4184-8238-a9a00d386a17",
+                  subjectName: "HINDI",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 40.0,
+                  grade: "C",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1059,
+                    headerName: "ASSESSMENT - I",
+                    subHeaderName: "TOTAL MARKS 400",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["ASSESSMENT - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "c9394c42-ce9f-4184-8238-a9a00d386a17",
+                  subjectName: "HINDI",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 90.0,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 130.0,
+              total: 200.0,
+              percentage: 65.0,
+              grade: "B",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 2,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "abdeef1c-eaa6-4289-b223-007964a0e15d",
+              subjectName: "NUMBER WORK",
+              subjectNature: "THEORY",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "abdeef1c-eaa6-4289-b223-007964a0e15d",
+                  subjectName: "NUMBER WORK",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 55.0,
+                  grade: "C",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1059,
+                    headerName: "ASSESSMENT - I",
+                    subHeaderName: "TOTAL MARKS 400",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["ASSESSMENT - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "abdeef1c-eaa6-4289-b223-007964a0e15d",
+                  subjectName: "NUMBER WORK",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 86.25,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 141.25,
+              total: 200.0,
+              percentage: 70.63,
+              grade: "B",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 3,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "daa72f28-45f7-44af-88d5-e9b7fa68ef0e",
+              subjectName: "NATURE STUDY",
+              subjectNature: "THEORY",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "daa72f28-45f7-44af-88d5-e9b7fa68ef0e",
+                  subjectName: "NATURE STUDY",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 95.0,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1059,
+                    headerName: "ASSESSMENT - I",
+                    subHeaderName: "TOTAL MARKS 400",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["ASSESSMENT - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "daa72f28-45f7-44af-88d5-e9b7fa68ef0e",
+                  subjectName: "NATURE STUDY",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 92.5,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 187.5,
+              total: 200.0,
+              percentage: 93.75,
+              grade: "A+",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 4,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "cab59727-9671-4e45-a64a-4a06162b5a3d",
+              subjectName: "ART & CRAFT",
+              subjectNature: "THEORY",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "cab59727-9671-4e45-a64a-4a06162b5a3d",
+                  subjectName: "ART & CRAFT",
+                  subjectNature: "THEORY",
+                  max: 100.0,
+                  obtained: 80.0,
+                  grade: "A",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 80.0,
+              total: 100.0,
+              percentage: 80.0,
+              grade: "A",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 5,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "6552eff1-4721-4e29-a513-409fe1796290",
+              subjectName: "READING",
+              subjectNature: "PRACTICAL",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "6552eff1-4721-4e29-a513-409fe1796290",
+                  subjectName: "READING",
+                  subjectNature: "PRACTICAL",
+                  max: 100.0,
+                  obtained: 84.99,
+                  grade: "A",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: true,
+                  pass: true,
+                },
+              ],
+              marksObtained: 84.99,
+              total: 100.0,
+              percentage: 84.99,
+              grade: "A",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 6,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "f596a543-50ad-4286-88ee-4eed5aba841d",
+              subjectName: "RECITATION",
+              subjectNature: "PRACTICAL",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "f596a543-50ad-4286-88ee-4eed5aba841d",
+                  subjectName: "RECITATION",
+                  subjectNature: "PRACTICAL",
+                  max: 100.0,
+                  obtained: 100.0,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: true,
+                  pass: true,
+                },
+              ],
+              marksObtained: 100.0,
+              total: 100.0,
+              percentage: 100.0,
+              grade: "A+",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 7,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "82adb0f5-a5b4-4466-91f9-827efa8600a5",
+              subjectName: "CONVERSATION",
+              subjectNature: "PRACTICAL",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "82adb0f5-a5b4-4466-91f9-827efa8600a5",
+                  subjectName: "CONVERSATION",
+                  subjectNature: "PRACTICAL",
+                  max: 100.0,
+                  obtained: 84.99,
+                  grade: "A",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: true,
+                  pass: true,
+                },
+              ],
+              marksObtained: 84.99,
+              total: 100.0,
+              percentage: 84.99,
+              grade: "A",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 8,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "d681ba99-e121-4929-aab8-237cf0eb4902",
+              subjectName: "DICTATION",
+              subjectNature: "PRACTICAL",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "d681ba99-e121-4929-aab8-237cf0eb4902",
+                  subjectName: "DICTATION",
+                  subjectNature: "PRACTICAL",
+                  max: 100.0,
+                  obtained: 100.0,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: true,
+                  pass: true,
+                },
+              ],
+              marksObtained: 100.0,
+              total: 100.0,
+              percentage: 100.0,
+              grade: "A+",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 9,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "0542a70a-dc5b-4487-b010-b09678b64d18",
+              subjectName: "PERSONAL HYGIENE",
+              subjectNature: "PRACTICAL",
+              markSheetReport: [
+                {
+                  studentInfoUid: "ec63370b-33af-4aca-88fb-7dd15abdb61e",
+                  admissionNo: "4155",
+                  studentName: "Divyansh Sethi",
+                  rollNo: 10,
+                  fatherName: "Ashish Sethi",
+                  className: "PRE NURSERY",
+                  sectionName: "A",
+                  classSectionUid: "758fa5c6-d6a2-4fd0-968d-c81c2c57feba",
+                  terms: "EXAM - I",
+                  subjectUid: "0542a70a-dc5b-4487-b010-b09678b64d18",
+                  subjectName: "PERSONAL HYGIENE",
+                  subjectNature: "PRACTICAL",
+                  max: 100.0,
+                  obtained: 74.99,
+                  grade: "B",
+                  status: "",
+                  markSheetName: "TERM - I",
+                  attachmentName: "",
+                  session: "2024-25",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1060,
+                    headerName: "EXAM - I",
+                    subHeaderName: "TOTAL MARKS 500",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 100.0,
+                    terms: ["EXAM - I"],
+                  },
+                  visible: false,
+                  graded: true,
+                  pass: true,
+                },
+              ],
+              marksObtained: 74.99,
+              total: 100.0,
+              percentage: 74.99,
+              grade: "B",
+              className: "PRE NURSERY",
+              sectionName: "A",
+              terms: "EXAM - I",
+              markSheetName: "TERM - I",
+              subjectPrt: 10,
+              decimalPlaces: 2,
+              visible: false,
+            },
+          ],
+          marksObtained: 1116.22,
+          total: 1400.0,
+          percentage: 79.73,
+          overAllGrade: "A",
+          visible: false,
+        },
+        remarks: {
+          uid: null,
+          terms: null,
+          studentId: null,
+          studentName: null,
+          rollNumber: 0,
+          classSectionUid: null,
+          classSection: null,
+          description: null,
+          fields: null,
+          status: false,
+          createdUser: null,
+          editedUser: null,
+          createdDate: null,
+          editedDate: null,
+        },
+        baseTermData: {
+          studentAcademic: {
+            dob: "23-08-2018",
+            admissionNo: "20222286",
+            studentName: "Jaitvik Jaiswal",
+            className: "I",
+            sectionName: "A",
+            rollNo: 1111,
+            fatherName: "Anshul Jaiswal",
+            motherName: "Anu Jaiswal",
+            attendance: "0.0/0",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 281665,
+                userUid: "a7b5c1a0-2e28-4a95-b06a-14c5b7785b83",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "df5df604-f5a4-4b7b-aad9-fa370100a3ef",
+                studentId: "20222286",
+                exAdmissionNo: null,
+                studentName: "Jaitvik Jaiswal",
+                fatherName: "Anshul Jaiswal",
+                motherName: "Anu Jaiswal",
+                dob: "23-08-2018",
+                gender: "Male",
+                studentAdhaarcard: "",
+                joiningClass: "I",
+                joiningSections: "A",
+                joiningDate: "19-04-2024",
+                plotNumber: "",
+                area: "Tri Nagar",
+                city: "New Delhi",
+                state: "NA",
+                pincode: "110035",
+                phone1: null,
+                rollNo: 1111,
+                emergencyNumber: "",
+                mobileNumber: "7557564755",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "NA",
+                fatherCity: "NA",
+                fatherState: "NA",
+                fatherPincode: "",
+                fatherPhone: null,
+                fatherMobile: "8882972149",
+                fatherEmail: null,
+                fatherAdhaarNumber: "",
+                schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "NA",
+                motherCity: "NA",
+                motherState: "NA",
+                motherPincode: "",
+                motherPhone: null,
+                motherMobile: "",
+                motherEmail: null,
+                motherAdhaarNumber: "",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: null,
+                otp: null,
+                schoolName: "Demo Public School",
+                remark: null,
+                classTeacher: "",
+                classTeacherUserName: "",
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: "I-IV",
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2024-2025",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: null,
+                attached: false,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-04-19 12:21:38.822751",
+                editeddate: "2024-04-19 12:21:38.822751",
+                permanentEducationNumber: null,
+                studentAddressResponse: {
+                  uid: "b0121e3e-9df6-4fb9-aec2-9c745623f563",
+                  houseNo: null,
+                  area: "Tri Nagar",
+                  landmark: null,
+                  city: "New Delhi",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 110035,
+                  street: "1185/80 Shanti Nagar",
+                  userName: "SPB303_20222286",
+                  createdDate: "19-04-2024 05:51 PM",
+                  editedDate: "19-04-2024 05:51 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                fatherAddressResponse: {
+                  uid: "d11175eb-abb7-4fdf-9721-a7a740a46982",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "19-04-2024 05:51 PM",
+                  editedDate: "19-04-2024 05:51 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                motherAddressResponse: {
+                  uid: "6e10df62-8520-472d-87bc-fdda2dc2922a",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "19-04-2024 05:51 PM",
+                  editedDate: "19-04-2024 05:51 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+            permanentEducationNumber: null,
+            school: {
+              uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+              schoolName: "SDPS Punjabi Bagh",
+              schoolAbb: "SPB",
+              educationBoard: null,
+              registrationNo: null,
+              plotNumber: null,
+              area: null,
+              city: null,
+              pincode: null,
+              state: null,
+              phoneNo1: null,
+              phoneNo2: null,
+              contactName: "VANDANA GUPTA",
+              contactMobile: "9868359499",
+              contactEmail: "sg4vgoyal@gmail.com",
+              schoolCode: null,
+              pfCode: null,
+              societyManagement: null,
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "sdps",
+              website: null,
+              schemaPrefix: null,
+              editedDate: "13-09-2024 10:57 AM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: true,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+            },
+          },
+          subject: [
+            {
+              subjectAllResponse: {
+                uid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
+                subjectName: "ENGLISH",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "QuickCampus",
+                createddate: "2024-05-16 06:44:38.299734",
+                editeddate: "2024-07-18 06:41:06.601021",
+              },
+              termName: "TERM-I",
+              max: 30,
+              markObtained: 5,
+              percentage: 16.666666666666668,
+              grade: "E",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: true,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
+                subjectName: "HINDI",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "user_374830",
+                createddate: "2024-05-16 06:44:48.348445",
+                editeddate: "2024-05-16 06:44:48.348005",
+              },
+              termName: "TERM-I",
+              max: 30,
+              markObtained: 5,
+              percentage: 16.666666666666668,
+              grade: "E",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: true,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
+                subjectName: "MATHEMATICS",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "user_374830",
+                createddate: "2024-05-16 06:45:28.451693",
+                editeddate: "2024-05-16 06:45:28.449747",
+              },
+              termName: "TERM-I",
+              max: 30,
+              markObtained: 5,
+              percentage: 16.666666666666668,
+              grade: "E",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: true,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "2c9de9f2-8d3f-4a9b-b21a-9c9e17f28c0d",
+                subjectName: "EVS",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "user_374830",
+                createddate: "2024-05-16 06:45:40.430972",
+                editeddate: "2024-05-16 06:45:40.430475",
+              },
+              termName: "TERM-I",
+              max: 30,
+              markObtained: 5,
+              percentage: 16.666666666666668,
+              grade: "E",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: true,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
+                subjectName: "INFORMATION TECHNOLOGY",
+                nature: "2A LIFE SKILLS",
+                natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "QuickCampus",
+                createddate: "2024-05-16 06:46:01.304863",
+                editeddate: "2024-07-18 09:05:05.992916",
+              },
+              termName: "TERM-I",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: false,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "37d62694-c64d-48dd-af42-da7d4507ce48",
+                subjectName: "ART & CRAFT",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "user_374830",
+                createddate: "2024-05-16 06:46:29.134974",
+                editeddate: "2024-05-16 06:50:00.915174",
+              },
+              termName: "TERM-I",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: false,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "2da03450-1d00-4c3c-bc5e-4c590b0098a9",
+                subjectName: "DISCIPLINE",
+                nature: "2A LIFE SKILLS",
+                natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "user_374830",
+                createddate: "2024-06-03 05:22:45.692195",
+                editeddate: "2024-06-05 03:47:48.790194",
+              },
+              termName: "TERM-I",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: false,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "15247237-c055-4606-89e1-a4ee213cedaa",
+                subjectName: "HEALTH & PHYSICAL EDUCATION",
+                nature: "2A LIFE SKILLS",
+                natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "user_374830",
+                editedUser: "QuickCampus",
+                createddate: "2024-06-03 05:22:45.704368",
+                editeddate: "2024-07-18 08:45:35.356345",
+              },
+              termName: "TERM-I",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: false,
+              added: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "7fd1dca0-37b4-4566-8dad-885ee4069f26",
+                subjectName: "WORK EDUCATION",
+                nature: "THEORY",
+                natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-07-18 08:45:19.423465",
+                editeddate: "2024-07-18 08:45:19.422707",
+              },
+              termName: "TERM-I",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              scholastic: false,
+              added: true,
+            },
+          ],
+          remarksEntry: {
+            uid: "f1907672-b0cc-4965-9578-867970e5ae0c",
+            terms: ["TERM-I"],
+            studentId: "20222314",
+            studentName: "Aaditya Narayan",
+            rollNumber: 1101,
+            classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+            classSection: "I-A",
+            description: "Good",
+            fields: [
+              {
+                uid: "7c102678-202a-489c-b47d-3f7798044083",
+                title: "Attendance",
+                type: "OPEN",
+                value: "75/100",
+                masterUid: "0491a44f-cea2-42d0-ab73-e3c527c4b975",
+                masterName: "Remark",
+              },
+            ],
+            status: true,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createdDate: "16-09-2024 03:30 PM",
+            editedDate: "16-09-2024 03:30 PM",
+          },
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "13-09-2024 10:57 AM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+          promotedClass: null,
+          promotedSection: null,
+          perSignedUrlResponse: {
+            url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SDPS/student-info/20222286/student/images/20222286.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240913T104830Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240913%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5d48c7a29dc804e84f32ff1985efe74f6243eeae09eedc91faa80a89c7e58327",
+            fileName: "20222286.png",
+          },
+          pass: false,
+          status_code: 200,
+        },
+        header: null,
+        footer: null,
+      },
+    ]);
+  </script>
+</html>
