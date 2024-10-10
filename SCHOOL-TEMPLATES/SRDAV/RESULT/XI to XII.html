@@ -131,7 +131,7 @@
                                 ${field.additionalInfo
                                 ? `
                                     <th style="text-align:left;border-right:none;width: 20%">${field.additionalInfo.label}</th>
-                                    <td style="text-align:left;border-left:none">: ${field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"] : student[field.additionalInfo.key] || ""
+                                    <td style="text-align:left;border-left:none">: ${field.additionalInfo.key === "boardRollNumber" ? (student["className"] === "XI" ? "-" : student[field.additionalInfo.key] || "") : field.additionalInfo.key === "className" ? student[field.additionalInfo.key] + " - " + student["sectionName"] : student[field.additionalInfo.key] || ""
                                 }</td>
                                 `
                                 : ""
@@ -1126,7 +1126,7 @@
                 dob: "06-01-2016",
                 admissionNo: "20220146",
                 studentName: "Aaradhya Singh",
-                className: "PLP 1",
+                className: "XI",
                 sectionName: "A",
                 rollNo: 1,
                 fatherName: "Mr. Bhupender Singh",
