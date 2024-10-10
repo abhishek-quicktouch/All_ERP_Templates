@@ -121,14 +121,12 @@
         };
         function handleGetDate() {
             let date = new Date(Date.now());
-            // console.log(date.getUTCMonth())
             let day = date.getDate().toString().padStart(2, "0");
             let month = (date.getMonth() + 1).toString().padStart(2, "0");
             let year = date.getFullYear();
             return `${day}-${month}-${year}`;
         }
         const generateStudentInfoTable = (studentInfoFields, student, remark) => {
-            // console.log(remark, "fffffffff remark")
 
             const totalDay = remark?.fields?.find(
                 (item) => item.title === "Total Days"
@@ -204,7 +202,7 @@ ${studentInfoFields
                     let subjectTotal = 0;
                     let subjectMaxTotal = 0;
                     const marks = {};
-
+                    let isStatus = false
                     subject?.markSheetReport?.forEach((report) => {
                         const termName = report?.markSheetTermResponse?.subHeaderName;
                         marks[termName] = {
@@ -230,21 +228,24 @@ ${studentInfoFields
                     <td style="font-weight:bold">${subject?.subjectName}</td>
                     ${termConfig
                             .map(
-                                (term) =>
-                                    `<td style="font-weight:${isNaN(marks[term.header]?.obtained)
+                                (term) => {
+                                    isNaN(marks[term.header]?.obtained) ? isStatus = true : ""
+                                    console.log(isStatus, "fffffffffff isStatus")
+                                    console.log(marks[term.header]?.obtained, "fffffffffffff marks[term.header]?.obtained")
+                                    return `<td style="font-weight:${isNaN(marks[term.header]?.obtained)
                                         ? "bold"
                                         : "normal"
-                                    };text-align:center">${parseFloat(marks[term.header]?.obtained).toFixed(
-                                        1
-                                    ) || "-"
-                                    }</td>`
+                                        };text-align:center">${isNaN(marks[term.header]?.obtained) ? marks[term.header]?.obtained : marks[term.header]?.obtained.toFixed(1)
+                                            || "-"
+                                        }</td>`
+                                }
                             )
                             .join("")}
-                    <td style="text-align:center">${parseFloat(
+                    <td style="text-align:center">${isStatus ? "-" : parseFloat(
                                 subjectTotal
                             ).toFixed(1)}</td>
-                    <td style="text-align:center">${percentage.toFixed(2)}%</td>
-                    <td style="text-align:center">${grade}</td>
+                    <td style="text-align:center">${isStatus ? "-" : `${percentage.toFixed(2)}%`}</td>
+                    <td style="text-align:center">${isStatus ? "-" : grade}</td>
                 </tr>
             `;
                 })
@@ -288,7 +289,6 @@ ${studentInfoFields
             let totalMainMarks = {}; // To track totals for each main subject
             let totalMaxMainMarks = {}; // To track maximum marks for each main subject
             let showLastSubTwo = false;
-            // console.log(subjectData, "ffffffffffff subjectData");
 
             subjectData.forEach((item) => {
                 const mainSubject = item?.subjectAllResponse?.parentName?.[0];
@@ -296,14 +296,9 @@ ${studentInfoFields
 
                 const marksObtained = parseFloat(item.markObtained) || 0;
 
-                // console.log(subSubject, "fffffffffffffff item?.subjectAllResponse?.subjectName")
-
-                // console.log(item, "ffffffffffff item");
-
                 // Calculate total marks for minor subjects
                 if (isMinor) {
                     totalMinorMarks += marksObtained;
-                    // const subSubject = item?.subjectAllResponse?.subjectName?.replace(" or ", ' / ');
 
                     minorSubjects.push({
                         subSubject: subSubject || "Unknown Subject",
@@ -336,13 +331,14 @@ ${studentInfoFields
                     totalMainMarks[mainSubject] += marksObtained;
                     totalMaxMainMarks[mainSubject] += item.max;
 
+                    // Handle Reading Bonus and apply `needStar` logic
                     if (subSubject?.toLowerCase() === "reading bonus") {
-                        // Adjust total marks to handle Reading Bonus
                         totalMainMarks[mainSubject] -= marksObtained;
                         if (totalMainMarks[mainSubject] < 30) {
                             totalMainMarks[mainSubject] += marksObtained;
-                            subjectsGroupedByMain[mainSubject].needStar = true; // Add a flag to mark subject with a star
-                        } else if (totalMainMarks[mainSubject] > 30) {
+                            subjectsGroupedByMain[mainSubject].needStar = true; // Correctly set `needStar`
+                        }
+                        if (totalMainMarks[mainSubject] > 30) {
                             totalMainMarks[mainSubject] = 30;
                         }
                     }
@@ -359,11 +355,14 @@ ${studentInfoFields
                 ${minorSubjects
                         .filter((item) => item.subSubject !== "NAITIK SHIKSHA")
                         .map((item) => {
-                            // console.log(item.subSubject, "fffffffffffff item.subSubject")
+                            console.log(item, "ffffffffffff item")
                             return `
                         <tr>
                             <td style="text-align:left;width: 80%;">${item.subSubject}</td>
-                            <td style="text-align:center; width: 20%;">${item.grade}</td>
+                            <td style="text-align:center; width: 20%;">${utils.getAttendanceOrMark(
+                                item.remarkStatus,
+                                item.grade
+                            )}</td>
                         </tr>`;
                         })
                         .join("")}
@@ -372,16 +371,8 @@ ${studentInfoFields
             } else {
                 let detailedSubjectsTableHtml = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">`;
 
-                let SubData = [
-                    "ENGLISH",
-                    "HINDI",
-                    "SCIENCE",
-                    "SOCIAL SCIENCE",
-                    "MATHEMATICS",
-                ];
-                let SANSKRIT = Object.keys(subjectsGroupedByMain).find(
-                    (key) => key === "SANSKRIT"
-                );
+                let SubData = ["ENGLISH", "HINDI", "SCIENCE", "SOCIAL SCIENCE", "MATHEMATICS"];
+                let SANSKRIT = Object.keys(subjectsGroupedByMain).find((key) => key === "SANSKRIT");
 
                 if (SANSKRIT) {
                     SubData.push("SANSKRIT");
@@ -399,43 +390,44 @@ ${studentInfoFields
                 SubData.forEach((mainSubject) => {
                     const subjectTotal = totalMainMarks[mainSubject]?.toFixed(2);
                     const subjectMaxTotal = totalMaxMainMarks[mainSubject];
-                    // console.log(mainSubject, "fffffffffff mainSubject")
 
-                    // console.log(subjectsGroupedByMain, "fffffffffffffffff subjectsGroupedByMain[mainSubject]")
+                    // Preserve the needStar value
+                    let needStarFlag = subjectsGroupedByMain[mainSubject].needStar;
 
+                    // Filter for portfolio and reading bonus
+                    let portfolioNotebook = subjectsGroupedByMain[mainSubject].filter(
+                        (item) => item.subSubject === "Portfolio (Notebook & SEA)"
+                    );
+                    let readingBonus = subjectsGroupedByMain[mainSubject].filter(
+                        (item) => item.subSubject === "Reading Bonus"
+                    );
 
-                    let portfolioNotebook = subjectsGroupedByMain[mainSubject]
-                        .filter(
-                            (item) => {
-                                return item.subSubject === "Portfolio (Notebook & SEA)";
-                            })
+                    // Remove Portfolio and Reading Bonus from the array
+                    subjectsGroupedByMain[mainSubject] = subjectsGroupedByMain[mainSubject].filter(
+                        (item) =>
+                            item.subSubject !== "Portfolio (Notebook & SEA)" &&
+                            item.subSubject !== "Reading Bonus"
+                    );
 
-                    let ReadingBonus = subjectsGroupedByMain[mainSubject]
-                        .filter(
-                            (item) => {
-                                return item.subSubject === "Reading Bonus";
-                            })
+                    // Add Portfolio and Reading Bonus back
+                    subjectsGroupedByMain[mainSubject].push(...portfolioNotebook);
+                    subjectsGroupedByMain[mainSubject].push(...readingBonus);
 
-                    console.log(portfolioNotebook, "fffffffff portfolioNotebook")
-
-                    subjectsGroupedByMain[mainSubject] = subjectsGroupedByMain[mainSubject].filter(item => item.subSubject !== "Portfolio (Notebook & SEA)")
-
-                    subjectsGroupedByMain[mainSubject] = subjectsGroupedByMain[mainSubject].filter(item => item.subSubject !== "Reading Bonus")
-
-                    subjectsGroupedByMain[mainSubject].push(...portfolioNotebook)
-                    subjectsGroupedByMain[mainSubject].push(...ReadingBonus)
-
+                    // Restore the needStar flag if it was previously set
+                    if (needStarFlag) {
+                        subjectsGroupedByMain[mainSubject].needStar = true;
+                    }
 
                     detailedSubjectsTableHtml += `
-            <table border="1" style="border-collapse: collapse; width: 100%; ${!showLastSub
+    <table border="1" style="border-collapse: collapse; width: 100%; ${!showLastSub
                             ? SubData?.length % 2 === 0
                                 ? ""
                                 : "grid-column: 1 / span 2;"
                             : ""
                         }">
-                <tr>
-                    <th colspan="4" style="text-align:center;">
-                        ${mainSubject === "ENGLISH"
+        <tr>
+            <th colspan="4" style="text-align:center;">
+                ${mainSubject === "ENGLISH"
                             ? `LANGUAGE I (${mainSubject})`
                             : mainSubject === "HINDI"
                                 ? `LANGUAGE II (${mainSubject})`
@@ -443,38 +435,37 @@ ${studentInfoFields
                                     ? `LANGUAGE III (${mainSubject})`
                                     : mainSubject
                         }
-                    </th>
-                </tr>
-                <tr>
-                    <th style="text-align:left;width: 80%;">Skills/Competencies</th>
-                    <th style="text-align:center; width: 20%;">TERM 1</th>
-                </tr>
-                ${subjectsGroupedByMain[mainSubject]
-                            .map((subData, index) => {
-                                // console.log(subData, "fffffffffff subData")
+            </th>
+        </tr>
+        <tr>
+            <th style="text-align:left;width: 80%;">Skills/Competencies</th>
+            <th style="text-align:center; width: 20%;">TERM 1</th>
+        </tr>
+        ${subjectsGroupedByMain[mainSubject]
+                            .map((subData) => {
                                 return `
-                        <tr>
-                            <td >${subData.subSubject === "Reading Bonus"
+            <tr>
+                <td>
+                    ${subData.subSubject === "Reading Bonus"
                                         ? subData.subSubject +
                                         " (0/1/2/3/4) " +
                                         `(${subData.maxMarks})`
                                         : subData.subSubject + ` (${subData.maxMarks})`
-                                    }</td>
-                            <td style="text-align:center">${utils.getAttendanceOrMark(
+                                    }
+                </td>
+                <td style="text-align:center">${utils.getAttendanceOrMark(
                                         subData.remarkStatus,
                                         subData.marksObtained.toFixed(2)
                                     )} </td>
-                        </tr>`;
+            </tr>`;
                             })
                             .join("")}
-                <tr>
-                    <td>TOTAL (${30})</td>
-                    <td style="text-align:center; font-weight: bold;">${subjectTotal}${subjectsGroupedByMain[mainSubject]?.needStar
-                            ? `<span>*</span>`
-                            : ""
+        <tr>
+            <td>TOTAL (${30})</td>
+            <td style="text-align:center; font-weight: bold;">${subjectTotal}${subjectsGroupedByMain[mainSubject]?.needStar ? `<span>*</span>` : ""
                         }</td>
-                </tr>
-            </table>`;
+        </tr>
+    </table>`;
                 });
 
                 detailedSubjectsTableHtml += `</div>`;
@@ -676,7 +667,6 @@ ${studentInfoFields
     `;
 
         const generateReportCard = (student) => {
-            // console.log(student, "fffffffffffffffff student");
             const termConfig =
                 student?.markData?.markSheetTerms?.map((term) => ({
                     header: term.subHeaderName,
@@ -4088,794 +4078,707 @@ ${studentInfoFields
                 },
             },
             markData: {
-                academicSession: "2024-25",
-                admissionNo: "17470",
-                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                studentName: "Aadhya Kansal",
-                rollNo: 1,
-                fatherName: "Mr. Prafful Kansal",
-                className: "V",
-                sectionName: "A",
-                terms: "HALF YEARLY",
-                markSheetName: "TERM-I",
-                overAllRank: "1",
-                markSheetTerms: [
+                "academicSession": "2024-25",
+                "admissionNo": "18493",
+                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                "studentName": "Naisha Jain",
+                "rollNo": 27,
+                "fatherName": "Mr. Amit Jain",
+                "className": "III",
+                "sectionName": "A",
+                "terms": "HALF YEARLY",
+                "markSheetName": "TERM-I",
+                "overAllRank": "1",
+                "markSheetTerms": [
                     {
-                        id: 938,
-                        headerName: "I.A-I",
-                        subHeaderName: "(30)",
-                        priority: 1,
-                        bestOf: 0,
-                        decimalPlaces: 2,
-                        weightage: 30,
-                        terms: ["I.A-I"],
+                        "id": 491,
+                        "headerName": "I.A-I",
+                        "subHeaderName": "(30)",
+                        "priority": 1,
+                        "bestOf": 0,
+                        "decimalPlaces": 1,
+                        "weightage": 30,
+                        "terms": [
+                            "I.A-I"
+                        ]
                     },
                     {
-                        id: 939,
-                        headerName: "PERIODIC TEST",
-                        subHeaderName: "(20)",
-                        priority: 2,
-                        bestOf: 0,
-                        decimalPlaces: 2,
-                        weightage: 20,
-                        terms: ["PERIODIC TEST 1"],
+                        "id": 492,
+                        "headerName": "PERIODIC TEST 1",
+                        "subHeaderName": "(20)",
+                        "priority": 2,
+                        "bestOf": 0,
+                        "decimalPlaces": 1,
+                        "weightage": 20,
+                        "terms": [
+                            "PERIODIC TEST 1"
+                        ]
                     },
                     {
-                        id: 940,
-                        headerName: "HALF YEARLY",
-                        subHeaderName: "(50)",
-                        priority: 3,
-                        bestOf: 0,
-                        decimalPlaces: 2,
-                        weightage: 50,
-                        terms: ["HALF YEARLY"],
-                    },
+                        "id": 493,
+                        "headerName": "HALF YEARLY",
+                        "subHeaderName": "(50)",
+                        "priority": 3,
+                        "bestOf": 0,
+                        "decimalPlaces": 1,
+                        "weightage": 50,
+                        "terms": [
+                            "HALF YEARLY"
+                        ]
+                    }
                 ],
-                subjectWiseMarkSheetReportResponses: [
+                "subjectWiseMarkSheetReportResponses": [
                     {
-                        subjectUid: "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
-                        subjectName: "ENGLISH",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
+                        "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                        "subjectName": "ENGLISH",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
-                                subjectName: "ENGLISH",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 30,
+                                "obtained": 29.5,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 491,
+                                    "headerName": "I.A-I",
+                                    "subHeaderName": "(30)",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 30,
+                                    "terms": [
+                                        "I.A-I"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
-                                subjectName: "ENGLISH",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 15,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 20,
+                                "obtained": 17,
+                                "grade": "A2",
+                                "status": "Absent",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 492,
+                                    "headerName": "PERIODIC TEST 1",
+                                    "subHeaderName": "(20)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 20,
+                                    "terms": [
+                                        "PERIODIC TEST 1"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
-                                subjectName: "ENGLISH",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 37.92,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "bb3f81d2-ac03-4d7e-87ac-0286dc409c12",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 50,
+                                "obtained": 38.5,
+                                "grade": "B1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 493,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "(50)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 50,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
+                            }
                         ],
-                        marksObtained: 82.92,
-                        total: 100,
-                        percentage: 82.92,
-                        grade: "A2",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 1,
-                        decimalPlaces: 2,
-                        visible: false,
+                        "marksObtained": 85,
+                        "total": 100,
+                        "percentage": 85,
+                        "grade": "A2",
+                        "className": "III",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 1,
+                        "decimalPlaces": 1,
+                        "visible": false
                     },
                     {
-                        subjectUid: "fafba141-4e89-4bd6-8291-b3e988db11f2",
-                        subjectName: "HINDI",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
+                        "subjectUid": "fafba141-4e89-4bd6-8291-b3e988db11f2",
+                        "subjectName": "HINDI",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "fafba141-4e89-4bd6-8291-b3e988db11f2",
-                                subjectName: "HINDI",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "fafba141-4e89-4bd6-8291-b3e988db11f2",
+                                "subjectName": "HINDI",
+                                "subjectNature": "THEORY",
+                                "max": 30,
+                                "obtained": 30,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 491,
+                                    "headerName": "I.A-I",
+                                    "subHeaderName": "(30)",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 30,
+                                    "terms": [
+                                        "I.A-I"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "fafba141-4e89-4bd6-8291-b3e988db11f2",
-                                subjectName: "HINDI",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 16,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "fafba141-4e89-4bd6-8291-b3e988db11f2",
+                                "subjectName": "HINDI",
+                                "subjectNature": "THEORY",
+                                "max": 20,
+                                "obtained": 17.5,
+                                "grade": "A2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 492,
+                                    "headerName": "PERIODIC TEST 1",
+                                    "subHeaderName": "(20)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 20,
+                                    "terms": [
+                                        "PERIODIC TEST 1"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "fafba141-4e89-4bd6-8291-b3e988db11f2",
-                                subjectName: "HINDI",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 39.17,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "fafba141-4e89-4bd6-8291-b3e988db11f2",
+                                "subjectName": "HINDI",
+                                "subjectNature": "THEORY",
+                                "max": 50,
+                                "obtained": 38.5,
+                                "grade": "B1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 493,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "(50)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 50,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
+                            }
                         ],
-                        marksObtained: 85.17,
-                        total: 100,
-                        percentage: 85.17,
-                        grade: "A2",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 2,
-                        decimalPlaces: 2,
-                        visible: false,
+                        "marksObtained": 86,
+                        "total": 100,
+                        "percentage": 86,
+                        "grade": "A2",
+                        "className": "III",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 2,
+                        "decimalPlaces": 1,
+                        "visible": false
                     },
                     {
-                        subjectUid: "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
-                        subjectName: "MATHEMATICS",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
+                        "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                        "subjectName": "MATHEMATICS",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
-                                subjectName: "MATHEMATICS",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                                "subjectName": "MATHEMATICS",
+                                "subjectNature": "THEORY",
+                                "max": 30,
+                                "obtained": 26.5,
+                                "grade": "A2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 491,
+                                    "headerName": "I.A-I",
+                                    "subHeaderName": "(30)",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 30,
+                                    "terms": [
+                                        "I.A-I"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
-                                subjectName: "MATHEMATICS",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 13.5,
-                                grade: "B2",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                                "subjectName": "MATHEMATICS",
+                                "subjectNature": "THEORY",
+                                "max": 20,
+                                "obtained": 17.5,
+                                "grade": "A2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 492,
+                                    "headerName": "PERIODIC TEST 1",
+                                    "subHeaderName": "(20)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 20,
+                                    "terms": [
+                                        "PERIODIC TEST 1"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
-                                subjectName: "MATHEMATICS",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 39.58,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "cda4d12c-be13-4dc9-b842-a1f4eab1bfdc",
+                                "subjectName": "MATHEMATICS",
+                                "subjectNature": "THEORY",
+                                "max": 50,
+                                "obtained": 48,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 493,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "(50)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 50,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
+                            }
                         ],
-                        marksObtained: 83.08,
-                        total: 100,
-                        percentage: 83.08,
-                        grade: "A2",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 3,
-                        decimalPlaces: 2,
-                        visible: false,
+                        "marksObtained": 92,
+                        "total": 100,
+                        "percentage": 92,
+                        "grade": "A1",
+                        "className": "III",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 3,
+                        "decimalPlaces": 1,
+                        "visible": false
                     },
                     {
-                        subjectUid: "ec52ea16-59c2-43d5-a433-10c23701676c",
-                        subjectName: "SCIENCE",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
+                        "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                        "subjectName": "SCIENCE",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "ec52ea16-59c2-43d5-a433-10c23701676c",
-                                subjectName: "SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                                "subjectName": "SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 30,
+                                "obtained": 21,
+                                "grade": "B2",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 491,
+                                    "headerName": "I.A-I",
+                                    "subHeaderName": "(30)",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 30,
+                                    "terms": [
+                                        "I.A-I"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "ec52ea16-59c2-43d5-a433-10c23701676c",
-                                subjectName: "SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 11.5,
-                                grade: "C1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                                "subjectName": "SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 20,
+                                "obtained": 16,
+                                "grade": "B1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 492,
+                                    "headerName": "PERIODIC TEST 1",
+                                    "subHeaderName": "(20)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 20,
+                                    "terms": [
+                                        "PERIODIC TEST 1"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "ec52ea16-59c2-43d5-a433-10c23701676c",
-                                subjectName: "SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 42.5,
-                                grade: "A2",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "ec52ea16-59c2-43d5-a433-10c23701676c",
+                                "subjectName": "SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 50,
+                                "obtained": 47,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 493,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "(50)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 50,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
+                            }
                         ],
-                        marksObtained: 84,
-                        total: 100,
-                        percentage: 84,
-                        grade: "A2",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 4,
-                        decimalPlaces: 2,
-                        visible: false,
+                        "marksObtained": 84,
+                        "total": 100,
+                        "percentage": 84,
+                        "grade": "A2",
+                        "className": "III",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 4,
+                        "decimalPlaces": 1,
+                        "visible": false
                     },
                     {
-                        subjectUid: "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
-                        subjectName: "SOCIAL SCIENCE",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
+                        "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                        "subjectName": "SOCIAL SCIENCE",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
-                                subjectName: "SOCIAL SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                                "subjectName": "SOCIAL SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 30,
+                                "obtained": 28,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 491,
+                                    "headerName": "I.A-I",
+                                    "subHeaderName": "(30)",
+                                    "priority": 1,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 30,
+                                    "terms": [
+                                        "I.A-I"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
-                                subjectName: "SOCIAL SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 18.5,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                                "subjectName": "SOCIAL SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 20,
+                                "obtained": 18.5,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 492,
+                                    "headerName": "PERIODIC TEST 1",
+                                    "subHeaderName": "(20)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 20,
+                                    "terms": [
+                                        "PERIODIC TEST 1"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
                             },
                             {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
-                                subjectName: "SOCIAL SCIENCE",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 40.42,
-                                grade: "B1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
+                                "studentInfoUid": "da96e655-eb3f-4593-86ca-45c9e8860a28",
+                                "admissionNo": "18493",
+                                "studentName": "Naisha Jain",
+                                "rollNo": 27,
+                                "fatherName": "Mr. Amit Jain",
+                                "className": "III",
+                                "sectionName": "A",
+                                "classSectionUid": "a7d35591-20a2-4a43-b933-bb03d816a930",
+                                "terms": "HALF YEARLY",
+                                "subjectUid": "b9048a6b-dae0-4483-8be5-b6c0f2f84d72",
+                                "subjectName": "SOCIAL SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 50,
+                                "obtained": 48,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-25",
+                                "decimalPlaces": 1,
+                                "markSheetTermResponse": {
+                                    "id": 493,
+                                    "headerName": "HALF YEARLY",
+                                    "subHeaderName": "(50)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 1,
+                                    "weightage": 50,
+                                    "terms": [
+                                        "HALF YEARLY"
+                                    ]
                                 },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
+                                "visible": false,
+                                "graded": false,
+                                "pass": true
+                            }
                         ],
-                        marksObtained: 88.92,
-                        total: 100,
-                        percentage: 88.92,
-                        grade: "A2",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 5,
-                        decimalPlaces: 2,
-                        visible: false,
-                    },
-                    {
-                        subjectUid: "f992d609-3016-4ed4-bd6c-97b4bf344a62",
-                        subjectName: "SANSKRIT",
-                        subjectNature: "THEORY",
-                        markSheetReport: [
-                            {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "f992d609-3016-4ed4-bd6c-97b4bf344a62",
-                                subjectName: "SANSKRIT",
-                                subjectNature: "THEORY",
-                                max: 30,
-                                obtained: 30,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 938,
-                                    headerName: "I.A-I",
-                                    subHeaderName: "(30)",
-                                    priority: 1,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 30,
-                                    terms: ["I.A-I"],
-                                },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
-                            {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "f992d609-3016-4ed4-bd6c-97b4bf344a62",
-                                subjectName: "SANSKRIT",
-                                subjectNature: "THEORY",
-                                max: 20,
-                                obtained: 19.5,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 939,
-                                    headerName: "PERIODIC TEST",
-                                    subHeaderName: "(20)",
-                                    priority: 2,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 20,
-                                    terms: ["PERIODIC TEST 1"],
-                                },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
-                            {
-                                studentInfoUid: "d10207e2-0dee-4174-b7ef-c5ff50e950bf",
-                                admissionNo: "17470",
-                                studentName: "Aadhya Kansal",
-                                rollNo: 1,
-                                fatherName: "Mr. Prafful Kansal",
-                                className: "V",
-                                sectionName: "A",
-                                classSectionUid: "addf45d3-5f38-41f8-ad09-51664ada5145",
-                                terms: "HALF YEARLY",
-                                subjectUid: "f992d609-3016-4ed4-bd6c-97b4bf344a62",
-                                subjectName: "SANSKRIT",
-                                subjectNature: "THEORY",
-                                max: 50,
-                                obtained: 50,
-                                grade: "A1",
-                                status: "",
-                                markSheetName: "TERM-I",
-                                attachmentName: "",
-                                session: "2024-25",
-                                decimalPlaces: 2,
-                                markSheetTermResponse: {
-                                    id: 940,
-                                    headerName: "HALF YEARLY",
-                                    subHeaderName: "(50)",
-                                    priority: 3,
-                                    bestOf: 0,
-                                    decimalPlaces: 2,
-                                    weightage: 50,
-                                    terms: ["HALF YEARLY"],
-                                },
-                                visible: false,
-                                graded: false,
-                                pass: true,
-                            },
-                        ],
-                        marksObtained: 99.5,
-                        total: 100,
-                        percentage: 99.5,
-                        grade: "A1",
-                        className: "V",
-                        sectionName: "A",
-                        terms: "HALF YEARLY",
-                        markSheetName: "TERM-I",
-                        subjectPrt: 6,
-                        decimalPlaces: 2,
-                        visible: false,
-                    },
+                        "marksObtained": 94.5,
+                        "total": 100,
+                        "percentage": 94.5,
+                        "grade": "A1",
+                        "className": "III",
+                        "sectionName": "A",
+                        "terms": "HALF YEARLY",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 5,
+                        "decimalPlaces": 1,
+                        "visible": false
+                    }
                 ],
-                marksObtained: 523.59,
-                total: 600,
-                percentage: 87.27,
-                overAllGrade: "A2",
-                visible: false,
+                "marksObtained": 441.5,
+                "total": 500,
+                "percentage": 88.3,
+                "overAllGrade": "A2",
+                "visible": false
             },
             remarks: {
                 uid: null,
@@ -5154,8 +5057,8 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 50,
-                        "markObtained": 39,
-                        "percentage": 78,
+                        "markObtained": 38.5,
+                        "percentage": 77,
                         "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
@@ -5183,9 +5086,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 50,
-                        "markObtained": 36,
-                        "percentage": 72,
-                        "grade": "B1",
+                        "markObtained": 48,
+                        "percentage": 96,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5212,9 +5115,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 50,
-                        "markObtained": 37,
-                        "percentage": 74,
-                        "grade": "B1",
+                        "markObtained": 47,
+                        "percentage": 94,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5241,8 +5144,8 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 50,
-                        "markObtained": 49,
-                        "percentage": 98,
+                        "markObtained": 48,
+                        "percentage": 96,
                         "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
@@ -5307,9 +5210,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4.5,
-                        "percentage": 90,
-                        "grade": "A2",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5340,9 +5243,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4.5,
-                        "percentage": 90,
-                        "grade": "A2",
+                        "markObtained": 5,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5352,7 +5255,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "dc7714e3-98aa-4db8-bf03-3fe5c7e02758",
-                            "subjectName": "Writing Skill & Language (Vocab, Spelling, Grammer)",
+                            "subjectName": "Writing Skill & Language (Vocab, Spelling, Grammar)",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -5367,9 +5270,9 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 09:27:18.556922",
-                            "editeddate": "2024-10-08 10:44:05.595665"
+                            "editeddate": "2024-10-09 06:40:59.112164"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
@@ -5406,9 +5309,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4,
-                        "percentage": 80,
-                        "grade": "B1",
+                        "markObtained": 4.5,
+                        "percentage": 90,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5439,9 +5342,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 5,
-                        "percentage": 100,
-                        "grade": "A1",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5505,9 +5408,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3,
-                        "percentage": 60,
-                        "grade": "C1",
+                        "markObtained": 4.5,
+                        "percentage": 90,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5538,9 +5441,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4,
-                        "percentage": 80,
-                        "grade": "B1",
+                        "markObtained": 3,
+                        "percentage": 60,
+                        "grade": "C1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5571,9 +5474,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3,
-                        "percentage": 60,
-                        "grade": "C1",
+                        "markObtained": 2,
+                        "percentage": 40,
+                        "grade": "D",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5583,7 +5486,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "b37c73ce-c482-4853-99db-d342de85f0fc",
-                            "subjectName": "Value or Ethical Application of Concepts",
+                            "subjectName": "Value Or Ethical Application of Concepts",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -5598,15 +5501,15 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 10:55:10.537851",
-                            "editeddate": "2024-10-08 05:23:34.805365"
+                            "editeddate": "2024-10-09 06:44:46.026115"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3,
-                        "percentage": 60,
-                        "grade": "C1",
+                        "markObtained": 2,
+                        "percentage": 40,
+                        "grade": "D",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5637,9 +5540,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4,
-                        "percentage": 80,
-                        "grade": "B1",
+                        "markObtained": 4.5,
+                        "percentage": 90,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5670,9 +5573,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 5,
-                        "percentage": 100,
-                        "grade": "A1",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5748,7 +5651,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "571bfef9-94b3-421f-9170-f7fb90d3b4a9",
-                            "subjectName": "Value or Ethical application of concept",
+                            "subjectName": "Value Or Ethical Application of Concepts",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -5763,15 +5666,15 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 10:56:27.54865",
-                            "editeddate": "2024-10-08 05:27:11.97459"
+                            "editeddate": "2024-10-09 06:45:00.066635"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 5,
-                        "percentage": 100,
-                        "grade": "A1",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5802,9 +5705,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4,
-                        "percentage": 80,
-                        "grade": "B1",
+                        "markObtained": 5,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5835,9 +5738,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3.5,
-                        "percentage": 70,
-                        "grade": "B2",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5847,7 +5750,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "2d3b0a2d-81d8-433f-be96-a319a56c006f",
-                            "subjectName": "Critical Thinking& Problem Solving",
+                            "subjectName": "Critical Thinking & Problem Solving",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -5862,9 +5765,9 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 10:57:04.437943",
-                            "editeddate": "2024-06-19 10:57:04.43721"
+                            "editeddate": "2024-10-09 06:42:15.188539"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
@@ -5901,9 +5804,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3,
-                        "percentage": 60,
-                        "grade": "C1",
+                        "markObtained": 4.5,
+                        "percentage": 90,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5928,15 +5831,15 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 10:57:30.566189",
-                            "editeddate": "2024-10-08 10:45:21.102771"
+                            "editeddate": "2024-10-09 06:46:00.433419"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 2,
-                        "percentage": 40,
-                        "grade": "D",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -5967,9 +5870,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 4,
-                        "percentage": 80,
-                        "grade": "B1",
+                        "markObtained": 5,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6000,9 +5903,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3,
-                        "percentage": 60,
-                        "grade": "C1",
+                        "markObtained": 4,
+                        "percentage": 80,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6099,7 +6002,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "eaa100f2-bd5a-4752-b3ba-a06610ac3cee",
-                            "subjectName": "VALUES OR LIFE SKILLS",
+                            "subjectName": "VALUES AND LIFE SKILLS",
                             "nature": "SOCIAL",
                             "natureUid": "8d626c2e-a175-4621-ae10-3bcf03cd1c4c",
                             "cbseVIIICode": "",
@@ -6128,7 +6031,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "05e8f98a-9b36-40e3-a88a-6ad78d3ae25b",
-                            "subjectName": "ENVIRONMENT COMMUNITY WORK",
+                            "subjectName": "ENVIRONMENT Or COMMUNITY WORK",
                             "nature": "SOCIAL",
                             "natureUid": "8d626c2e-a175-4621-ae10-3bcf03cd1c4c",
                             "cbseVIIICode": "",
@@ -6139,9 +6042,9 @@ ${studentInfoFields
                             "parentName": [],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 13:01:30.78374",
-                            "editeddate": "2024-09-19 06:19:04.853777"
+                            "editeddate": "2024-10-09 06:43:57.486363"
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
@@ -6174,9 +6077,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
-                        "markObtained": 80.99,
-                        "percentage": 80.99,
-                        "grade": "A2",
+                        "markObtained": 100,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6319,9 +6222,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
-                        "markObtained": 60.99,
-                        "percentage": 60.99,
-                        "grade": "B1",
+                        "markObtained": 80.99,
+                        "percentage": 80.99,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6348,9 +6251,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
-                        "markObtained": 80.99,
-                        "percentage": 80.99,
-                        "grade": "A2",
+                        "markObtained": 100,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6389,7 +6292,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "d870cb6d-edee-49eb-a7ac-8577b49bc7a2",
-                            "subjectName": "SUPW  WORK EDUCATION",
+                            "subjectName": "SUPW  Or WORK EDUCATION",
                             "nature": "1B Scholastic",
                             "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
                             "cbseVIIICode": "",
@@ -6400,9 +6303,9 @@ ${studentInfoFields
                             "parentName": [],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-06-19 13:05:03.057484",
-                            "editeddate": "2024-06-19 13:05:03.055189"
+                            "editeddate": "2024-10-09 06:44:18.261736"
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
@@ -6464,9 +6367,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
-                        "markObtained": 80.99,
-                        "percentage": 80.99,
-                        "grade": "B1",
+                        "markObtained": 90.99,
+                        "percentage": 90.99,
+                        "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6588,9 +6491,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 2.5,
-                        "percentage": 50,
-                        "grade": "C2",
+                        "markObtained": 5,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6601,8 +6504,8 @@ ${studentInfoFields
                         "subjectAllResponse": {
                             "uid": "741ab290-c026-44cb-a307-b6afeaf7299c",
                             "subjectName": "RELATIONS WITH TEACHERS",
-                            "nature": "1B Scholastic",
-                            "natureUid": "684a3365-7634-49cf-a466-552dd7ba88d8",
+                            "nature": "SOCIAL",
+                            "natureUid": "8d626c2e-a175-4621-ae10-3bcf03cd1c4c",
                             "cbseVIIICode": "",
                             "cbseXCode": "",
                             "cbseXIICode": "",
@@ -6611,9 +6514,9 @@ ${studentInfoFields
                             "parentName": [],
                             "haveChild": false,
                             "createdUser": "Reena_487422",
-                            "editedUser": "Reena_487422",
+                            "editedUser": "QuickCampus",
                             "createddate": "2024-07-05 11:18:58.090354",
-                            "editeddate": "2024-07-05 11:18:58.088932"
+                            "editeddate": "2024-10-09 08:46:18.123426"
                         },
                         "termName": "HALF YEARLY",
                         "max": 100,
@@ -6646,9 +6549,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 50,
-                        "markObtained": 32,
-                        "percentage": 64,
-                        "grade": "B2",
+                        "markObtained": 38.5,
+                        "percentage": 77,
+                        "grade": "B1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,
@@ -6679,8 +6582,8 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 5,
-                        "percentage": 100,
+                        "markObtained": 4.5,
+                        "percentage": 90,
                         "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
@@ -6757,7 +6660,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "c58296cd-3473-4569-87c1-226b26fc4ade",
-                            "subjectName": "Writing Skill and Language",
+                            "subjectName": "Writing Skill & Language (Vocab, Spelling, Grammar)",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -6772,14 +6675,14 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-09-03 04:47:10.33655",
-                            "editeddate": "2024-09-03 04:47:10.330257"
+                            "editeddate": "2024-10-09 06:41:34.445164"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
-                        "markObtained": 3.5,
-                        "percentage": 70,
+                        "markObtained": 4,
+                        "percentage": 80,
                         "grade": "A2",
                         "remarkStatus": "",
                         "attachmentName": "",
@@ -6790,7 +6693,7 @@ ${studentInfoFields
                     {
                         "subjectAllResponse": {
                             "uid": "b36289b5-625b-49a7-92ee-0ae6a50a8158",
-                            "subjectName": "Project and Viva",
+                            "subjectName": "Project & Viva",
                             "nature": "THEORY",
                             "natureUid": "bc807c78-e158-424a-a0ec-45eaf8d73fa4",
                             "cbseVIIICode": "",
@@ -6805,9 +6708,9 @@ ${studentInfoFields
                             ],
                             "haveChild": false,
                             "createdUser": "QuickCampus",
-                            "editedUser": "QuickCampus",
+                            "editedUser": "NEETUNAIR_501967",
                             "createddate": "2024-09-03 04:47:32.151308",
-                            "editeddate": "2024-09-03 04:47:32.149485"
+                            "editeddate": "2024-10-09 06:41:49.853739"
                         },
                         "termName": "HALF YEARLY",
                         "max": 5,
@@ -6877,9 +6780,9 @@ ${studentInfoFields
                         },
                         "termName": "HALF YEARLY",
                         "max": 4,
-                        "markObtained": 3,
-                        "percentage": 75,
-                        "grade": "A2",
+                        "markObtained": 4,
+                        "percentage": 100,
+                        "grade": "A1",
                         "remarkStatus": "",
                         "attachmentName": "",
                         "additional": false,

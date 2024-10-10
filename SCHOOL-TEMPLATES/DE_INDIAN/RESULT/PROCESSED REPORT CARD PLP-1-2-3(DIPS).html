@@ -589,13 +589,18 @@ ${studentData?.header}
               totalHeaderName += headerValue;
               return `<th style="text-align: center; font-size: 11px; padding: 4px; margin: 0; height: 20px">
                 <div style="width: 100%; height: 100%; display: flex; flex-direction: column;justify-content: space-between">
-                  <h4 style="margin-top: -1px; margin-bottom: 2px">${term?.headerName} </h4> <p style="margin: 0px;"> ${term?.subHeaderName} </p>
+                  <h4 style="margin: auto">${term?.headerName} </h4> <p style="margin: 0px;"> ${term?.subHeaderName} </p>
                   </div>
                 </th>`;
             })
             .join("");
         })()}
-                        <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;"><h4 style="margin-top: -1px; margin-bottom: 2px"> TOTAL MARKS OBTAINED </h4> <p style="vertical-align: text-bottom;"> (${totalHeaderName})</p></th>
+                        <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0; height: 20px">
+                          <div style="width: 100%; height: 100%; display: flex; flex-direction: column;justify-content: space-between">
+                          <h4 style="margin: auto; "> TOTAL MARKS OBTAINED </h4> 
+                          <p style="vertical-align: text-bottom; margin: 0px;"> (${totalHeaderName})</p>
+                          </div>
+                          </th>
                         <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;">% AGE</th>
                         <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;">GRADE</th>
                     </tr>
@@ -603,7 +608,7 @@ ${studentData?.header}
                     <tr>
                         <td style="font-size: 12px; padding: 4px; margin: 0; font-weight: bold;">GRAND TOTAL:</td>
                         <td colspan="5" style="padding: 4px; margin: 0;"></td>
-                        <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center;">${scholasticResult?.totalMarksObtained
+                        <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center;">${scholasticResult?.totalMarksObtained.toFixed(2)
         }/${scholasticResult?.totalPossibleMarks}</td>
                         <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center">${(
           (scholasticResult?.totalMarksObtained /
@@ -687,6 +692,7 @@ ${studentData?.header}
       studentHtml.appendChild(studhtml);
     });
   };
+
 </script>
 
 <script>
