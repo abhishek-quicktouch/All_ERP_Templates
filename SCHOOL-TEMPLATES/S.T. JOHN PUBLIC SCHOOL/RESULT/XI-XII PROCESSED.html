@@ -163,7 +163,8 @@
       
       student.innerHTML += `<div style="page-break-before: always;"></div>
     <page orientation="portrait" format="A4" margin="0" style=" position: relative; z-index: 1; font-size: 16px;">
-        <div style="border:2px solid black; padding:10px; margin-top:${index!==0 ? "20px;":""}">
+        <div style="border:2px solid black; display:flex; flex-direction:column; justify-content:space-between; padding:10px; height:91vh; margin-top:${index!==0 ? "20px;":""}">
+    <div>  
       <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <div style="width:12%;">
         <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_228266413.png" alt="" style="width:100%;"/>
@@ -284,8 +285,10 @@
               <td>${st?.remarks?.fields?.find(f=>f?.title == "PRESENT DAYS")?.value || "-"}</td> 
             </tr>   
         </table>
+        </div>
 
-        <div style="margin-top:200px; display:flex; justify-content:space-between; align-items:center; ">
+        <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; ">
             <div style="width:fit-content; margin-top:auto;">
             <p style="text-align:center;">_________________________</p>  
             <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
@@ -294,6 +297,7 @@
             <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_233337673.png" style="width:50%;margin-bottom:-15px;"/>
             <p style="text-align:center;">_________________________</p>  
             <p style="font-weight:bold;text-align:center; font-size:14px;">PRINCIPAL'S SIGNATURE</p>  
+        </div>
         </div>
         </div>
         </div>
