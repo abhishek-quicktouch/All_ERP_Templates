@@ -220,80 +220,82 @@
         singleStudentHtml.innerHTML = `
 <style type="text/css">
 
-          body {
-                  font-family: Arial, sans-serif;
-              }
+    body {
+            font-family: Arial, sans-serif;
+        }
 
-              table {
-                  width: 100%;
-                  border-collapse: collapse;
-                  /* page-break-inside: avoid; */
-                  /* Prevents table from breaking across pages */
-              }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* page-break-inside: avoid; */
+            /* Prevents table from breaking across pages */
+        }
 
-              th,
-              td {
-                  border: 1px solid black;
-                  padding: 2px;
-                  text-align: left;
-                  font-size: 13px;
-                  /* white-space: nowrap; */
-              }
+        th,
+        td {
+            border: 1px solid black;
+            padding: 2px;
+            text-align: left;
+            font-size: 13px;
+            /* white-space: nowrap; */
+        }
 
-              h3 {
-                  margin: 3px 0px;
-                  padding: 0px;
-                  font-size: 15px;
-                  /* page-break-after: avoid; */
-                  /* Prevents breaking after h3 elements */
-              }
+        h3 {
+            margin: 3px 0px;
+            padding: 0px;
+            font-size: 15px;
+            /* page-break-after: avoid; */
+            /* Prevents breaking after h3 elements */
+        }
 
-              .header {
-                  text-align: center;
-                  font-weight: bold;
-                  margin: 10px 0;
-              }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            margin-top: -20px;
+        }
 
-              .page {
-                  page-break-after: always;
-                  /* page-break-inside: avoid; */
-                  break-after: page;
-              }
+        .page {
+            page-break-after: always;
+            /* page-break-inside: avoid; */
+            break-after: page;
+        }
 
-              .section {
-                  /* margin-bottom: 20px; */
-                  /* page-break-inside: avoid; */
-              }
+        .section {
+            /* margin-bottom: 20px; */
+            /* page-break-inside: avoid; */
+        }
 
-              @media print {
-                  @page {
-                      margin: auto;
-                      size: A4;
-                      margin: 2mm;
-                  }
+        @media print {
+            @page {
+                margin: auto;
+                size: A4;
+                margin: 2mm;
+            }
 
-                  .page {
-                      page-break-after: always;
-                  }
-              }
-          </style>
+            .page {
+                page-break-after: always;
+            }
+        }
+    </style>
 
-      <page class="page" orientation="portrait" format="A4" margin="0">
+<page class="page" orientation="portrait" format="A4" margin="0">
+ <div style="display: flex; align-items: center;   padding: 0px;width:100%;justify-content:center">
+                 
+${studentData?.header}
 
 
-      <div style="display: flex; align-items: center; margin: 0px; padding: 0px;width:100%;">
-          <div style="width:14%;">
-             
-          </div>
-          <div class="header">
-             <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-07T12_30_56_298292422.png" alt="School Logo" class="logo" style="width:80%;">
-          </div>
-      </div>
+                   
+    
+    </div>
+    
+    
+<div style="display:flex; justify-content:flex-end; width:99%; text-transform:uppercase; font-weight:bold; font-size:13px; align-items:center;margin-top:-12px;">Affiliation No. : 2730712</div>
 
-      <div style="text-align: center;">
-          <h3>HOLISTIC PROGRESS CARD</h3>
-          <h3>CLASS: ${student.className || "-"}</h3>
-      </div>
+<div style="text-align: center;">
+    <h3>HOLISTIC PROGRESS CARD</h3>
+    <h3>CLASS: ${student.className || ""}</h3>
+</div>
 
 <table class="section" style="font-weight:bold;">
     <tr>
@@ -423,8 +425,8 @@
                 <tr>
                     <td colspan="${subjectData.terms.length + 1}"><strong>${`Curriculum Goal ${count}- ` + sub
                       }</strong></td>
-                      </tr>
-                      ${(subjectData.childs[sub] || [])
+                </tr>
+                ${(subjectData.childs[sub] || [])
                         .map(
                           (child, i) => `
                     <tr>
@@ -500,12 +502,9 @@ ${main === "G.K and COMPUTER"
                   : ""
                 }
 
-
-
-              </table>
-
-          </div>
-          `
+        </table>
+    </div>
+    `
             )
             .join("")}
 

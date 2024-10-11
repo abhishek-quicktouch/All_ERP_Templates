@@ -248,24 +248,24 @@
 
             return `
                         <tr>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:20%;">${subject?.subjectName
+                            <td style="font-size: 12px; padding: 4px; margin: 0;">${subject?.subjectName
               }</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center; font-weight:${isNaN(unitTest1) ? "bold" : ""
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(unitTest1) ? "bold" : ""
               }">${unitTest1}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center; font-weight:${isNaN(attendance) ? "bold" : ""
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(attendance) ? "bold" : ""
               }">${attendance}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center; font-weight:${isNaN(project) ? "bold" : ""
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(project) ? "bold" : ""
               }">${project}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center; font-weight:${isNaN(assessment) ? "bold" : ""
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(assessment) ? "bold" : ""
               }">${assessment}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center; font-weight:${isNaN(midTerm) ? "bold" : ""
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(midTerm) ? "bold" : ""
               }">${midTerm}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center;">${subject?.marksObtained?.toFixed(
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center;">${subject?.marksObtained?.toFixed(
                 2
               )}</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center">${subject?.percentage
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.percentage
               }</td>
-                            <td style="font-size: 12px; padding: 2px; margin: 0; width:10%; text-align: center">${subject?.grade
+                            <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.grade
               }</td>
                         </tr>
                     `;
@@ -455,13 +455,13 @@ ${studentData?.header}
                    
     
     </div>
+<div style="display:flex; justify-content:flex-end; width:99%; text-transform:uppercase; font-weight:bold; font-size:13px; align-items:center;margin-top:-12px;">Affiliation No. : 2730712</div>
                 <div class="header">
                     <h2 style="margin: 0; padding: 0">ACADEMIC SESSION ${studentData?.markData?.academicSession
         }</h2>
                     <h3 style="margin: 0; margin-bottom: -5px">${studentData?.markData?.markSheetName
         } REPORT CARD</h3>
                 </div>
-                <div style="display:flex; justify-content:flex-end; width:100%; text-transform:uppercase; font-weight:bold; font-size:13px; align-items:center;  margin-top:10px;">Affiliation No. : 2730712</div>
                 <table>
                     <tr>
                         <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>STUDENT’S NAME:</strong> ${viewTemplate
@@ -573,12 +573,12 @@ ${studentData?.header}
                     </tr>
                 </table>
                 <div style="width: 100%; margin-bottom: 20px;">
-                <table style="width:100%;">
+                <table>
                     <tr rowspan>
                         <th colspan="9" style="font-size: 14px; text-align:center;">SCHOLASTIC AREAS</th>
                     </tr>
                     <tr>
-                        <th style="text-align: center; font-size: 11px; padding: 2px; width:20%; margin: 0;">SUBJECT</th>
+                        <th style="text-align: center; font-size: 11px; padding: 4px; margin: 0;">SUBJECT</th>
                         ${(() => {
           return studentData?.markData?.markSheetTerms
             ?.map((term) => {
@@ -610,12 +610,12 @@ ${studentData?.header}
                         <td colspan="5" style="padding: 4px; margin: 0;"></td>
                         <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center;">${scholasticResult?.totalMarksObtained.toFixed(2)
         }/${scholasticResult?.totalPossibleMarks}</td>
-                        <td style="font-weight: bold; font-size: 12px; padding: 2px; margin: 0; text-align: center">${(
+                        <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center">${(
           (scholasticResult?.totalMarksObtained /
             scholasticResult?.totalPossibleMarks) *
           100
         )?.toFixed(2)}%</td>
-                        <td style="font-weight: bold; font-size: 12px; padding: 2px; margin: 0; text-align: center">${getGradeCustomFunction(
+                        <td style="font-weight: bold; font-size: 12px; padding: 4px; margin: 0; text-align: center">${getGradeCustomFunction(
           (
             (scholasticResult?.totalMarksObtained /
               scholasticResult?.totalPossibleMarks) *
