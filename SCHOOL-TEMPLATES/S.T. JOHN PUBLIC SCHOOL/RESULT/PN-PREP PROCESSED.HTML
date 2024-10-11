@@ -182,7 +182,7 @@
     <page orientation="portrait" format="A4" margin="0" style=" position: relative; z-index: 1; font-size: 16px;">
         <div style="border:2px solid black; display:flex; flex-direction:column; justify-content:space-between; padding:10px; height:91vh; margin-top:${
           index !== 0 ? "20px;" : ""
-          }">
+        }">
     <div>
       <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <div style="width:12%;">
@@ -342,11 +342,12 @@
                         <td style="font-size:12px; font-weight:bold;">PERCENTAGE</td>
                         ${terms
                           ?.map((el) => {
-                            let per = (allTotal[el?.headerName]?.obt /
+                            let per =
+                              (allTotal[el?.headerName]?.obt /
                                 allTotal[el?.headerName]?.max) *
-                              100
+                              100;
                             return `<td style="font-size:12px; font-weight:bold; text-align:center;">${
-                              (!isNaN(per) ? per.toFixed(2): 0.00)
+                              !isNaN(per) ? per.toFixed(2) : 0.0
                             }%</td>`;
                           })
                           .join("")}
