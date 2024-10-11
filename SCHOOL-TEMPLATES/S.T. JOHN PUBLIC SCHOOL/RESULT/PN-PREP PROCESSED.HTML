@@ -180,9 +180,10 @@
         let termTotal = 0;
         student.innerHTML += `<div style="page-break-before: always;"></div>
     <page orientation="portrait" format="A4" margin="0" style=" position: relative; z-index: 1; font-size: 16px;">
-        <div style="border:2px solid black; padding:10px; margin-top:${
+        <div style="border:2px solid black; display:flex; flex-direction:column; justify-content:space-between; padding:10px; height:91vh; margin-top:${
           index !== 0 ? "20px;" : ""
-        }">
+          }">
+    <div>
       <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <div style="width:12%;">
         <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_228266413.png" alt="" style="width:100%;"/>
@@ -246,10 +247,10 @@
   </tr>
 </table>
 
-        <div style="width: 100%; display:flex; justify-content:space-between; margin-top:1rem; height:fit-content; gap:10px; border:1px solid;">
+        <div style="width: 100%; display:flex; justify-content:space-between; margin-top:1rem; height:fit-content; gap:10px;">
             <div style="width: 70%;">
                 <table style="width: 100%; border:none; ">
-                    <tr style="text-align:center; height:60px;">
+                    <tr style="text-align:center; max-height:60px;">
                       <th style="width:40%; font-size:12px;">SUBJECTS</th>
                        ${terms
                          ?.map(
@@ -341,11 +342,12 @@
                         <td style="font-size:12px; font-weight:bold;">PERCENTAGE</td>
                         ${terms
                           ?.map((el) => {
-                            return `<td style="font-size:12px; font-weight:bold; text-align:center;">${
-                              (allTotal[el?.headerName]?.obt /
+                            let per = (allTotal[el?.headerName]?.obt /
                                 allTotal[el?.headerName]?.max) *
                               100
-                            }</td>`;
+                            return `<td style="font-size:12px; font-weight:bold; text-align:center;">${
+                              (!isNaN(per) ? per.toFixed(2): 0.00)
+                            }%</td>`;
                           })
                           .join("")}
                         <td style="font-size:12px; font-weight:bold; text-align:center;">${(
@@ -381,16 +383,19 @@
               }</td> 
             </tr>   
         </table>
-
-        <div style="margin-top:200px; display:flex; justify-content:space-between; align-items:center; ">
-            <div style="width:fit-content; margin-top:auto;">
-            <p style="text-align:center;">_________________________</p>  
-            <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
         </div>
+
+        <div>
+        <div style=" display:flex; justify-content:space-between; align-items:center; ">
+            <div style="width:fit-content; margin-top:auto;">
+              <p style="text-align:center;">_________________________</p>  
+              <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
+            </div>
         <div style="width:fit-content; text-align:center; margin-right:-35px;">
             <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_233337673.png" style="width:50%;margin-bottom:-15px;"/>
             <p style="text-align:center;">_________________________</p>  
             <p style="font-weight:bold;text-align:center; font-size:14px;">PRINCIPAL'S SIGNATURE</p>  
+        </div>
         </div>
         </div>
         </div>
