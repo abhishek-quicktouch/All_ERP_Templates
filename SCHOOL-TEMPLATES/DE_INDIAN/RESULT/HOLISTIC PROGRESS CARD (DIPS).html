@@ -311,6 +311,7 @@ ${studentData?.header}
         <td>I LIVE IN</td>
         <td>${studentInfo.studentAddressResponse
             ? `${studentInfo.studentAddressResponse.houseNo || ""} 
+            ${studentInfo.studentAddressResponse.street || ""}
             ${studentInfo.studentAddressResponse.area || ""} 
             ${studentInfo.studentAddressResponse.city || ""} 
             ${studentInfo.studentAddressResponse.state || ""} 
@@ -360,7 +361,7 @@ ${studentData?.header}
         <td>MY BLOOD GROUP</td>
         <td>${studentInfo.bloodGroup || "-"}</td>
         <td>MY ATTENDANCE</td>
-        <td>${remarks?.fields.find((item) => item.title === "Attendance")?.value ||
+        <td>${remarks?.fields.find((item) => item.title.toLowerCase() === "attendance")?.value ||
           "-"
           }</td>
     </tr>
@@ -543,7 +544,7 @@ ${main === "G.K and COMPUTER"
                     <p>Parent/Guardian</p>
                 </div>
             </div>
-            <p style="font-size:10px;margin-top:-10px;"><strong>Note:</strong> This is a computer-generated Report Card. It does not need any signature. In case of any typing error or discrepancy, please contact the Class Teacher.</p>
+            <p style="font-size:10px;margin-top:-5px;"><strong>Note:</strong> This is a computer-generated Report Card. It does not need any signature. In case of any typing error or discrepancy, please contact the Class Teacher.</p>
         </page >
         `;
         singleStudentHtml.innerHTML += temp;

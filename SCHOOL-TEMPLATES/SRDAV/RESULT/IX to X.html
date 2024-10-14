@@ -175,8 +175,9 @@ ${studentInfoFields
                 0
             );
 
+            console.log(subjects, "FFFFFFFFFFF subject")
             const scholasticSubjects = subjects?.filter(
-                (subject) => subject?.subjectNature === "THEORY"
+                (subject) => subject?.subjectNature === "THEORY" && subject?.subjectName !== "ARTIFICIAL INTELLIGENCE"
             );
 
             const rows = scholasticSubjects
@@ -272,6 +273,7 @@ ${studentInfoFields
         };
 
         const generateAdditionalSubjectsTable = (areas) => {
+            console.log(areas, "fffffffffffffff areas")
             return `
             <table>
                 <tr>
@@ -394,7 +396,9 @@ ${studentInfoFields
                     <div class="section">
                         ${generateAdditionalSubjectsTable(
                     element?.baseTermData?.subject.filter(
-                        (s) => s.subjectAllResponse?.nature === "ADDITIONAL"
+                        (s) => {
+                            return s?.additional === true
+                        }
                     )
                 )}
                     </div>
