@@ -326,45 +326,39 @@ ${studentData?.header}
     <tr>
         <td>MY FATHER</td>
         <td>${student.fatherName || "-"}</td>
-        <td>COLOURS</td>
-        <td id="favouriteColor">${remarks?.fields.find((item) => item.title === "COLOUR")?.value || "-"
+         <td>FOOD</td>
+        <td id="favouriteFood">${remarks?.fields.find((item) => item.title === "FOOD")?.value || "-"
           }</td>
     </tr>
     <tr>
         <td>MY MOTHER</td>
         <td>${student.motherName || "-"}</td>
-        <td>FOOD</td>
-        <td id="favouriteFood">${remarks?.fields.find((item) => item.title === "FOOD")?.value || "-"
-          }</td>
-    </tr>
-    <tr>
-        <td>MY BIRTHDAY</td>
-        <td>${student.dob || "-"}</td>
-        <td>GAMES</td>
-        <td id="favouriteGame">${remarks?.fields.find((item) => item.title === "GAME")?.value || "-"
-          }</td>
-    </tr>
-    <tr>
-        <td>MY HEIGHT</td>
-        <td>${studentInfo.height || "-"} cm</td>
-        <td>ANIMALS</td>
-        <td id="favouriteAnimal">${remarks?.fields.find((item) => item.title === "ANIMAL")?.value || "-"
-          }</td>
-    </tr>
-    <tr>
-        <td>MY WEIGHT</td>
-        <td>${studentInfo.weight || "-"} kg</td>
-        <td>MY CONTACT NO.</td>
-        <td>${studentInfo.mobileNumber || "-"}</td>
-    </tr>
-    <tr>
-        <td>MY BLOOD GROUP</td>
-        <td>${studentInfo.bloodGroup || "-"}</td>
         <td>MY ATTENDANCE</td>
         <td>${remarks?.fields.find((item) => item.title.toLowerCase() === "attendance")?.value ||
           "-"
           }</td>
     </tr>
+    <tr>
+        <td>MY BIRTHDAY</td>
+        <td>${student.dob || "-"}</td>
+        <td>MY BLOOD GROUP</td>
+        <td>${studentInfo.bloodGroup || "-"}</td>
+        
+    </tr>
+    <tr>
+        <td>MY HEIGHT</td>
+        <td>${studentInfo.height || "-"} cm</td>
+         
+        <td>MY CONTACT NO.</td>
+        <td>${studentInfo.mobileNumber || "-"}</td>
+    </tr>
+    <tr>
+        <td>MY WEIGHT</td>
+        <td>${studentInfo.weight || "-"} kg</td>
+       <td></td>
+        <td></td>
+    </tr>
+    
 </table >
 
 
@@ -525,7 +519,7 @@ ${main === "G.K and COMPUTER"
 
       </table>`: ""}
 
-      <div style = "padding: 5px; border: 1px solid black; height: 50px; margin-top: 20px" >
+      <div style = "padding: 5px; border: 1px solid black; min-height: 50px; margin-top: 20px" >
       <strong >Teacher’s Suggestions/Remarks:</strong> ${viewTemplate ? "__________" : remarks?.description ? remarks?.description : remarks?.fields.find((item) => item.title === "Remarks")?.value || ""
           }
             </div>
@@ -2357,7 +2351,7 @@ ${main === "G.K and COMPUTER"
             rollNumber: 0,
             classSectionUid: "f434ec56-6878-410a-b2ff-e073e9e67364",
             classSection: "FLP 1-A",
-            description: "",
+            description: "sfjkhsfd sdjkhjksdg sdjkghsdg sdgjhkjd sdjkghsgd sdkjhsdg sdgkjhdsdgjkhsdgjk sdgjhskjdghsdgkjhsdgjk sdg kjshjkdg jkhsgdkj",
             fields: [
               {
                 uid: "fc3c039b-52bd-4dbf-ac90-7bd55d8ec175",
