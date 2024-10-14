@@ -392,7 +392,7 @@
       <strong>ADMIT CARD </strong> 
     </td>
     <td style="width: 30%; border-bottom: solid 0.5mm #000000;font-size:10pt;">
-      <strong>ANNUAL EXAM ${student?.contentRequest?.session || "-"}</strong> 
+      <strong>${student?.selectedDatesheet?.[0]?.termName} ${student?.contentRequest?.session || "-"}</strong> 
     </td>
   </tr>
 </table>
