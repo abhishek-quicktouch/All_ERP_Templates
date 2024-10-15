@@ -11,6 +11,7 @@
   <div id="studentsList">Student Report Card</div>
 </body>
 <script>
+
   window.SetTemplateData = function (data) {
     const dataList = Array.isArray(data) ? data : [data];
     const viewTemplate = dataList[0]?.viewTemplate;
@@ -918,16 +919,16 @@
                     <td colspan="2" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
                             <div style="padding:4px 0px;"> MID TERM <br/> PRACTICAL (${practical?.total
                 })</div>
-                            <div style="border-top:2px solid; padding:10px 0px;">${practical?.marksObtained
+                            <div style="border-top:2px solid; padding:10px 0px;">${practical?.marksObtained.toFixed(2)
                 }<div>
                     </td>
                      <td colspan="3" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
                             <div style="padding:4px 0px;"> MID TERM <br/> THEORY (${subject?.total
                 })</div>
-                            <div style="border-top:2px solid; padding:10px 0px;">${subject?.marksObtained
+                            <div style="border-top:2px solid; padding:10px 0px;">${subject?.marksObtained.toFixed(2)
                 }<div>
                     </td>
-               <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${total}</td>
+               <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${total.toFixed(2)}</td>
                <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${(
                   (subject?.marksObtained / subject?.total) *
                   100
@@ -955,7 +956,7 @@
               }"">${subjectEnrich}</td>
                     <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center; font-weight:${isNaN(midTerm) ? "bold" : "normal"
               }">${midTerm}</td>
-                    <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.marksObtained
+                    <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${subject?.marksObtained.toFixed(2)
               }</td>
                     <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${(
                 (subject?.marksObtained / subject?.total) *
@@ -998,7 +999,7 @@
             : subject?.grade || "-"; // Extract the grade
           // Assign grades based on subject names
           switch (subjectName) {
-            case "ART & WORK EDUCATION":
+            case "ART AND WORK EDUCATION":
               visualArtsGrade = {
                 grade: grade,
                 ...(subject.remarkStatus
@@ -1038,7 +1039,7 @@
                   : {}),
               };
               break;
-            case "SWIMMING/YOGA":
+            case "Swimming":
               swimmingYogaGrade = {
                 grade: grade,
                 ...(subject.remarkStatus
@@ -1362,8 +1363,8 @@ ${studentData?.header}
                    
                     <tr class="right-align" >
 <td colspan="5" style="border: none"></td>
-                        <td colspan="4" style="font-weight: bold">GRAND TOTAL: ${scholasticResult?.totalMarksObtained
-        }/${scholasticResult?.totalPossibleMarks}</td>
+                        <td colspan="4" style="font-weight: bold">GRAND TOTAL: ${scholasticResult?.totalMarksObtained.toFixed(2)
+        }/${scholasticResult?.totalPossibleMarks.toFixed(2)}</td>
                         
                         
                     </tr>
@@ -1408,10 +1409,10 @@ ${studentData?.header}
                 </div>
 
 
-                <div style="display: flex; justify-content: space-between; margin-top: 20px; margin-bottom: -20px">
+                <div style="display: flex; justify-content: space-between; margin-top: 40px; margin-bottom: -20px">
                     <div>
+                      <p>${studentData.student.studentInfoResponse[0]?.classTeacher || "-"}</p>
                         <p>Class Teacher</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
                     </div>
                     <div>
                         <p>Officiating Principal</p>
@@ -1427,6 +1428,8 @@ ${studentData?.header}
       studentHtml.appendChild(studhtml);
     });
   };
+
+
 </script>
 
 <script>

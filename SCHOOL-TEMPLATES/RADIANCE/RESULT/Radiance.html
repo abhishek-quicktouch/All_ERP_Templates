@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="student"></div>
+  </body>
+  <script>
+    window.SetTemplateData = function (dataList) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+      };
+
+      const convertData = (dataList) => {
+        const res = dataList?.map((data) => {
+          return {
+            academicSession: {
+              year: data?.markData?.academicSession || "",
+              reportName: data?.markData?.markSheetName || "",
+              class: data?.markData?.className || "",
+              classTeacher: "",
+            },
+            baseTermData: data?.baseTermData,
+            studentInfo: data?.student,
+            studentResponse: data?.markData,
+
+            remarks: data?.baseTermData || "",
+            header: data?.header || "",
+            footer: data?.footer || "",
+          };
+        });
+        return res;
+      };
+
+      const multipleStudents = convertData(dataList);
+      const studentHtml = document.getElementById("student");
+      studentHtml.innerHTML = "";
+      multipleStudents?.forEach((v) => {
+        const mainResult = v?.studentResponse ?? [];
+        const studentDetails = v.studentInfo;
+        const studentRemarks = v?.remarks;
+        const tempRemarks = v?.remarks?.remarksEntry?.fields;
+        const studentRemarksObject = {
+          attendance:
+            tempRemarks?.find((v) => v?.title == "PRESENT DAYS")?.value +
+            "/" +
+            tempRemarks?.find((v) => v?.title == "WORKING DAYS")?.value,
+          behavior: tempRemarks?.find((v) => v?.title == "BEHAVIOUR")?.value,
+          neatAndClean: tempRemarks?.find((v) => v?.title == "NEAT & CLEANNESS")
+            ?.value,
+          percentage:
+            (Number(
+              tempRemarks?.find((v) => v?.title == "PRESENT DAYS")?.value
+            ) *
+              100) /
+            Number(tempRemarks?.find((v) => v?.title == "WORKING DAYS")?.value),
+        };
+
+        const getTerms = (termData) => {
+          const res = termData?.markSheetTerms
+            ?.map((d) => {
+              return `<th style="border-left: solid 0.264583333mm #000000;" >${d?.headerName} <br>${d?.subHeaderName}  </th>`;
+            })
+            .join("");
+
+          return res;
+        };
+        const getGradeCustomFunction = (int) => {
+          let num = int;
+          if (typeof num != "number") {
+            num = +int;
+          }
+          return gradeRequests?.find(
+            (el) => num >= el?.floorValue && num <= el?.ceilingValue
+          )?.grade;
+        };
+        const getSubjectMarks = (marksData) => {
+          const subj = marksData?.subjectWiseMarkSheetReportResponses.filter(
+            (item) => {
+              return (
+                item.subjectNature?.toLowerCase() === "theory" ||
+                item.subjectNature?.toLowerCase() === "grade"
+              );
+            }
+          );
+          let check = true;
+          let arr = [];
+          let str = "";
+          let subStr = "";
+          let totalStr = "";
+
+          subj.forEach((sub, i) => {
+            marksData?.subjectWiseMarkSheetReportResponses?.find((d) => {
+              if (sub?.subjectName === d?.subjectName) {
+                str += `
+
+                <tr>
+
+                        
+                        <td align="center" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+                          d?.subjectName
+                        }</td>${d.markSheetReport
+                  .map((v) => {
+                    return `<td align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:${
+                      v?.status ? "bold;" : ""
+                    } font-size:11pt;">${
+                      v?.subjectNature.toLowerCase() === "grade"
+                        ? attendanceValue[v?.status] || v?.grade
+                        : attendanceValue[v?.status] || Math.floor(v?.obtained)
+                    }</td>`;
+                  })
+                  .join(
+                    ""
+                  )} <td align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;" >${
+                  d?.subjectNature.toLowerCase() === "grade"
+                    ? d?.grade
+                    : Math.floor(d?.marksObtained)
+                }</td>
+                
+                  <td align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                    d?.percentage
+                  }</td>
+                   <td align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                     d?.grade
+                   }</td>
+                     </tr>`;
+              }
+            });
+          });
+          return subStr + str + totalStr;
+        };
+
+        const baseTermSubjects = () => {
+          return v?.baseTermData?.subject?.filter(
+            (v) => v.subjectAllResponse?.nature == "CO SCO"
+          );
+        };
+
+        let addObj =
+          v?.baseTermData?.studentAcademic?.studentInfoResponse?.[0]
+            ?.studentAddressResponse;
+
+        let address = `${addObj?.houseNo ? `${addObj?.houseNo}, ` : ""}${
+          addObj?.street ? `${addObj?.street}, ` : ""
+        }${addObj?.area ? `${addObj?.area}, ` : ""}${
+          addObj?.landmark ? `${addObj?.landmark}, ` : ""
+        }${addObj?.poPs ? `${addObj?.poPs}, ` : ""}${
+          addObj?.district ? `${addObj?.district}, ` : ""
+        }${addObj?.state ? `${addObj?.state}` : ""}${
+          addObj?.pincode ? ` - ${addObj?.pincode}` : ""
+        }`;
+
+        const singleStudentHtml = document.createElement("div");
+        singleStudentHtml.style.pageBreakAfter = "always";
+        singleStudentHtml.innerHTML = `
+                <style type="text/css">
+      @page {
+      size: A4
+      }
+      * {
+      	margin: 0px;
+      	padding: 0px;
+      	color: #000;
+      }
+      td {
+      	padding-left: 1mm;
+      	padding-right: 1mm;
+      	padding-top: 2mm;
+      	padding-bottom:2mm;
+      	font-size: 9pt;
+      	color: #000000;
+      	font-family: Arial, Helvetica, sans-serif;
+      }
+      th {
+      	padding-left: 1mm;
+      	padding-right: 1mm;
+      	padding-top:1mm;
+      	padding-bottom: 1mm;
+      	background: #e7e7e7;
+      	font-family: Arial, Helvetica, sans-serif;
+      }
+      .bgcol{
+      background-color: #999;
+      }
+
+      @media print {
+      @page {
+      margin:auto;
+      size: A4
+      }
+      }
+      </style>
+
+      <page orientation="portrait" format="A4" margin="0">
+      	<table cellspacing="10" cellpadding="10" style="width: 100%; border: solid 0.264583333mm #000000;">
+        		<tr valign="top">
+          	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+      		<!-- logo and Name section -->
+      		<table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 100px; height: 100px" src="data:image/png;base64,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" /></td>
+      				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+      					<span style="color:#0089e0; font-size:24pt; text-transform:uppercase; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">RADIANCE CENTRAL SCHOOL</span>
+      					<br/><span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">BHATWALIYA, BARHANI BAZAR, SIWAN(BIHAR) - INDIA<br>
+      					radianceschoolsiwan2013@gmail.com<br>7367084638</span>
+
+      					</td>
+      			</tr>
+      			<tr>
+      				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+      				<table cellspacing="0" style="width:100%;">
+      				<col style="width: 10%"/>
+      				<col style="width: 80%"/>
+      				<col style="width: 10%"/>
+      				</table>
+      				</td>
+      			</tr>
+      		</table>
+      		<!--// logo and Name section -->
+
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+            <tr>
+      					<td align="center" style="width:100%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; padding-top:15px; padding-bottom:15px;">${
+                  mainResult?.markSheetName
+                } : ${mainResult?.academicSession}</td>
+      				</tr>
+      		</table>
+
+      		<!-- Basic Details -->
+              <table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+              <tr>
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" >
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Name</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails?.studentName
+                          }</td>
+                      </tr>
+                  </table>
+              </td>
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Admission No.</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails?.admissionNo
+                          }</td>
+                      </tr>
+                  </table>
+              </td>
+              </tr>
+              <tr>
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Father</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails?.fatherName
+                          }</td>
+                      </tr>
+                  </table>
+              </td>
+
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Class/Section</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails.className
+                          }-${studentDetails.sectionName}</td>
+                      </tr>
+                  </table>
+              </td>
+              </tr>
+              <tr>
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Mother</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails?.motherName
+                          }</td>
+                      </tr>
+                  </table>
+              </td>
+
+              <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Roll No.</strong></td>
+                          <td style="width:70%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                            studentDetails?.rollNo
+                          }</td>
+                      </tr>
+                  </table>
+              </td>
+              </tr>
+              <tr>
+              <td colspan="2" style="width:50%;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                          <td style="width:15%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Address</strong></td>
+                          <td style="width:85%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${address}</td>
+                      </tr>
+                  </table>
+              </td>
+
+
+              </tr>
+              </table>
+      		<!--// Basic Details -->
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+      		</table>
+
+      		<!-- Term -->
+      		<table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:left; font-size:11pt; font-weight:bold; color:#000000;">ACADEMIC PERFORMANCE : SCHOLASTIC AREAS</td>
+      			</tr>
+      		</table>
+      		<!--// Term -->
+
+      		<!-- Main Subject Table -->
+      	 <table style="width: 100%;border: 1px solid;cellspacing=;border-spacing: 0px;">
+                  <tr>
+                   <br/>
+                    <th class="align-center subject-header" style="width:11%"; padding-left: 0.3rem;padding-top:20px;border-right: solid 0.264583333mm #000000;">Subject</th>
+                  ${getTerms(mainResult)}
+                 <th style="width:11%;border-left: solid 0.264583333mm #000000;">TOTAL</th>
+                 <th class="align-center subject-header" style="width:11%;border-left: solid 0.264583333mm #000000; padding-left: 0.3rem;">Percentage</th>
+          <th class="align-center subject-header" style="width:11%;border-left: solid 0.264583333mm #000000; padding-left: 0.3rem;">Grade</th>
+
+
+
+                  </tr>
+                  <tr>
+                    ${getSubjectMarks(mainResult)}
+
+                  </tr>
+                </table>
+      		<!--// Main Subject Table -->
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+      		</table>
+
+          <!-- CO-SCHOLASTIC -->
+          <table style="width:100%;" cellspacing="0" cellpadding="0">
+      			<tr>
+      				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:2mm; text-align:left; font-size:11pt; font-weight:bold; color:#000000;">CO-SCHOLASTIC</td>
+      			</tr>
+      		</table>
+
+              <div style="width: 100%; display: flex; flex-wrap: wrap;">
+              ${baseTermSubjects()
+                ?.map(
+                  (
+                    val
+                  ) => `<div style="width:33%; border: 1px solid"><table width="100%" border="0" cellspacing="0" >
+                      <tr>
+                          <td style="width:80%; padding:10px;"><strong>${val.subjectAllResponse.subjectName}</strong></td>
+                          <td style="width:20%; padding-left:0px; padding-right:10px; padding-top:0mm; padding-bottom:0mm;">${val.grade}</td>
+                      </tr>
+                  </table></div>`
+                )
+                .join("")}
+              </div>
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+      		</table>
+
+      		<!-- performance -->
+
+      		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                	<tr style="background-color:#e7e7e7;">
+                    <td align="center" style="width:20%; font-weight:bold;">Total Marks</td>
+                    <td align="center" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Percentage %</td>
+                    <td align="center" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Division</td>
+                    <td align="center" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;">Grade</td>
+                    <td align="center" style="width:20%; font-weight:bold; border-left: solid 0.264583333mm #000000;white-space:nowrap;">Position in Class</td>
+
+                  </tr>
+
+      			<tr>
+              <td align="center" style="width:25%; border-top: solid 0.264583333mm #000000;">${
+                mainResult?.marksObtained
+              }</td>
+      				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${mainResult?.percentage?.toFixed(
+                2
+              )} %</td>
+      				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                mainResult?.percentage >= 60
+                  ? "1st"
+                  : mainResult?.percentage >= 45
+                  ? "2nd"
+                  : mainResult?.percentage >= 30
+                  ? "3rd"
+                  : "Fail"
+              }</td>
+      				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                mainResult?.overAllGrade
+              }</td>
+              <td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                mainResult?.overAllRank
+              }</td>
+      			</tr>
+      		</table>
+      		<!--// performance -->
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+      		</table>
+
+      		<table cellspacing="0" style="width:100%;">
+      			<tr>
+      				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+      			</tr>
+      		</table>
+      						</td>
+      					</tr>
+      				</table>
+      				</td>
+      			</tr>
+      		</table>
+      		<!--// bottom grades -->
+
+      		<!-- Sign. section -->
+      		<table style="width:100%; margin-top: ${
+            280 - mainResult?.subjectWiseMarkSheetReportResponses?.length * 30
+          }px" cellspacing="0" cellpadding="0">
+      			<tr>
+      				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+      				<table cellspacing="0" style="width:100%;">
+      				<tr>
+      					<td valign="top" align="left" style="width:32%; padding-left:10px; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Class Teacher</strong></td>
+      						<td valign="top" align="center" style="width:32%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Principal</strong></td>
+      						<td valign="top" align="right" style="width:32%; padding-left:0mm; padding-right:10px; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Parent/Guardian</strong></td>
+      					</tr>
+      				</table>
+      				</td>
+      			</tr>
+      		</table>
+      		<!--// Sign. section -->
+      		</td>
+        		</tr>
+      		</table>
+
+      </page>
+      `;
+
+        studentHtml.appendChild(singleStudentHtml);
+      });
+    };
+  </script>
+  <script>
+    window.SetTemplateData([
+      {
+        student: {
+          dob: "29-06-2010",
+          admissionNo: "20148970",
+          studentName: "Ridhima",
+          className: "IX",
+          sectionName: "A",
+          rollNo: 9125,
+          fatherName: "Kamal",
+          motherName: "Sangeeta",
+          attendance: "5.0/8",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 282700,
+              userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
+              studentId: "20148970",
+              exAdmissionNo: null,
+              studentName: "Ridhima",
+              fatherName: "Kamal",
+              motherName: "Sangeeta",
+              dob: "29-06-2010",
+              gender: "Female",
+              studentAdhaarcard: "",
+              joiningClass: "IX",
+              joiningSections: "A",
+              joiningDate: "19-04-2024",
+              plotNumber: "",
+              area: "New Moti Nagar",
+              city: "New Delhi",
+              state: "NA",
+              pincode: "110015",
+              phone1: null,
+              rollNo: 9125,
+              emergencyNumber: "",
+              mobileNumber: "8802424733",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "8802225545",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "IX",
+              classUid: null,
+              sections: "A",
+              group: "IX-X(HINDI)",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-2025",
+              joiningStatus: "Old",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "APR",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "MAY",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JUN",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JUL",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "AUG",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "SEP",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "OCT",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "NOV",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "DEC",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JAN",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "FEB",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "MAR",
+                },
+              ],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-04-19 12:30:13.725495",
+              editeddate: "2024-04-19 12:30:13.725495",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
+                houseNo: null,
+                area: "New Moti Nagar",
+                landmark: null,
+                city: "New Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110015,
+                street: "B-1/112",
+                userName: "SPB303_20148970",
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "80b031ab-293b-488e-9752-a0d48ff88055",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "02-08-2024 01:11 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        markData: {
+          academicSession: "2024-2025",
+          admissionNo: "198",
+          studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+          studentName: "Rishav Kumar",
+          rollNo: 0,
+          fatherName: "Pintu Kumar Singh",
+          className: "LKG",
+          sectionName: "B",
+          terms: "Half Yearly",
+          markSheetName: "HALF YEARLY",
+          overAllRank: "1",
+          markSheetTerms: [
+            {
+              id: 1075,
+              headerName: "UNIT TEST 1",
+              subHeaderName: "20",
+              priority: 1,
+              bestOf: 0,
+              decimalPlaces: 2,
+              weightage: 20.0,
+              terms: ["Unit Test 1"],
+            },
+            {
+              id: 1076,
+              headerName: "HALF YEARLY",
+              subHeaderName: "80",
+              priority: 2,
+              bestOf: 0,
+              decimalPlaces: 2,
+              weightage: 80.0,
+              terms: ["Half Yearly"],
+            },
+          ],
+          subjectWiseMarkSheetReportResponses: [
+            {
+              subjectUid: "3f759662-9976-4247-acde-d847c33a5eee",
+              subjectName: "Hindi",
+              subjectNature: "Theory",
+              markSheetReport: [
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "3f759662-9976-4247-acde-d847c33a5eee",
+                  subjectName: "Hindi",
+                  subjectNature: "Theory",
+                  max: 20.0,
+                  obtained: 19.0,
+                  grade: "A+",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1075,
+                    headerName: "UNIT TEST 1",
+                    subHeaderName: "20",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 20.0,
+                    terms: ["Unit Test 1"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "3f759662-9976-4247-acde-d847c33a5eee",
+                  subjectName: "Hindi",
+                  subjectNature: "Theory",
+                  max: 80.0,
+                  obtained: 54.0,
+                  grade: "C",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1076,
+                    headerName: "HALF YEARLY",
+                    subHeaderName: "80",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 80.0,
+                    terms: ["Half Yearly"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 73.0,
+              total: 100.0,
+              percentage: 73.0,
+              grade: "B",
+              className: "LKG",
+              sectionName: "B",
+              terms: "Half Yearly",
+              markSheetName: "HALF YEARLY",
+              subjectPrt: 1,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "583630b9-491d-49e7-b57e-1bc011c962a2",
+              subjectName: "English",
+              subjectNature: "Theory",
+              markSheetReport: [
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "583630b9-491d-49e7-b57e-1bc011c962a2",
+                  subjectName: "English",
+                  subjectNature: "Theory",
+                  max: 20.0,
+                  obtained: 18.0,
+                  grade: "A",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1075,
+                    headerName: "UNIT TEST 1",
+                    subHeaderName: "20",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 20.0,
+                    terms: ["Unit Test 1"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "583630b9-491d-49e7-b57e-1bc011c962a2",
+                  subjectName: "English",
+                  subjectNature: "Theory",
+                  max: 80.0,
+                  obtained: 72.0,
+                  grade: "A",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1076,
+                    headerName: "HALF YEARLY",
+                    subHeaderName: "80",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 80.0,
+                    terms: ["Half Yearly"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 90.0,
+              total: 100.0,
+              percentage: 90.0,
+              grade: "A",
+              className: "LKG",
+              sectionName: "B",
+              terms: "Half Yearly",
+              markSheetName: "HALF YEARLY",
+              subjectPrt: 2,
+              decimalPlaces: 2,
+              visible: false,
+            },
+            {
+              subjectUid: "07f1b81f-857b-48de-a9db-9713ce939272",
+              subjectName: "Mathematics",
+              subjectNature: "Theory",
+              markSheetReport: [
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "07f1b81f-857b-48de-a9db-9713ce939272",
+                  subjectName: "Mathematics",
+                  subjectNature: "Theory",
+                  max: 20.0,
+                  obtained: 17.0,
+                  grade: "B+",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1075,
+                    headerName: "UNIT TEST 1",
+                    subHeaderName: "20",
+                    priority: 1,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 20.0,
+                    terms: ["Unit Test 1"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+                {
+                  studentInfoUid: "4eaa703e-3352-43cf-97d1-17877e780a0c",
+                  admissionNo: "198",
+                  studentName: "Rishav Kumar",
+                  rollNo: 0,
+                  fatherName: "Pintu Kumar Singh",
+                  className: "LKG",
+                  sectionName: "B",
+                  classSectionUid: "0d44eb48-4b91-46ea-a12f-eebed934664e",
+                  terms: "Half Yearly",
+                  subjectUid: "07f1b81f-857b-48de-a9db-9713ce939272",
+                  subjectName: "Mathematics",
+                  subjectNature: "Theory",
+                  max: 80.0,
+                  obtained: 70.0,
+                  grade: "B+",
+                  status: "",
+                  markSheetName: "HALF YEARLY",
+                  attachmentName: "",
+                  session: "2024-2025",
+                  decimalPlaces: 2,
+                  markSheetTermResponse: {
+                    id: 1076,
+                    headerName: "HALF YEARLY",
+                    subHeaderName: "80",
+                    priority: 2,
+                    bestOf: 0,
+                    decimalPlaces: 2,
+                    weightage: 80.0,
+                    terms: ["Half Yearly"],
+                  },
+                  visible: false,
+                  graded: false,
+                  pass: true,
+                },
+              ],
+              marksObtained: 87.0,
+              total: 100.0,
+              percentage: 87.0,
+              grade: "B+",
+              className: "LKG",
+              sectionName: "B",
+              terms: "Half Yearly",
+              markSheetName: "HALF YEARLY",
+              subjectPrt: 3,
+              decimalPlaces: 2,
+              visible: false,
+            },
+          ],
+          marksObtained: 250.0,
+          total: 300.0,
+          percentage: 83.33,
+          overAllGrade: "B+",
+          visible: false,
+        },
+        remarks: {
+          uid: null,
+          terms: null,
+          studentId: null,
+          studentName: null,
+          rollNumber: 0,
+          classSectionUid: null,
+          classSection: null,
+          description: null,
+          fields: null,
+          status: false,
+          createdUser: null,
+          editedUser: null,
+          createdDate: null,
+          editedDate: null,
+        },
+        baseTermData: {
+          studentAcademic: {
+            dob: "29-06-2010",
+            admissionNo: "20148970",
+            studentName: "Ridhima",
+            className: "IX",
+            sectionName: "A",
+            rollNo: 9125,
+            fatherName: "Kamal",
+            motherName: "Sangeeta",
+            attendance: "5.0/8",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 282700,
+                userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
+                studentId: "20148970",
+                exAdmissionNo: null,
+                studentName: "Ridhima",
+                fatherName: "Kamal",
+                motherName: "Sangeeta",
+                dob: "29-06-2010",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "IX",
+                joiningSections: "A",
+                joiningDate: "19-04-2024",
+                plotNumber: "",
+                area: "New Moti Nagar",
+                city: "New Delhi",
+                state: "NA",
+                pincode: "110015",
+                phone1: null,
+                rollNo: 9125,
+                emergencyNumber: "",
+                mobileNumber: "8802424733",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "NA",
+                fatherCity: "NA",
+                fatherState: "NA",
+                fatherPincode: "",
+                fatherPhone: null,
+                fatherMobile: "8802225545",
+                fatherEmail: null,
+                fatherAdhaarNumber: "",
+                schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "NA",
+                motherCity: "NA",
+                motherState: "NA",
+                motherPincode: "",
+                motherPhone: null,
+                motherMobile: "",
+                motherEmail: null,
+                motherAdhaarNumber: "",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: null,
+                otp: null,
+                schoolName: "Demo Public School",
+                remark: null,
+                classTeacher: "",
+                classTeacherUserName: "",
+                classes: "IX",
+                classUid: null,
+                sections: "A",
+                group: "IX-X(HINDI)",
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2024-2025",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: null,
+                attached: false,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "APR",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "MAY",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "JUN",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "JUL",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "AUG",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "SEP",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "OCT",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "NOV",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "DEC",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "JAN",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "FEB",
+                  },
+                  {
+                    concessionName: "HALF T.FEE",
+                    consessionType: null,
+                    employeeId: null,
+                    installment: "MAR",
+                  },
+                ],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-04-19 12:30:13.725495",
+                editeddate: "2024-04-19 12:30:13.725495",
+                permanentEducationNumber: null,
+                studentAddressResponse: {
+                  uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
+                  houseNo: null,
+                  area: "New Moti Nagar",
+                  landmark: null,
+                  city: "New Delhi",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 110015,
+                  street: "B-1/112",
+                  userName: "SPB303_20148970",
+                  createdDate: "19-04-2024 06:00 PM",
+                  editedDate: "19-04-2024 06:00 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                fatherAddressResponse: {
+                  uid: "80b031ab-293b-488e-9752-a0d48ff88055",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "19-04-2024 06:00 PM",
+                  editedDate: "19-04-2024 06:00 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                motherAddressResponse: {
+                  uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "19-04-2024 06:00 PM",
+                  editedDate: "19-04-2024 06:00 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+            permanentEducationNumber: null,
+            school: {
+              uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+              schoolName: "SDPS Punjabi Bagh",
+              schoolAbb: "SPB",
+              educationBoard: null,
+              registrationNo: null,
+              plotNumber: null,
+              area: null,
+              city: null,
+              pincode: null,
+              state: null,
+              phoneNo1: null,
+              phoneNo2: null,
+              contactName: "VANDANA GUPTA",
+              contactMobile: "9868359499",
+              contactEmail: "sg4vgoyal@gmail.com",
+              schoolCode: null,
+              pfCode: null,
+              societyManagement: null,
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "sdps",
+              website: null,
+              schemaPrefix: null,
+              editedDate: "02-08-2024 01:11 PM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: true,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+            },
+          },
+          subject: [
+            {
+              subjectAllResponse: {
+                uid: "3f759662-9976-4247-acde-d847c33a5eee",
+                subjectName: "Hindi",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 02:58:13.342275",
+                editeddate: "2024-03-12 06:49:02.023629",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 60,
+              percentage: 75,
+              grade: "B",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "583630b9-491d-49e7-b57e-1bc011c962a2",
+                subjectName: "English",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 03:06:49.645036",
+                editeddate: "2024-03-12 06:49:29.497797",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 64,
+              percentage: 80,
+              grade: "B+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "07f1b81f-857b-48de-a9db-9713ce939272",
+                subjectName: "Mathematics",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 03:09:53.591336",
+                editeddate: "2024-03-12 06:50:29.504343",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 76,
+              percentage: 95,
+              grade: "A+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "0d26bdd3-477b-4d9d-8ec2-b7b70520f6cc",
+                subjectName: "Drawing",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-06-29 07:15:40.194078",
+                editeddate: "2024-03-30 05:04:57.570645",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "3f759662-9976-4247-acde-d847c33a5eee",
+                subjectName: "Hindi",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 02:58:13.342275",
+                editeddate: "2024-03-12 06:49:02.023629",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 54,
+              percentage: 67.5,
+              grade: "C",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "583630b9-491d-49e7-b57e-1bc011c962a2",
+                subjectName: "English",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 03:06:49.645036",
+                editeddate: "2024-03-12 06:49:29.497797",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 72,
+              percentage: 90,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "07f1b81f-857b-48de-a9db-9713ce939272",
+                subjectName: "Mathematics",
+                nature: "Theory",
+                natureUid: "cdee5fbe-ad63-4bd0-91f3-4483e75deec6",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-05-16 03:09:53.591336",
+                editeddate: "2024-03-12 06:50:29.504343",
+              },
+              termName: "Half Yearly",
+              max: 80,
+              markObtained: 70,
+              percentage: 87.5,
+              grade: "B+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "0d26bdd3-477b-4d9d-8ec2-b7b70520f6cc",
+                subjectName: "Drawing",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "Dr135794",
+                editedUser: "Dr135794",
+                createddate: "2023-06-29 07:15:40.194078",
+                editeddate: "2024-03-30 05:04:57.570645",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "85503cf2-f754-4dd0-b054-1a4b16f47968",
+                subjectName: "Work Education",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:00:12.731025",
+                editeddate: "2024-03-12 07:00:12.729689",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "90f6f771-0c37-463c-b014-3a43be43b89e",
+                subjectName: "Scientific Skills",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:00:25.661497",
+                editeddate: "2024-03-12 07:00:25.657341",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "de48fbba-624a-4522-8fdd-8d43a3819e1b",
+                subjectName: "Yoga Skills",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:00:36.508095",
+                editeddate: "2024-03-12 07:00:36.507035",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "d78a64e9-fafc-4e2d-b130-f52ebcdf6584",
+                subjectName: "Art Education",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:00:48.094796",
+                editeddate: "2024-03-12 07:00:48.093967",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "019d111c-c435-407e-920d-0e1042f02830",
+                subjectName: "Thinking Skills",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:00:56.411125",
+                editeddate: "2024-03-12 07:01:00.948923",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "7e9be1be-59f1-400a-bd3d-69d262718e6d",
+                subjectName: "Sports Skills",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:01:17.769974",
+                editeddate: "2024-03-12 07:01:17.765854",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A+",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "3bcd50e1-0a33-4f67-864e-9f00aeb39fde",
+                subjectName: "Health Physical Education",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:01:31.752602",
+                editeddate: "2024-03-12 07:01:31.752172",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "01a2af88-6c11-4b1f-8b42-b746060a9b41",
+                subjectName: "Social Skills",
+                nature: "CO SCO",
+                natureUid: "3a7ca4fa-c55b-442b-bace-b80aabcf538f",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-03-12 07:01:40.981986",
+                editeddate: "2024-03-12 07:01:40.977916",
+              },
+              termName: "Half Yearly",
+              max: 100,
+              markObtained: 94.99,
+              percentage: 94.99,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              added: false,
+              scholastic: false,
+            },
+          ],
+          remarksEntry: {
+            uid: null,
+            terms: null,
+            studentId: null,
+            studentName: null,
+            rollNumber: 0,
+            classSectionUid: null,
+            classSection: null,
+            description: null,
+            fields: null,
+            status: false,
+            createdUser: null,
+            editedUser: null,
+            createdDate: null,
+            editedDate: null,
+          },
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "02-08-2024 01:11 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+          promotedClass: null,
+          promotedSection: null,
+          perSignedUrlResponse: {
+            url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SDPS/student-info/20148970/student/images/20148970.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240904T072906Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240904%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=4865ffdff2f26050f07da6477a9be357fb267db2d678f2e3e54a077ecb1689fa",
+            fileName: "20148970.png",
+          },
+          pass: false,
+          status_code: 200,
+        },
+      },
+    ]);
+  </script>
+</html>
