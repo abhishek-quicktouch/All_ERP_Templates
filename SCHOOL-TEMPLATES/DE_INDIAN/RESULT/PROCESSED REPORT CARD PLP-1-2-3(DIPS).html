@@ -11,6 +11,7 @@
   <div id="studentsList">Student Report Card</div>
 </body>
 <script>
+
   window.SetTemplateData = function (data) {
     const dataList = Array.isArray(data) ? data : [data];
     const viewTemplate = dataList[0]?.viewTemplate;
@@ -502,8 +503,8 @@ ${studentData?.header}
         }</td>
                         <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ATTENDANCE:</strong> ${viewTemplate
           ? "__________"
-          : studentData?.baseTermData?.remarksEntry.fields.find((field) => field?.title === "Attendance").value
-        }</td>
+          : studentData?.baseTermData?.remarksEntry?.fields?.find((field) => field?.title === "Attendance")?.value
+          || "-"}</td>
                     </tr>
                     <tr>
                         <td style="width: 50%; font-size: 12px; padding: 4px; margin: 0;"><strong>ADDRESS:</strong> ${viewTemplate
@@ -4932,7 +4933,7 @@ ${studentData?.header}
               "uid": "b98c9ea4-1376-4c87-b13d-bf83631072e6",
               "title": "Attendance",
               "type": "OPEN",
-              "value": "103/105",
+              "value": null,
               "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
               "masterName": "Remarks"
             },

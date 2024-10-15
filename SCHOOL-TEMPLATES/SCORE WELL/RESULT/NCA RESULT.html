@@ -298,19 +298,19 @@
                Total Working Days
               </td>  
                <td >
-               ${remarksEntry?.fields.find((item) => item.title === "WORKING DAYS")?.value || "-"}
+               ${remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value || "-"}
               </td> 
               <td> 
               Present Days   
               </td> 
               <td >
-                 ${remarksEntry?.fields.find((item) => item.title === "PRESENT DAYS")?.value || "-"
+                 ${remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value || "-"
         }
               </td>
               <td> 
               Percentage - 
              
-                 ${(remarksEntry?.fields.find((item) => item.title === "PRESENT DAYS")?.value / remarksEntry?.fields.find((item) => item.title === "WORKING DAYS")?.value * 100).toFixed(2) || "-"}%
+                 ${(remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value / remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value * 100).toFixed(2) || "-"}%
               </td>
               
               </tr>
@@ -321,14 +321,14 @@
               Height (cm)   
               </td> 
               <td >
-                 ${remarksEntry?.fields.find((item) => item.title === "HEIGHT CM")?.value || "-"}
+                 ${remarksEntry?.fields?.find((item) => item?.title === "HEIGHT CM")?.value || "-"}
               </td>
               <td colspan=2>
                 Weight 
 (kg) 
               </td>  
                <td colspan=2 >
-                ${remarksEntry?.fields.find((item) => item.title === "WEIGHT KG")?.value || "-"}
+                ${remarksEntry?.fields?.find((item) => item?.title === "WEIGHT KG")?.value || "-"}
               </td> 
               </tr>
 
@@ -3128,7 +3128,7 @@
     studentHtml.innerHTML = "";
 
     const multipleStudents = viewTemplate ? staticData : dataList
-    multipleStudents.forEach((student) => {
+    multipleStudents?.forEach((student) => {
       const { firstPageHtml } = generateReportCard(student);
 
       const firstPage = document.createElement("div");

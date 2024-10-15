@@ -71,11 +71,11 @@
           .header { display: flex; align-items: center; justify-content: space-around; margin-bottom: 20px;width: 80%; }
           .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; } 
           .header img { max-width: 100px;border: none; }
-          .section { margin-bottom: 10px; }
+          .section { margin-bottom: 15px; }
           .section div{ font-size:12px }
           .section table { width: 100%; border-collapse: collapse; }
           .section table, .section th, .section td { border: 1px solid #000; }
-          .section td { padding: 4px; text-align: center; font-size: 12px; margin: 0px; }
+          .section td { padding: 3px; text-align: center; font-size: 12px; margin: 0px; }
           .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
           .remarks { margin-bottom: 20px; }
           .signatures { display: flex; justify-content: space-between; }
@@ -294,20 +294,20 @@
                Total Working Days
               </td>  
                <td >
-               ${remarksEntry?.fields.find((item) => item.title === "WORKING DAYS")?.value || "-"}
+               ${remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value || "-"}
               </td> 
               <td> 
               Present Days   
               </td> 
               <td >
-                 ${remarksEntry?.fields.find((item) => item.title === "PRESENT DAYS")?.value || "-"
+                 ${remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value || "-"
                 }
               </td>
               <td> 
               Percentage
               </td> 
               <td >
-                 ${(remarksEntry?.fields.find((item) => item.title === "PRESENT DAYS")?.value / remarksEntry?.fields.find((item) => item.title === "WORKING DAYS")?.value * 100).toFixed(2) || "-"}%
+                 ${(remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value / remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value * 100).toFixed(2) || "-"}%
               </td>
               
               </tr>
@@ -318,14 +318,14 @@
               Height (cm)   
               </td> 
               <td >
-                 ${remarksEntry?.fields.find((item) => item.title === "HEIGHT CM")?.value || "-"}
+                 ${remarksEntry?.fields?.find((item) => item?.title === "HEIGHT CM")?.value || "-"}
               </td>
               <td colspan=2>
                 Weight 
 (kg) 
               </td>  
                <td colspan=2 >
-                ${remarksEntry?.fields.find((item) => item.title === "WEIGHT KG")?.value || "-"}
+                ${remarksEntry?.fields?.find((item) => item?.title === "WEIGHT KG")?.value || "-"}
               </td> 
               </tr>
 
@@ -2684,7 +2684,7 @@
         studentHtml.innerHTML = "";
 
         const multipleStudents = viewTemplate ? staticData : dataList
-        multipleStudents.forEach((student) => {
+        multipleStudents?.forEach((student) => {
             const { firstPageHtml } = generateReportCard(student);
 
             const firstPage = document.createElement("div");
