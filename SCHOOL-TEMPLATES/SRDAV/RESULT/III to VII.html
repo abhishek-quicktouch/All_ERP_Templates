@@ -230,8 +230,8 @@ ${studentInfoFields
                             .map(
                                 (term) => {
                                     isNaN(marks[term.header]?.obtained) ? isStatus = true : ""
-                                    console.log(isStatus, "fffffffffff isStatus")
-                                    console.log(marks[term.header]?.obtained, "fffffffffffff marks[term.header]?.obtained")
+                                    // console.log(isStatus, "fffffffffff isStatus")
+                                    // console.log(marks[term.header]?.obtained, "fffffffffffff marks[term.header]?.obtained")
                                     return `<td style="font-weight:${isNaN(marks[term.header]?.obtained)
                                         ? "bold"
                                         : "normal"

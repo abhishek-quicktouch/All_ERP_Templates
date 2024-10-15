@@ -326,37 +326,44 @@ ${studentData?.header}
     <tr>
         <td>MY FATHER</td>
         <td>${student.fatherName || "-"}</td>
-         <td>FOOD</td>
-        <td id="favouriteFood">${remarks?.fields.find((item) => item.title === "FOOD")?.value || "-"
+        <td>COLOUR</td>
+        <td id="favouriteColor">${remarks?.fields.find((item) => item.title === "COLOUR")?.value || "-"
           }</td>
     </tr>
     <tr>
         <td>MY MOTHER</td>
         <td>${student.motherName || "-"}</td>
-        <td>MY ATTENDANCE</td>
-        <td>${remarks?.fields.find((item) => item.title.toLowerCase() === "attendance")?.value ||
-          "-"
+        <td>FOOD</td>
+        <td id="favouriteFood">${remarks?.fields.find((item) => item.title === "FOOD")?.value || "-"
           }</td>
     </tr>
     <tr>
         <td>MY BIRTHDAY</td>
         <td>${student.dob || "-"}</td>
-        <td>MY BLOOD GROUP</td>
-        <td>${studentInfo.bloodGroup || "-"}</td>
-        
+        <td>GAME</td>
+        <td id="favouriteGame">${remarks?.fields.find((item) => item.title === "GAME")?.value || "-"
+          }</td>
     </tr>
     <tr>
         <td>MY HEIGHT</td>
         <td>${studentInfo.height || "-"} cm</td>
-         
-        <td>MY CONTACT NO.</td>
-        <td>${studentInfo.mobileNumber || "-"}</td>
+        <td>ANIMAL</td>
+        <td id="favouriteAnimal">${remarks?.fields.find((item) => item.title === "ANIMAL")?.value || "-"
+          }</td>
     </tr>
     <tr>
         <td>MY WEIGHT</td>
         <td>${studentInfo.weight || "-"} kg</td>
-       <td></td>
-        <td></td>
+        <td>MY CONTACT NO.</td>
+        <td>${studentInfo.mobileNumber || "-"}</td>
+    </tr>
+    <tr>
+        <td>MY BLOOD GROUP</td>
+        <td>${studentInfo.bloodGroup || "-"}</td>
+        <td>MY ATTENDANCE</td>
+        <td>${remarks?.fields.find((item) => item.title.toLowerCase() === "attendance")?.value ||
+          "-"
+          }</td>
     </tr>
     
 </table >
