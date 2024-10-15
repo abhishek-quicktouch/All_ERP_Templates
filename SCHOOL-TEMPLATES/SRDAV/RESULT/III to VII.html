@@ -76,7 +76,7 @@
                 height: 100%;
                 background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png') no-repeat center;
                 background-size: 80%;
-                opacity: 0.1;
+                opacity: 0.06;
                 z-index: -1;
                 pointer-events: none;
             }
@@ -230,8 +230,8 @@ ${studentInfoFields
                             .map(
                                 (term) => {
                                     isNaN(marks[term.header]?.obtained) ? isStatus = true : ""
-                                    console.log(isStatus, "fffffffffff isStatus")
-                                    console.log(marks[term.header]?.obtained, "fffffffffffff marks[term.header]?.obtained")
+                                    // console.log(isStatus, "fffffffffff isStatus")
+                                    // console.log(marks[term.header]?.obtained, "fffffffffffff marks[term.header]?.obtained")
                                     return `<td style="font-weight:${isNaN(marks[term.header]?.obtained)
                                         ? "bold"
                                         : "normal"
@@ -336,10 +336,10 @@ ${studentInfoFields
                         totalMainMarks[mainSubject] -= marksObtained;
                         if (totalMainMarks[mainSubject] < 30) {
                             totalMainMarks[mainSubject] += marksObtained;
-                            subjectsGroupedByMain[mainSubject].needStar = true; // Correctly set `needStar`
                         }
                         if (totalMainMarks[mainSubject] > 30) {
                             totalMainMarks[mainSubject] = 30;
+                            subjectsGroupedByMain[mainSubject].needStar = true; // Correctly set `needStar`
                         }
                     }
                 }

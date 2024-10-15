@@ -502,7 +502,7 @@ ${studentData?.header}
         }</td>
                         <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ATTENDANCE:</strong> ${viewTemplate
           ? "__________"
-          : studentData?.student?.attendance
+          : studentData?.baseTermData?.remarksEntry.fields.find((field) => field?.title === "Attendance").value
         }</td>
                     </tr>
                     <tr>
@@ -554,12 +554,12 @@ ${studentData?.header}
           ? "__________"
           : studentData?.student
             ?.studentInfoResponse[0]?.height
-        }</strong></p>
+        }cm</strong></p>
                                         <p style="font-weight: bold; display: inline">Wt.:<strong style="margin-left: 5px; font-weight: normal; width: 45px; display: inline-block; ">${viewTemplate
           ? "__________"
           : studentData?.student
             ?.studentInfoResponse[0]?.weight
-        }</strong></p>
+        }kg</strong></p>
                                         <p style="font-weight: bold; display: inline">B.G.:<strong style="margin-left: 5px; font-weight: normal; width: 45px; display: inline-block; ">${viewTemplate
           ? "__________"
           : studentData?.student
@@ -666,7 +666,7 @@ ${studentData?.header}
         })()}]</p>
                 </div>
                 </div>
-                <div style="padding: 4px; border: 2px solid black; height: 50px;">
+                <div style="padding: 4px; border: 2px solid black; min-height: 50px;">
                     <strong >REMARKS:</strong> ${viewTemplate
           ? "__________"
           : studentData?.baseTermData?.remarksEntry
@@ -4909,20 +4909,103 @@ ${studentData?.header}
           },
         ],
         remarksEntry: {
-          uid: null,
-          terms: null,
-          studentId: null,
-          studentName: null,
-          rollNumber: 0,
-          classSectionUid: null,
-          classSection: null,
-          description: null,
-          fields: null,
-          status: false,
-          createdUser: null,
-          editedUser: null,
-          createdDate: null,
-          editedDate: null,
+          "uid": "570b9ec0-b030-49cb-9720-0b6d5dba7ddf",
+          "terms": [
+            "MID TERM"
+          ],
+          "studentId": "20200001",
+          "studentName": "Kavya",
+          "rollNumber": 17,
+          "classSectionUid": "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+          "classSection": "PLP 1-A",
+          "description": "Kavya is a bright and quick-witted student who consistently excels in all the subjects. Her ability to think outside the box sets her apart.She demonstrates an exceptional understanding of scientific concepts and methodologies. Keep it up!",
+          "fields": [
+            {
+              "uid": "fc3c039b-52bd-4dbf-ac90-7bd55d8ec175",
+              "title": "ANIMAL",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "b98c9ea4-1376-4c87-b13d-bf83631072e6",
+              "title": "Attendance",
+              "type": "OPEN",
+              "value": "103/105",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "48aed999-9c8d-468a-a2d7-6eff18218ce3",
+              "title": "COLOUR",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "2c04dbb7-1e69-40e3-923b-99a2ff48a490",
+              "title": "FOOD",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "3555086b-ae1c-4ac0-af35-1106d9ceffc7",
+              "title": "GAME",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "4ac293ee-6277-46cf-b862-3c6511eb2c74",
+              "title": "Height",
+              "type": "OPEN",
+              "value": "129",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "04fe728b-9cb2-4c14-91c9-6cfea471dd14",
+              "title": "MY FAVOURITE",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "5bc2cf08-54d9-425a-8e5b-c73937db75f8",
+              "title": "MY FRIENDS ARE",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "4584bbc1-1416-4d09-bc93-251f1a13c0b4",
+              "title": "Remarks",
+              "type": "OPEN",
+              "value": "",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            },
+            {
+              "uid": "4762f148-5e12-45ef-978d-6d3c0e6063d5",
+              "title": "Weight",
+              "type": "OPEN",
+              "value": "19",
+              "masterUid": "4b22a350-b857-4357-bbef-294fc27e848e",
+              "masterName": "Remarks"
+            }
+          ],
+          "status": true,
+          "createdUser": "AnkitaSolanki_509676",
+          "editedUser": "AnkitaSolanki_509676",
+          "createdDate": "13-09-2024 12:43 PM",
+          "editedDate": "14-10-2024 02:45 PM"
         },
         school: {
           uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",

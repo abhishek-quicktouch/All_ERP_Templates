@@ -1119,7 +1119,8 @@
                 <th colspan="2" style="text-align: center; border: none">(Grading on 3 Point Scale A,B,C)</th>
             </tr>
                     <tr>
-                        <th colspan="2" style="text-align: center;">DISCIPLINE</th>
+                        <th  style="text-align: center;">DISCIPLINE</th>
+                        <th style="text-align: center;">GRADE</th>
                     </tr>
                     ${personalitySubjects
             ?.map(
@@ -1400,7 +1401,7 @@ ${studentData?.header}
                
                
               
-                <div style="padding: 5px; border: 2px solid black; height: 60px;">
+                <div style="padding: 5px; border: 2px solid black; min-height: 60px;">
                     <strong >REMARKS:</strong> ${viewTemplate
           ? "__________"
           : studentData?.baseTermData?.remarksEntry

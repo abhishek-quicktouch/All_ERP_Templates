@@ -68,7 +68,7 @@
                 height: 100%;
                 background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png') no-repeat center;
                 background-size: 80%;
-                opacity: 0.1;
+                opacity: 0.06;
                 z-index: -1;
                 pointer-events: none;
             }
@@ -95,7 +95,7 @@
             getAttendanceOrMark: (status, mark) => {
                 const attendanceValue = {
                     Absent: "AB",
-                    Medical: "M",
+                    Medical: "ML",
                     Sports: "S",
                     Leave: "L",
                     "Late Admission": "LA",
@@ -180,6 +180,7 @@ ${studentInfoFields
                 ?.map((subject) => {
                     let subjectTotal = 0;
                     let subjectMaxTotal = 0;
+                    let isStatus = false
                     const marks = {};
 
                     subject?.markSheetReport?.forEach((report) => {
@@ -203,15 +204,18 @@ ${studentInfoFields
                     <td style="font-weight:bold">${subject?.subjectName}</td>
                     ${termConfig
                             .map(
-                                (term) =>
-                                    `<td style="font-weight:${isNaN(marks[term.header]?.obtained) ? "bold" : "normal"
-                                    };text-align:center">${parseFloat(marks[term.header]?.obtained).toFixed(1) || "-"
-                                    }</td>`
+                                (term) => {
+                                    isNaN(marks[term.header]?.obtained) ? isStatus = true : ""
+
+                                    return `<td style="font-weight:${isNaN(marks[term.header]?.obtained) ? "bold" : "normal"
+                                        };text-align:center">${isNaN(marks[term.header]?.obtained) ? marks[term.header]?.obtained : parseFloat(marks[term.header]?.obtained).toFixed(1) || "-"
+                                        }</td>`
+                                }
                             )
                             .join("")}
-                    <td style="text-align:center">${parseFloat(subjectTotal).toFixed(1)}</td>
+                    <td style="text-align:center">${isStatus ? "-" : parseFloat(subjectTotal).toFixed(1)}</td>
                  
-                    <td style="text-align:center">${grade}</td>
+                    <td style="text-align:center">${isStatus ? "-" : grade}</td>
                 </tr>
             `;
                 })
@@ -281,7 +285,7 @@ OBTAINED</br>(${totalSubheader})</th>
         };
 
         const generateTeacherRemarks = (remarks) => `
-        <div class="section" style="border: 1px solid #000; height: 50px;padding: 5px; font-size: 12px;">
+        <div class="section" style="border: 1px solid #000; min-height: 50px;padding: 5px; font-size: 12px;">
             <strong style="font-size: 12px">Class Teacher Remarks:</strong>
             ${remarks || "-"}
         </div>
@@ -703,7 +707,7 @@ OBTAINED</br>(${totalSubheader})</th>
                                 "max": 20,
                                 "obtained": 13,
                                 "grade": "B2",
-                                "status": "",
+                                "status": "Exempted",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-25",

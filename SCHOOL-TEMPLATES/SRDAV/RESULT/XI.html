@@ -70,7 +70,7 @@
                 height: 100%;
                 background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-25T06_16_20_774548159.png') no-repeat center;
                 background-size: 80%;
-                opacity: 0.1;
+                opacity: 0.06;
                 z-index: -1;
                 pointer-events: none;
             }
@@ -95,7 +95,7 @@
         };
         const attendanceValue = {
             Absent: "AB",
-            Medical: "M",
+            Medical: "ML",
             Sports: "S",
             Leave: "L",
             "Late Admission": "LA",
@@ -645,6 +645,13 @@
                 <p>COORDINATOR</p>
                 
             </div>
+            
+            <div>
+                <p>PRINCIPAL</p>
+                
+            </div>
+            
+
         </div>
     `;
 
@@ -790,15 +797,17 @@
 
             const { subjectList, resSub, totalMarksObj, additionalSubData, additionalSubName } = getResultData();
 
-            console.log(subjectList, resSub, totalMarksObj, additionalSubData, additionalSubName, "fffffffffffffffff ")
+            // console.log(subjectList, resSub, totalMarksObj, additionalSubData, additionalSubName, "fffffffffffffffff ")
 
 
 
 
+            let isStatusOverall = false
             const termConfig = element?.markData?.markSheetTerms?.map((term) => ({
                 header: term.subHeaderName,
                 subHeaderName: term.headerName,
             })) || [];
+            let isStatus = false
             return `
             <div class="report-card" id="report-card">
             <div class="container">
@@ -883,6 +892,8 @@
 
                     ${subjectList
                     ?.map((subj) => {
+                        resSub[subj]["UT-I"]?.THEORY?.status || resSub[subj]["HALF YEARLY"]?.THEORY?.status || resSub[subj]["HALF YEARLY"]?.PRACTICAL?.status ? isStatus = true : isStatus = false
+                        isStatus ? isStatusOverall = true : ""
                         // console.log(subjectList["ARTIFICIAL INTELLIGENCE"], "fffffffffffffffff subj")
                         return `<tr>
                                 <td style="font-size: 12px; padding:0px 5px; margin: 0; text-transform:uppercase;">${subj}</td>
@@ -950,7 +961,7 @@
 
                                 
 
-                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${(resSub[subj]["UT-I"]?.THEORY
+                                <td style="font-size: 12px;text-align:center; padding: 0px; margin: 0;">${isStatus ? "-" : (resSub[subj]["UT-I"]?.THEORY
                                 ?.obtained +
                                 resSub[subj]["HALF YEARLY"]?.PRACTICAL
                                     ?.obtained +
@@ -965,12 +976,12 @@
 
                         <td colspan=8 style="font-size: 12px; padding: 0px; margin: 0;font-weight:bold; text-align:center;">
                             
-                            <div style="display:flex; justify-content:space-around; align-items:center; padding: 0px; margin: 0px;  "> <strong> TOTAL :  ${totalMarksObj.OVERALL_TOTAL.toFixed(2)
+                            <div style="display:flex; justify-content:space-around; align-items:center; padding: 0px; margin: 0px;  "> <strong> TOTAL :  ${isStatusOverall ? "-" : totalMarksObj.OVERALL_TOTAL.toFixed(2)
                 } / ${totalMarksObj.OVERALL_MAX_TOTAL.toFixed(2)}
                  </strong>
                 
 
-                 <strong> PERCENTAGE: ${(
+                 <strong> PERCENTAGE: ${isStatusOverall ? "-" : (
                     (totalMarksObj.OVERALL_TOTAL /
                         totalMarksObj.OVERALL_MAX_TOTAL) *
                     100
@@ -1423,7 +1434,7 @@
                                 "max": 25,
                                 "obtained": 22,
                                 "grade": "A2",
-                                "status": "",
+                                "status": "Absent",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "ENGLISH",
                                 "session": "2024-25",
@@ -2007,7 +2018,7 @@
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "c818c256-50d1-4386-8f5c-1d29cad0da5f",
                                 "subjectName": "ARTIFICIAL INTELLIGENCE",
-                                "subjectNature": "ADDITIONAL",
+                                "subjectNature": "THEORY",
                                 "max": 25,
                                 "obtained": 19,
                                 "grade": "B1",
@@ -2044,7 +2055,7 @@
                                 "terms": "HALF YEARLY",
                                 "subjectUid": "c818c256-50d1-4386-8f5c-1d29cad0da5f",
                                 "subjectName": "ARTIFICIAL INTELLIGENCE",
-                                "subjectNature": "ADDITIONAL",
+                                "subjectNature": "THEORY",
                                 "max": 50,
                                 "obtained": 48,
                                 "grade": "A1",
