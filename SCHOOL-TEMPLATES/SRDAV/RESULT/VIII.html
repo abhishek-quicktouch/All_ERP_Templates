@@ -205,7 +205,7 @@ ${studentInfoFields
                             .map(
                                 (term) =>
                                     `<td style="font-weight:${isNaN(marks[term.header]?.obtained) ? "bold" : "normal"
-                                    };text-align:center">${parseFloat(marks[term.header]?.obtained).toFixed(1) || "-"
+                                    };text-align:center">${isNaN(marks[term.header]?.obtained) ? marks[term.header]?.obtained : parseFloat(marks[term.header]?.obtained).toFixed(1) || "-"
                                     }</td>`
                             )
                             .join("")}
@@ -281,7 +281,7 @@ OBTAINED</br>(${totalSubheader})</th>
         };
 
         const generateTeacherRemarks = (remarks) => `
-        <div class="section" style="border: 1px solid #000; height: 50px;padding: 5px; font-size: 12px;">
+        <div class="section" style="border: 1px solid #000; min-height: 50px;padding: 5px; font-size: 12px;">
             <strong style="font-size: 12px">Class Teacher Remarks:</strong>
             ${remarks || "-"}
         </div>
@@ -703,7 +703,7 @@ OBTAINED</br>(${totalSubheader})</th>
                                 "max": 20,
                                 "obtained": 13,
                                 "grade": "B2",
-                                "status": "",
+                                "status": "Exempted",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-25",

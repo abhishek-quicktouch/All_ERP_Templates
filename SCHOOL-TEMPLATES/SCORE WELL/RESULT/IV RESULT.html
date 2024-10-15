@@ -75,7 +75,7 @@
           .section div{ font-size:12px }
           .section table { width: 100%; border-collapse: collapse; }
           .section table, .section th, .section td { border: 1px solid #000; }
-          .section td { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+          .section td { padding: 4px; text-align: center; font-size: 12px; margin: 0px; }
           .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
           .remarks { margin-bottom: 20px; }
           .signatures { display: flex; justify-content: space-between; }
@@ -420,7 +420,7 @@
 
         const gradingScales = () => `
 <div class="section" style="width: 50%;">
-    <h4>Grading Chart</h4>
+    <h4>3 Point Grading Chart</h4>
     <table >
         <tr>
             <th style="width: 10%; text-align: center;">Grade</th>
@@ -428,15 +428,15 @@
         </tr>
         <tr>
             <td style="width: 10%; text-align: center;">A+</td>
-            <td style="width: 10%; text-align: center;">80-100</td>
+            <td style="width: 10%; text-align: center;">19-50</td>
         </tr>
         <tr>
             <td style="width: 10%; text-align: center;">A</td>
-            <td style="width: 10%; text-align: center;">60-79</td>
+            <td style="width: 10%; text-align: center;">18-30</td>
         </tr>
         <tr>
             <td style="width: 10%; text-align: center;">B</td>
-            <td style="width: 10%; text-align: center;">0-59</td>
+            <td style="width: 10%; text-align: center;">0-17</td>
         </tr>
     </table>
           
@@ -446,7 +446,7 @@
 
         const generateTeacherRemarks = (remarks, classTeacher, printDate) => `
       <div class="section">
-          <div style="display: flex; justify-content: space-between;  text-align: left; border: 1px solid #000; height: 30px;padding: 5px">
+          <div style="display: flex; justify-content: space-between;  text-align: left; border: 1px solid #000; min-height: 30px;padding: 5px">
     Teacher Remarks:
     <span style=" flex-grow: 1; margin-left: 5px;">${remarks || "--"}</span></div>
 
@@ -455,6 +455,8 @@
 <div style="margin-top:10px">
  
   </div>
+
+  ${gradingScales()}
 
               <div style="display: flex;justify-content: space-between;">
                 <div style="margin-top:30px">
@@ -507,9 +509,9 @@
 
 
               <div class="section" style="margin-top: 10px">
+               
                 ${generateTeacherRemarks(student?.baseTermData?.remarksEntry?.description, student?.baseTermData?.classTeacher, student?.printDate)}
 
-                ${gradingScales()}
                 </div>
 
 
