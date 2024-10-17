@@ -662,7 +662,7 @@ ${studentData?.header}
         }</td>
                         <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ATTENDANCE:</strong> ${viewTemplate
           ? "__________"
-          : studentData?.student?.attendance
+          : studentData?.baseTermData?.remarksEntry?.fields?.find((field) => field?.title === "Attendance")?.value || studentData?.student?.attendance || "-"
         }</td>
                     </tr>
                     <tr>
@@ -673,7 +673,15 @@ ${studentData?.header}
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.houseNo + ", "
             : ""
-          }${studentData?.student?.studentInfoResponse[0]
+          }
+          ${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.street
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.street + ", "
+            : ""
+          }  
+          
+          ${studentData?.student?.studentInfoResponse[0]
             ?.studentAddressResponse?.area
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.area + ", "
@@ -1060,6 +1068,8 @@ ${studentData?.header}
       studentHtml.appendChild(studhtml);
     });
   };
+
+
 </script>
 <script>
   window.SetTemplateData([

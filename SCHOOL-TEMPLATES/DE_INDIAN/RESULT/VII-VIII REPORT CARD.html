@@ -1251,9 +1251,9 @@ ${studentData?.header}
           ? "__________"
           : studentData?.student?.dob
         }</td>
-                        <td><strong>ATTENDANCE:</strong> ${viewTemplate
+                         <td ><strong>ATTENDANCE:</strong> ${viewTemplate
           ? "__________"
-          : studentData?.student?.attendance
+          : studentData?.baseTermData?.remarksEntry?.fields?.find((field) => field?.title === "Attendance")?.value || studentData?.student?.attendance || "-"
         }</td>
                     </tr>
                     <tr>
@@ -1264,7 +1264,14 @@ ${studentData?.header}
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.houseNo + ", "
             : ""
-          }${studentData?.student?.studentInfoResponse[0]
+          }
+          ${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.street
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.street + ", "
+            : ""
+          }  
+          ${studentData?.student?.studentInfoResponse[0]
             ?.studentAddressResponse?.area
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.area + ", "
