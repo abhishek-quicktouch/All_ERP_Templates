@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OXFORD || FEE CERTIFICATE</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const multipleStudents = dataList;
+        //number to words
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        //today date function
+        const todayDate = () => {
+          const monthName = {
+            1: "Jan",
+            2: "Feb",
+            3: "Mar",
+            4: "Apr",
+            5: "May",
+            6: "Jun",
+            7: "Jul",
+            8: "Aug",
+            9: "Sep",
+            10: "Oct",
+            11: "Nov",
+            12: "Dec",
+          };
+          const today = new Date();
+
+          const day = today.getDate();
+          const month = today.getMonth() + 1;
+          const year = today.getFullYear();
+
+          const formattedDate =
+            (day < 10 ? "0" : "") + day + "-" + monthName[month] + "-" + year;
+
+          return formattedDate;
+        };
+
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        multipleStudents?.[0]?.contentRequest.forEach((element, i) => {
+          const feeDetails = element;
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.style.margin = "30px";
+          singleStudentHtml.innerHTML = `
+
+                <style type="text/css">
+      @page {
+      size: A4
+      }
+      * {
+      	margin: 0px;
+      	padding: 0px;
+      	color: #000;
+      }
+      td {
+      	padding-left: 2mm;
+      	padding-right: 2mm;
+      	padding-top: 2mm;
+      	padding-bottom: 2mm;
+      	font-size: 10pt;
+      	color: #000000;
+      	font-family: Arial, Helvetica, sans-serif;
+      }
+      th {
+      	padding-left: 2mm;
+      	padding-right: 2mm;
+      	padding-top: 2mm;
+      	padding-bottom: 2mm;
+      	font-size: 10pt;
+      	background: #e7e7e7;
+      	color: #000000;
+      	text-transform:uppercase;
+      	font-family: Arial, Helvetica, sans-serif;
+      }
+
+       @media print {
+      @page {
+      margin:auto;
+      size: A4;
+      }
+
+      }
+      </style>
+
+                <page orientation="portrait" format="A4" margin="0">
+      	<table cellspacing="0" style="width:100%;">
+      		<tr>
+      			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+      		</tr>
+      	</table>
+
+      	<table style="width:100%;" cellspacing="0" cellpadding="0">
+                        <tbody>
+                           <tr>
+                              <td valign="middle" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;">
+                                 <img align="left" style="width: 80px;" src="
+                                  https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-06T08_08_17_209919856.png">
+                              </td>
+                              <td align="middle" style="width:80%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:30pt; text-transform:uppercase; font-weight:bold; padding-top:0mm; padding-bottom:0mm; font-family: math;">SDPS Punjabi Bagh</span>
+                                 <br>
+                                 <span style="width:80%; padding-top:0mm; padding-bottom:0mm; font-size:16px; text-transform:uppercase; font-family: math;"><strong>Road No. 10, East Punjabi Bagh, New Delhi</strong></span></br>
+                                 <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:12px; line-height: 140%; text-transform:uppercase; font-family: math;">
+                                <strong> Phone No: 28311317, 28314757</strong>
+                              </span>
+                              <br/>
+                              <span  style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:12px; line-height: 140%;  font-family: math;"><strong>E-mail: sanatandps@gmail.com</strong></span>
+                              </td>
+
+                           </tr>
+                        </tbody>
+                     </table>
+        <table cellspacing="0" style="width:100%;">
+      		<tr>
+      			<td align="left" style="width:100%; font-size:10pt; font-weight:bold;">Ref.No. SDPS/${
+              multipleStudents[0]?.session
+            }/20138800</td>
+
+      		</tr>
+      		<tr>
+
+      			<td align="left" style="width:100%; font-size:10pt;white-space:nowrap;">Voucher No..............</td>
+      <td align="right" style="width:100%; font-size:10pt; font-weight:bold; white-space:nowrap;">
+       From Date: <span style="border: 1px solid black; padding: 5px;">${
+         multipleStudents[0]?.dates?.fromDate
+       }</span>
+        To Date: <span style="border: 1px solid black; padding: 5px;">${
+          multipleStudents[0]?.dates?.toDate
+        }</span>
+      </td>
+      	</table>
+
+
+          <table cellspacing="0" style="width:100%;">
+              <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+              </tr>
+          </table>
+
+      	<table cellspacing="0" style="width:100%;">
+              <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+              </tr>
+          </table>
+
+      	<table cellspacing="0" style="width:98%; border: solid 0.264583333mm #000000;margin-left:10px;">
+      		<tr>
+      			<th align="left" style="width:70%;border-bottom: solid 0.25mm #000000; ">DEBIT</th>
+      			<th align="right" style=" border-left: solid 0.25mm #000000;border-bottom: solid 0.25mm #000000;">AMOUNT (Rs.)</th>
+      			<th align="left" style="border-left: solid 0.25mm #000000;border-bottom: solid 0.25mm #000000;">(p)</th>
+      		</tr>
+
+          ${feeDetails?.studentFeeCollectionReceiptList
+            .map(
+              (val, index) => `
+            <tr>
+                  <td align="left" style="width:25%; text-transform:uppercase; ${
+                    index !== 0 ? "border-top: solid 0.25mm #000000;" : ""
+                  }">${val.componentName}</td>
+      			<td align="left" style="width:25%; text-transform:uppercase;  border-left: solid 0.25mm #000000;text-align:right;">${
+              val.componentAmount
+            }</td>
+      			<td align="right" style="width:25%; text-transform:uppercase;  border-left: solid 0.25mm #000000;"></td>
+
+      		</tr>`
+            )
+            .join("")}
+            <tr>
+      <td style="border-top: solid 0.25mm #000000;">
+        <span style="float: left;">RUPEES</span>
+        <span style="float: right;">TOTAL Rs.</span>
+      </td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${
+        feeDetails?.netReceived
+      }</td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;"></td>
+
+      </tr>
+      <tr><td style="border-top:1px solid black;">CREDIT ${
+        feeDetails?.modeBank
+      }</td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+              <tr><td style="border-top:1px solid black;"></td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+              <tr><td style="border-top:1px solid black;"></td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+              <tr><td style="border-top:1px solid black;"></td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+              <tr><td style="border-top:1px solid black;"></td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+              <tr><td style="border-top:1px solid black;"</td>
+                <td style="border-left: 1px solid black;"></td>
+                <td style="border-left: 1px solid black;" ></td>
+                </tr>
+          <tr>
+
+      <td style="border-top: solid 0.25mm #000000;">
+        <span style="float: left;">RUPEES</span>
+        <span style="float: right;">TOTAL Rs.</span>
+      </td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${
+        feeDetails?.netReceived
+      }</td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;"></td>
+
+      </tr>
+
+      	</table>
+
+
+
+      	<table cellspacing="0" style="width:100%;">
+              <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+              </tr>
+          </table>
+
+      	<table cellspacing="0" style="width:80%; border:1px solid black; margin-left:10px;">
+      		<tr>
+
+      		<td style="
+          font-size: 16px;
+          font-family: monospace;
+      "><p>Being reversal entry for dishonour of 1 cheques as per details attached</p></td>
+      		</tr>
+      	</table>
+
+      	<table cellspacing="0" style="width:100%;">
+              <tr>
+                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+              </tr>
+          </table>
+
+
+
+
+      <table style="width:100%;" cellspacing="0" cellpadding="0">
+            <tr>
+              <td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+              <table cellspacing="0" style="width:100%;">
+              <tr>
+                  <td align="center" style="width:36%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;font-size: 16px;
+          font-family: monospace;">Accountant</td>
+                  <td valign="top" align="center" style="width:32%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;"></strong></td>
+                  <td valign="top" align="center" style="width:32%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;font-size: 16px;
+          font-family: monospace;">Principal</td>
+                </tr>
+              </table>
+              </td>
+            </tr>
+          </table>
+          <table cellspacing="0" style="width:80%; margin-left:50px;margin-top:10px;">
+      		<tr>
+
+      		<td style="
+          font-size: 16px;
+          font-family: monospace;
+      "><p>Passed for the adjustment of Rs. ${feeDetails?.netReceived}</p></td>
+      		</tr>
+      	</table>
+           <table cellspacing="0" style="width:80%; margin-top:10px;text-align:right; margin-right:10px;">
+      		<tr>
+
+      		<td style="
+          font-size: 16px;
+          font-family: monospace;
+      "><p>Dated:......... </p></td>
+      		</tr>
+      	</table>
+           <table cellspacing="0" style="width:100%; margin-top:10px;text-align:center;">
+      		<tr>
+
+      		<td style="
+          font-size: 16px;
+          font-family: monospace;
+      "><p>Manager/ Chairman</p></td>
+      		</tr>
+      	</table>
+      </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          session: "",
+          dates: {
+            fromDate: "",
+            toDate: "",
+          },
+          contentRequest: [
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+            {
+              feeUid: "325815e6-e889-4763-85bd-73b981beedce",
+              receiptNo: "3039",
+              admissionNo: "20138251",
+              studentName: "Ishant Sharma",
+              studentClass: "XII",
+              studentSection: "B",
+              paidInstallmentsName: "JUL,AUG,SEP",
+              feeDate: "15-07-2024",
+              feeTime: "",
+              userName: "quickadmin",
+              feeMode: "CHEQUE",
+              feeModeNumber: "906245",
+              modeBank: "CANARA BANK",
+              modeBranch: "DWARKA",
+              feeModeDate: "-",
+              feeModeRemark: "",
+              feeDeleteRemark: "-",
+              isBounced: "1",
+              bouncedDate: "20-07-2024",
+              totalAmount: "20130.00",
+              excessPaid: "0.00",
+              excessUsed: "0.00",
+              excessBalance: "0.0",
+              netReceived: "20130.00",
+              studentFeeCollectionReceiptList: [
+                {
+                  componentName: "TUTION FEE",
+                  componentAmount: "15195.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "15195.00",
+                },
+                {
+                  componentName: "ANNUAL CHARGES",
+                  componentAmount: "1500.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "1500.00",
+                },
+                {
+                  componentName: "DEVLOPMENT FEE",
+                  componentAmount: "2280.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "2280.00",
+                },
+                {
+                  componentName: "PUPIL FUND",
+                  componentAmount: "540.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "540.00",
+                },
+                {
+                  componentName: "ONLINE COMMUNICATION",
+                  componentAmount: "210.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "210.00",
+                },
+                {
+                  componentName: "EXAMINATION FEE",
+                  componentAmount: "405.00",
+                  componentType: "",
+                  componentConcession: "0.00",
+                  componentDiscount: "0.00",
+                  accountName: "ACCOUNT1",
+                  accountUid: "a93a4d73-4c49-4fb9-8204-7211e4d1dfd4",
+                  componentReceived: "405.00",
+                },
+              ],
+            },
+          ],
+          header: `
+            <table style="width:100%;" cellspacing="0" cellpadding="0">
+                    <tbody>
+                       <tr>
+                          <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                          <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                             <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span>
+                             <br>
+                             <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                          </td>
+                          <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                             <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                          </td>
+                       </tr>
+                       <tr>
+                          <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                             <table cellspacing="0" style="width:100%;">
+                                <tbody>
+                                   <tr>
+                                      <td style="width:10%;">&nbsp;</td>
+                                      <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                      </td>
+                                      <td style="width:10%;">&nbsp;</td>
+                                   </tr>
+                                   <tr>
+                                      <td style="width:10%;">&nbsp;</td>
+                                      <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                         <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                         27050252 <br>
+                                         www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                      </td>
+                                      <td style="width:10%;">&nbsp;</td>
+                                   </tr>
+                                </tbody>
+                             </table>
+                          </td>
+                       </tr>
+                    </tbody>
+                 </table>
+      `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>
