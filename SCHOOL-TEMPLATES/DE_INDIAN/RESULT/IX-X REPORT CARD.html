@@ -416,7 +416,7 @@ ${studentData?.header}
         }</td>
                         <td style="font-size: 12px; padding: 4px; margin: 0;"><strong>ATTENDANCE:</strong> ${viewTemplate
           ? "__________"
-          : studentData?.student?.attendance
+          : studentData?.baseTermData?.remarksEntry?.fields?.find((field) => field?.title === "Attendance")?.value || studentData?.student?.attendance || "-"
         }</td>
                     </tr>
                     <tr>
@@ -427,7 +427,15 @@ ${studentData?.header}
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.houseNo + ", "
             : ""
-          }${studentData?.student?.studentInfoResponse[0]
+          }
+            ${studentData?.student?.studentInfoResponse[0]
+            ?.studentAddressResponse?.street
+            ? studentData?.student?.studentInfoResponse[0]
+              ?.studentAddressResponse?.street + ", "
+            : ""
+          }
+            
+          ${studentData?.student?.studentInfoResponse[0]
             ?.studentAddressResponse?.area
             ? studentData?.student?.studentInfoResponse[0]
               ?.studentAddressResponse?.area + ", "
@@ -637,12 +645,13 @@ ${studentData?.header}
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 40px;">
                     <div>
+                                            <p>${studentData.student.studentInfoResponse[0]?.classTeacher || "-"}</p>
+
                         <p>Class Teacher</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
                     </div>
                     <div>
+                      <p>${viewTemplate ? "__________" : ""}</p>
                         <p>Officiating Principal</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
                     </div>
                     <div>
                         <p>Parent/Guardian</p>
