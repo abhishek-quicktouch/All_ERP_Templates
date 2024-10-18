@@ -14,7 +14,7 @@
 </body>
 <script>
     window.SetTemplateData = function (data) {
-        console.log(data[0]?.student, "ddddddddddddddddddd data.student");
+        // console.log(data[0]?.student, "ddddddddddddddddddd data.student");
 
         const config = {
             schoolLogo:
@@ -176,123 +176,124 @@
 
 
         // Generate scholastic table
-        function generateScholasticTable(subjects, termConfig) {
+        function generateScholasticTable(subjects) {
             let totalMarksObtained = 0;
-            let totalPossibleMarks = 0;
-            let totalSubheader = 0;
-            termConfig.forEach((term) => {
-                totalSubheader += Number(term.subHeaderName.replace(/\D/g, ''));
-            });
+            let grandTotalMarks = 0;
+            let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
+            let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
 
-            const scholasticSubjects = subjects?.filter(
-                (subject) => subject?.subjectNature === config.scholasticConfig.nature && subject?.subjectName !== "ARTIFICIAL INTELLIGENCE"
-            );
+            // Group subjects by attachmentName and their parts (Theory or Practical)
+            const groupedSubjects = subjects.reduce((acc, subject) => {
+                const attachmentName = subject?.markSheetReport[0]?.attachmentName || "";
+                const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
 
-            const rows = scholasticSubjects
-                ?.map((subject) => {
+                if (!acc[attachmentName]) {
+                    acc[attachmentName] = { theory: null, practical: null };
+                }
+                if (subjectPart % 2 !== 0) {
+                    acc[attachmentName].theory = subject;
+                } else if (subjectPart % 2 === 0) {
+                    acc[attachmentName].practical = subject;
+                }
+                return acc;
+            }, {});
+
+            const rows = Object.entries(groupedSubjects)
+                .map(([attachmentName, parts]) => {
+                    let unitTestMarks = 0;
+                    let halfYearlyTheory = 0;
+                    let halfYearlyPractical = 0;
                     let subjectTotal = 0;
-                    let subjectMaxTotal = 0;
-                    const marks = {};
 
-                    subject?.markSheetReport?.forEach((report) => {
-                        const termName = report?.markSheetTermResponse?.headerName;
-                        const isPractical = report?.assessmentType === "Practical";
+                    if (parts.theory) {
+                        const theoryReports = parts.theory.markSheetReport;
+                        theoryReports.forEach((report) => {
+                            const termName = report?.markSheetTermResponse?.headerName?.trim().toLowerCase() || "";
+                            const marksObtained = report?.obtained || 0;
 
-                        if (!marks[termName]) {
-                            marks[termName] = { theory: "-", practical: "-" };
-                        }
-                        marks[termName][isPractical ? "practical" : "theory"] = getAttendanceOrMark(report?.status, report?.obtained);
+                            // Match term names in a case-insensitive manner
+                            if (termName === "u.t -1") {
+                                unitTestMarks = marksObtained;
+                            } else if (termName === "half yearly") {
+                                halfYearlyTheory = marksObtained;
+                                totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
+                            }
+                            subjectTotal += marksObtained;
+                        });
+                    }
 
-                        subjectTotal += Number(report?.obtained) || 0;
-                        subjectMaxTotal += Number(report?.max) || 0;
-                    });
+                    if (parts.practical) {
+                        const practicalReports = parts.practical.markSheetReport;
+                        practicalReports.forEach((report) => {
+                            const termName = report?.markSheetTermResponse?.headerName?.trim().toLowerCase() || "";
+                            const marksObtained = report?.obtained || 0;
+
+                            if (termName === "half yearly") {
+                                halfYearlyPractical = marksObtained;
+                                totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
+                            }
+                            subjectTotal += marksObtained;
+                        });
+                    }
 
                     totalMarksObtained += subjectTotal;
-                    totalPossibleMarks += subjectMaxTotal;
+                    grandTotalMarks += 100; // Assuming the total is always out of 100 for the grand total
 
-                    const percentage = (subjectTotal / subjectMaxTotal) * 100;
-                    const grade = calculateGrade(percentage);
-
+                    // Render table row for each subject
                     return `
-                <tr>
-                    <td style="font-weight:bold">${subject?.subjectName}</td>
-                    ${termConfig
-                            .map(
-                                (term) => `
-                            <td style="text-align:center">${marks[term.headerName]?.theory || "-"}</td>
-                            <td style="text-align:center">${marks[term.headerName]?.practical || "-"}</td>`
-                            )
-                            .join("")}
-                    <td style="text-align:center">${subjectTotal}</td>
-                    <td style="text-align:center">${grade}</td>
-                </tr>
+            <tr>
+                <td style="text-transform:uppercase; font-weight:bold;">${attachmentName}</td>
+                <td style="text-align:center">${unitTestMarks.toFixed(2)}</td>
+                <td style="text-align:center">${halfYearlyTheory.toFixed(2)}</td>
+                <td style="text-align:center">${halfYearlyPractical.toFixed(2)}</td>
+                <td style="text-align:center">${(halfYearlyTheory + halfYearlyPractical).toFixed(2)}</td>
+                <td style="text-align:center">${subjectTotal.toFixed(2)}</td>
+            </tr>
             `;
                 })
                 .join("");
 
-            const overallPercentage = (totalMarksObtained / totalPossibleMarks) * 100;
+
+
+            const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
             const overallGrade = calculateGrade(overallPercentage);
 
+            // Render the final table
             return `
-        <table>
-            <tr style="background-color: #e4f2f2">
-                <th rowspan="2" style="text-align: center; width: 30%;">SUBJECT</th>
-                <th colspan="${termConfig.length * 2 + 2}" style="text-align: center;">ACADEMIC PERFORMANCE</th>
-            </tr>
-            <tr style="background-color: #e4f2f2">
-                ${termConfig
-                    .map(
-                        (term) => `
-                        <th style="text-align: center; width: 10%;">Theory (${term.subHeaderName})</th>
-                        <th style="text-align: center; width: 10%;">Practical (${term.subHeaderName})</th>`
-                    )
-                    .join("")}
-                <th style="text-align: center;width: 10%;">Marks Out of (${totalSubheader})</th>
-                <th style="text-align: center; width: 10%;">GRADE</th>
-            </tr>
-            ${rows}
-            <tr>
-                <td style="font-weight:bold; text-align:center">GRAND TOTAL</td>
-                ${"<td colspan='2' style='text-align:center'>".repeat(termConfig.length)}
-                <td style="text-align:center">${totalMarksObtained}</td>
-                <td style="text-align:center">${overallGrade}</td>
-            </tr>
-        </table>
+    <table>
+        <tr style="background-color: #e4f2f2">
+            <th rowspan="2" style="text-align: center; width: 30%;">SUBJECTS</th>
+            <th rowspan="2" style="text-align: center;">Unit Test-1 (25)</th>
+            <th colspan="4" style="text-align: center;">Half Yearly (50)</th>
+        </tr>
+        <tr style="background-color: #e4f2f2">
+            <th style="text-align: center;">Theory (80)</th>
+            <th style="text-align: center;">Practical (20)</th>
+            <th style="text-align: center;">Total (100)</th>
+            <th style="text-align: center;">Highest Marks in Class (100)</th>
+        </tr>
+        ${rows}
+        <tr style="font-weight:bold">
+            <td style="text-align:center">GRAND TOTAL</td>
+            <td></td>
+            
+            <td colspan="3" style="text-align:center">${(totalHalfYearlyTheory + totalHalfYearlyPractical).toFixed(2)} (${((totalHalfYearlyTheory + totalHalfYearlyPractical) / grandTotalMarks * 100).toFixed(2)} %)</td>
+            <td style="text-align:center"></td>
+        </tr>
+    </table>
     `;
         }
 
+        // Helper function to calculate grade based on percentage
 
-        function generateAdditionalTable(subjects) {
-            return `<table style="width: 100%;font-size: 12px">
-        <tr style="background-color: #e4f2f2">
-            <th style="width: 60%;">SUBJECT</th>
-            <th style="width: 20%; text-align: center">PT-2</th>
-            <th style="width: 20%; text-align: center">GRADE</th>
-        </tr>
-        ${subjects
-                    .filter((subject) => subject?.additional)
-                    .map(
-                        (subject) => `
-                    <tr>
-                        <td style="width: 60%;">${subject?.subjectAllResponse?.subjectName || ""
-                            }</td>
-                        <td style="width: 20%; text-align: center; font-weight:${subject.remarkStatus ? "bold" : "normal"}">${subject.remarkStatus || subject?.markObtained || "-"
-                            }</td>
-                        <td style="width: 20%; text-align: center">${subject?.grade || ""
-                            }</td>
-                    </tr>
-                `
-                    )
-                    .join("")}
-                    
 
-        
-        `;
-        }
+
+
+
+
 
 
         function generateCoScholasticTable(subjects) {
-            console.log(subjects, "fffffffffffffff subjects");
             const coScholasticSubjects = subjects?.filter(
                 (subject) =>
                     subject?.subjectAllResponse?.nature ===
@@ -300,15 +301,15 @@
             );
 
             let tableContent = "";
-            console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
+            // console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
             for (let i = 0; i < coScholasticSubjects.length; i++) {
                 const leftSubject = coScholasticSubjects[i];
-                console.log(leftSubject, "fffffffffffff leftSubject")
+                // console.log(leftSubject, "fffffffffffff leftSubject")
                 tableContent += `
                 <tr>
-                    <td style="width: 80%;">${leftSubject?.subjectAllResponse?.subjectName || ""
+                    <td style="width: 70%;">${leftSubject?.subjectAllResponse?.subjectName || ""
                     }</td>
-                    <td style="width: 20%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"}">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
+                    <td style="width: 30%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"}">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
                     }</td>
                     
                 </tr>
@@ -317,17 +318,10 @@
 
             return `
             <table>
-                <tr>
-                    <th colspan="2" style="border: none; background-color: #c1e0e0">
-                        
-                            <span>CO-SCHOLASTIC COMPETENCIES</span>
-                           
-                        
-                    </th>
-                </tr>
+                
                 <tr style="background-color: #e4f2f2">
-                    <th style="width: 80%;">SUBJECT</th>
-                    <th style="width: 20%; text-align: center">GRADE</th>
+                    <th style="width: 70%;">Grade Subjects</th>
+                    <th style="width: 30%; text-align: center">HALF YEARLY</th>
                     
                 </tr>
                 ${tableContent}
@@ -341,7 +335,7 @@
             return `
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #c1e0e0"> 
-            <th style="">CLASS TEACHER'S REMARKS</th>
+            <th style="text-align: left">GENERAL REMARKS</th>
         <tr>
             <th style="text-align: left">${remark?.description || remark?.field?.find((f) => f?.title === "Teacher's Remarks").value || "-"}</th>
             
@@ -479,11 +473,7 @@ ${element.header
                 )}
 
                     </div>
-<div class="section">
-${generateAdditionalTable(element?.baseTermData?.subject)}
 
-
-                    </div>
 
                     <div class="section">
                         ${generateCoScholasticTable(
@@ -820,7 +810,7 @@ ${generateSignature()}
                                 "grade": "C1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -857,7 +847,7 @@ ${generateSignature()}
                                 "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -912,7 +902,7 @@ ${generateSignature()}
                                 "grade": "C",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "ENGLISH",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -967,7 +957,7 @@ ${generateSignature()}
                                 "grade": "C",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1004,7 +994,7 @@ ${generateSignature()}
                                 "grade": "C1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1059,7 +1049,7 @@ ${generateSignature()}
                                 "grade": "B",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "PHYSICS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1114,7 +1104,7 @@ ${generateSignature()}
                                 "grade": "C",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "CHEMISTRY",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1151,7 +1141,7 @@ ${generateSignature()}
                                 "grade": "E",
                                 "status": "Sports",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "CHEMISTRY",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1206,7 +1196,7 @@ ${generateSignature()}
                                 "grade": "E",
                                 "status": "Leave",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "CHEMISTRY",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1261,7 +1251,7 @@ ${generateSignature()}
                                 "grade": "C",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1298,7 +1288,7 @@ ${generateSignature()}
                                 "grade": "C1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1353,7 +1343,7 @@ ${generateSignature()}
                                 "grade": "D",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "MATHS",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1408,7 +1398,7 @@ ${generateSignature()}
                                 "grade": "C1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "COMPUTER SCIENCE",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1445,7 +1435,7 @@ ${generateSignature()}
                                 "grade": "C1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "COMPUTER SCIENCE",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1500,7 +1490,7 @@ ${generateSignature()}
                                 "grade": "E",
                                 "status": "Sports",
                                 "markSheetName": "TERM-I",
-                                "attachmentName": "",
+                                "attachmentName": "COMPUTER SCIENCE",
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
@@ -1821,7 +1811,7 @@ ${generateSignature()}
                         "percentage": 81.25,
                         "grade": "A1",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "ENGLISH",
                         "additional": false,
                         "priority": 1,
                         "added": true,
@@ -1851,7 +1841,7 @@ ${generateSignature()}
                         "percentage": 55,
                         "grade": "C",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "ENGLISH",
                         "additional": false,
                         "priority": 2,
                         "added": true,
@@ -1881,7 +1871,7 @@ ${generateSignature()}
                         "percentage": 47.857142857142854,
                         "grade": "C1",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "PHYSICS",
                         "additional": false,
                         "priority": 3,
                         "added": true,
@@ -1911,7 +1901,7 @@ ${generateSignature()}
                         "percentage": 76.66666666666667,
                         "grade": "B",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "PHYSICS",
                         "additional": false,
                         "priority": 4,
                         "added": true,
@@ -1941,7 +1931,7 @@ ${generateSignature()}
                         "percentage": 0,
                         "grade": "E",
                         "remarkStatus": "Sports",
-                        "attachmentName": "",
+                        "attachmentName": "CHEMISTRY",
                         "additional": false,
                         "priority": 5,
                         "added": true,
@@ -1971,7 +1961,7 @@ ${generateSignature()}
                         "percentage": 0,
                         "grade": "E",
                         "remarkStatus": "Leave",
-                        "attachmentName": "",
+                        "attachmentName": "CHEMISTRY",
                         "additional": false,
                         "priority": 6,
                         "added": true,
@@ -2001,7 +1991,7 @@ ${generateSignature()}
                         "percentage": 46.25,
                         "grade": "C1",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "MATHS",
                         "additional": false,
                         "priority": 7,
                         "added": true,
@@ -2031,7 +2021,7 @@ ${generateSignature()}
                         "percentage": 40,
                         "grade": "D",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "MATHS",
                         "additional": false,
                         "priority": 8,
                         "added": true,
@@ -2061,7 +2051,7 @@ ${generateSignature()}
                         "percentage": 46.42857142857143,
                         "grade": "C1",
                         "remarkStatus": "",
-                        "attachmentName": "",
+                        "attachmentName": "COMPUTER SCIENCE",
                         "additional": false,
                         "priority": 9,
                         "added": true,
@@ -2091,7 +2081,7 @@ ${generateSignature()}
                         "percentage": 0,
                         "grade": "E",
                         "remarkStatus": "Sports",
-                        "attachmentName": "",
+                        "attachmentName": "COMPUTER SCIENCE",
                         "additional": false,
                         "priority": 10,
                         "added": true,
@@ -2250,20 +2240,37 @@ ${generateSignature()}
                 ],
 
                 remarksEntry: {
-                    "uid": null,
-                    "terms": null,
-                    "studentId": null,
-                    "studentName": null,
-                    "rollNumber": 0,
-                    "classSectionUid": null,
-                    "classSection": null,
-                    "description": null,
-                    "fields": null,
-                    "status": false,
-                    "createdUser": null,
-                    "editedUser": null,
-                    "createdDate": null,
-                    "editedDate": null
+                    uid: "9b2c9e50-001e-4c1e-be5a-012842ee95fd",
+                    terms: ["HALF YEARLY"],
+                    studentId: "18493",
+                    studentName: "Naisha Jain",
+                    rollNumber: 27,
+                    classSectionUid: "a7d35591-20a2-4a43-b933-bb03d816a930",
+                    classSection: "III-A",
+                    description: "KEEP IT UP.",
+                    fields: [
+                        {
+                            uid: "58864e43-32da-476f-8266-aa60073120c5",
+                            title: "Total Days",
+                            type: "OPEN",
+                            value: "109",
+                            masterUid: "46604011-6dd7-46fb-aea5-755d2b5243e8",
+                            masterName: "Remarks",
+                        },
+                        {
+                            uid: "88c16538-fa6d-4882-b1b3-d5b1a706fc03",
+                            title: "Working Days",
+                            type: "OPEN",
+                            value: "92",
+                            masterUid: "46604011-6dd7-46fb-aea5-755d2b5243e8",
+                            masterName: "Remarks",
+                        },
+                    ],
+                    status: true,
+                    createdUser: "Reena_487422",
+                    editedUser: "NEETUNAIR_501967",
+                    createdDate: "07-10-2024 12:46 PM",
+                    editedDate: "08-10-2024 01:01 PM",
                 },
                 school: {
                     uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",

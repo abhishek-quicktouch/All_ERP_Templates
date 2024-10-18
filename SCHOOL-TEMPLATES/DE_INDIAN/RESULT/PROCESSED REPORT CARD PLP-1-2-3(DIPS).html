@@ -676,8 +676,9 @@ ${studentData?.header}
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 40px;">
                     <div>
-                        <p>Class Teacher</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
+                         <p style="margin: 0px;padding: 0px">${studentData.student.studentInfoResponse[0]?.classTeacher || "-"}</p>
+
+                        <p style="margin: 0px;padding: 0px">Class Teacher</p>
                     </div>
                     <div>
                         <p style="margin:0px ;padding:0px">Padmini Dubey Ojha</p>
