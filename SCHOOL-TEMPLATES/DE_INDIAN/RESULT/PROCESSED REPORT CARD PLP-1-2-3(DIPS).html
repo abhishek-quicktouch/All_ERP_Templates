@@ -356,7 +356,7 @@
                             <tr style="font-size: 12px">
                                 <td style="width: 50%; padding: 4px; margin: 0;">${subject?.subjectAllResponse?.subjectName
               }</td>
-                                <td style="padding: 4px; margin: 0; font-weight:${subject?.remarkStatus ? "bold" : ""
+                                <td style="padding: 4px; margin: 0;text-align:center; font-weight:${subject?.remarkStatus ? "bold" : ""
               }">${subject?.remarkStatus
                 ? attendanceValue[subject?.remarkStatus]
                 : subject?.grade
@@ -387,7 +387,7 @@
                                 <tr style="font-size: 12px">
                                     <td style="width: 50%; padding: 4px; margin: 0;">${subject?.subjectAllResponse?.subjectName
                 }</td>
-                                    <td style="padding: 4px; margin: 0; font-weight:${subject?.remarkStatus ? "bold;" : ""
+                                    <td style="padding: 4px; margin: 0;text-align:center; font-weight:${subject?.remarkStatus ? "bold;" : ""
                 }">${subject?.remarkStatus
                   ? attendanceValue[subject?.remarkStatus]
                   : subject?.grade
@@ -642,7 +642,7 @@ ${studentData?.header}
                     </tr>
                     <tr style="font-size: 12px">
                         <th style="padding: 4px; margin: 0;">SKILLS</th>
-                        <th style="padding: 4px; margin: 0;">GRADE</th>
+                        <th style="padding: 4px; margin: 0;text-align:center;">GRADE</th>
                     </tr>
                     ${generateCoScholasticRows(
           studentData?.baseTermData?.subject
@@ -680,8 +680,8 @@ ${studentData?.header}
                         <p>${viewTemplate ? "__________" : ""}</p>
                     </div>
                     <div>
-                        <p>Officiating Principal</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
+                        <p style="margin:0px ;padding:0px">Padmini Dubey Ojha</p>
+                    <p style="margin:0px ;padding:0px">Officiating Principal</p>
                     </div>
                     <div>
                         <p>Parent/Guardian</p>

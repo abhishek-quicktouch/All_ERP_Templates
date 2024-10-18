@@ -278,6 +278,7 @@ ${studentInfoFields
 
         const generateAdditionalSubjectsTable = (areas) => {
             console.log(areas, "fffffffffffffff areas")
+            let isStatus = false
             return `
             <table>
                 <tr>
@@ -288,18 +289,18 @@ ${studentInfoFields
                 </tr>
                 ${areas
                     .map((area) => {
+                        area?.remarkStatus ? isStatus = true : ""
                         return `
                     <tr>
                         <td>${area?.subjectAllResponse?.subjectName}</td>
-                        <td style="text-align:center; font-weight:${area?.remarkStatus ? "bold" : "normal"
-                            }">${area?.max}</td>
-                        <td style="text-align:center; font-weight:${area?.remarkStatus ? "bold" : "normal"
-                            }">${area?.markObtained}</td>
+                        <td style="text-align:center; ">${area?.max}</td>
                         <td style="text-align:center; font-weight:${area?.remarkStatus ? "bold" : "normal"
                             }">${utils.getAttendanceOrMark(
                                 area?.remarkStatus,
-                                area?.grade
+                                area?.markObtained
                             )}</td>
+                        <td style="text-align:center; ">${isStatus ? "-" : area?.grade
+                            }</td>
                     </tr>
                 `;
                     })
@@ -1071,7 +1072,7 @@ ${studentInfoFields
                                 subjectName: "ARTIFICIAL INTELLIGENCE",
                                 subjectNature: "THEORY",
                                 max: 80,
-                                obtained: 72,
+                                obtained: 27,
                                 grade: "A1",
                                 status: "",
                                 markSheetName: "TERM-I",

@@ -421,9 +421,8 @@ size: A4;
                      
                          <td style="white-space: nowrap;" >
                             <div style="display: flex;justify-content:space-around;  text-align: center;">
-                                <strong>ATTENDANCE:</strong> ${element.student.attendance || ""
-                }<strong> DATE:</strong>${element.
-                    baseTermData?.remarksEntry?.createdDate || "__________"
+                                <strong>ATTENDANCE:</strong> ${element?.baseTermData?.remarksEntry?.fields?.find(f => f.title === 'Attendance').value || element.student.attendance || ""
+                }<strong> DATE:</strong>${element?.printDate || "__________"
                 }   <strong>PLACE:</strong> ${element.baseTermData?.school?.city || "______"}
                                 </div>
                             </td >
