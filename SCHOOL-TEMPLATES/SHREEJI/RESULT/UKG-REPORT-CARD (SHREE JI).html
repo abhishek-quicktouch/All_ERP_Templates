@@ -1009,22 +1009,24 @@
 
 
 <p style="margin-top: 2px; font-weight: bold; margin-bottom:0; font-size: 12px">SPECIFIC PARTICIPATION:</p>
-         <div style="padding: 5px; border: 1px solid black; height: 20px; ">
+         <div style="padding: 5px; border: 1px solid black; min-height: 20px; ">
+          ${studentData?.remarks?.details[0]?.fields?.find((f) => f?.title == "Specific Participation")?.value || "-"}
          </div>
 
              <p style="margin-top: 2px; font-weight: bold; margin-bottom:0; font-size: 12px">GENERAL REMARKS:</p>
-         <div style="padding: 5px; border: 1px solid black; height: 20px; font-size: 12px ">
- ${viewTemplate ? "__________" : studentData?.remarks?.description || ""}
+         <div style="padding: 5px; border: 1px solid black; min-height: 20px; font-size: 12px ">
+  ${viewTemplate ? "__________" : studentData?.remarks?.details[0]?.description || ""}
          </div>
 
 
 <div style="display:flex ; justify-content: space-between; margin-top: 10px">
     <div style="display: flex;width: 30%; justify-content: space-left; border: 1px solid black;font-size:12px ; ;padding: 2px 2px 2px 2px">
-        <span style="font-size:12px; font-weight:bold">ATTENDANCE: </span>  ${viewTemplate ? "__________" : student?.attendance || ""}
+        <span style="font-size:12px; font-weight:bold">ATTENDANCE: </span>${viewTemplate ? "__________" : studentData?.remarks?.details[0]?.fields?.find((f) => f?.title == "Attendance")?.value || student?.attendance || ""
+                    }
     </div>
     <div style="display: flex;width: 30%; justify-content: left; border: 1px solid black;font-size:12px ; padding: 2px 2px 2px 2px">
         <span style="font-size:12px;font-weight:bold">DATE:</span >
-        ${viewTemplate ? "__________" : new Date().toLocaleDateString("en-GB", { year: 'numeric', month: 'long', day: 'numeric' })}
+        ${viewTemplate ? "__________" : studentData?.printDate || new Date().toLocaleDateString("en-GB", { year: 'numeric', month: 'long', day: 'numeric' })}
     </div>
         <div style="display: flex;width: 30%; justify-content: left; border: 1px solid black;font-size:12px ;padding: 2px 2px 2px 2px">
         <span style="font-size:12px ;font-weight:bold">PLACE:</span >
@@ -1784,45 +1786,46 @@
                 ],
             },
             remarks: {
-                uid: "69431c26-f12d-4927-b4d2-b076a36e30ce",
-                terms: ["TERM-I"],
-                studentId: "15516",
-                studentName: "Niya Massey",
-                rollNumber: 20,
-                classSectionUid: "02cc86c8-335f-4a9d-9f1c-ee583898cb14",
-                classSection: "LKG-A",
-                description: "GENERAL REMARKS",
-                fields: [
+                "classSection": "LKG-A",
+                "totalNumber": 1,
+                "termName": "MID TERM",
+                "details": [
                     {
-                        uid: "87abd191-f913-421e-8606-1619006ae3ce",
-                        title: "Session Date",
-                        type: "ALPHA_NUMERIC",
-                        value: "1st Of April 2024",
-                        masterUid: "d6bdde3b-5399-4edb-88c3-f4bbb1bfa6ec",
-                        masterName: "NEW SESSION BEGINS ON",
-                    },
-                    {
-                        uid: "0b5777e4-291c-4bcf-a503-d5a4560f5343",
-                        title: "TEACHER REMARK",
-                        type: "ALPHABETS_WITH_SPECIAL",
-                        value: "HI HELLO",
-                        masterUid: "59de457f-192d-43ae-96b4-23d323467b74",
-                        masterName: "REMARKS",
-                    },
-                    {
-                        uid: "34cc79e5-9cc1-4e98-a0a9-ff6309e6b95a",
-                        title: "TOTAL ATTENDANCE",
-                        type: "NUMERIC",
-                        value: "",
-                        masterUid: "46a05041-392f-4825-aa64-bd5b6dd4ca05",
-                        masterName: "ATTENDANCE",
-                    },
-                ],
-                status: true,
-                createdUser: "PremSir_453226",
-                editedUser: "PremSir_453226",
-                createdDate: "31-01-2024 11:14 AM",
-                editedDate: "31-01-2024 11:14 AM",
+                        "uid": "2a01caec-ba6e-4684-8265-e63580efddf2",
+                        "terms": [
+                            "MID TERM"
+                        ],
+                        "studentId": "20240078",
+                        "studentName": "AARNIK RAAZ",
+                        "rollNumber": 0,
+                        "classSectionUid": "fc1c4b3e-13be-4d77-90d8-f40195b0fd30",
+                        "classSection": "LKG-A",
+                        "description": "Arnik shows enthusiasm for classroom activites.He consistently completes homework assignments.",
+                        "fields": [
+                            {
+                                "uid": "017b270e-a47e-41e6-a97e-f0f3230196a2",
+                                "title": "Attendance",
+                                "type": "NUMERIC",
+                                "value": "87/91",
+                                "masterUid": "3d12ecc5-76b4-4f0d-b481-91fe47e62162",
+                                "masterName": "Attendance"
+                            },
+                            {
+                                "uid": "ecf11d68-aeab-4350-aac5-d79dcffd14c2",
+                                "title": "Specific Participation",
+                                "type": "ALPHABETS",
+                                "value": "Speaking skill, Pool party",
+                                "masterUid": "3d12ecc5-76b4-4f0d-b481-91fe47e62162",
+                                "masterName": "Attendance"
+                            }
+                        ],
+                        "status": true,
+                        "createdUser": "SADIKASADIKA_402461",
+                        "editedUser": "SADIKASADIKA_402461",
+                        "createdDate": "30-09-2024 12:06 PM",
+                        "editedDate": "17-10-2024 01:06 PM"
+                    }
+                ]
             },
             header: `<div>
                <table style="width:100%;" cellspacing="0" cellpadding="0">

@@ -42,13 +42,13 @@
             uniqueParents.forEach((sub, i) => {
               str += `<tr>
             <td>${uniqueParents[i]}</td>
-            <td style="text-align: center;">${unitTest1[i]?.grade ||
-                attendanceValue[unitTest1[i]?.status] ||
-                unitTest1[i]?.status
+            <td style="text-align: center; font-weight:${unitTest1[i]?.status ? "bold" : "normal"}">${attendanceValue[unitTest1[i]?.status] ||
+
+                unitTest1[i]?.status || unitTest1[i]?.grade
                 }</td>
-            <td style="text-align:center;">${unitTest2[i]?.grade ||
-                attendanceValue[unitTest2[i]?.status] ||
-                unitTest2[i]?.status
+            <td style="text-align:center; font-weight:${unitTest2[i]?.status ? "bold" : "normal"}">${attendanceValue[unitTest2[i]?.status] ||
+                unitTest2[i]?.status || unitTest2[i]?.grade
+
                 }</td>
             </tr>
            `;
@@ -538,8 +538,9 @@ ${main === "G.K and COMPUTER"
                     <p>${viewTemplate ? "__________" : ""}</p>
                 </div>
                 <div>
-                    <p>Officiating Principal</p>
-                    <p>${viewTemplate ? "__________" : ""}</p>
+                  <p style="margin:0px ;padding:0px">Padmini Dubey Ojha</p>
+                    <p style="margin:0px ;padding:0px">Officiating Principal</p>
+                    
                 </div>
                 <div>
                     <p>Parent/Guardian</p>

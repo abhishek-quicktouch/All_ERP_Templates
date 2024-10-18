@@ -211,14 +211,17 @@
                     const grade = calculateGrade(percentage);
 
                     // Get data for the new column from baseTermSubject
-                    const bestTermMark = baseTermSubject?.find(
+
+                    const bestTermMark = getAttendanceOrMark(baseTermSubject?.find(
                         (term) => term?.subjectAllResponse?.subjectName === subject?.subjectName
-                    )?.markObtained || "-";
+                    )?.remarkStatus, baseTermSubject?.find(
+                        (term) => term?.subjectAllResponse?.subjectName === subject?.subjectName
+                    )?.markObtained)
 
                     return `
                 <tr>
                     <td style="font-weight:bold">${subject?.subjectName}</td>
-                    <td style="text-align:center">${bestTermMark}</td> 
+                    <td style="text-align:center; font-weight:${isNaN(bestTermMark) ? "bold" : "normal"}">${bestTermMark}</td> 
                     ${termConfig
                             .map(
                                 (term) => `
@@ -274,7 +277,7 @@
                     <tr>
                         <td style="width: 60%;">${subject?.subjectAllResponse?.subjectName || ""
                             }</td>
-                        <td style="width: 20%; text-align: center">${subject?.markObtained || ""
+                        <td style="width: 20%; text-align: center; font-weight:${subject.remarkStatus ? "bold" : "normal"}">${subject.remarkStatus || subject?.markObtained || "-"
                             }</td>
                         <td style="width: 20%; text-align: center">${subject?.grade || ""
                             }</td>
@@ -398,6 +401,26 @@
 `;
         }
 
+        function generateHeader(element) {
+            return ` <div class="header">
+            
+${element.header
+                    ? element.header
+                    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+              <div style="text-align:center">
+                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <div style="color: #2b595e" >${config.schoolAddress}</div>
+                   </div>
+              <img src="${config.schoolLogo}" alt="School Logo"/> 
+            `
+                }
+
+             
+</div>`
+
+
+        }
+
         function generateSignature() {
             return `
              <div class="signatures">
@@ -440,24 +463,7 @@
             <style type="text/css">${config.styles}</style>
             <page orientation="portrait" format="A4" margin="0">
                 <div class="container">
-                    <div class="header">
-            
-${element.header
-                    ? element.header
-                    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
-              <div style="text-align:center">
-                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
-                        <div style="color: #2b595e" >${config.schoolAddress}</div>
-                        
-                
-              </div>
-              <img src="${config.schoolLogo}" alt="School Logo"/> 
-            `
-                }
-
-             
-</div>
-
+                   ${generateHeader(element)}
     <h4 style="background-color : #c1e0e0 ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
                 }</h4> 
                        ${generateStudentInfo(element?.student)}
