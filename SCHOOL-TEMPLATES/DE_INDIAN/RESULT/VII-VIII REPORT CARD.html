@@ -911,7 +911,12 @@
               const practical = subjects.find(
                 (d) => d.subjectName === "ARTIFICIAL INTELLIGENCE PR"
               );
-              const total = practical?.marksObtained + subject?.marksObtained;
+              const theory = subjects.find(
+                (d) => d.subjectName === "ARTIFICIAL INTELLIGENCE"
+              )
+              console.log(theory, "fffffffff theory")
+              const total = practical?.markSheetReport[0]?.obtained + theory?.markSheetReport[0]?.obtained
+              const maxTotal = practical?.total + theory?.total
 
               return `  <tr>
                   <td style="font-size: 12px; padding: 4px; margin: 0;">${subject?.subjectName
@@ -919,25 +924,23 @@
                     <td colspan="2" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
                             <div style="padding:4px 0px;"> MID TERM <br/> PRACTICAL (${practical?.total
                 })</div>
-                            <div style="border-top:2px solid; padding:10px 0px;">${practical?.marksObtained.toFixed(2)
+                            <div style="border-top:2px solid; padding:10px 0px;">${practical?.markSheetReport[0]?.obtained.toFixed(2)
                 }<div>
                     </td>
                      <td colspan="3" style="font-size: 11px;padding: 0px; margin: 0; text-align:center;">
-                            <div style="padding:4px 0px;"> MID TERM <br/> THEORY (${subject?.total
+                            <div style="padding:4px 0px;"> MID TERM <br/> THEORY (${theory?.total
                 })</div>
-                            <div style="border-top:2px solid; padding:10px 0px;">${subject?.marksObtained.toFixed(2)
+                            <div style="border-top:2px solid; padding:10px 0px;">${theory?.markSheetReport[0]?.obtained.toFixed(2)
                 }<div>
                     </td>
                <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${total.toFixed(2)}</td>
-               <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${(
-                  (subject?.marksObtained / subject?.total) *
+               <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center ;">${(
+                  (total / maxTotal) *
                   100
                 ).toFixed(2)}</td>
                     <td style="font-size: 12px; padding: 4px; margin: 0; text-align: center">${calculateGrade(
-                  ((subject?.marksObtained / subject?.total) * 100).toFixed(
-                    2
-                  )
-                )}</td>
+                  ((total / maxTotal) *
+                    100).toFixed(2))}</td>
            
             </tr>`;
             }
@@ -1417,16 +1420,17 @@ ${studentData?.header}
                 </div>
 
 
-                <div style="display: flex; justify-content: space-between; margin-top: 40px; margin-bottom: -20px">
+                <div style="display: flex; justify-content: space-between; margin-top: 40px; margin-bottom: -20px;vertical-align: bottom">
                     <div>
                       <p>${studentData.student.studentInfoResponse[0]?.classTeacher || "-"}</p>
                         <p>Class Teacher</p>
                     </div>
                     <div>
+                      <p>Padmini Dubey Ojha</p>
                         <p>Officiating Principal</p>
-                        <p>${viewTemplate ? "__________" : ""}</p>
                     </div>
                     <div>
+                      <p> </p>
                         <p>Parent/Guardian</p>
                     </div>
                 </div>
