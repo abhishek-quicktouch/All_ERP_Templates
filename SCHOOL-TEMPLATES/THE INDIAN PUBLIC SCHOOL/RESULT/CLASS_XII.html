@@ -243,11 +243,11 @@
                     return `
             <tr>
                 <td style="text-transform:uppercase; font-weight:bold;">${attachmentName}</td>
-                <td style="text-align:center">${unitTestMarks.toFixed(2)}</td>
-                <td style="text-align:center">${halfYearlyTheory.toFixed(2)}</td>
-                <td style="text-align:center">${halfYearlyPractical.toFixed(2)}</td>
-                <td style="text-align:center">${(halfYearlyTheory + halfYearlyPractical).toFixed(2)}</td>
-                <td style="text-align:center">${subjectTotal.toFixed(2)}</td>
+                <td style="text-align:center">${unitTestMarks}</td>
+                <td style="text-align:center">${halfYearlyTheory}</td>
+                <td style="text-align:center">${halfYearlyPractical}</td>
+                <td style="text-align:center">${(halfYearlyTheory + halfYearlyPractical)}</td>
+                <td style="text-align:center">${subjectTotal}</td>
             </tr>
             `;
                 })
@@ -261,16 +261,16 @@
             // Render the final table
             return `
     <table>
-        <tr style="background-color: #e4f2f2">
+        <tr style="background-color: #fff">
             <th rowspan="2" style="text-align: center; width: 30%;">SUBJECTS</th>
-            <th rowspan="2" style="text-align: center;">Unit Test-1 (25)</th>
+            <th rowspan="2" style="text-align: center;width: 14%;">Unit Test-1<br/> (25)</th>
             <th colspan="4" style="text-align: center;">Half Yearly (50)</th>
         </tr>
-        <tr style="background-color: #e4f2f2">
-            <th style="text-align: center;">Theory (80)</th>
-            <th style="text-align: center;">Practical (20)</th>
-            <th style="text-align: center;">Total (100)</th>
-            <th style="text-align: center;">Highest Marks in Class (100)</th>
+        <tr style="background-color: #fff">
+            <th style="text-align: center;width: 14%;">Theory (80/70/30)</th>
+            <th style="text-align: center; width: 14%;">Practical (20/30/70)</th>
+            <th style="text-align: center; width: 14%;">Total (100)</th>
+            <th style="text-align: center; width: 14%;">HIGHEST MARKS IN CLASS (100)</th>
         </tr>
         ${rows}
         <tr style="font-weight:bold">
@@ -319,7 +319,7 @@
             return `
             <table>
                 
-                <tr style="background-color: #e4f2f2">
+                <tr style="background-color: #fff">
                     <th style="width: 70%;">Grade Subjects</th>
                     <th style="width: 30%; text-align: center">HALF YEARLY</th>
                     
@@ -334,7 +334,7 @@
         function generateRemark(remark) {
             return `
     <table style="width: 100%;font-size: 12px">
-        <tr style="background-color: #c1e0e0"> 
+        <tr style="background-color: #fff"> 
             <th style="text-align: left">GENERAL REMARKS</th>
         <tr>
             <th style="text-align: left">${remark?.description || remark?.field?.find((f) => f?.title === "Teacher's Remarks").value || "-"}</th>
@@ -343,6 +343,36 @@
     </table>
     `;
         }
+
+
+
+        function generateSubjectRemark(remark) {
+            return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">STUDENT'S PROFILE</th>
+            </tr>
+            ${remark?.masterName === "STUDENT'S PROFILE" ? remark?.field?.map((f) => `<tr style="background-color: #fff"> <th style="text-align: left">${f?.title || ""}</th><td>${f?.value || ""}</td></tr>`).join("") : ""}
+       
+    </table>
+    `;
+        }
+
+
+        function generatePrincipalRemark(remark) {
+            return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">PRINCIPAL'S REMARKS</th>
+            </tr>
+            ${remark?.masterName === "PRINCIPAL'S REMARKS" ? remark?.field?.map((f) => `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""}</td></tr>`).join("") : ""}
+       
+    </table>
+    `;
+        }
+
 
         function generateGradingTable() {
             return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
@@ -457,7 +487,7 @@ ${element.header
             <page orientation="portrait" format="A4" margin="0">
                 <div class="container">
                    ${generateHeader(element)}
-    <h4 style="background-color : #c1e0e0 ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
+    <h4 style="background-color : #fff ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
                 }</h4> 
                        ${generateStudentInfo(element?.student)}
 
@@ -465,7 +495,7 @@ ${element.header
                 
 
                     <div class="section">
-                        <h3 style="text-align: center; font-size: 13px;background-color : #c1e0e0; border: 1px solid black ">SCHOLASTIC REPORT</h3>
+                        <h3 style="text-align: center; font-size: 13px;background-color : #fff; border: 1px solid black ">SCHOLASTIC REPORT</h3>
                         ${generateScholasticTable(
                     element?.markData
                         ?.subjectWiseMarkSheetReportResponses,
@@ -483,10 +513,21 @@ ${element.header
 <div class="section">
                    ${generateRemark(element?.baseTermData?.remarksEntry)}
                    </div>
+
+<div class="section">
+${generateSubjectRemark(element?.baseTermData?.remarksEntry)}
+    </div>
+    <div class="section">
+        ${generatePrincipalRemark(element?.baseTermData?.remarksEntry)}
+    </div>
+
                    <div class="section">
 
-                   ${generateGradingTable()}
-                   <div style="font-size: 12px">Date : ${element?.printDate || new Date().toLocaleDateString()}</div>
+                   
+                   <div style="font-size: 12px; display:flex; justify-content: space-between">
+                    <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()} </span>
+                    <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find((field) => field?.title === "attendance")?.value || element?.student?.attendance} </span>
+                    </div>
 </div>
                    
 ${generateSignature()}
@@ -500,6 +541,7 @@ ${generateSignature()}
             studentHtml.appendChild(singleStudentHtml);
         });
     };
+
 </script>
 
 <script></script>
