@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THUKRAL I-VI</title>
+  </head>
+
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const resultDate = "26-04-2024";
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+        };
+        const subjectNatures = {
+          PA: "P ASSESSMENT",
+          TH: "THEORY",
+        };
+
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              baseTermData: data?.baseTermData,
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+              address: `${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.houseNo
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.houseNo + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.street
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.street + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.landmark
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.landmark + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.area
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.area + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.city
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.city + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.district
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.district + ", "
+                  : ""
+              }${
+                data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.pincode
+                  ? data?.student?.studentInfoResponse?.[0]
+                      ?.studentAddressResponse?.pincode
+                  : ""
+              }`,
+
+              remarks: data?.remarks?.details?.[0]?.description || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = `<style type="text/css">
+@page {
+size: A4
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+}
+td {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top: 0.7mm;
+	padding-bottom:0.7mm;
+	font-size: 10pt;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	padding-left: 1mm;
+	padding-right: 1mm;
+	padding-top:1mm;
+	padding-bottom: 1mm;
+	background: #e7e7e7;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@media print {
+@page {
+margin:auto;
+size: A4
+}
+	
+	
+}
+</style>`;
+        multipleStudents?.forEach((v) => {
+          const mainResult = v?.studentResponse ?? [];
+          const studentDetails = v.studentInfo;
+          const theorySubjects =
+            mainResult?.subjectWiseMarkSheetReportResponses;
+          const remarksEntry = v?.baseTermData?.remarksEntry;
+
+          const baseTermSubjects = (nature) => {
+            console.log(nature, "nnnnnnnnnn");
+
+            if (nature == subjectNatures.PA) {
+              return v?.baseTermData?.subject?.filter(
+                (v) =>
+                  v.subjectAllResponse?.nature == nature &&
+                  !theorySubjects?.find(
+                    (val) => val.subjectName == v.subjectAllResponse.subjectName
+                  )
+              );
+            }
+
+            return v?.baseTermData?.subject?.filter(
+              (v) => v.subjectAllResponse?.nature == nature
+            );
+          };
+
+          // v.baseTermData?.subject;
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML += `<page orientation="portrait" format="A4" margin="0" >
+                 
+
+                  
+            <!-- START PAGE-1 --> 
+     <table cellspacing="0" style="width: 100%;padding: 10px;background-image: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_30_12_406823627.jpeg'); background-repeat: no-repeat; background-position: center;">
+  		    <tr valign="top">
+    	    <td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+		     <!-- logo and Name section -->
+		   <table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/uploads/DPS286/registration-instructions/UploadFile2024-02-26T07_29_18_632313344.png" /></td>
+				<td align="center" style="width:85%; color:#dd0812; font-size:15pt; font-weight:bold; text-transform:uppercase; line-height: 140%;">Hazrat Allama Anwar Shah kashmiri islamic international academy, Poonch</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; line-height: 140%;"><span style="color:#dd0812;">Head Office:</span> Mohalla Anwar Abad, Nakhon wali Road, Poonch<br>
+				Behind Forest Complex, City Poonch-185101 J & K (India)<br>
+				Mob. : 9797473121, 9622278204, 8494005716, 7051073084
+				</td>
+			</tr>
+		</table>	
+		<!--// logo and Name section -->
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Basic Details -->	
+		<table cellspacing="0" style="width:100%;">
+			<col style="width: 83%"/>
+    		<col style="width: 2%"/>
+    		<col style="width: 15%"/>
+			<tr>
+				<td style="width:83%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<!-- left -->
+				<table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" >
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Student's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.studentName
+              }</td>
+						</tr>
+					</table>
+				</td>
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Admission No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.admissionNo
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Father's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.fatherName
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Class/Section</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.className
+              }-${studentDetails.sectionName}</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Mother's Name</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.motherName
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Roll No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.rollNo
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td style="width:60%; border-bottom: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:30%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Date Of Birth</strong></td>
+							<td style="width:70%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails.dob
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				<td style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Mobile No.</strong></td>
+							<td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                studentDetails?.studentInfoResponse?.[0]?.mobileNumber ?? ""
+              }</td>
+						</tr>
+					</table>
+				</td>
+				</tr>
+					
+				<tr>
+				<td colspan="2" style="width:100%;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td style="width:18%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>Address</strong></td>
+							<td style="width:82%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                v?.address
+              }</td>
+						</tr>
+					</table>
+				</td>
+
+				</tr>
+					
+				</table>	
+				<!--// left -->
+				</td>
+				<td style="width:2%; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td align="right" style="width:15%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<div style="width:100px; height:100px; border:1px #000 solid; font-size:10px; line-height:130%; text-align:center;">
+          <img align="left" alt="student photo" style="width:100px; height:100px;" src=${
+            v?.baseTermData?.perSignedUrlResponse?.url
+          } />
+				</td>
+			</tr>
+		</table>
+		
+		
+		<!--// Basic Details -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:3mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			
+			<tr>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:50%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#0000ff; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">Progress Report</div></td>
+				<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		<!--// Term -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:2mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+	
+		<!-- Main Subject Table -->	
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:5%; font-weight:bold;">S.No.</td>
+				<td align="center" style="width:20%; border-left: solid 0.264583333mm #000000; font-weight:bold; color:#4570bc;">Subject</td>
+
+        ${v?.studentResponse?.markSheetTerms
+          ?.map(
+            (val) => `
+          <td align="center" style="width:9%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:9mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">${val.headerName}<br>M.M.</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt; color:#dd0812; font-weight:bold;">${val.subHeaderName}</div>
+				</td>`
+          )
+          .join("")}
+
+			
+				<td align="center" style="width:8%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:9mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Total</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt;">&nbsp;</div>
+				</td>
+				<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:9mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Percentage</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt; font-weight:bold;">%</div>
+				</td>
+				<td align="center" style="width:8%; border-left: solid 0.264583333mm #000000;">
+				<div style="height:9mm; text-align:center; width:100%; line-height:130%; font-size:8pt; font-weight:bold;">Grade</div>
+      			<div style=" width:100%; text-align:center; font-size:8pt;">&nbsp;</div>
+				</td>
+			</tr>
+			
+      ${theorySubjects
+        ?.map(
+          (val, index) => `
+        <tr>
+				<td align="center" style="width:5%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+          index + 1
+        }.</td>
+				<td align="center" style="width:20%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold; color:#dd0812;">${
+          val.subjectName
+        }</td>
+
+        ${val.markSheetReport
+          ?.map(
+            (ele, j) => `<td align="center" style="width:${
+              j ? "10%" : "9%"
+            }; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+              ele.obtained
+            }</td>
+				`
+          )
+          .join("")}
+			
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.marksObtained
+        }</td>
+				<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.percentage
+        }</td>
+				<td align="center" style="width:8%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${
+          val.grade
+        }</td>
+			</tr>`
+        )
+        .join("")}
+
+		</table>
+		<!--// Main Subject Table -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:3mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Grade Total -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">		
+			<tr>
+				<td align="left" style="width:5%;">&nbsp;</td>
+				<td align="left" style="width:39%;"><strong>Grand Total (Out of ${
+          mainResult?.total
+        } Marks)</strong>:  ${mainResult.marksObtained}</td>
+				<td align="left" style="width:30%; "> </td>
+				<td align="center" style="width:8%; font-weight:bold; border-left: solid 0.264583333mm #000000;"><strong>Rank :</strong>
+                   </td>
+				<td align="center" style="width:18%; ">&nbsp;</td>
+			</tr>		
+		</table>
+		<!--// Grade Total -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:3mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Grades -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">		
+			<tr>
+				<td align="left" style="width:100%;">
+				<table cellspacing="0" style="width:100%;">
+					<tr>
+						<td align="left" style="width:10%; font-weight:bold;">Overall %</td>
+						<td align="left" style="width:15%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${
+              mainResult.percentage
+            }</td>
+						<td align="left" style="width:12%; font-weight:bold;">Overall Grade</td>
+						<td align="left" style="width:15%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${
+              mainResult.overAllGrade
+            }</td>
+						
+						<td align="left" style="width:28%; font-weight:bold;">Result (Pass/Fail) Result Date:</td>
+						<td align="left" style="width:20%; border-bottom: dotted 0.264583333mm #000000; font-weight:bold;">${resultDate}</td>
+					
+				</table>
+				</td>
+			</tr>		
+		</table>
+		<!--// Grades -->
+
+
+       <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#800080; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">Personal Assessment</div></td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:2mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:50%; font-weight:bold; color: #4570bc;">SUBJECT</td>
+				<td align="center" style="width:50%; border-left: solid 0.264583333mm #000000; font-weight:bold; color: #4570bc;">GRADE</td>
+			</tr>
+ 
+      ${baseTermSubjects(subjectNatures.PA)
+        ?.map(
+          (val, i) => `
+            <tr>
+				<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; font-weight:bold; color:#dd0812;">${val.subjectAllResponse.subjectName}</td>
+				<td align="center" style="width:50%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">${val.grade}</td>
+			</tr>
+`
+        )
+        .join("")}
+			
+		</table>
+
+
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+				<td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-align:center; font-size:11pt;" valign="top" align="center"><div style="background-color:#4472c4; color:#ffffff; padding-top:1mm; padding-bottom:1mm; border: solid 0.264583333mm #000000;">KEY TO GRADES :</div></td>
+				<td style="width:30%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:2mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:25%; font-weight:bold;">Above</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Above 85%</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">A</td>
+				<td align="center" style="width:25%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Excellent</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">75% & 84%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">B</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Very Good</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">55% & 64%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">C</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Good</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Between</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">40 & 49%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">D</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Average</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; font-weight:bold;">Below</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">below 40%</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">E</td>
+				<td align="center" style="width:25%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold;">Poor</td>
+			</tr>
+		</table>
+		
+       <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- co-curricular Section -->
+		
+		<!-- attendace Section -->
+		<table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+			<tr>
+				<td align="center" style="width:30%; font-weight:bold;">Total No. of Working Days</td>
+				<td align="center" style="width:40%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Total No. of Present Days</td>
+				<td align="center" style="width:30%; border-left: solid 0.264583333mm #000000; font-weight:bold;">Percentage %</td>		
+			</tr>
+			
+			<tr>
+				<td align="center" style="width:30%; border-top: solid 0.264583333mm #000000;">${
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Working Days"
+          )?.value
+        }</td>
+				<td align="center" style="width:40%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Present Days"
+          )?.value
+        }</td>
+				<td align="center" style="width:30%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${(
+          (Number(
+            remarksEntry?.fields?.find(
+              (val) => val.title == "Total No. of Present Days"
+            )?.value
+          ) *
+            100) /
+          remarksEntry?.fields?.find(
+            (val) => val.title == "Total No. of Working Days"
+          )?.value
+        ).toFixed(2)}</td>
+			</tr>
+		</table>
+		<!--// attendace Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:3mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		
+		
+		
+		<!-- remarks Section -->
+		<table cellspacing="0" style="width:100%; border:solid 0.264583333mm #000000;">
+        <tr>
+            <td align="left" style="width:100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="left" valign="top" style="width:10%; font-weight:bold;">Remarks:</td>
+                    <td align="left" style="width:90%; border-bottom: dotted 0.264583333mm #000000;">${
+                      remarksEntry?.description
+                    }</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" style="width:100%;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="left" valign="top" style="width:35%; font-weight:bold;">Promotion Granted / Not Granted to Class:</td>
+                    <td align="left" style="width:65%; border-bottom: dotted 0.264583333mm #000000;">${
+                      v?.baseTermData?.pass
+                        ? `Promoted to ${v?.baseTermData?.promotedClass}-${v.baseTermData?.promotedSection}.`
+                        : "Repeated in same class."
+                    }</td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    	</table>
+		<!--// remarks Section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+		<!-- signature section -->
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:left; border-bottom: dotted 0.264583333mm #000000;"></td>
+				
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				
+				
+				
+				<td align="center" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:center; border-bottom: dotted 0.264583333mm #000000;"></td>
+				
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				
+				<td align="right" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; font-size:10pt; text-align:right; border-bottom: dotted 0.264583333mm #000000;"></td>
+			</tr>
+			
+			<tr>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:left; font-weight:bold;">Sign. of Class Teacher</td>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				<td align="center" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:center; font-weight:bold;">Sign. of HOD</td>
+				<td align="left" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm;">&nbsp;</td>
+				<td align="right" valign="bottom" style="padding-left:0mm; width:20%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-size:10pt; text-align:right; font-weight:bold;">Sign. of Principal</td>
+			</tr>
+		</table>
+		<!--// signature section -->
+	
+		</td>
+  		</tr>
+		</table>
+		<!-- END PAGE-2 --> 	
+                </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+            dob: "16-06-2016",
+            admissionNo: "1903244",
+            studentName: "WAJID ALI",
+            className: "I",
+            sectionName: "A",
+            rollNo: 37,
+            fatherName: "SAJID ALI",
+            motherName: "SHAHIN AKHTER",
+            attendance: "118.0/132",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 92843,
+                userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+                studentId: "1903244",
+                studentName: "WAJID ALI",
+                fatherName: "SAJID ALI",
+                motherName: "SHAHIN AKHTER",
+                dob: "16-06-2016",
+                gender: "NA",
+                studentAdhaarcard: "",
+                joiningClass: "I",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 37,
+                emergencyNumber: "",
+                mobileNumber: "8494005716",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9797895186",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: "9797895186",
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "SwTBTi",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "NA",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "HAAKIIA",
+                editedUser: "HAAKIIA",
+                createddate: "2023-05-03 09:42:16.870927",
+                editeddate: "2023-05-18 03:10:59.980625",
+                studentAddressResponse: {
+                  uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                fatherAddressResponse: {
+                  uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_F1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                motherAddressResponse: {
+                  uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "HIIAPJK134_M1903244",
+                  createdDate: "11-05-2023 03:49 PM",
+                  editedDate: "11-05-2023 03:49 PM",
+                  createdBy: "HAAKIIA",
+                  editedBy: "HAAKIIA",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2024-25",
+            admissionNo: "4775",
+            studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+            studentName: "Khushi",
+            rollNo: 0,
+            fatherName: "Bhawneet Kumar",
+            className: "I",
+            sectionName: "A",
+            terms: "Half Yearly",
+            markSheetName: "TERM 1",
+            overAllRank: "1",
+            markSheetTerms: [
+              {
+                id: 1092,
+                headerName: "UT-1",
+                subHeaderName: "20",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 20.0,
+                terms: ["Unit Test 1"],
+              },
+              {
+                id: 1093,
+                headerName: "Term-1",
+                subHeaderName: "80",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 2,
+                weightage: 80.0,
+                terms: ["Half Yearly"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "2985a774-0db6-48ea-9cd5-0599ece1e9cd",
+                subjectName: "HINDI",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "2985a774-0db6-48ea-9cd5-0599ece1e9cd",
+                    subjectName: "HINDI",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 18.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "2985a774-0db6-48ea-9cd5-0599ece1e9cd",
+                    subjectName: "HINDI",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 75.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 93.0,
+                total: 100.0,
+                percentage: 93.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 1,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "25fbd9cc-f80c-4998-9a0a-e1e86f570fea",
+                subjectName: "ENGLISH",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "25fbd9cc-f80c-4998-9a0a-e1e86f570fea",
+                    subjectName: "ENGLISH",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 19.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "25fbd9cc-f80c-4998-9a0a-e1e86f570fea",
+                    subjectName: "ENGLISH",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 77.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 96.0,
+                total: 100.0,
+                percentage: 96.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 2,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "501a0e4a-56c2-4690-9fa6-a0c24265440b",
+                subjectName: "MATH",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "501a0e4a-56c2-4690-9fa6-a0c24265440b",
+                    subjectName: "MATH",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 16.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "501a0e4a-56c2-4690-9fa6-a0c24265440b",
+                    subjectName: "MATH",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 76.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 92.0,
+                total: 100.0,
+                percentage: 92.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 3,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "b611643a-3ba5-41cf-bc0f-4dba207e5104",
+                subjectName: "SCIENCE",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "b611643a-3ba5-41cf-bc0f-4dba207e5104",
+                    subjectName: "SCIENCE",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 17.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "b611643a-3ba5-41cf-bc0f-4dba207e5104",
+                    subjectName: "SCIENCE",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 74.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 91.0,
+                total: 100.0,
+                percentage: 91.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 4,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "74ef898e-102a-4cc9-927b-fef65a51512a",
+                subjectName: "S.ST",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "74ef898e-102a-4cc9-927b-fef65a51512a",
+                    subjectName: "S.ST",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 18.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "74ef898e-102a-4cc9-927b-fef65a51512a",
+                    subjectName: "S.ST",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 77.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 95.0,
+                total: 100.0,
+                percentage: 95.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 5,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "7ace886b-160b-4e3a-9cbc-02be98242fb6",
+                subjectName: "COMPUTER",
+                subjectNature: "",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "7ace886b-160b-4e3a-9cbc-02be98242fb6",
+                    subjectName: "COMPUTER",
+                    subjectNature: "",
+                    max: 20.0,
+                    obtained: 16.0,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "7ace886b-160b-4e3a-9cbc-02be98242fb6",
+                    subjectName: "COMPUTER",
+                    subjectNature: "",
+                    max: 80.0,
+                    obtained: 75.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 91.0,
+                total: 100.0,
+                percentage: 91.0,
+                grade: "O",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 6,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "b35ff724-3af4-436f-9986-82ee2e499d98",
+                subjectName: "GK",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "b35ff724-3af4-436f-9986-82ee2e499d98",
+                    subjectName: "GK",
+                    subjectNature: "THEORY",
+                    max: 20.0,
+                    obtained: 18.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: true,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "b35ff724-3af4-436f-9986-82ee2e499d98",
+                    subjectName: "GK",
+                    subjectNature: "THEORY",
+                    max: 80.0,
+                    obtained: 71.99,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: true,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 89.99,
+                total: 100.0,
+                percentage: 89.99,
+                grade: "A",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 7,
+                decimalPlaces: 2,
+                visible: false,
+              },
+              {
+                subjectUid: "004e9fbe-3d71-48bb-805a-6080ad21f92d",
+                subjectName: "DRAWING",
+                subjectNature: "THEORY",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "004e9fbe-3d71-48bb-805a-6080ad21f92d",
+                    subjectName: "DRAWING",
+                    subjectNature: "THEORY",
+                    max: 20.0,
+                    obtained: 18.0,
+                    grade: "O",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1092,
+                      headerName: "UT-1",
+                      subHeaderName: "20",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 20.0,
+                      terms: ["Unit Test 1"],
+                    },
+                    visible: false,
+                    graded: true,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "b9bec115-2028-49a5-9430-2125ecd437b4",
+                    admissionNo: "4775",
+                    studentName: "Khushi",
+                    rollNo: 0,
+                    fatherName: "Bhawneet Kumar",
+                    className: "I",
+                    sectionName: "A",
+                    classSectionUid: "164a24d6-14a3-400d-8e4c-8817dd19b5cb",
+                    terms: "Half Yearly",
+                    subjectUid: "004e9fbe-3d71-48bb-805a-6080ad21f92d",
+                    subjectName: "DRAWING",
+                    subjectNature: "THEORY",
+                    max: 80.0,
+                    obtained: 71.99,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 2,
+                    markSheetTermResponse: {
+                      id: 1093,
+                      headerName: "Term-1",
+                      subHeaderName: "80",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 2,
+                      weightage: 80.0,
+                      terms: ["Half Yearly"],
+                    },
+                    visible: false,
+                    graded: true,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 89.99,
+                total: 100.0,
+                percentage: 89.99,
+                grade: "A",
+                className: "I",
+                sectionName: "A",
+                terms: "Half Yearly",
+                markSheetName: "TERM 1",
+                subjectPrt: 8,
+                decimalPlaces: 2,
+                visible: false,
+              },
+            ],
+            marksObtained: 737.98,
+            total: 800.0,
+            percentage: 92.25,
+            overAllGrade: "O",
+            visible: false,
+          },
+          remarks: {
+            uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+            terms: ["TERM 2"],
+            studentId: "1903244",
+            studentName: "WAJID ALI",
+            rollNumber: 37,
+            classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+            classSection: "I-A",
+            description:
+              "is an enthusiastic learner who seems to enjoy school.",
+            fields: [
+              {
+                uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+                title: "Total No. of Present Days",
+                type: "NUMERIC",
+                value: "80",
+                masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                masterName: "ATTENDANCE",
+              },
+              {
+                uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+                title: "Total No. of Working Days",
+                type: "NUMERIC",
+                value: "120",
+                masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                masterName: "ATTENDANCE",
+              },
+            ],
+            status: true,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createdDate: "28-02-2024 05:33 PM",
+            editedDate: "28-02-2024 05:34 PM",
+          },
+
+          baseTermData: {
+            studentAcademic: {
+              dob: "16-06-2016",
+              admissionNo: "1903244",
+              studentName: "WAJID ALI",
+              className: "I",
+              sectionName: "A",
+              rollNo: 37,
+              fatherName: "SAJID ALI",
+              motherName: "SHAHIN AKHTER",
+              attendance: "119.0/133",
+              boardRollNumber: "",
+              studentInfoResponse: [
+                {
+                  id: 92843,
+                  userUid: "7710680a-b9cc-4ae7-8ea8-3092be4df2ef",
+                  userName: null,
+                  fatherUserName: null,
+                  motherUserName: null,
+                  guardianUserName: null,
+                  uid: "dc869156-f677-4efe-b847-f2ff069a2d1c",
+                  studentId: "1903244",
+                  studentName: "WAJID ALI",
+                  fatherName: "SAJID ALI",
+                  motherName: "SHAHIN AKHTER",
+                  dob: "16-06-2016",
+                  gender: "NA",
+                  studentAdhaarcard: "",
+                  joiningClass: "I",
+                  joiningSections: "A",
+                  joiningDate: "01-01-2022",
+                  plotNumber: "",
+                  area: "",
+                  city: "",
+                  state: "",
+                  pincode: null,
+                  phone1: "",
+                  rollNo: 37,
+                  emergencyNumber: "",
+                  mobileNumber: "8494005716",
+                  studentEmail: null,
+                  religion: "",
+                  category: "",
+                  minority: "",
+                  motherTongue: "",
+                  idMark: "",
+                  height: "",
+                  weight: "",
+                  physicalDisability: "",
+                  bloodGroup: "",
+                  healthRemark: "",
+                  siblingDetails: "",
+                  alumni: "",
+                  siblingResponse: [],
+                  fatherOccupation: "",
+                  fatherQualification: "",
+                  fatherOrganization: "",
+                  fatherDesignation: "",
+                  fatherIncome: "",
+                  fatherArea: "",
+                  fatherCity: "",
+                  fatherState: "",
+                  fatherPincode: null,
+                  fatherPhone: null,
+                  fatherMobile: "9797895186",
+                  fatherEmail: null,
+                  fatherAdhaarNumber: null,
+                  schoolUid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+                  motherQualification: "",
+                  motherOccupation: "",
+                  motherOrganization: "",
+                  motherDesignation: "",
+                  motherIncome: "",
+                  motherArea: "",
+                  motherCity: "",
+                  motherState: "",
+                  motherPincode: null,
+                  motherPhone: null,
+                  motherMobile: "9797895186",
+                  motherEmail: null,
+                  motherAdhaarNumber: null,
+                  guardianName: null,
+                  relation: null,
+                  guardianOccupation: null,
+                  guardianPhone: null,
+                  guardianMobile: null,
+                  guardianEmail: null,
+                  guardianAddress: null,
+                  leavingDate: null,
+                  previousSchoolName: "",
+                  otp: "SwTBTi",
+                  schoolName: "Demo Public School",
+                  remark: "",
+                  classTeacher: null,
+                  classTeacherUserName: null,
+                  classes: "I",
+                  classUid: null,
+                  sections: "A",
+                  group: null,
+                  wing: "NA",
+                  status: "Studying",
+                  academicSession: "2023-2024",
+                  joiningStatus: "NA",
+                  houses: null,
+                  certificates: "",
+                  certificatesList: [],
+                  caste: "",
+                  listOfDocuments: ["string"],
+                  attached: true,
+                  required: false,
+                  submitted: false,
+                  studentHostel: [],
+                  studentConcession: [],
+                  studentTransport: [],
+                  studentAadharCard: null,
+                  fatherAadharCard: null,
+                  motherAadharCard: null,
+                  studentImage: null,
+                  fatherImage: null,
+                  motherImage: null,
+                  guardianImage: null,
+                  birthCertificate: null,
+                  classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+                  aluminiProof: null,
+                  siblingProof: null,
+                  residenceProof: null,
+                  firstBornChildProof: null,
+                  medicalFitnessCertificate: null,
+                  fatherQualificationProof: null,
+                  motherQualificationProof: null,
+                  casteCertificate: null,
+                  createdUser: "HAAKIIA",
+                  editedUser: "HAAKIIA",
+                  createddate: "2023-05-03 09:42:16.870927",
+                  editeddate: "2023-05-18 03:10:59.980625",
+                  studentAddressResponse: {
+                    uid: "6fa17af8-b48e-4349-876c-82683b2f1278",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  fatherAddressResponse: {
+                    uid: "e8512db8-4a7e-4ab1-91cd-fa0900927bd4",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_F1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  motherAddressResponse: {
+                    uid: "fe63425b-0cf8-4990-90ba-dd68f8808c65",
+                    houseNo: null,
+                    area: "",
+                    landmark: null,
+                    city: "",
+                    district: null,
+                    state: "",
+                    poPs: null,
+                    pincode: null,
+                    street: "",
+                    userName: "HIIAPJK134_M1903244",
+                    createdDate: "11-05-2023 03:49 PM",
+                    editedDate: "11-05-2023 03:49 PM",
+                    createdBy: "HAAKIIA",
+                    editedBy: "HAAKIIA",
+                  },
+                  guardianAddressResponse: null,
+                  correspondenceAddressResponse: null,
+                },
+              ],
+              classTeacher: "",
+              classTeacherUserName: "",
+            },
+            subject: [
+              {
+                subjectAllResponse: {
+                  uid: "2985a774-0db6-48ea-9cd5-0599ece1e9cd",
+                  subjectName: "HINDI",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.686395",
+                  editeddate: "2024-07-31 12:42:25.686397",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 75,
+                percentage: 93.75,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "25fbd9cc-f80c-4998-9a0a-e1e86f570fea",
+                  subjectName: "ENGLISH",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.689727",
+                  editeddate: "2024-07-31 12:42:25.689729",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 77,
+                percentage: 96.25,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "501a0e4a-56c2-4690-9fa6-a0c24265440b",
+                  subjectName: "MATH",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.692918",
+                  editeddate: "2024-07-31 12:42:25.692919",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 76,
+                percentage: 95,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "b611643a-3ba5-41cf-bc0f-4dba207e5104",
+                  subjectName: "SCIENCE",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.695916",
+                  editeddate: "2024-07-31 12:42:25.695917",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 74,
+                percentage: 92.5,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "74ef898e-102a-4cc9-927b-fef65a51512a",
+                  subjectName: "S.ST",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.698819",
+                  editeddate: "2024-07-31 12:42:25.698821",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 77,
+                percentage: 96.25,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "7ace886b-160b-4e3a-9cbc-02be98242fb6",
+                  subjectName: "COMPUTER",
+                  nature: null,
+                  natureUid: null,
+                  cbseVIIICode: null,
+                  cbseXCode: null,
+                  cbseXIICode: null,
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-07-31 12:42:25.703892",
+                  editeddate: "2024-07-31 12:42:25.703894",
+                },
+                termName: "Half Yearly",
+                max: 80,
+                markObtained: 75,
+                percentage: 93.75,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: true,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "b35ff724-3af4-436f-9986-82ee2e499d98",
+                  subjectName: "GK",
+                  nature: "THEORY",
+                  natureUid: "25a8b230-68e0-4bd8-bfcc-21d540b22687",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-09-30 07:44:14.712635",
+                  editeddate: "2024-09-30 07:44:14.711572",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "004e9fbe-3d71-48bb-805a-6080ad21f92d",
+                  subjectName: "DRAWING",
+                  nature: "THEORY",
+                  natureUid: "25a8b230-68e0-4bd8-bfcc-21d540b22687",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-09-30 07:44:18.826166",
+                  editeddate: "2024-09-30 07:44:18.825453",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "d177a615-4bd6-49df-bbf9-9ed8f4f3377a",
+                  subjectName: "UNIFORM",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:49:45.118131",
+                  editeddate: "2024-10-10 06:55:00.878022",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "91fafed4-9f66-4e87-946b-13c2494fa39d",
+                  subjectName: "LANGUAGE AND LITERACY DEVELOPMENT",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:56:01.589734",
+                  editeddate: "2024-10-10 06:56:01.589349",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "eb270d68-cdef-4af5-9458-f2cbed7f401f",
+                  subjectName: "COGNITIVE DEVELOPMENT",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:56:29.371125",
+                  editeddate: "2024-10-10 06:56:29.369641",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 74.99,
+                percentage: 74.99,
+                grade: "B",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "8e3e9d5f-3b78-4e68-8c17-629ea65089c0",
+                  subjectName: "POSITIVE LEARNING HABITS",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:56:49.160295",
+                  editeddate: "2024-10-10 06:56:49.158285",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "24737782-3ddc-4f08-a7e2-438872e53606",
+                  subjectName: "SOCIAL EMOTIONAL AND ETHICAL DEVELOPMENT",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:58:27.770151",
+                  editeddate: "2024-10-10 07:08:31.301174",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "b6133370-2fd4-42bc-a7d9-6d6232537799",
+                  subjectName: "PHYSICAL DEVLOPMENT",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:58:44.333587",
+                  editeddate: "2024-10-10 06:58:44.332682",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 100,
+                percentage: 100,
+                grade: "O",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "474fe531-3680-409a-97f6-25ca0248c161",
+                  subjectName: "AESTHETIC AND CULTURAL DEVELOPMENT",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 06:59:59.60451",
+                  editeddate: "2024-10-10 06:59:59.603561",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 74.99,
+                percentage: 74.99,
+                grade: "B",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "74ae7bc2-b822-4559-9d03-027456784feb",
+                  subjectName: "SELF CONFIDENCE",
+                  nature: "P ASSESSMENT",
+                  natureUid: "ed4d9cc5-a9aa-48c2-a5e6-af6e220777ce",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-10 07:00:20.532877",
+                  editeddate: "2024-10-10 07:00:20.53246",
+                },
+                termName: "Half Yearly",
+                max: 100,
+                markObtained: 89.99,
+                percentage: 89.99,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                added: false,
+                scholastic: false,
+              },
+            ],
+            remarksEntry: {
+              uid: "e1a6cb10-cd74-43f2-a3bf-9905be773392",
+              terms: ["TERM 2"],
+              studentId: "1903244",
+              studentName: "WAJID ALI",
+              rollNumber: 37,
+              classSectionUid: "6cbe9c1f-d6ec-436c-9ec4-18bbc6d7767b",
+              classSection: "I-A",
+              description:
+                "is an enthusiastic learner who seems to enjoy school.",
+              fields: [
+                {
+                  uid: "064bad46-64a5-4200-bb24-88ffe033ac36",
+                  title: "Total No. of Present Days",
+                  type: "NUMERIC",
+                  value: "80",
+                  masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                  masterName: "ATTENDANCE",
+                },
+                {
+                  uid: "b12c2f62-7f55-4ec1-b538-586b40933c24",
+                  title: "Total No. of Working Days",
+                  type: "NUMERIC",
+                  value: "120",
+                  masterUid: "87f3f396-9d60-40b8-b890-fd59663b1ccc",
+                  masterName: "ATTENDANCE",
+                },
+              ],
+              status: true,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createdDate: "28-02-2024 05:33 PM",
+              editedDate: "28-02-2024 05:34 PM",
+            },
+            school: {
+              uid: "64d1b4aa-af7d-4959-bcfb-2606b825d226",
+              apikey: "UdrZUz0Viw9pV5WLG3VUHTy4CJ9uREmJ",
+              schoolName: "HAAKIIA Islamic International Academy City Poonch",
+              schoolAbb: "HIIAPJK",
+              educationBoard: "Central Board of Secondary Education (CBSE)",
+              registrationNo: "CEO P Pvt 3000 02",
+              plotNumber: "Near Nakhon wali Road behind",
+              area: "Nai Basti Poonch",
+              city: "Jammu and Kashmir",
+              pincode: "185101",
+              state: "Jammu and Kashmir",
+              phoneNo1: "8494005716",
+              phoneNo2: "7298191935",
+              contactName: "Sajid Rather",
+              contactMobile: "8494005716",
+              contactEmail: "haakiiaacademy9@gmail.com",
+              schoolCode: "Haakiia p01",
+              pfCode: "185101",
+              societyManagement: "Anwar Abaad poonch",
+              language: "English Urdu Hindi",
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "haakiia",
+              website: "haakiiaacademy.com",
+              schemaPrefix: null,
+              editedDate: "28-02-2024 05:36 PM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: false,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+            },
+            promotedClass: "II",
+            promotedSection: "A",
+            perSignedUrlResponse: {
+              url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/HAAKIIA/student-info/1903244/student/images/1903244.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240228T123234Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240228%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=57b9b8d6a311401cfbcd7d9c75fcad3747f75f7c78a0fead0c3ead310698f382",
+              fileName: "1903244.png",
+            },
+            pass: true,
+          },
+        },
+      ]);
+    </script>
+  </body>
+</html>
