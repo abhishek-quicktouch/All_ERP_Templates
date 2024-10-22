@@ -20,6 +20,7 @@
       "Late Admission": "LA",
       Exempted: "EX",
       NA: "NA",
+       "Not Submitted":"NS"
     };
 
     const getTerms = (termData) => {
@@ -41,42 +42,32 @@
 
       let str = "";
       let totalStr = "";
-
+      let grandTotal = 0
+      let subCount = 0
       subjects.forEach((sub, i) => {
+        let maxObtained = 0;
         marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
           (d) => {
             if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
+              subCount+=100
               str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
                 }</td>${d.markSheetReport
                   .map((v) => {
+                    maxObtained += Math.round(v?.obtained);
                     return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""} font-size:11pt;">${attendanceValue[v?.status] || Math.round(v?.obtained)
                       }</td>`;
                   })
                   .join(
                     ""
-                  )} <td style="text-align: center" >${Math.round(d?.marksObtained)}</td>
+                  )} <td style="text-align: center" >${maxObtained}</td>
               <td style="text-align: center">${d?.grade}</td></tr>`;
-            }
-
-            if (check && subjects.length - 1 === i) {
-              check = false;
-              totalStr += `<tr>
-      
-                   <td style="text-align:left;font-weight:bold; border:none;">Total : ${Math.round(marksData?.markData?.marksObtained)}</td> 
-                   <td colspan=${marksData?.markData?.markSheetTerms.length} style="text-align:left;font-weight:bold;  border:none;"></td> 
-                   <td colspan=2 style="text-align:right;font-weight:bold; border:none; " >Percentage : ${Math.round(marksData?.markData?.percentage)}%</td>
-                  </td>
-             </tr>
-              <tr>
-        
-              </tr>
-              `;
+              grandTotal+=maxObtained
             }
           }
         );
       });
 
-      return str + totalStr;
+      return {rows:str, grandTotal, colspan:marksData?.markData?.markSheetTerms.length,subCount};
     };
 
     const getCoScholasticSub = (marksData) => {
@@ -270,9 +261,16 @@
 
           </tr>
           <tr>
-            ${getSubjectMarks(st)}
-
+            ${getSubjectMarks(st)?.rows}
           </tr>
+           <tr>
+                  <td style="text-align:left;font-weight:bold; border:none;">Total : ${getSubjectMarks(st)?.grandTotal}</td> 
+                   <td colspan=${
+                    getSubjectMarks(st)?.colspan
+                   } style="text-align:left;font-weight:bold;  border:none;"></td> 
+                   <td colspan=2 style="text-align:right;font-weight:bold; border:none;" >Percentage : ${((getSubjectMarks(st)?.grandTotal/getSubjectMarks(st)?.subCount)*100).toFixed(0)}%</td>
+                  </td>
+             </tr>
         </table>
 
          <table style="width:100%;">
