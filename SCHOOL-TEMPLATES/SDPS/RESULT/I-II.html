@@ -12,14 +12,14 @@
   <script>
     window.SetTemplateData = function (data) {
       const attendanceValue = {
-        Absent: "AB",
-        Medical: "ML",
-        Sports: "S",
-        Leave: "L",
-        "Late Admission": "LA",
-        Exempted: "EX",
-        NA: "NA",
-        "Not Submitted": "NS",
+        absent: "AB",
+        medical: "ML",
+        sports: "S",
+        leave: "L",
+        "late admission": "LA",
+        exempted: "EX",
+        na: "NA",
+        "not submitted": "NS",
       };
 
       const getTerms = (termData) => {
@@ -57,7 +57,7 @@
                     return `<td  style="text-align: center;width:10%;  font-weight:${
                       v?.status ? "bold" : ""
                     }">${
-                      attendanceValue[v?.status] || Math.round(v?.obtained)
+                      attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained)
                     }</td>`;
                   })
                   .join("")} <td style="text-align: center" >${maxObtained}</td>

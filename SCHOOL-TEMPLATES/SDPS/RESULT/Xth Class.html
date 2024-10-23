@@ -12,14 +12,14 @@
   <script>
     window.SetTemplateData = function (data) {
       const attendanceValue = {
-        Absent: "AB",
-        Medical: "ML",
-        Sports: "S",
-        Leave: "L",
-        "Late Admission": "LA",
-        Exempted: "EX",
-        NA: "NA",
-        "Not Submitted":"NS"
+        absent: "AB",
+        medical: "ML",
+        sports: "S",
+        leave: "L",
+        "late admission": "LA",
+        exempted: "EX",
+        na: "NA",
+        "not submitted": "NS",
       };
       // ${i == 1 ? `<td>sss</td>` : ""}
 
@@ -118,7 +118,7 @@
                   str += `<td style="text-align: center; font-size:${
                     v?.status ? "10pt" : "11pt"
                   }; font-weight:${v?.status ? "bold" : ""}">
-            ${attendanceValue[v?.status] || Math.round(v?.obtained || 0)}</td>`; // Apply Math.round here
+            ${attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained || 0)}</td>`; // Apply Math.round here
                 });
                 str += `<td style="text-align: center; font-size:11pt;">${
                   Math.round(customObtainedMark) || "-"
@@ -163,7 +163,7 @@
                     <td align="center" style="font-size:${
                       d?.remarkStatus ? "10pt" : "11pt"
                     }; font-weight:${d?.remarkStatus ? "bold" : ""}">${
-            attendanceValue[d?.remarkStatus] || d?.grade
+            attendanceValue[d?.remarkStatus?.toLowerCase()] || d?.grade
           }</td></tr> `;
         });
 

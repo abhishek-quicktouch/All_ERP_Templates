@@ -13,13 +13,14 @@
   <script>
     window.SetTemplateData = function (data) {
       const attendanceValue = {
-        Absent: "AB",
-        Medical: "ML",
-        Sports: "S",
-        Leave: "L",
-        "Late Admission": "LA",
-        Exempted: "EX",
-        NA: "NA",
+        absent: "AB",
+        medical: "ML",
+        sports: "S",
+        leave: "L",
+        "late admission": "LA",
+        exempted: "EX",
+        na: "NA",
+        "not submitted": "NS",
       };
 
 
@@ -130,7 +131,7 @@
           <td style="font-size:11pt;">${d?.subjectName}</td>
           <td style="font-size:11pt;">THEORY</td>
           <td style="font-size:11pt; font-weight:${d?.markSheetReport?.[0]?.status ? "bold;" : ""}">
-            ${attendanceValue[d?.markSheetReport?.[0]?.status] ? attendanceValue[d?.markSheetReport?.[0]?.status] : `${Math.round(d?.markSheetReport?.[0]?.obtained)}/${d?.markSheetReport?.[0]?.max}`}
+            ${attendanceValue[d?.markSheetReport?.[0]?.status?.toLowerCase()] ? attendanceValue[d?.markSheetReport?.[0]?.status?.toLowerCase()] : `${Math.round(d?.markSheetReport?.[0]?.obtained)}/${d?.markSheetReport?.[0]?.max}`}
           </td>
           <td style="font-size:11pt;">${d?.markSheetReport?.[1]?.max}</td>
           <td style="font-size:11pt;">${Math.round(d?.markSheetReport?.[1]?.obtained)}</td>
@@ -335,12 +336,12 @@
                        <td style="font-weight:${getGrade("WORK EXPERIENCE", st)?.remarkStatus
             ? "bold"
             : ""
-          }">${attendanceValue[getGrade("WORK EXPERIENCE", st)?.remarkStatus] ||
+          }">${attendanceValue[getGrade("WORK EXPERIENCE", st)?.remarkStatus?.toLowerCase()] ||
           getGrade("WORK EXPERIENCE", st)?.grade
           }</td>
                        <td colspan="5" class="alignLeft" >DISCIPLINE</td>
                        <td style="font-weight:${getGrade("DISCIPLINE", st)?.remarkStatus ? "bold" : ""
-          }">${attendanceValue[getGrade("DISCIPLINE", st)?.remarkStatus] ||
+          }">${attendanceValue[getGrade("DISCIPLINE", st)?.remarkStatus?.toLowerCase()] ||
           getGrade("DISCIPLINE", st)?.grade
           }</td>
                    </tr>
@@ -349,7 +350,7 @@
                        <td style="font-weight:${getGrade("GENERAL STUDIES", st)?.remarkStatus
             ? "bold"
             : ""
-          }">${attendanceValue[getGrade("GENERAL STUDIES", st)?.remarkStatus] ||
+          }">${attendanceValue[getGrade("GENERAL STUDIES", st)?.remarkStatus?.toLowerCase()] ||
           getGrade("GENERAL STUDIES", st)?.grade
           }</td>
                        <td colspan="5" class="alignLeft">HEALTH & PHY. EDUCATION</td>
@@ -358,7 +359,7 @@
             ? "bold"
             : ""
           }">${attendanceValue[
-          getGrade("HEALTH & PHYSICAL EDUCATION", st)?.remarkStatus
+          getGrade("HEALTH & PHYSICAL EDUCATION", st)?.remarkStatus?.toLowerCase()
           ] || getGrade("HEALTH & PHYSICAL EDUCATION", st)?.grade
           }</td>
                    </tr>
@@ -688,7 +689,7 @@
                   max: 30,
                   obtained: 23,
                   grade: "B1",
-                  status: "",
+                  status: "Na",
                   markSheetName: "TERM I",
                   attachmentName: "ENGLISH",
                   session: "2024-2025",
