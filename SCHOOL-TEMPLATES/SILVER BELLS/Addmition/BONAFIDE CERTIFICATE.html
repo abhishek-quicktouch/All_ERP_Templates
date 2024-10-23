@@ -12,7 +12,9 @@
         <code>Bonafide</code>
     </div>
 </body>
+
 <script>
+
     window.SetTemplateData = function (data) {
         const dataList = Array.isArray(data) ? data : [data];
         const viewTemplate = dataList[0]?.viewTemplate;
@@ -126,16 +128,16 @@
             singleStudentHtml.style.pageBreakAfter = "always";
             singleStudentHtml.innerHTML =
                 (element?.header || "") +
-                ` <div style="border: 2px solid black;line-height: 1.5; border-radius: 30px; padding: 30px; width: 90%;min-height: 500px; margin: 10px auto; text-align: center; font-family: Arial, sans-serif;page-break-after: always;">
-        <div style="font-size: 24px; font-weight: bold; text-transform: uppercase;">Silver Bells English Medium School</div>
+                ` <div style="border: 2px solid black;line-height: 1.5; border-radius: 30px; padding: 30px; width: 90%;min-height: 500px; margin: 10px auto; text-align: center; font-family: Arial, sans-serif;page-break-after: always;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;width: 83%;"><img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-24T06_20_04_230842879.jpeg" alt="School Logo" style="width: 80px; height: 95px; margin-right: 20px;"> <div> <div style="font-size: 20px; font-weight: bold; text-transform: uppercase;">Silver Bells English Medium School</div>
         <div style="font-size: 16px; margin: 5px 0;">Affiliated to CBSE, School Affiliation No.-430347</div>
-        <div style="font-size: 16px; margin: 5px 0;">Jagana road Road, Palanpur (B.K.)</div>
+        <div style="font-size: 16px; margin: 5px 0;">Jagana road Road, Palanpur (B.K.)</div></div> 
+       </div>
         <div style="text-align: left; font-size: 16px; margin-top: 20px;">Date: ${new Date().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).split('/').join('/')}</div>
         <div style="font-size: 22px; font-weight: bold; text-decoration: underline; margin: 20px 0;">Bonafide Certificate</div>
         <div style="text-align: justify; font-size: 18px; margin: 20px 0;line-height: 2.5;">
             This is to certify that <strong>${contentData.studentName}</strong> studying in <strong>${contentData.className}-${contentData.sectionName}</strong>, in our school.
             She is a bonafide student of our school during the academic year <strong>${contentData.session}</strong>.
-            Her G.R. No. is <strong>${contentData.admissionNo}</strong> and her date of birth is <strong>${contentData.dob}</strong> as per our school records.
+            Her G.R. No. is <strong>${contentData.admissionNo}</strong> and her date of birth is <strong>${new Date(contentData.dob).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('/')}</strong> as per our school records.
         </div>
         <div style="text-align: left; font-size: 18px; margin: 20px 0;line-height: 2.5;">
             
@@ -148,8 +150,6 @@ Date: ${new Date().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', y
     };
 
 </script>
-
-
 
 <script>
     window.SetTemplateData([
