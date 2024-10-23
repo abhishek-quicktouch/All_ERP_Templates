@@ -33,7 +33,7 @@
       };
 
       const getSubjectMarks = (marksData) => {
-        const subjects = marksData?.baseTermData?.subject.filter((d) => {
+        const subjects = marksData?.baseTermData?.subject?.filter((d) => {
           return d.scholastic;
         });
 
@@ -42,16 +42,16 @@
         let str = "";
         let totalStr = "";
         let grandTotal = 0;
-        let subCount = 0;
+        let totalMaxObtained = 0
         subjects.forEach((sub, i) => {
           let maxObtained = 0;
           marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
             (d) => {
               if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
-                subCount += 100;
+                totalMaxObtained+=d?.total
                 str += `<tr><td class="align-left" style="padding-left: 0.3rem; ">${
                   d?.subjectName
-                }</td>${d.markSheetReport
+                }</td>${d?.markSheetReport
                   .map((v) => {
                     maxObtained += Math.round(v?.obtained);
                     return `<td  style="text-align: center;width:10%;  font-weight:${
@@ -72,18 +72,18 @@
           rows: str,
           grandTotal,
           colspan: marksData?.markData?.markSheetTerms.length,
-          subCount,
+          totalMaxObtained,
         };
       };
 
       const getCoScholasticSub = (marksData) => {
-        const subjects = marksData?.baseTermData?.subject.filter((d) => {
+        const subjects = marksData?.baseTermData?.subject?.filter((d) => {
           return d.scholastic == false;
         });
 
         let str = "";
 
-        subjects.forEach((sub) => {
+        subjects?.forEach((sub) => {
           str += `<tr><td class="align-left" colspan="10" style="padding-left: 0.3rem;">${
             sub?.subjectAllResponse?.subjectName
           }</td>
@@ -305,7 +305,7 @@
                    } style="text-align:left;font-weight:bold;  border:none;"></td> 
                    <td colspan=2 style="text-align:right;font-weight:bold; border:none;" >Percentage : ${(
                      (getSubjectMarks(st)?.grandTotal /
-                       getSubjectMarks(st)?.subCount) *
+                       getSubjectMarks(st)?.totalMaxObtained) *
                      100
                    ).toFixed(0)}%</td>
                   </td>
