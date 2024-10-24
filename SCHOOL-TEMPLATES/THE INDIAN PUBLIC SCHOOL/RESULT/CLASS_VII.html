@@ -7,7 +7,7 @@
   </head>
 
   <body>
-    <div id="student"></div>
+    <div id="student">HHHHH</div>
   </body>
   <script>
     window.SetTemplateData = function (data) {
@@ -294,7 +294,7 @@
     <page orientation="portrait" format="A3" margin="0">
       <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
       <div style="width:15%; ">
-        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_37_854900798.png" alt="" style="width:100%;"/>
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png" alt="" style="width:100%; "/>
       </div>
       <div style="width:50%; text-align:center; color:#2B595E">
         <p style="font-size:40px; font-weight:bold;">THE INDIAN SCHOOL</p>
@@ -303,7 +303,7 @@
         <p style="font-size:15px;">Email ID : contactus@theindianschool.in Web : theindianschool.in</p>
       </div>
       <div style="width:15%; ">
-        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_18_848990259.png" alt="" style="width:100%; "/>
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png" alt="" style="width:100%; "/>
       </div>
       </div>
       <div style="text-align: center; font-weight: bold; margin-top:5px; border:1px solid; padding:5px;">
@@ -395,7 +395,7 @@
       </table>
         <div
           class="total"
-          style="display: flex; justify-content: space-between; margin: 0.5rem 0"
+          style="display: flex; justify-content: space-between; margin: 2rem 0"
         >
         </div>
         <div style="border: 1px solid; margin:0px; padding: 0px; width:100%; font-size:13px; text-align:center; margin-bottom:20px; min-height:70px;">
@@ -405,7 +405,7 @@
         </div>
         </div>
 
-        <div style="border: 1px solid; padding: 0.3rem; width:100%; font-size:13px; text-align:center;">
+        <div style="border: 1px solid; padding: 0.3rem; font-size:13px; text-align:center;">
         <strong> INSTRUCTIONS </strong><br/>
         <p style="font-weight:bold; margin:0px; margin-top:5px; width:100%; "> Grading scale for Scholastic Areas: Grades are awarded on a 8 point grading scale as follows </p>
         <table style="width: 80%; margin:auto; border-collapse: collapse; margin-top:5px;">
@@ -446,7 +446,12 @@
         </table>
         </div>
 
-         <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; padding:0px 10px; font-weight:bold;">
+        <div class="flex-btw" style="margin-top: 0.3rem; margin-bottom: 8px; padding:0px 1px; font-weight:bold; font-size:13px;">
+            <div>DATE: ${st?.printDate || ""}</div>
+            <div>ATTENDANCE: ${st?.student?.attendance || ""}</div>
+          </div>
+
+         <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; padding:0px 2px; font-weight:bold;">
             <div>CLASS TEACHER</div>
             <div>PRINCIPAL</div>
             <div>PARENT</div>
@@ -3097,6 +3102,7 @@
         },
         header: null,
         footer: null,
+        printDate:"12-10-2024"
       },
     ]);
   </script>

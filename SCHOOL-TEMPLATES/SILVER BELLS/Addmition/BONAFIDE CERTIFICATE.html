@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="studentsList">
+        <code>Bonafide</code>
+    </div>
+</body>
+<script>
+    window.SetTemplateData = function (data) {
+        const dataList = Array.isArray(data) ? data : [data];
+        const viewTemplate = dataList[0]?.viewTemplate;
+        const basicDetails = {
+            place: "Delhi",
+            date: new Date().toLocaleDateString("en-GB", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            }),
+            principal: "O. V. SHARMA",
+        };
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+
+        multipleStudents?.forEach((element, index) => {
+            function formatDateToText(dateString) {
+                const monthsText = [
+                    "ZERO",
+                    "JANUARY",
+                    "FEBRUARY",
+                    "MARCH",
+                    "APRIL",
+                    "MAY",
+                    "JUNE",
+                    "JULY",
+                    "AUGUST",
+                    "SEPTEMBER",
+                    "OCTOBER",
+                    "NOVEMBER",
+                    "DECEMBER",
+                ];
+                const [year, month, day] = dateString.split("-");
+                const yearText = convertToText(Number(year));
+                const monthText = monthsText[Number(month)];
+                const dayText = convertToText(Number(day));
+                const result = `${dayText} ${monthText} ${yearText}`;
+                console.log(result);
+                return result;
+            }
+
+            function convertToText(number) {
+                const digitsText = [
+                    "ZERO",
+                    "ONE",
+                    "TWO",
+                    "THREE",
+                    "FOUR",
+                    "FIVE",
+                    "SIX",
+                    "SEVEN",
+                    "EIGHT",
+                    "NINE",
+                ];
+                if (number < 10) {
+                    return digitsText[number];
+                } else if (number >= 10 && number < 20) {
+                    const teensText = [
+                        "TEN",
+                        "ELEVEN",
+                        "TWELVE",
+                        "THIRTEEN",
+                        "FOURTEEN",
+                        "FIFTEEN",
+                        "SIXTEEN",
+                        "SEVENTEEN",
+                        "EIGHTEEN",
+                        "NINETEEN",
+                    ];
+                    return teensText[number - 10];
+                } else if (number < 100) {
+                    const tensText = [
+                        "",
+                        "",
+                        "TWENTY",
+                        "THIRTY",
+                        "FORTY",
+                        "FIFTY",
+                        "SIXTY",
+                        "SEVENTY",
+                        "EIGHTY",
+                        "NINETY",
+                    ];
+                    const ten = Math.floor(number / 10);
+                    const unit = number % 10;
+                    return `${tensText[ten]} ${digitsText[unit]}`;
+                } else if (number < 1000) {
+                    const hundred = Math.floor(number / 100);
+                    const remainder = number % 100;
+                    if (remainder === 0) {
+                        return `${digitsText[hundred]} HUNDRED`;
+                    } else {
+                        return `${digitsText[hundred]} HUNDRED ${convertToText(remainder)}`;
+                    }
+                } else {
+                    const thousand = Math.floor(number / 1000);
+                    const remainder = number % 1000;
+                    if (remainder === 0) {
+                        return `${digitsText[thousand]} THOUSAND`;
+                    } else {
+                        return `${digitsText[thousand]} THOUSAND ${convertToText(remainder)}`;
+                    }
+                }
+            }
+
+            const contentData = element?.contentRequest;
+            console.log(contentData, "fffffffffff contentData")
+
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakAfter = "always";
+            singleStudentHtml.innerHTML =
+                (element?.header || "") +
+                ` <div style="border: 2px solid black;line-height: 1.5; border-radius: 30px; padding: 30px; width: 90%;min-height: 500px; margin: 10px auto; text-align: center; font-family: Arial, sans-serif;page-break-after: always;">
+        <div style="font-size: 24px; font-weight: bold; text-transform: uppercase;">Silver Bells English Medium School</div>
+        <div style="font-size: 16px; margin: 5px 0;">Affiliated to CBSE, School Affiliation No.-430347</div>
+        <div style="font-size: 16px; margin: 5px 0;">Jagana road Road, Palanpur (B.K.)</div>
+        <div style="text-align: left; font-size: 16px; margin-top: 20px;">Date: ${new Date().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).split('/').join('/')}</div>
+        <div style="font-size: 22px; font-weight: bold; text-decoration: underline; margin: 20px 0;">Bonafide Certificate</div>
+        <div style="text-align: justify; font-size: 18px; margin: 20px 0;line-height: 2.5;">
+            This is to certify that <strong>${contentData.studentName}</strong> studying in <strong>${contentData.className}-${contentData.sectionName}</strong>, in our school.
+            She is a bonafide student of our school during the academic year <strong>${contentData.session}</strong>.
+            Her G.R. No. is <strong>${contentData.admissionNo}</strong> and her date of birth is <strong>${contentData.dob}</strong> as per our school records.
+        </div>
+        <div style="text-align: left; font-size: 18px; margin: 20px 0;line-height: 2.5;">
+            
+           Place: Palanpur <br/>
+Date: ${new Date().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).split('/').join('/')}
+        </div>
+    </div>`;
+            studentHtml.appendChild(singleStudentHtml);
+        });
+    };
+
+</script>
+
+
+
+<script>
+    window.SetTemplateData([
+        {
+            contentRequest: {
+                uid: "f78379ef-7e9a-47e2-ad6f-23f63a53bddb",
+                admissionNo: "20230001",
+                studentName: "Naysha Bansa",
+                className: "PRE SCHOOL",
+                sectionName: "A",
+                joiningStatus: "New",
+                joiningDate: "2023-12-28",
+                gender: "NA",
+                certificate: null,
+                joiningClassName: "PRE SCHOOL",
+                joiningSectionName: "A",
+                group: null,
+                status: "Studying",
+                caste: null,
+                wing: "NA",
+                house: null,
+                dob: "2019-05-19",
+                rollNo: 15,
+                session: "2023-24",
+                fatherInformation: {
+                    name: "Mr. Amit Bansal",
+                    qualification: null,
+                    occupation: null,
+                    yearlyIncome: null,
+                    email: null,
+                },
+                motherInformation: {
+                    name: "Mrs. Chinki Devi",
+                    qualification: null,
+                    occupation: null,
+                    yearlyIncome: null,
+                    email: null,
+                },
+                permanentAddress: {
+                    houseNo: null,
+                    area: "Phase-1",
+                    street: "L-1/22, Budh Vihar",
+                    city: "Delhi",
+                    pincode: "110086",
+                    state: "NA",
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "1111111111",
+                },
+                correspondanceAddress: {
+                    houseNo: null,
+                    area: null,
+                    street: null,
+                    city: null,
+                    pincode: null,
+                    state: null,
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "1111111111",
+                },
+                officialAddress: {
+                    houseNo: "NA",
+                    area: null,
+                    street: null,
+                    city: null,
+                    pincode: null,
+                    state: null,
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "",
+                },
+                guardianInformation: {
+                    guradianName: null,
+                    guradianRelation: null,
+                    guradianOccupation: null,
+                    guradianEmail: null,
+                    guradianMobileNo: null,
+                },
+                characterCertificateDetail: {
+                    uid: "84164f89-4b4e-4edf-8997-9155b3674021",
+                    type: "GOOD",
+                    issueDate: "2024-02-12",
+                },
+                transportDetails: {
+                    circleName: null,
+                    routeName: null,
+                    pickUp: null,
+                    drop: null,
+                },
+                certificateList: [],
+                status_code: 200,
+            },
+            header: `
+      <table cellspacing="0" style="width:100%;">
+         <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+               <div style="height:10mm;">&nbsp;</div>
+            </td>
+         </tr>
+      </table>
+`,
+            footer:
+                '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+
+        {
+            contentRequest: {
+                uid: "f78379ef-7e9a-47e2-ad6f-23f63a53bddb",
+                admissionNo: "20230001",
+                studentName: "Naysha Bansa",
+                className: "PRE SCHOOL",
+                sectionName: "A",
+                joiningStatus: "New",
+                joiningDate: "2023-12-28",
+                gender: "NA",
+                certificate: null,
+                joiningClassName: "PRE SCHOOL",
+                joiningSectionName: "A",
+                group: null,
+                status: "Studying",
+                caste: null,
+                wing: "NA",
+                house: null,
+                dob: "2019-05-19",
+                rollNo: 15,
+                session: "2023-24",
+                fatherInformation: {
+                    name: "Mr. Amit Bansal",
+                    qualification: null,
+                    occupation: null,
+                    yearlyIncome: null,
+                    email: null,
+                },
+                motherInformation: {
+                    name: "Mrs. Chinki Devi",
+                    qualification: null,
+                    occupation: null,
+                    yearlyIncome: null,
+                    email: null,
+                },
+                permanentAddress: {
+                    houseNo: null,
+                    area: "Phase-1",
+                    street: "L-1/22, Budh Vihar",
+                    city: "Delhi",
+                    pincode: "110086",
+                    state: "NA",
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "1111111111",
+                },
+                correspondanceAddress: {
+                    houseNo: null,
+                    area: null,
+                    street: null,
+                    city: null,
+                    pincode: null,
+                    state: null,
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "1111111111",
+                },
+                officialAddress: {
+                    houseNo: "NA",
+                    area: null,
+                    street: null,
+                    city: null,
+                    pincode: null,
+                    state: null,
+                    emergencyNo: "",
+                    phoneNo: null,
+                    mobileNo: "",
+                },
+                guardianInformation: {
+                    guradianName: null,
+                    guradianRelation: null,
+                    guradianOccupation: null,
+                    guradianEmail: null,
+                    guradianMobileNo: null,
+                },
+                characterCertificateDetail: {
+                    uid: "84164f89-4b4e-4edf-8997-9155b3674021",
+                    type: "GOOD",
+                    issueDate: "2024-02-12",
+                },
+                transportDetails: {
+                    circleName: null,
+                    routeName: null,
+                    pickUp: null,
+                    drop: null,
+                },
+                certificateList: [],
+                status_code: 200,
+            },
+            header: `
+      <table cellspacing="0" style="width:100%;">
+         <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+               <div style="height:10mm;">&nbsp;</div>
+            </td>
+         </tr>
+      </table>
+`,
+            footer:
+                '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+
+    ]);
+</script>
+
+<script>
+
+
+
+
+
+    // window.SetTemplateData({ viewTemplate: true, header: "", footer: "" });
+</script>
+
+</html>

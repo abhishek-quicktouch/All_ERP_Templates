@@ -534,9 +534,9 @@ ${main === "G.K and COMPUTER"
             
             <div style="display: flex; justify-content: space-between; margin-top: 30px;">
                 <div>
-                    <p>Class Teacher</p>
-                    <p>${viewTemplate ? "__________" : ""}</p>
-                </div>
+                        <p style="margin: 0px;padding: 0px">${studentData.student.studentInfoResponse[0]?.classTeacher || ""}</p>
+                        <p style="margin-top: ${studentData.student.studentInfoResponse[0]?.classTeacher ? "0px" : "25px"};padding: "0px;">Class Teacher</p>
+                    </div>
                 <div>
                   <p style="margin:0px ;padding:0px">Padmini Dubey Ojha</p>
                     <p style="margin:0px ;padding:0px">Officiating Principal</p>

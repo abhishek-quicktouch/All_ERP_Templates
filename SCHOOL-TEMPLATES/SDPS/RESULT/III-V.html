@@ -13,14 +13,15 @@
 <script>
   window.SetTemplateData = function (data) {
     const attendanceValue = {
-      Absent: "AB",
-      Medical: "ML",
-      Sports: "S",
-      Leave: "L",
-      "Late Admission": "LA",
-      Exempted: "EX",
-      NA: "NA",
-    };
+        absent: "AB",
+        medical: "ML",
+        sports: "S",
+        leave: "L",
+        "late admission": "LA",
+        exempted: "EX",
+        na: "NA",
+        "not submitted": "NS",
+      };
 
     const getTerms = (termData) => {
       const res = termData?.markSheetTerms
@@ -33,7 +34,7 @@
     };
 
     const getSubjectMarks = (marksData) => {
-      const subjects = marksData?.baseTermData?.subject.filter((d) => {
+      const subjects = marksData?.baseTermData?.subject?.filter((d) => {
         return d.scholastic;
       });
 
@@ -41,46 +42,36 @@
 
       let str = "";
       let totalStr = "";
-
-      subjects.forEach((sub, i) => {
+      let grandTotal = 0
+      let totalMaxObtained = 0
+      subjects?.forEach((sub, i) => {
+        let maxObtained = 0;
         marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
           (d) => {
             if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
+              totalMaxObtained+=d?.total
               str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
-                }</td>${d.markSheetReport
+                }</td>${d?.markSheetReport
                   .map((v) => {
-                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""} font-size:11pt;">${attendanceValue[v?.status] || Math.round(v?.obtained)
+                    maxObtained += Math.round(v?.obtained);
+                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""} font-size:11pt;">${attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained)
                       }</td>`;
                   })
                   .join(
                     ""
-                  )} <td style="text-align: center" >${Math.round(d?.marksObtained)}</td>
+                  )} <td style="text-align: center" >${maxObtained}</td>
               <td style="text-align: center">${d?.grade}</td></tr>`;
-            }
-
-            if (check && subjects.length - 1 === i) {
-              check = false;
-              totalStr += `<tr>
-      
-                   <td style="text-align:left;font-weight:bold; border:none;">Total : ${Math.round(marksData?.markData?.marksObtained)}</td> 
-                   <td colspan=${marksData?.markData?.markSheetTerms.length} style="text-align:left;font-weight:bold;  border:none;"></td> 
-                   <td colspan=2 style="text-align:right;font-weight:bold; border:none; " >Percentage : ${Math.round(marksData?.markData?.percentage)}%</td>
-                  </td>
-             </tr>
-              <tr>
-        
-              </tr>
-              `;
+              grandTotal+=maxObtained
             }
           }
         );
       });
 
-      return str + totalStr;
+      return {rows:str, grandTotal, colspan:marksData?.markData?.markSheetTerms.length,totalMaxObtained};
     };
 
     const getCoScholasticSub = (marksData) => {
-      const subjects = marksData?.baseTermData?.subject.filter((d) => {
+      const subjects = marksData?.baseTermData?.subject?.filter((d) => {
         return d.scholastic == false;
       });
 
@@ -88,7 +79,7 @@
 
       subjects.forEach((sub) => {
         str += `<tr><td class="align-left" colspan="10" style="padding-left: 0.3rem;">${sub?.subjectAllResponse?.subjectName}</td>
-              <td align="center" style="font-weight:${sub?.remarkStatus ? "bold" : ""}">${attendanceValue[sub?.remarkStatus] || sub?.grade}</td></tr> `;
+              <td align="center" style="font-weight:${sub?.remarkStatus ? "bold" : ""}">${attendanceValue[sub?.remarkStatus?.toLowerCase()] || sub?.grade}</td></tr> `;
       });
 
       return str;
@@ -270,9 +261,16 @@
 
           </tr>
           <tr>
-            ${getSubjectMarks(st)}
-
+            ${getSubjectMarks(st)?.rows}
           </tr>
+           <tr>
+                  <td style="text-align:left;font-weight:bold; border:none;">Total : ${getSubjectMarks(st)?.grandTotal}</td> 
+                   <td colspan=${
+                    getSubjectMarks(st)?.colspan-1
+                   } style="text-align:left;font-weight:bold;  border:none;"></td> 
+                   <td colspan=3 style="text-align:right;font-weight:bold; border:none;" >Percentage : ${((getSubjectMarks(st)?.grandTotal/getSubjectMarks(st)?.totalMaxObtained)*100).toFixed(0)}%</td>
+                  </td>
+             </tr>
         </table>
 
          <table style="width:100%;">
