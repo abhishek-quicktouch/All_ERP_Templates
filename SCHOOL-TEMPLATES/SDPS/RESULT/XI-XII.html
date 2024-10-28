@@ -113,7 +113,7 @@
         });
 
         // Function to generate table rows for a list of subjects
-        const generateSubjectRows = (subjectList) => {
+        const generateSubjectRows = (subjectList,isAdditional) => {
           let localStr = "";
           subjectList.forEach((d) => {
             const currPractical = marksData?.markData?.subjectWiseMarkSheetReportResponses.find(
@@ -123,8 +123,8 @@
             let maxTotal = Math.round(d?.markSheetReport?.[1]?.max + currPractical?.total);
             let maxObtained = Math.round(d?.markSheetReport?.[1]?.obtained + currPractical?.marksObtained);
 
-            overallMaxTotal += isNaN(maxTotal) ? 0 : maxTotal;
-            overallObtainedTotal += isNaN(maxObtained) ? 0 : maxObtained;
+            overallMaxTotal += isNaN(maxTotal) || isAdditional ? 0 : maxTotal;
+            overallObtainedTotal += isNaN(maxObtained) || isAdditional ? 0 : maxObtained;
 
             if (!d?.subjectName.endsWith("PR")) {
               localStr += `<tr>
@@ -159,7 +159,7 @@
 
         // Generate rows for regular subjects first, then additional subjects
         str += generateSubjectRows(regularSubjects);
-        str += generateSubjectRows(additionalSubjects);
+        str += generateSubjectRows(additionalSubjects,true);
 
         let customPercentage = Math.round((overallObtainedTotal / overallMaxTotal) * 100);
         let customGrade = getGradeCustomFunction(((overallObtainedTotal / overallMaxTotal) * 100));

@@ -1,253 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Report Card</title>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <div id="studentsList">Student Report Card</div>
-</body>
-<script>
+  </body>
+  <script>
     window.SetTemplateData = function (data) {
-
-        const dataList = Array.isArray(data) ? data : [data];
-        const viewTemplate = dataList[0]?.viewTemplate;
-        const staticData = [
-            {
-                markData: {
-                    academicSession: "2023-2024",
-                    markSheetName: "MID TERM",
-                    markSheetTerms: [
-                        { subHeaderName: "UNIT TEST-I", headerName: "(50)" },
-                        { subHeaderName: "ATTENDANCE", headerName: "(10)" },
-                        {
-                            subHeaderName: "COLD CALLING + MULTI DISCIPLINARY PROJECT",
-                            headerName: "(20)",
-                        },
-                        {
-                            subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
-                            headerName: "(20)",
-                        },
-                        { subHeaderName: "MID TERM", headerName: "(100)" },
-                    ],
-                    subjectWiseMarkSheetReportResponses: [
-                        {
-                            subjectName: "Mathematics",
-                            markSheetReport: [
-                                {
-                                    markSheetTermResponse: { subHeaderName: "UNIT TEST-I" },
-                                    obtained: "45",
-                                    max: "50",
-                                },
-                                {
-                                    markSheetTermResponse: { subHeaderName: "ATTENDANCE" },
-                                    obtained: "10",
-                                    max: "10",
-                                },
-                                {
-                                    markSheetTermResponse: {
-                                        subHeaderName:
-                                            "COLD CALLING + MULTI DISCIPLINARY PROJECT",
-                                    },
-                                    obtained: "18",
-                                    max: "20",
-                                },
-                                {
-                                    markSheetTermResponse: {
-                                        subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
-                                    },
-                                    obtained: "19",
-                                    max: "20",
-                                },
-                                {
-                                    markSheetTermResponse: { subHeaderName: "MID TERM" },
-                                    obtained: "90",
-                                    max: "100",
-                                },
-                            ],
-                            marksObtained: "182",
-                            percentage: "91%",
-                            grade: "A",
-                        },
-                        // Add more subjects as needed
-                    ],
-                },
-                student: {
-                    studentName: "John Doe",
-                    admissionNo: "12345",
-                    fatherName: "Mr. Doe",
-                    motherName: "Mrs. Doe",
-                    className: "10",
-                    sectionName: "A",
-                    rollNo: "12",
-                    dob: "01/01/2008",
-                    attendance: "95%",
-                    studentInfoResponse: [
-                        {
-                            studentAddressResponse: {
-                                houseNo: "123",
-                                area: "Main Street",
-                                landmark: "Near Park",
-                                city: "New Delhi",
-                                state: "Delhi",
-                                pincode: "110001",
-                            },
-                            mobileNumber: "9876543210",
-                            height: "150 cm",
-                            weight: "50 kg",
-                            bloodGroup: "O+",
-                        },
-                    ],
-                },
-                baseTermData: {
-                    subject: [
-                        {
-                            subjectAllResponse: {
-                                parentName: ["Mathematics"],
-                                subjectName: "Algebra",
-                                nature: "2A LIFE-SKILLS",
-                            },
-                            grade: "A",
-                        },
-                        {
-                            subjectAllResponse: {
-                                parentName: ["Science"],
-                                subjectName: "Physics",
-                                nature: "3A LIFE SKILLS",
-                            },
-                            grade: "B",
-                        },
-                        // Add more subjects as needed
-                    ],
-                    remarksEntry: {
-                        description: "Excellent performance",
+      const dataList = Array.isArray(data) ? data : [data];
+      const viewTemplate = dataList[0]?.viewTemplate;
+      const staticData = [
+        {
+          markData: {
+            academicSession: "2023-2024",
+            markSheetName: "MID TERM",
+            markSheetTerms: [
+              { subHeaderName: "UNIT TEST-I", headerName: "(50)" },
+              { subHeaderName: "ATTENDANCE", headerName: "(10)" },
+              {
+                subHeaderName: "COLD CALLING + MULTI DISCIPLINARY PROJECT",
+                headerName: "(20)",
+              },
+              {
+                subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+                headerName: "(20)",
+              },
+              { subHeaderName: "MID TERM", headerName: "(100)" },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectName: "Mathematics",
+                markSheetReport: [
+                  {
+                    markSheetTermResponse: { subHeaderName: "UNIT TEST-I" },
+                    obtained: "45",
+                    max: "50",
+                  },
+                  {
+                    markSheetTermResponse: { subHeaderName: "ATTENDANCE" },
+                    obtained: "10",
+                    max: "10",
+                  },
+                  {
+                    markSheetTermResponse: {
+                      subHeaderName:
+                        "COLD CALLING + MULTI DISCIPLINARY PROJECT",
                     },
+                    obtained: "18",
+                    max: "20",
+                  },
+                  {
+                    markSheetTermResponse: {
+                      subHeaderName: "PORTFOLIO + MULTIPLE ASSESSMENT",
+                    },
+                    obtained: "19",
+                    max: "20",
+                  },
+                  {
+                    markSheetTermResponse: { subHeaderName: "MID TERM" },
+                    obtained: "90",
+                    max: "100",
+                  },
+                ],
+                marksObtained: "182",
+                percentage: "91%",
+                grade: "A",
+              },
+              // Add more subjects as needed
+            ],
+          },
+          student: {
+            studentName: "John Doe",
+            admissionNo: "12345",
+            fatherName: "Mr. Doe",
+            motherName: "Mrs. Doe",
+            className: "10",
+            sectionName: "A",
+            rollNo: "12",
+            dob: "01/01/2008",
+            attendance: "95%",
+            studentInfoResponse: [
+              {
+                studentAddressResponse: {
+                  houseNo: "123",
+                  area: "Main Street",
+                  landmark: "Near Park",
+                  city: "New Delhi",
+                  state: "Delhi",
+                  pincode: "110001",
                 },
-                header: "School Name: XYZ School",
-                footer: "Footer Information",
+                mobileNumber: "9876543210",
+                height: "150 cm",
+                weight: "50 kg",
+                bloodGroup: "O+",
+              },
+            ],
+          },
+          baseTermData: {
+            subject: [
+              {
+                subjectAllResponse: {
+                  parentName: ["Mathematics"],
+                  subjectName: "Algebra",
+                  nature: "2A LIFE-SKILLS",
+                },
+                grade: "A",
+              },
+              {
+                subjectAllResponse: {
+                  parentName: ["Science"],
+                  subjectName: "Physics",
+                  nature: "3A LIFE SKILLS",
+                },
+                grade: "B",
+              },
+              // Add more subjects as needed
+            ],
+            remarksEntry: {
+              description: "Excellent performance",
             },
-        ];
+          },
+          header: "School Name: XYZ School",
+          footer: "Footer Information",
+        },
+      ];
 
-        function generateScholasticRows(subjects) {
-            let totalMarksObtained = 0;
-            let totalPossibleMarks = 0;
+      function generateScholasticRows(subjects) {
+        let totalMarksObtained = 0;
+        let totalPossibleMarks = 0;
 
-            const rows = subjects
-                ?.map((subject) => {
-                    let unitTest1 = "-",
-                        unitTotal = "",
-                        attendance = "-",
-                        attendanceTotal = "",
-                        project = "-",
-                        projectTotal = "",
-                        assessment = "-",
-                        assessmentTotal = "",
-                        midTerm = "-",
-                        midTermTotal = "";
+        const rows = subjects
+          ?.map((subject) => {
+            let unitTest1 = "-",
+              unitTotal = "",
+              attendance = "-",
+              attendanceTotal = "",
+              project = "-",
+              projectTotal = "",
+              assessment = "-",
+              assessmentTotal = "",
+              midTerm = "-",
+              midTermTotal = "";
 
-                    subject?.markSheetReport?.forEach((report) => {
-                        console.log(report?.markSheetTermResponse?.headerName, "ffffffffff report?.markSheetTermResponse?.subHeaderName")
-                        switch (report?.markSheetTermResponse?.headerName) {
-                            case "PERIODIC ASSESSMENT":
-                                unitTest1 = report?.obtained;
-                                unitTotal = report?.max;
-                                break;
-                            case "S.E.A":
-                                attendance = report?.obtained;
-                                attendanceTotal = report?.max;
-                                break;
-                            case "M.A":
-                                project = report?.obtained;
-                                projectTotal = report?.max;
-                                break;
-                            case "PORTFOLIO":
-                                assessment = report?.obtained;
-                                assessmentTotal = report?.max;
-                                break;
-                            case "TERM-I":
-                                midTerm = report?.obtained;
-                                midTermTotal = report?.max;
-                                break;
-                        }
-                    });
+            console.log(subject);
+            subject?.markSheetReport?.forEach((report) => {
+              switch (report?.markSheetTermResponse?.headerName) {
+                case "PERIODIC ASSESSMENT":
+                  unitTest1 = report?.obtained;
+                  unitTotal = report?.max;
+                  break;
+                case "S.E.A":
+                  attendance = report?.obtained;
+                  attendanceTotal = report?.max;
+                  break;
+                case "M.A":
+                  project = report?.obtained;
+                  projectTotal = report?.max;
+                  break;
+                case "PORTFOLIO":
+                  assessment = report?.obtained;
+                  assessmentTotal = report?.max;
+                  break;
+                case "TERM-I":
+                  midTerm = report?.obtained;
+                  midTermTotal = report?.max;
+                  break;
+              }
+            });
 
-                    if (!subject?.markSheetReport[0]?.graded) {
-                        totalMarksObtained += Number(subject?.marksObtained) || 0;
-                        totalPossibleMarks +=
-                            Number(unitTotal) +
-                            Number(attendanceTotal) +
-                            Number(projectTotal) +
-                            Number(assessmentTotal) +
-                            Number(midTermTotal);
+            if (!subject?.markSheetReport[0]?.graded) {
+              totalMarksObtained += Number(subject?.marksObtained) || 0;
+              totalPossibleMarks +=
+                Number(unitTotal) +
+                Number(attendanceTotal) +
+                Number(projectTotal) +
+                Number(assessmentTotal) +
+                Number(midTermTotal);
 
-                        return `
+              return `
                         <tr>
                             <td >${subject?.subjectName}</td>
-                            <td >${unitTest1}</td>
-                            <td >${attendance}</td>
-                            <td >${project}</td>
-                            <td >${assessment}</td>
-                            <td >${midTerm}</td>
-                            <td >${subject?.marksObtained}</td>
+                            <td style="text-align:center;">${unitTest1}</td>
+                            <td style="text-align:center;">${attendance}</td>
+                            <td style="text-align:center;">${project}</td>
+                            <td style="text-align:center;">${assessment}</td>
+                            <td style="text-align:center;">${midTerm}</td>
+                            <td style="text-align:center;">${subject?.marksObtained?.toFixed(2)}</td>
                           
-                            <td >${subject?.grade}</td>
+                            <td style="text-align:center;">${subject?.grade}</td>
                         </tr>
                     `;
-                    } else {
-                        return "";
-                    }
-                })
-                .join("");
+            } else {
+              return "";
+            }
+          })
+          .join("");
 
-            return {
-                rows,
-                totalMarksObtained,
-                totalPossibleMarks,
-            };
-        }
-        function generateCoScholasticRows(subjects) {
-            const coScholasticSubjects = subjects?.filter(
-                (subject) => subject?.subjectAllResponse?.nature === "2A LIFE-SKILLS"
-            );
-            const halfLength = Math.ceil(coScholasticSubjects.length / 2);
-            let tableContent = "";
+        return {
+          rows,
+          totalMarksObtained,
+          totalPossibleMarks,
+        };
+      }
+      function generateCoScholasticRows(subjects) {
+        const coScholasticSubjects = subjects?.filter(
+          (subject) => subject?.subjectAllResponse?.nature === "2A LIFE-SKILLS"
+        );
+        const halfLength = Math.ceil(coScholasticSubjects.length / 2);
+        let tableContent = "";
 
-            for (let i = 0; i < halfLength; i++) {
-                const leftSubject = coScholasticSubjects[i];
-                const rightSubject = coScholasticSubjects[i + halfLength];
+        for (let i = 0; i < halfLength; i++) {
+          const leftSubject = coScholasticSubjects[i];
+          const rightSubject = coScholasticSubjects[i + halfLength];
 
-                tableContent += `
+          tableContent += `
             <tr>
-                <td style="width: 30%;">${leftSubject?.subjectAllResponse?.subjectName || ""
-                    }</td>
-                <td style="width: 20%;">${leftSubject?.grade || ""}</td>
-                <td style="width: 30%;">${rightSubject?.subjectAllResponse?.subjectName || ""
-                    }</td>
-                <td style="width: 25%;">${rightSubject?.grade || ""}</td>
+                <td style="width: 30%; text-align:center;">${
+                  leftSubject?.subjectAllResponse?.subjectName || ""
+                }</td>
+                <td style="width: 20%; text-align:center;">${leftSubject?.grade || ""}</td>
+                <td style="width: 30%; text-align:center;">${
+                  rightSubject?.subjectAllResponse?.subjectName || ""
+                }</td>
+                <td style="width: 25%; text-align:center;">${rightSubject?.grade || ""}</td>
             </tr>
         `;
-            }
-
-            return tableContent;
         }
-        const multipleStudents = viewTemplate ? staticData : dataList;
-        const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
-        multipleStudents?.forEach((element) => {
-            console.log(element, "fffffffff")
-            const singleStudentHtml = document.createElement("div");
-            singleStudentHtml.style.pageBreakAfter = "always";
 
-            const scholasticResult = generateScholasticRows(
-                element?.markData?.subjectWiseMarkSheetReportResponses
-            );
-            let totalHeaderName = 0;
+        return tableContent;
+      }
+      const multipleStudents = viewTemplate ? staticData : dataList;
+      const studentHtml = document.getElementById("studentsList");
+      studentHtml.innerHTML = ``;
+      multipleStudents?.forEach((element) => {
+        console.log(element, "fffffffff");
+        const singleStudentHtml = document.createElement("div");
+        singleStudentHtml.style.pageBreakAfter = "always";
 
-            singleStudentHtml.innerHTML = `
+        const scholasticResult = generateScholasticRows(
+          element?.markData?.subjectWiseMarkSheetReportResponses
+        );
+        let totalHeaderName = 0;
+
+        singleStudentHtml.innerHTML = `
             <style type="text/css">
 @page {
 size: A4
@@ -336,17 +335,24 @@ size: A4;
                           <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-07T10_48_06_661575730.png" alt="School Logo" style="height:100%;">  
                         </div>
                         <p style="font-size:12px;margin-bottom:5px;">Gurudwara Lane, Nanesh Enclave, Prahladpur, Khera Road Sector -35 Rohini, Delhi</p>
-                        <p style="font-size:14px;">ACADEMIC SESSION-${element.markData.academicSession
-                }, ${element.markData.markSheetName}</p>
-                        <p style="font-size:14px;">GRADE: ${element.student.className}</p>
+                        <p style="font-size:14px;">ACADEMIC SESSION-${
+                          element.markData.academicSession
+                        }, ${element.markData.markSheetName}</p>
+                        <p style="font-size:14px;">GRADE: ${
+                          element.student.className
+                        }</p>
                     </div>
                     <div class="section">
                         <table>
                             <tr>
                                 <th style="width: 30%;">NAME OF THE STUDENT</th>
-                                <td style="width: 20%;">${element.student.studentName}</td>
+                                <td style="width: 20%;">${
+                                  element.student.studentName
+                                }</td>
                                 <th style="width: 30%;">ADMISSION NO.</th>
-                                <td style="width: 20%;">${element.student.admissionNo}</td>
+                                <td style="width: 20%;">${
+                                  element.student.admissionNo
+                                }</td>
                             </tr>
                             <tr>
                                 <th>FATHER'S NAME</th>
@@ -358,8 +364,9 @@ size: A4;
                                 <th>MOTHER'S NAME</th>
                                 <td>${element.student.motherName}</td>
                                 <th>CLASS & SECTION</th>
-                                <td>${element.student.className} - ${element.student.sectionName
-                }</td>
+                                <td>${element.student.className} - ${
+          element.student.sectionName
+        }</td>
                             </tr>
                         </table>
                     </div>
@@ -376,20 +383,20 @@ size: A4;
                                 
                             </tr>
                             <tr>
-                                <th style="text-align: center; width: 16%;">SUBJECT</th>
+                                <th style="text-align: center;  width: 12%;">SUBJECT</th>
                                 ${element?.markData?.markSheetTerms
-                    ?.map((term) => {
-                        const headerValue =
-                            parseInt(
-                                term?.headerName?.replace(/[()]/g, "")
-                            ) || 0;
-                        totalHeaderName += headerValue;
-                        return `<th style="text-align: center; width: 12%;">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
-                    })
-                    .join("")}
-                                <th style="text-align: center;width: 12%;"><h4>TOTAL MARKS OBTAINED</h4>(${totalHeaderName})</th>
+                                  ?.map((term) => {
+                                    const headerValue =
+                                      parseInt(
+                                        term?.headerName?.replace(/[()]/g, "")
+                                      ) || 0;
+                                    totalHeaderName += headerValue;
+                                    return `<th style="text-align: center;  width: 11%;">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
+                                  })
+                                  .join("")}
+                                <th style="text-align: center; width: 11%;"><h4>TOTAL MARKS OBTAINED</h4>(${100})</th>
                              
-                                <th style="text-align: center; width: 12%;">GRADE</th>
+                                <th style="text-align: center;  width: 11%;">GRADE</th>
                             </tr>
                             ${scholasticResult.rows}
                             
@@ -407,10 +414,10 @@ size: A4;
                     </tr>
                    
                     <tr>
-                        <th>PARTICULAR</th>
-                        <th>GRADE</th>
-                        <th>PARTICULAR</th>
-                        <th>GRADE</th
+                        <th style="text-align:center;">PARTICULAR</th>
+                        <th style="text-align:center;">GRADE</th>
+                        <th style="text-align:center;">PARTICULAR</th>
+                        <th style="text-align:center;">GRADE</th
                     </tr>
                     ${generateCoScholasticRows(element?.baseTermData?.subject)}
                 </table>
@@ -421,14 +428,24 @@ size: A4;
                      
                          <td style="white-space: nowrap;" >
                             <div style="display: flex;justify-content:space-around;  text-align: center;">
-                                <strong>ATTENDANCE:</strong> ${element?.baseTermData?.remarksEntry?.fields?.find(f => f.title === 'Attendance').value || element.student.attendance || ""
-                }<strong> DATE:</strong>${element?.printDate || "__________"
-                }   <strong>PLACE:</strong> ${element.baseTermData?.school?.city || "______"}
+                                <strong>ATTENDANCE:</strong> ${
+                                  element?.baseTermData?.remarksEntry?.fields?.find(
+                                    (f) => f.title === "Attendance"
+                                  ).value ||
+                                  element.student.attendance ||
+                                  ""
+                                }<strong> DATE:</strong>${
+          element?.printDate || "__________"
+        }   <strong>PLACE:</strong> ${
+          element.baseTermData?.school?.city || "______"
+        }
                                 </div>
                             </td >
                         </tr >
             <tr>
-                <td > <strong>REMARKS: </strong>${element.baseTermData?.remarksEntry?.description || " __________________________________________________________________________________"
+                <td > <strong>REMARKS: </strong>${
+                  element.baseTermData?.remarksEntry?.description ||
+                  " __________________________________________________________________________________"
                 }</td>
             </tr>
                     </table >
@@ -456,12 +473,12 @@ size: A4;
                 </div >
                 </page>
             `;
-            studentHtml.appendChild(singleStudentHtml);
-        });
+        studentHtml.appendChild(singleStudentHtml);
+      });
     };
-</script>
+  </script>
 
-<!-- <script>
+  <!-- <script>
     window.SetTemplateData(
         {
             viewTemplate: true,
@@ -470,11 +487,10 @@ size: A4;
     );
 </script> -->
 
-
-<script>
+  <script>
     window.SetTemplateData([
-        {
-            header: `< div style = "display: flex; align-items: center; justify-content:center; margin: 0px; padding: 0px;" >
+      {
+        header: `< div style = "display: flex; align-items: center; justify-content:center; margin: 0px; padding: 0px;" >
         <img src="school_logo_url" alt="School Logo" class="logo">
             <div>
                 <h1 style="margin: 0px;">DE INDIAN</h1>
@@ -484,260 +500,348 @@ size: A4;
             </div>
             <img src="school_logo_url" alt="School Logo" class="logo">
             </div>`,
-            footer: `<p style="font-size: 0.8em; margin-top: 20px;">Note: This is a computer generated Report Card. It does not need any signature. In case of any typing error or discrepancy please contact the Class Teacher.</p>`,
-            student: {
-                dob: "06-01-2016",
-                admissionNo: "20220146",
-                studentName: "Aaradhya Singh",
-                className: "PLP 1",
-                sectionName: "A",
-                rollNo: 1,
-                fatherName: "Mr. Bhupender Singh",
-                motherName: "Mrs. Sadhna Singh",
-                attendance: "0.0/0",
-                boardRollNumber: "",
-                studentInfoResponse: [
-                    {
-                        id: 262207,
-                        userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
-                        userName: null,
-                        fatherUserName: null,
-                        motherUserName: null,
-                        guardianUserName: null,
-                        uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
-                        studentId: "20220146",
-                        exAdmissionNo: null,
-                        studentName: "Aaradhya Singh",
-                        fatherName: "Mr. Bhupender Singh",
-                        motherName: "Mrs. Sadhna Singh",
-                        dob: "06-01-2016",
-                        gender: "Female",
-                        studentAdhaarcard: "",
-                        joiningClass: "FLP 4",
-                        joiningSections: "A",
-                        joiningDate: "31-03-2022",
-                        plotNumber: "",
-                        area: "Budh Vihar",
-                        city: "Delhi",
-                        state: "NA",
-                        pincode: "110085",
-                        phone1: null,
-                        rollNo: 1,
-                        emergencyNumber: "8920098444",
-                        mobileNumber: "9811230274",
-                        studentEmail: "bhpendersingh198383@gmail.com",
-                        religion: "",
-                        category: "General",
-                        minority: "",
-                        motherTongue: "",
-                        idMark: "",
-                        height: "",
-                        weight: "",
-                        physicalDisability: "",
-                        bloodGroup: "",
-                        healthRemark: "",
-                        siblingDetails: "",
-                        alumni: "",
-                        siblingResponse: [],
-                        fatherOccupation: "",
-                        fatherQualification: "",
-                        fatherOrganization: "",
-                        fatherDesignation: "",
-                        fatherIncome: "",
-                        fatherArea: "NA",
-                        fatherCity: "NA",
-                        fatherState: "NA",
-                        fatherPincode: "",
-                        fatherPhone: null,
-                        fatherMobile: "",
-                        fatherEmail: null,
-                        fatherAdhaarNumber: "",
-                        schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
-                        motherQualification: "",
-                        motherOccupation: "",
-                        motherOrganization: "",
-                        motherDesignation: "",
-                        motherIncome: "",
-                        motherArea: "NA",
-                        motherCity: "NA",
-                        motherState: "NA",
-                        motherPincode: "",
-                        motherPhone: null,
-                        motherMobile: "",
-                        motherEmail: null,
-                        motherAdhaarNumber: "",
-                        guardianName: null,
-                        relation: null,
-                        guardianOccupation: null,
-                        guardianPhone: null,
-                        guardianMobile: null,
-                        guardianEmail: null,
-                        guardianAddress: null,
-                        leavingDate: null,
-                        previousSchoolName: null,
-                        otp: null,
-                        schoolName: "Demo Public School",
-                        remark: null,
-                        classTeacher: "",
-                        classTeacherUserName: "",
-                        classes: "PLP 1",
-                        classUid: null,
-                        sections: "A",
-                        group: "IST 2019-20",
-                        wing: "NA",
-                        status: "Studying",
-                        academicSession: "2024-25",
-                        joiningStatus: "Old",
-                        houses: "INTELLIGENCE BLUE",
-                        certificates: "",
-                        certificatesList: [],
-                        caste: "",
-                        listOfDocuments: null,
-                        attached: false,
-                        required: false,
-                        submitted: false,
-                        studentHostel: [],
-                        studentConcession: [],
-                        studentTransport: [],
-                        studentAadharCard: null,
-                        fatherAadharCard: null,
-                        motherAadharCard: null,
-                        studentImage: null,
-                        fatherImage: null,
-                        motherImage: null,
-                        guardianImage: null,
-                        birthCertificate: null,
-                        classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
-                        aluminiProof: null,
-                        siblingProof: null,
-                        residenceProof: null,
-                        firstBornChildProof: null,
-                        medicalFitnessCertificate: null,
-                        fatherQualificationProof: null,
-                        motherQualificationProof: null,
-                        casteCertificate: null,
-                        createdUser: "QuickCampus",
-                        editedUser: "QuickCampus",
-                        createddate: "2024-02-15 16:01:44.372632",
-                        editeddate: "2024-02-15 16:01:44.372632",
-                        permanentEducationNumber: null,
-                        studentAddressResponse: {
-                            uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
-                            houseNo: null,
-                            area: "Budh Vihar",
-                            landmark: null,
-                            city: "Delhi",
-                            district: null,
-                            state: "NA",
-                            poPs: null,
-                            pincode: 110085,
-                            street: "A-28, Veer Singh Clny",
-                            userName: "DIPS653_20220146",
-                            createdDate: "15-02-2024 09:31 PM",
-                            editedDate: "15-02-2024 09:31 PM",
-                            createdBy: "QuickCampus",
-                            editedBy: "QuickCampus",
-                        },
-                        fatherAddressResponse: {
-                            uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
-                            houseNo: null,
-                            area: "NA",
-                            landmark: null,
-                            city: "NA",
-                            district: null,
-                            state: "NA",
-                            poPs: null,
-                            pincode: 0,
-                            street: null,
-                            userName: null,
-                            createdDate: "15-02-2024 09:31 PM",
-                            editedDate: "15-02-2024 09:31 PM",
-                            createdBy: "QuickCampus",
-                            editedBy: "QuickCampus",
-                        },
-                        motherAddressResponse: {
-                            uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
-                            houseNo: null,
-                            area: "NA",
-                            landmark: null,
-                            city: "NA",
-                            district: null,
-                            state: "NA",
-                            poPs: null,
-                            pincode: 0,
-                            street: null,
-                            userName: null,
-                            createdDate: "15-02-2024 09:31 PM",
-                            editedDate: "15-02-2024 09:31 PM",
-                            createdBy: "QuickCampus",
-                            editedBy: "QuickCampus",
-                        },
-                        guardianAddressResponse: null,
-                        correspondenceAddressResponse: null,
-                    },
-                ],
-                classTeacher: "",
-                classTeacherUserName: "",
-                permanentEducationNumber: null,
-                school: {
-                    uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
-                    apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
-                    schoolName: "DE INDIAN PUBLIC SCHOOL",
-                    schoolAbb: "DIPS",
-                    educationBoard: "Central Board of Secondary Education (CBSE)",
-                    registrationNo: "1412743",
-                    plotNumber: "POCKET-11",
-                    area: "SECTOR-24,ROHINI",
-                    city: "DELHI",
-                    pincode: "110085",
-                    state: "Delhi",
-                    phoneNo1: "1127050252",
-                    phoneNo2: "1127050253",
-                    contactName: "DIPS",
-                    contactMobile: null,
-                    contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
-                    schoolCode: null,
-                    pfCode: null,
-                    societyManagement: null,
-                    language: null,
-                    schoolLogo: null,
-                    schoolFavicon: null,
-                    enabled: true,
-                    subDomain: "dips",
-                    website: "WWW.DIPSROHINI.IN",
-                    schemaPrefix: null,
-                    editedDate: "20-07-2024 04:14 PM",
-                    editedUser: "QuickCampus",
-                    visitorSchool: false,
-                    clientSchoolId: null,
-                    cscId: null,
-                    onlinePaymentEnabled: true,
-                    registrationSeries: null,
-                    underTakingDetails: null,
-                    formNumberStart: null,
-                    sessionResponse: null,
-                    schoolLogoUrl: null,
-                    printAcknowledge: false,
-                    whatsAppEnabled: false,
-                    notificationEnabled: true,
-                    loanEnabled: false,
-                    smsenabled: false,
-                },
+        footer: `<p style="font-size: 0.8em; margin-top: 20px;">Note: This is a computer generated Report Card. It does not need any signature. In case of any typing error or discrepancy please contact the Class Teacher.</p>`,
+        student: {
+          dob: "06-01-2016",
+          admissionNo: "20220146",
+          studentName: "Aaradhya Singh",
+          className: "PLP 1",
+          sectionName: "A",
+          rollNo: 1,
+          fatherName: "Mr. Bhupender Singh",
+          motherName: "Mrs. Sadhna Singh",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 262207,
+              userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
+              studentId: "20220146",
+              exAdmissionNo: null,
+              studentName: "Aaradhya Singh",
+              fatherName: "Mr. Bhupender Singh",
+              motherName: "Mrs. Sadhna Singh",
+              dob: "06-01-2016",
+              gender: "Female",
+              studentAdhaarcard: "",
+              joiningClass: "FLP 4",
+              joiningSections: "A",
+              joiningDate: "31-03-2022",
+              plotNumber: "",
+              area: "Budh Vihar",
+              city: "Delhi",
+              state: "NA",
+              pincode: "110085",
+              phone1: null,
+              rollNo: 1,
+              emergencyNumber: "8920098444",
+              mobileNumber: "9811230274",
+              studentEmail: "bhpendersingh198383@gmail.com",
+              religion: "",
+              category: "General",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "PLP 1",
+              classUid: null,
+              sections: "A",
+              group: "IST 2019-20",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-25",
+              joiningStatus: "Old",
+              houses: "INTELLIGENCE BLUE",
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-02-15 16:01:44.372632",
+              editeddate: "2024-02-15 16:01:44.372632",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
+                houseNo: null,
+                area: "Budh Vihar",
+                landmark: null,
+                city: "Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110085,
+                street: "A-28, Veer Singh Clny",
+                userName: "DIPS653_20220146",
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
             },
-            markData: {
-                "academicSession": "2024-2025",
-                "admissionNo": "20220003",
-                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                "studentName": "Srishti",
-                "rollNo": 0,
-                "fatherName": "Kanhiya Mandal",
-                "className": "III",
-                "sectionName": "A",
-                "terms": "MID TERM",
-                "markSheetName": "TERM-I",
-                "overAllRank": "1",
-                "markSheetTerms": [
-                    {
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+            schoolName: "DE INDIAN PUBLIC SCHOOL",
+            schoolAbb: "DIPS",
+            educationBoard: "Central Board of Secondary Education (CBSE)",
+            registrationNo: "1412743",
+            plotNumber: "POCKET-11",
+            area: "SECTOR-24,ROHINI",
+            city: "DELHI",
+            pincode: "110085",
+            state: "Delhi",
+            phoneNo1: "1127050252",
+            phoneNo2: "1127050253",
+            contactName: "DIPS",
+            contactMobile: null,
+            contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "dips",
+            website: "WWW.DIPSROHINI.IN",
+            schemaPrefix: null,
+            editedDate: "20-07-2024 04:14 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+            smsenabled: false,
+          },
+        },
+        markData: {
+    "academicSession": "2024-2025",
+    "admissionNo": "20220019",
+    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+    "studentName": "Ayush Kumar",
+    "rollNo": 0,
+    "fatherName": "Vishwkarma Mehto",
+    "className": "III",
+    "sectionName": "A",
+    "terms": "MID TERM",
+    "markSheetName": "TERM-I",
+    "overAllRank": "1",
+    "markSheetTerms": [
+        {
+            "id": 1094,
+            "headerName": "PERIODIC ASSESSMENT",
+            "subHeaderName": "(10)",
+            "priority": 1,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 10,
+            "terms": [
+                "PERIODIC ASSESSMENT"
+            ]
+        },
+        {
+            "id": 1095,
+            "headerName": "S.E.A",
+            "subHeaderName": "(10)",
+            "priority": 2,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 10,
+            "terms": [
+                "SUBJECT ENRICHMENT"
+            ]
+        },
+        {
+            "id": 1096,
+            "headerName": "M.A",
+            "subHeaderName": "(10)",
+            "priority": 3,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 10,
+            "terms": [
+                "MULTIPLE ASSESSMENT"
+            ]
+        },
+        {
+            "id": 1097,
+            "headerName": "PORTFOLIO",
+            "subHeaderName": "(10)",
+            "priority": 4,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 10,
+            "terms": [
+                "PORTFOLIO"
+            ]
+        },
+        {
+            "id": 1098,
+            "headerName": "TERM-I",
+            "subHeaderName": "(60)",
+            "priority": 5,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 60,
+            "terms": [
+                "TERM - I"
+            ]
+        }
+    ],
+    "subjectWiseMarkSheetReportResponses": [
+        {
+            "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+            "subjectName": "ENGLISH",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 6.88,
+                    "grade": "B2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
                         "id": 1094,
                         "headerName": "PERIODIC ASSESSMENT",
                         "subHeaderName": "(10)",
@@ -749,7 +853,32 @@ size: A4;
                             "PERIODIC ASSESSMENT"
                         ]
                     },
-                    {
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
                         "id": 1095,
                         "headerName": "S.E.A",
                         "subHeaderName": "(10)",
@@ -761,7 +890,32 @@ size: A4;
                             "SUBJECT ENRICHMENT"
                         ]
                     },
-                    {
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
                         "id": 1096,
                         "headerName": "M.A",
                         "subHeaderName": "(10)",
@@ -773,7 +927,32 @@ size: A4;
                             "MULTIPLE ASSESSMENT"
                         ]
                     },
-                    {
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
                         "id": 1097,
                         "headerName": "PORTFOLIO",
                         "subHeaderName": "(10)",
@@ -785,7 +964,32 @@ size: A4;
                             "PORTFOLIO"
                         ]
                     },
-                    {
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                    "subjectName": "ENGLISH",
+                    "subjectNature": "Theory",
+                    "max": 60,
+                    "obtained": 44.5,
+                    "grade": "B1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
                         "id": 1098,
                         "headerName": "TERM-I",
                         "subHeaderName": "(60)",
@@ -796,910 +1000,1470 @@ size: A4;
                         "terms": [
                             "TERM - I"
                         ]
-                    }
-                ],
-                "subjectWiseMarkSheetReportResponses": [
-                    {
-                        "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
-                        "subjectName": "ENGLISH",
-                        "subjectNature": "Theory",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                                "admissionNo": "20220003",
-                                "studentName": "Srishti",
-                                "rollNo": 0,
-                                "fatherName": "Kanhiya Mandal",
-                                "className": "III",
-                                "sectionName": "A",
-                                "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
-                                "terms": "MID TERM",
-                                "subjectUid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
-                                "subjectName": "ENGLISH",
-                                "subjectNature": "Theory",
-                                "max": 10,
-                                "obtained": 8.62,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1094,
-                                    "headerName": "PERIODIC ASSESSMENT",
-                                    "subHeaderName": "(10)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 10,
-                                    "terms": [
-                                        "PERIODIC ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 8.62,
-                        "total": 10,
-                        "percentage": 86.2,
-                        "grade": "A2",
-                        "className": "III",
-                        "sectionName": "A",
-                        "terms": "MID TERM",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 1,
-                        "decimalPlaces": 2,
-                        "visible": false
                     },
-                    {
-                        "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
-                        "subjectName": "HINDI",
-                        "subjectNature": "Theory",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                                "admissionNo": "20220003",
-                                "studentName": "Srishti",
-                                "rollNo": 0,
-                                "fatherName": "Kanhiya Mandal",
-                                "className": "III",
-                                "sectionName": "A",
-                                "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
-                                "terms": "MID TERM",
-                                "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
-                                "subjectName": "HINDI",
-                                "subjectNature": "Theory",
-                                "max": 10,
-                                "obtained": 8.12,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1094,
-                                    "headerName": "PERIODIC ASSESSMENT",
-                                    "subHeaderName": "(10)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 10,
-                                    "terms": [
-                                        "PERIODIC ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 8.12,
-                        "total": 10,
-                        "percentage": 81.2,
-                        "grade": "A2",
-                        "className": "III",
-                        "sectionName": "A",
-                        "terms": "MID TERM",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 2,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
-                        "subjectName": "MATHEMATICS",
-                        "subjectNature": "Theory",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                                "admissionNo": "20220003",
-                                "studentName": "Srishti",
-                                "rollNo": 0,
-                                "fatherName": "Kanhiya Mandal",
-                                "className": "III",
-                                "sectionName": "A",
-                                "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
-                                "terms": "MID TERM",
-                                "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
-                                "subjectName": "MATHEMATICS",
-                                "subjectNature": "Theory",
-                                "max": 10,
-                                "obtained": 8.5,
-                                "grade": "A2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1094,
-                                    "headerName": "PERIODIC ASSESSMENT",
-                                    "subHeaderName": "(10)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 10,
-                                    "terms": [
-                                        "PERIODIC ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 8.5,
-                        "total": 10,
-                        "percentage": 85,
-                        "grade": "A2",
-                        "className": "III",
-                        "sectionName": "A",
-                        "terms": "MID TERM",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 3,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
-                        "subjectName": "EVS",
-                        "subjectNature": "Theory",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                                "admissionNo": "20220003",
-                                "studentName": "Srishti",
-                                "rollNo": 0,
-                                "fatherName": "Kanhiya Mandal",
-                                "className": "III",
-                                "sectionName": "A",
-                                "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
-                                "terms": "MID TERM",
-                                "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
-                                "subjectName": "EVS",
-                                "subjectNature": "Theory",
-                                "max": 10,
-                                "obtained": 6.87,
-                                "grade": "B2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1094,
-                                    "headerName": "PERIODIC ASSESSMENT",
-                                    "subHeaderName": "(10)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 10,
-                                    "terms": [
-                                        "PERIODIC ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 6.87,
-                        "total": 10,
-                        "percentage": 68.7,
-                        "grade": "B2",
-                        "className": "III",
-                        "sectionName": "A",
-                        "terms": "MID TERM",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 4,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
-                        "subjectName": "COMPUTER",
-                        "subjectNature": "Theory",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "6924c417-f4dd-49d3-911a-d47d81cdbd97",
-                                "admissionNo": "20220003",
-                                "studentName": "Srishti",
-                                "rollNo": 0,
-                                "fatherName": "Kanhiya Mandal",
-                                "className": "III",
-                                "sectionName": "A",
-                                "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
-                                "terms": "MID TERM",
-                                "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
-                                "subjectName": "COMPUTER",
-                                "subjectNature": "Theory",
-                                "max": 10,
-                                "obtained": 7.37,
-                                "grade": "B1",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1094,
-                                    "headerName": "PERIODIC ASSESSMENT",
-                                    "subHeaderName": "(10)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 10,
-                                    "terms": [
-                                        "PERIODIC ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 7.37,
-                        "total": 10,
-                        "percentage": 73.7,
-                        "grade": "B1",
-                        "className": "III",
-                        "sectionName": "A",
-                        "terms": "MID TERM",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 5,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    }
-                ],
-                "marksObtained": 39.48,
-                "total": 50,
-                "percentage": 78.96,
-                "overAllGrade": "B1",
-                "visible": false
-            },
-            remarks: {
-                uid: null,
-                terms: null,
-                studentId: null,
-                studentName: null,
-                rollNumber: 0,
-                classSectionUid: null,
-                classSection: null,
-                description: null,
-                fields: null,
-                status: false,
-                createdUser: null,
-                editedUser: null,
-                createdDate: null,
-                editedDate: null,
-            },
-            baseTermData: {
-                student: {
-                    dob: "06-01-2016",
-                    admissionNo: "20220146",
-                    studentName: "Aaradhya Singh",
-                    className: "PLP 1",
-                    sectionName: "A",
-                    rollNo: 1,
-                    fatherName: "Mr. Bhupender Singh",
-                    motherName: "Mrs. Sadhna Singh",
-                    attendance: "0.0/0",
-                    boardRollNumber: "",
-                    studentInfoResponse: [
-                        {
-                            id: 262207,
-                            userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
-                            userName: null,
-                            fatherUserName: null,
-                            motherUserName: null,
-                            guardianUserName: null,
-                            uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
-                            studentId: "20220146",
-                            exAdmissionNo: null,
-                            studentName: "Aaradhya Singh",
-                            fatherName: "Mr. Bhupender Singh",
-                            motherName: "Mrs. Sadhna Singh",
-                            dob: "06-01-2016",
-                            gender: "Female",
-                            studentAdhaarcard: "",
-                            joiningClass: "FLP 4",
-                            joiningSections: "A",
-                            joiningDate: "31-03-2022",
-                            plotNumber: "",
-                            area: "Budh Vihar",
-                            city: "Delhi",
-                            state: "NA",
-                            pincode: "110085",
-                            phone1: null,
-                            rollNo: 1,
-                            emergencyNumber: "8920098444",
-                            mobileNumber: "9811230274",
-                            studentEmail: "bhpendersingh198383@gmail.com",
-                            religion: "",
-                            category: "General",
-                            minority: "",
-                            motherTongue: "",
-                            idMark: "",
-                            height: "",
-                            weight: "",
-                            physicalDisability: "",
-                            bloodGroup: "",
-                            healthRemark: "",
-                            siblingDetails: "",
-                            alumni: "",
-                            siblingResponse: [],
-                            fatherOccupation: "",
-                            fatherQualification: "",
-                            fatherOrganization: "",
-                            fatherDesignation: "",
-                            fatherIncome: "",
-                            fatherArea: "NA",
-                            fatherCity: "NA",
-                            fatherState: "NA",
-                            fatherPincode: "",
-                            fatherPhone: null,
-                            fatherMobile: "",
-                            fatherEmail: null,
-                            fatherAdhaarNumber: "",
-                            schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
-                            motherQualification: "",
-                            motherOccupation: "",
-                            motherOrganization: "",
-                            motherDesignation: "",
-                            motherIncome: "",
-                            motherArea: "NA",
-                            motherCity: "NA",
-                            motherState: "NA",
-                            motherPincode: "",
-                            motherPhone: null,
-                            motherMobile: "",
-                            motherEmail: null,
-                            motherAdhaarNumber: "",
-                            guardianName: null,
-                            relation: null,
-                            guardianOccupation: null,
-                            guardianPhone: null,
-                            guardianMobile: null,
-                            guardianEmail: null,
-                            guardianAddress: null,
-                            leavingDate: null,
-                            previousSchoolName: null,
-                            otp: null,
-                            schoolName: "Demo Public School",
-                            remark: null,
-                            classTeacher: "",
-                            classTeacherUserName: "",
-                            classes: "PLP 1",
-                            classUid: null,
-                            sections: "A",
-                            group: "IST 2019-20",
-                            wing: "NA",
-                            status: "Studying",
-                            academicSession: "2024-25",
-                            joiningStatus: "Old",
-                            houses: "INTELLIGENCE BLUE",
-                            certificates: "",
-                            certificatesList: [],
-                            caste: "",
-                            listOfDocuments: null,
-                            attached: false,
-                            required: false,
-                            submitted: false,
-                            studentHostel: [],
-                            studentConcession: [],
-                            studentTransport: [],
-                            studentAadharCard: null,
-                            fatherAadharCard: null,
-                            motherAadharCard: null,
-                            studentImage: null,
-                            fatherImage: null,
-                            motherImage: null,
-                            guardianImage: null,
-                            birthCertificate: null,
-                            classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
-                            aluminiProof: null,
-                            siblingProof: null,
-                            residenceProof: null,
-                            firstBornChildProof: null,
-                            medicalFitnessCertificate: null,
-                            fatherQualificationProof: null,
-                            motherQualificationProof: null,
-                            casteCertificate: null,
-                            createdUser: "QuickCampus",
-                            editedUser: "QuickCampus",
-                            createddate: "2024-02-15 16:01:44.372632",
-                            editeddate: "2024-02-15 16:01:44.372632",
-                            permanentEducationNumber: null,
-                            studentAddressResponse: {
-                                uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
-                                houseNo: null,
-                                area: "Budh Vihar",
-                                landmark: null,
-                                city: "Delhi",
-                                district: null,
-                                state: "NA",
-                                poPs: null,
-                                pincode: 110085,
-                                street: "A-28, Veer Singh Clny",
-                                userName: "DIPS653_20220146",
-                                createdDate: "15-02-2024 09:31 PM",
-                                editedDate: "15-02-2024 09:31 PM",
-                                createdBy: "QuickCampus",
-                                editedBy: "QuickCampus",
-                            },
-                            fatherAddressResponse: {
-                                uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
-                                houseNo: null,
-                                area: "NA",
-                                landmark: null,
-                                city: "NA",
-                                district: null,
-                                state: "NA",
-                                poPs: null,
-                                pincode: 0,
-                                street: null,
-                                userName: null,
-                                createdDate: "15-02-2024 09:31 PM",
-                                editedDate: "15-02-2024 09:31 PM",
-                                createdBy: "QuickCampus",
-                                editedBy: "QuickCampus",
-                            },
-                            motherAddressResponse: {
-                                uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
-                                houseNo: null,
-                                area: "NA",
-                                landmark: null,
-                                city: "NA",
-                                district: null,
-                                state: "NA",
-                                poPs: null,
-                                pincode: 0,
-                                street: null,
-                                userName: null,
-                                createdDate: "15-02-2024 09:31 PM",
-                                editedDate: "15-02-2024 09:31 PM",
-                                createdBy: "QuickCampus",
-                                editedBy: "QuickCampus",
-                            },
-                            guardianAddressResponse: null,
-                            correspondenceAddressResponse: null,
-                        },
-                    ],
-                    classTeacher: "",
-                    classTeacherUserName: "",
-                    permanentEducationNumber: null,
-                    school: {
-                        uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
-                        apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
-                        schoolName: "DE INDIAN PUBLIC SCHOOL",
-                        schoolAbb: "DIPS",
-                        educationBoard: "Central Board of Secondary Education (CBSE)",
-                        registrationNo: "1412743",
-                        plotNumber: "POCKET-11",
-                        area: "SECTOR-24,ROHINI",
-                        city: "DELHI",
-                        pincode: "110085",
-                        state: "Delhi",
-                        phoneNo1: "1127050252",
-                        phoneNo2: "1127050253",
-                        contactName: "DIPS",
-                        contactMobile: null,
-                        contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
-                        schoolCode: null,
-                        pfCode: null,
-                        societyManagement: null,
-                        language: null,
-                        schoolLogo: null,
-                        schoolFavicon: null,
-                        enabled: true,
-                        subDomain: "dips",
-                        website: "WWW.DIPSROHINI.IN",
-                        schemaPrefix: null,
-                        editedDate: "20-07-2024 04:14 PM",
-                        editedUser: "QuickCampus",
-                        visitorSchool: false,
-                        clientSchoolId: null,
-                        cscId: null,
-                        onlinePaymentEnabled: true,
-                        registrationSeries: null,
-                        underTakingDetails: null,
-                        formNumberStart: null,
-                        sessionResponse: null,
-                        schoolLogoUrl: null,
-                        printAcknowledge: false,
-                        whatsAppEnabled: false,
-                        notificationEnabled: true,
-                        loanEnabled: false,
-                        smsenabled: false,
-                    },
-                },
-                subject: [
-                    {
-                        "subjectAllResponse": {
-                            "uid": "4098c6f9-a43c-49bd-9464-9c30595c6bad",
-                            "subjectName": "ENGLISH",
-                            "nature": "Theory",
-                            "natureUid": "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": true,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:26:43.316124",
-                            "editeddate": "2024-08-03 11:26:43.315198"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 92.62,
-                        "percentage": 92.62,
-                        "grade": "A1",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": true
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
-                            "subjectName": "HINDI",
-                            "nature": "Theory",
-                            "natureUid": "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": true,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:29:09.523202",
-                            "editeddate": "2024-08-03 11:29:09.522539"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 84.62,
-                        "percentage": 84.62,
-                        "grade": "A2",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": true
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "cf076e8d-4a29-4717-b941-649391477355",
-                            "subjectName": "MATHEMATICS",
-                            "nature": "Theory",
-                            "natureUid": "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": true,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:34:16.946987",
-                            "editeddate": "2024-08-03 11:34:16.946125"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 74.5,
-                        "percentage": 74.5,
-                        "grade": "B1",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": true
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "f227517e-2211-4b93-81b3-8bd18557b167",
-                            "subjectName": "EVS",
-                            "nature": "Theory",
-                            "natureUid": "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:53:21.268481",
-                            "editeddate": "2024-08-03 11:53:21.267444"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 72.37,
-                        "percentage": 72.37,
-                        "grade": "B1",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": true
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "70a44852-5906-479a-bfb1-f2a93476877c",
-                            "subjectName": "COMPUTER",
-                            "nature": "Theory",
-                            "natureUid": "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:53:36.69248",
-                            "editeddate": "2024-08-03 11:53:36.691522"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 77.5,
-                        "percentage": 77.5,
-                        "grade": "B1",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": true
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "6d01b1b6-3e94-4f8d-9d27-d6e484b80981",
-                            "subjectName": "ART EDUCATION",
-                            "nature": "1B Scholastic",
-                            "natureUid": "61d0adda-9a43-4663-bd9a-b8133a6006ee",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:53:55.273756",
-                            "editeddate": "2024-08-03 11:53:55.272201"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 79.99,
-                        "percentage": 79.99,
-                        "grade": "B",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": false
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "f301aca9-dde9-447f-9e9d-1d1996c99ad9",
-                            "subjectName": "PHYSICAL AND HEALTH EDUCATION",
-                            "nature": "1B Scholastic",
-                            "natureUid": "61d0adda-9a43-4663-bd9a-b8133a6006ee",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:54:20.976439",
-                            "editeddate": "2024-08-03 11:54:20.975007"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 79.99,
-                        "percentage": 79.99,
-                        "grade": "B",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": false
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "ded39a05-9ceb-4443-b31d-4fcfcfa2da32",
-                            "subjectName": "GERENAL KNOWLEDGE",
-                            "nature": "1B Scholastic",
-                            "natureUid": "61d0adda-9a43-4663-bd9a-b8133a6006ee",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:55:10.592564",
-                            "editeddate": "2024-08-03 11:55:10.590578"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 100,
-                        "percentage": 100,
-                        "grade": "A",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": false
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "dcc7fe69-5908-4486-b51e-1e528ae2800e",
-                            "subjectName": "WORK EDUCATION",
-                            "nature": "1B Scholastic",
-                            "natureUid": "61d0adda-9a43-4663-bd9a-b8133a6006ee",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:55:26.463418",
-                            "editeddate": "2024-08-03 11:55:26.462061"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 100,
-                        "percentage": 100,
-                        "grade": "A",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": false
-                    },
-                    {
-                        "subjectAllResponse": {
-                            "uid": "ede779a4-e9e8-4243-81bd-c6a6c5119c48",
-                            "subjectName": "DISCIPLINE",
-                            "nature": "1B Scholastic",
-                            "natureUid": "61d0adda-9a43-4663-bd9a-b8133a6006ee",
-                            "cbseVIIICode": "",
-                            "cbseXCode": "",
-                            "cbseXIICode": "",
-                            "status": true,
-                            "parent": [],
-                            "parentName": [],
-                            "haveChild": false,
-                            "createdUser": "SADIKASADIKA_402461",
-                            "editedUser": "SADIKASADIKA_402461",
-                            "createddate": "2024-08-03 11:55:39.076228",
-                            "editeddate": "2024-08-03 11:55:39.074846"
-                        },
-                        "termName": "MID TERM",
-                        "max": 100,
-                        "markObtained": 100,
-                        "percentage": 100,
-                        "grade": "A",
-                        "remarkStatus": "",
-                        "attachmentName": "",
-                        "additional": false,
-                        "added": true,
-                        "scholastic": false
-                    }
-                ],
-                remarksEntry: {
-                    uid: null,
-                    terms: null,
-                    studentId: null,
-                    studentName: null,
-                    rollNumber: 0,
-                    classSectionUid: null,
-                    classSection: null,
-                    description: null,
-                    fields: null,
-                    status: false,
-                    createdUser: null,
-                    editedUser: null,
-                    createdDate: null,
-                    editedDate: null,
-                },
-                school: {
-                    uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
-                    apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
-                    schoolName: "DE INDIAN PUBLIC SCHOOL",
-                    schoolAbb: "DIPS",
-                    educationBoard: "Central Board of Secondary Education (CBSE)",
-                    registrationNo: "1412743",
-                    plotNumber: "POCKET-11",
-                    area: "SECTOR-24,ROHINI",
-                    city: "DELHI",
-                    pincode: "110085",
-                    state: "Delhi",
-                    phoneNo1: "1127050252",
-                    phoneNo2: "1127050253",
-                    contactName: "DIPS",
-                    contactMobile: null,
-                    contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
-                    schoolCode: null,
-                    pfCode: null,
-                    societyManagement: null,
-                    language: null,
-                    schoolLogo: null,
-                    schoolFavicon: null,
-                    enabled: true,
-                    subDomain: "dips",
-                    website: "WWW.DIPSROHINI.IN",
-                    schemaPrefix: null,
-                    editedDate: "20-07-2024 04:14 PM",
-                    editedUser: "QuickCampus",
-                    visitorSchool: false,
-                    clientSchoolId: null,
-                    cscId: null,
-                    onlinePaymentEnabled: true,
-                    registrationSeries: null,
-                    underTakingDetails: null,
-                    formNumberStart: null,
-                    sessionResponse: null,
-                    schoolLogoUrl: null,
-                    printAcknowledge: false,
-                    whatsAppEnabled: false,
-                    notificationEnabled: true,
-                    loanEnabled: false,
-                    smsenabled: false,
-                },
-                promotedClass: null,
-                promotedSection: null,
-                perSignedUrlResponse: {
-                    url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIPS/student-info/20220146/student/images/20220146.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240729T100532Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240729%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=cb707469666efe4ff9dd0c9c166555b096d93608eb0b7f3ac1bb5f23a2081f66",
-                    fileName: "20220146.png",
-                },
-                pass: false,
-                status_code: 200,
-            },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                }
+            ],
+            "marksObtained": 81.38,
+            "total": 100,
+            "percentage": 81.38,
+            "grade": "A2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "MID TERM",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 1,
+            "decimalPlaces": 2,
+            "visible": false
         },
+        {
+            "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+            "subjectName": "HINDI",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                    "subjectName": "HINDI",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 5.25,
+                    "grade": "C1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1094,
+                        "headerName": "PERIODIC ASSESSMENT",
+                        "subHeaderName": "(10)",
+                        "priority": 1,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PERIODIC ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                    "subjectName": "HINDI",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1095,
+                        "headerName": "S.E.A",
+                        "subHeaderName": "(10)",
+                        "priority": 2,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "SUBJECT ENRICHMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                    "subjectName": "HINDI",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1096,
+                        "headerName": "M.A",
+                        "subHeaderName": "(10)",
+                        "priority": 3,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "MULTIPLE ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                    "subjectName": "HINDI",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1097,
+                        "headerName": "PORTFOLIO",
+                        "subHeaderName": "(10)",
+                        "priority": 4,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PORTFOLIO"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                    "subjectName": "HINDI",
+                    "subjectNature": "Theory",
+                    "max": 60,
+                    "obtained": 24,
+                    "grade": "D",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1098,
+                        "headerName": "TERM-I",
+                        "subHeaderName": "(60)",
+                        "priority": 5,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 60,
+                        "terms": [
+                            "TERM - I"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                }
+            ],
+            "marksObtained": 59.25,
+            "total": 100,
+            "percentage": 59.25,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "MID TERM",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 2,
+            "decimalPlaces": 2,
+            "visible": false
+        },
+        {
+            "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+            "subjectName": "MATHEMATICS",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 6.25,
+                    "grade": "B2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1094,
+                        "headerName": "PERIODIC ASSESSMENT",
+                        "subHeaderName": "(10)",
+                        "priority": 1,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PERIODIC ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 9,
+                    "grade": "A2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1095,
+                        "headerName": "S.E.A",
+                        "subHeaderName": "(10)",
+                        "priority": 2,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "SUBJECT ENRICHMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1096,
+                        "headerName": "M.A",
+                        "subHeaderName": "(10)",
+                        "priority": 3,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "MULTIPLE ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 7,
+                    "grade": "B2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1097,
+                        "headerName": "PORTFOLIO",
+                        "subHeaderName": "(10)",
+                        "priority": 4,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PORTFOLIO"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "cf076e8d-4a29-4717-b941-649391477355",
+                    "subjectName": "MATHEMATICS",
+                    "subjectNature": "Theory",
+                    "max": 60,
+                    "obtained": 20.5,
+                    "grade": "D",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1098,
+                        "headerName": "TERM-I",
+                        "subHeaderName": "(60)",
+                        "priority": 5,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 60,
+                        "terms": [
+                            "TERM - I"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                }
+            ],
+            "marksObtained": 52.75,
+            "total": 100,
+            "percentage": 52.75,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "MID TERM",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 3,
+            "decimalPlaces": 2,
+            "visible": false
+        },
+        {
+            "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+            "subjectName": "EVS",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+                    "subjectName": "EVS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 5.5,
+                    "grade": "C1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1094,
+                        "headerName": "PERIODIC ASSESSMENT",
+                        "subHeaderName": "(10)",
+                        "priority": 1,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PERIODIC ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+                    "subjectName": "EVS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 9,
+                    "grade": "A2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1095,
+                        "headerName": "S.E.A",
+                        "subHeaderName": "(10)",
+                        "priority": 2,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "SUBJECT ENRICHMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+                    "subjectName": "EVS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1096,
+                        "headerName": "M.A",
+                        "subHeaderName": "(10)",
+                        "priority": 3,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "MULTIPLE ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+                    "subjectName": "EVS",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 10,
+                    "grade": "A1",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1097,
+                        "headerName": "PORTFOLIO",
+                        "subHeaderName": "(10)",
+                        "priority": 4,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PORTFOLIO"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "f227517e-2211-4b93-81b3-8bd18557b167",
+                    "subjectName": "EVS",
+                    "subjectNature": "Theory",
+                    "max": 60,
+                    "obtained": 21.5,
+                    "grade": "D",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1098,
+                        "headerName": "TERM-I",
+                        "subHeaderName": "(60)",
+                        "priority": 5,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 60,
+                        "terms": [
+                            "TERM - I"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                }
+            ],
+            "marksObtained": 56,
+            "total": 100,
+            "percentage": 56,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "MID TERM",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 4,
+            "decimalPlaces": 2,
+            "visible": false
+        },
+        {
+            "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+            "subjectName": "COMPUTER",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+                    "subjectName": "COMPUTER",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 4.25,
+                    "grade": "C2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1094,
+                        "headerName": "PERIODIC ASSESSMENT",
+                        "subHeaderName": "(10)",
+                        "priority": 1,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PERIODIC ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+                    "subjectName": "COMPUTER",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 9,
+                    "grade": "A2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1095,
+                        "headerName": "S.E.A",
+                        "subHeaderName": "(10)",
+                        "priority": 2,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "SUBJECT ENRICHMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+                    "subjectName": "COMPUTER",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 9,
+                    "grade": "A2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1096,
+                        "headerName": "M.A",
+                        "subHeaderName": "(10)",
+                        "priority": 3,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "MULTIPLE ASSESSMENT"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+                    "subjectName": "COMPUTER",
+                    "subjectNature": "Theory",
+                    "max": 10,
+                    "obtained": 9,
+                    "grade": "A2",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1097,
+                        "headerName": "PORTFOLIO",
+                        "subHeaderName": "(10)",
+                        "priority": 4,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 10,
+                        "terms": [
+                            "PORTFOLIO"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": true,
+                    "graded": false
+                },
+                {
+                    "studentInfoUid": "89c7805a-fc4f-431f-bac9-e79a4594d322",
+                    "admissionNo": "20220019",
+                    "studentName": "Ayush Kumar",
+                    "rollNo": 0,
+                    "fatherName": "Vishwkarma Mehto",
+                    "className": "III",
+                    "sectionName": "A",
+                    "classSectionUid": "fea839e3-f7c0-47c6-b10b-c6f4758ee06e",
+                    "terms": "MID TERM",
+                    "subjectUid": "70a44852-5906-479a-bfb1-f2a93476877c",
+                    "subjectName": "COMPUTER",
+                    "subjectNature": "Theory",
+                    "max": 60,
+                    "obtained": 15.5,
+                    "grade": "E",
+                    "status": "",
+                    "markSheetName": "TERM-I",
+                    "attachmentName": "",
+                    "session": "2024-2025",
+                    "decimalPlaces": 2,
+                    "markSheetTermResponse": {
+                        "id": 1098,
+                        "headerName": "TERM-I",
+                        "subHeaderName": "(60)",
+                        "priority": 5,
+                        "bestOf": 0,
+                        "decimalPlaces": 2,
+                        "weightage": 60,
+                        "terms": [
+                            "TERM - I"
+                        ]
+                    },
+                    "visible": false,
+                    "pass": false,
+                    "graded": false
+                }
+            ],
+            "marksObtained": 46.75,
+            "total": 100,
+            "percentage": 46.75,
+            "grade": "C2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "MID TERM",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 5,
+            "decimalPlaces": 2,
+            "visible": false
+        }
+    ],
+    "marksObtained": 296.13,
+    "total": 500,
+    "percentage": 59.23,
+    "overAllGrade": "C1",
+    "visible": false
+}, remarks: {
+          uid: null,
+          terms: null,
+          studentId: null,
+          studentName: null,
+          rollNumber: 0,
+          classSectionUid: null,
+          classSection: null,
+          description: null,
+          fields: null,
+          status: false,
+          createdUser: null,
+          editedUser: null,
+          createdDate: null,
+          editedDate: null,
+        },
+        baseTermData: {
+          student: {
+            dob: "06-01-2016",
+            admissionNo: "20220146",
+            studentName: "Aaradhya Singh",
+            className: "PLP 1",
+            sectionName: "A",
+            rollNo: 1,
+            fatherName: "Mr. Bhupender Singh",
+            motherName: "Mrs. Sadhna Singh",
+            attendance: "0.0/0",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 262207,
+                userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
+                studentId: "20220146",
+                exAdmissionNo: null,
+                studentName: "Aaradhya Singh",
+                fatherName: "Mr. Bhupender Singh",
+                motherName: "Mrs. Sadhna Singh",
+                dob: "06-01-2016",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "FLP 4",
+                joiningSections: "A",
+                joiningDate: "31-03-2022",
+                plotNumber: "",
+                area: "Budh Vihar",
+                city: "Delhi",
+                state: "NA",
+                pincode: "110085",
+                phone1: null,
+                rollNo: 1,
+                emergencyNumber: "8920098444",
+                mobileNumber: "9811230274",
+                studentEmail: "bhpendersingh198383@gmail.com",
+                religion: "",
+                category: "General",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "NA",
+                fatherCity: "NA",
+                fatherState: "NA",
+                fatherPincode: "",
+                fatherPhone: null,
+                fatherMobile: "",
+                fatherEmail: null,
+                fatherAdhaarNumber: "",
+                schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "NA",
+                motherCity: "NA",
+                motherState: "NA",
+                motherPincode: "",
+                motherPhone: null,
+                motherMobile: "",
+                motherEmail: null,
+                motherAdhaarNumber: "",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: null,
+                otp: null,
+                schoolName: "Demo Public School",
+                remark: null,
+                classTeacher: "",
+                classTeacherUserName: "",
+                classes: "PLP 1",
+                classUid: null,
+                sections: "A",
+                group: "IST 2019-20",
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2024-25",
+                joiningStatus: "Old",
+                houses: "INTELLIGENCE BLUE",
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: null,
+                attached: false,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "QuickCampus",
+                createddate: "2024-02-15 16:01:44.372632",
+                editeddate: "2024-02-15 16:01:44.372632",
+                permanentEducationNumber: null,
+                studentAddressResponse: {
+                  uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
+                  houseNo: null,
+                  area: "Budh Vihar",
+                  landmark: null,
+                  city: "Delhi",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 110085,
+                  street: "A-28, Veer Singh Clny",
+                  userName: "DIPS653_20220146",
+                  createdDate: "15-02-2024 09:31 PM",
+                  editedDate: "15-02-2024 09:31 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                fatherAddressResponse: {
+                  uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "15-02-2024 09:31 PM",
+                  editedDate: "15-02-2024 09:31 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                motherAddressResponse: {
+                  uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "15-02-2024 09:31 PM",
+                  editedDate: "15-02-2024 09:31 PM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+            permanentEducationNumber: null,
+            school: {
+              uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+              apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+              schoolName: "DE INDIAN PUBLIC SCHOOL",
+              schoolAbb: "DIPS",
+              educationBoard: "Central Board of Secondary Education (CBSE)",
+              registrationNo: "1412743",
+              plotNumber: "POCKET-11",
+              area: "SECTOR-24,ROHINI",
+              city: "DELHI",
+              pincode: "110085",
+              state: "Delhi",
+              phoneNo1: "1127050252",
+              phoneNo2: "1127050253",
+              contactName: "DIPS",
+              contactMobile: null,
+              contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+              schoolCode: null,
+              pfCode: null,
+              societyManagement: null,
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "dips",
+              website: "WWW.DIPSROHINI.IN",
+              schemaPrefix: null,
+              editedDate: "20-07-2024 04:14 PM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: true,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              whatsAppEnabled: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+              smsenabled: false,
+            },
+          },
+          subject: [
+            {
+              subjectAllResponse: {
+                uid: "4098c6f9-a43c-49bd-9464-9c30595c6bad",
+                subjectName: "ENGLISH",
+                nature: "Theory",
+                natureUid: "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: true,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "SADIKASADIKA_402461",
+                createddate: "2024-08-03 11:26:43.316124",
+                editeddate: "2024-08-03 11:26:43.315198",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 81.38,
+              percentage: 81.38,
+              grade: "A2",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 1,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "833b18f6-5ec6-4f69-94b8-705889cd32ba",
+                subjectName: "HINDI",
+                nature: "Theory",
+                natureUid: "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: true,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "SADIKASADIKA_402461",
+                createddate: "2024-08-03 11:29:09.523202",
+                editeddate: "2024-08-03 11:29:09.522539",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 58.25,
+              percentage: 58.25,
+              grade: "C1",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 2,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "cf076e8d-4a29-4717-b941-649391477355",
+                subjectName: "MATHEMATICS",
+                nature: "Theory",
+                natureUid: "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: true,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "SADIKASADIKA_402461",
+                createddate: "2024-08-03 11:34:16.946987",
+                editeddate: "2024-08-03 11:34:16.946125",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 52.75,
+              percentage: 52.75,
+              grade: "C1",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 3,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "f227517e-2211-4b93-81b3-8bd18557b167",
+                subjectName: "EVS",
+                nature: "Theory",
+                natureUid: "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "SADIKASADIKA_402461",
+                createddate: "2024-08-03 11:53:21.268481",
+                editeddate: "2024-08-03 11:53:21.267444",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 56,
+              percentage: 56,
+              grade: "C1",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 4,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "70a44852-5906-479a-bfb1-f2a93476877c",
+                subjectName: "COMPUTER",
+                nature: "Theory",
+                natureUid: "088a575e-2bac-4d87-8ee6-23cac9d9d7bc",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "SADIKASADIKA_402461",
+                createddate: "2024-08-03 11:53:36.69248",
+                editeddate: "2024-08-03 11:53:36.691522",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 66.75,
+              percentage: 66.75,
+              grade: "B2",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 5,
+              added: true,
+              scholastic: true,
+            },
+            {
+              subjectAllResponse: {
+                uid: "6d01b1b6-3e94-4f8d-9d27-d6e484b80981",
+                subjectName: "ART EDUCATION",
+                nature: "2A LIFE-SKILLS",
+                natureUid: "c2eca3cd-81f9-4beb-a8c8-530fdfc56448",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "QuickCampus",
+                createddate: "2024-08-03 11:53:55.273756",
+                editeddate: "2024-10-23 09:32:57.429278",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 6,
+              added: true,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "f301aca9-dde9-447f-9e9d-1d1996c99ad9",
+                subjectName: "PHYSICAL AND HEALTH EDUCATION",
+                nature: "2A LIFE-SKILLS",
+                natureUid: "c2eca3cd-81f9-4beb-a8c8-530fdfc56448",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "QuickCampus",
+                createddate: "2024-08-03 11:54:20.976439",
+                editeddate: "2024-10-23 09:33:23.563677",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 79.99,
+              percentage: 79.99,
+              grade: "B",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 7,
+              added: true,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "ded39a05-9ceb-4443-b31d-4fcfcfa2da32",
+                subjectName: "GERENAL KNOWLEDGE",
+                nature: "2A LIFE-SKILLS",
+                natureUid: "c2eca3cd-81f9-4beb-a8c8-530fdfc56448",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "QuickCampus",
+                createddate: "2024-08-03 11:55:10.592564",
+                editeddate: "2024-10-23 09:33:32.90241",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 8,
+              added: true,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "dcc7fe69-5908-4486-b51e-1e528ae2800e",
+                subjectName: "WORK EDUCATION",
+                nature: "2A LIFE-SKILLS",
+                natureUid: "c2eca3cd-81f9-4beb-a8c8-530fdfc56448",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "QuickCampus",
+                createddate: "2024-08-03 11:55:26.463418",
+                editeddate: "2024-10-23 09:32:34.770837",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 9,
+              added: true,
+              scholastic: false,
+            },
+            {
+              subjectAllResponse: {
+                uid: "ede779a4-e9e8-4243-81bd-c6a6c5119c48",
+                subjectName: "DISCIPLINE",
+                nature: "2A LIFE-SKILLS",
+                natureUid: "c2eca3cd-81f9-4beb-a8c8-530fdfc56448",
+                cbseVIIICode: "",
+                cbseXCode: "",
+                cbseXIICode: "",
+                status: true,
+                parent: [],
+                parentName: [],
+                haveChild: false,
+                createdUser: "SADIKASADIKA_402461",
+                editedUser: "QuickCampus",
+                createddate: "2024-08-03 11:55:39.076228",
+                editeddate: "2024-10-23 09:33:47.187122",
+              },
+              termName: "MID TERM",
+              max: 100,
+              markObtained: 100,
+              percentage: 100,
+              grade: "A",
+              remarkStatus: "",
+              attachmentName: "",
+              additional: false,
+              priority: 10,
+              added: true,
+              scholastic: false,
+            },
+          ],
+          remarksEntry: {
+            uid: null,
+            terms: null,
+            studentId: null,
+            studentName: null,
+            rollNumber: 0,
+            classSectionUid: null,
+            classSection: null,
+            description: null,
+            fields: null,
+            status: false,
+            createdUser: null,
+            editedUser: null,
+            createdDate: null,
+            editedDate: null,
+          },
+          school: {
+            uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+            schoolName: "DE INDIAN PUBLIC SCHOOL",
+            schoolAbb: "DIPS",
+            educationBoard: "Central Board of Secondary Education (CBSE)",
+            registrationNo: "1412743",
+            plotNumber: "POCKET-11",
+            area: "SECTOR-24,ROHINI",
+            city: "DELHI",
+            pincode: "110085",
+            state: "Delhi",
+            phoneNo1: "1127050252",
+            phoneNo2: "1127050253",
+            contactName: "DIPS",
+            contactMobile: null,
+            contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "dips",
+            website: "WWW.DIPSROHINI.IN",
+            schemaPrefix: null,
+            editedDate: "20-07-2024 04:14 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+            smsenabled: false,
+          },
+          promotedClass: null,
+          promotedSection: null,
+          perSignedUrlResponse: {
+            url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIPS/student-info/20220146/student/images/20220146.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240729T100532Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240729%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=cb707469666efe4ff9dd0c9c166555b096d93608eb0b7f3ac1bb5f23a2081f66",
+            fileName: "20220146.png",
+          },
+          pass: false,
+          status_code: 200,
+        },
+      },
     ]);
-</script>
-
+  </script>
 </html>
