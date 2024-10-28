@@ -10,7 +10,30 @@
     <script>
       window.SetTemplateData = function (dataList) {
         const multipleStudents = dataList;
-        //number to words
+
+        const allReceipts = multipleStudents[0].contentRequest.reduce(
+          (accu, student) => {
+            return accu.concat(student.studentFeeCollectionReceiptList);
+          },
+          []
+        );
+        const aggregatedFees = allReceipts.reduce((accu, current) => {
+          const amount = parseFloat(current.componentAmount);
+
+          const existingComponent = accu.find(
+            (item) => item.componentName === current.componentName
+          );
+          if (existingComponent) {
+            existingComponent.totalAmount += amount;
+          } else {
+            accu.push({
+              componentName: current.componentName,
+              totalAmount: amount,
+            });
+          }
+          return accu;
+        }, []);
+        let totalAmountSum = 0;
         function convertNumberToWords(number) {
           const units = [
             "",
@@ -136,7 +159,7 @@
 
         const studentHtml = document.getElementById("studentsList");
         studentHtml.innerHTML = ``;
-        multipleStudents?.[0]?.contentRequest.forEach((element, i) => {
+        multipleStudents?.forEach((element, i) => {
           const feeDetails = element;
           const singleStudentHtml = document.createElement("div");
           singleStudentHtml.style.pageBreakAfter = "always";
@@ -250,29 +273,30 @@
       			<th align="left" style="border-left: solid 0.25mm #000000;border-bottom: solid 0.25mm #000000;">(p)</th>
       		</tr>
 
-          ${feeDetails?.studentFeeCollectionReceiptList
-            .map(
-              (val, index) => `
-            <tr>
-                  <td align="left" style="width:25%; text-transform:uppercase; ${
-                    index !== 0 ? "border-top: solid 0.25mm #000000;" : ""
-                  }">${val.componentName}</td>
-      			<td align="left" style="width:25%; text-transform:uppercase;  border-left: solid 0.25mm #000000;text-align:right;">${
-              val.componentAmount
-            }</td>
-      			<td align="right" style="width:25%; text-transform:uppercase;  border-left: solid 0.25mm #000000;"></td>
+       ${aggregatedFees
+         .map((val, index) => {
+           totalAmountSum += val.totalAmount;
+           return `
+    <tr>
+      <td align="left" style="width:25%; text-transform:uppercase; ${
+        index !== 0 ? "border-top: solid 0.25mm #000000;" : ""
+      }">${val.componentName}</td>
+      <td align="left" style="width:25%; text-transform:uppercase; border-left: solid 0.25mm #000000;text-align:right;">
+        ${
+          val.totalAmount
+        } <!-- Assuming you want to format totalAmount as well -->
+      </td>
+      <td align="right" style="width:25%; text-transform:uppercase; border-left: solid 0.25mm #000000;"></td>
+    </tr>`;
+         })
+         .join("")}
 
-      		</tr>`
-            )
-            .join("")}
             <tr>
       <td style="border-top: solid 0.25mm #000000;">
         <span style="float: left;">RUPEES</span>
         <span style="float: right;">TOTAL Rs.</span>
       </td>
-      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${
-        feeDetails?.netReceived
-      }</td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${totalAmountSum}</td>
       <td style="border-left: 1px solid black;border-top:1px solid black;"></td>
 
       </tr>
@@ -313,9 +337,7 @@
         <span style="float: left;">RUPEES</span>
         <span style="float: right;">TOTAL Rs.</span>
       </td>
-      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${
-        feeDetails?.netReceived
-      }</td>
+      <td style="border-left: 1px solid black;border-top:1px solid black;text-align:right;">${totalAmountSum}</td>
       <td style="border-left: 1px solid black;border-top:1px solid black;"></td>
 
       </tr>
