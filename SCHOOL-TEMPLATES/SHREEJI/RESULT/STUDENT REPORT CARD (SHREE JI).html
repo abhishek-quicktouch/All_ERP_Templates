@@ -189,7 +189,7 @@
                             <td style="text-align:center;">${project}</td>
                             <td style="text-align:center;">${assessment}</td>
                             <td style="text-align:center;">${midTerm}</td>
-                            <td style="text-align:center;">${subject?.marksObtained}</td>
+                            <td style="text-align:center;">${subject?.marksObtained?.toFixed(2)}</td>
                           
                             <td style="text-align:center;">${subject?.grade}</td>
                         </tr>
@@ -394,7 +394,7 @@ size: A4;
                                     return `<th style="text-align: center;  width: 11%;">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
                                   })
                                   .join("")}
-                                <th style="text-align: center; width: 11%;"><h4>TOTAL MARKS OBTAINED</h4>(${totalHeaderName})</th>
+                                <th style="text-align: center; width: 11%;"><h4>TOTAL MARKS OBTAINED</h4>(${100})</th>
                              
                                 <th style="text-align: center;  width: 11%;">GRADE</th>
                             </tr>
