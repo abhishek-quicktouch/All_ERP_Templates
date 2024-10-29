@@ -27,7 +27,7 @@
             schoolName: "THE INDIAN SCHOOL",
             schoolAddress: `<h5 >J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
                 <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
-                <h5 >EmailID : contactus@theindianschool.in WebSite : theindianschool.in</h5>`,
+                <h5 >EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
             studentInfoFields: [
                 {
                     label: "NAME",
@@ -89,10 +89,7 @@
             .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
             .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
             .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
-            .graph-container{
-            margin-top: 20px;
-            border: 1px solid #000;
-            }
+           
             
         `,
         };
@@ -505,7 +502,7 @@ ${element.header
                         <h3 style="text-align: center; font-size: 12px; background-color: #c1e0e0; border: 1px solid black; padding: 2px; text-transform: uppercase">
                             ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
                         </h3>
-                        <div id="${graphId}">
+                        <div id="${graphId}" style="border: 1px solid black">
                             
                             </div>
                     </div>
@@ -541,18 +538,19 @@ ${element.header
 
             const canvas = document.createElement("canvas");
             canvas.width = 378;
-            canvas.height = 250;
-            canvas.style.border = "1px solid black";
-            canvas.style.paddingTop = "10px";
+            canvas.height = 220;
+            // canvas.style.border = "1px solid black";
+            canvas.style.paddingTop = "5px";
             container.appendChild(canvas);
 
             const ctx = canvas.getContext("2d");
             if (!ctx) return;
 
             // Sort data by maxObtainedMark in descending order
-            const sortedData = [...studentPerformanceData].sort(
-                (a, b) => b.maxObtainedMark - a.maxObtainedMark
-            );
+            const sortedData = ["ENGLISH", "HINDI", "FRENCH", "MATHS", "SCIENCE", "SOCIAL SCIENCE"]
+                .map(subject => studentPerformanceData.find(s => s.subjectName === subject))
+                .filter(s => s !== undefined)
+
 
             // Prepare data
             const labels = sortedData.map(s => s.subjectName.charAt(0) + s.subjectName.slice(1).toLowerCase());
@@ -561,8 +559,8 @@ ${element.header
             const averageMarks = sortedData.map(s => s.averageObtainedMark * 5);
 
             // Chart configuration
-            const barWidth = 7;
-            const barGap = 35;
+            const barWidth = 10;
+            const barGap = 40;
             const chartHeight = 100;
             const maxBarHeight = 100;
             const xOffset = 40;
@@ -650,6 +648,7 @@ ${element.header
             const uniqueGraphId = `graph-container-${index}`;
             graphContainer.id = uniqueGraphId;
             graphContainer.className = 'graph-container';
+
 
 
 
