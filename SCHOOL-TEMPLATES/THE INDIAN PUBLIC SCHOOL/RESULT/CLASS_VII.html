@@ -434,7 +434,10 @@
 
         <div class="flex-btw" style="margin-top: 0.3rem; margin-bottom: 8px; padding:0px 1px; font-weight:bold; font-size:13px;">
             <div>DATE: ${st?.printDate || ""}</div>
-            <div>ATTENDANCE: ${st?.student?.attendance || ""}</div>
+            <div>ATTENDANCE: ${st?.baseTermData?.remarksEntry?.fields?.find(
+                    (field) => field?.title === "Attendance"
+                )?.value || st?.student?.attendance
+                }</div>
           </div>
 
          <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; padding:0px 2px; font-weight:bold;">
