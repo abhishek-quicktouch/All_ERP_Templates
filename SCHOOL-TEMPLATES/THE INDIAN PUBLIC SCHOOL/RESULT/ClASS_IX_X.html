@@ -16,8 +16,9 @@
 </body>
 <script>
     window.SetTemplateData = function (data) {
-        console.log(data, "ddddddddddddddddddd data");
-
+        const dataList = Array.isArray(data) ? data : [data];
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ''; // Clear existing content
         const config = {
             schoolLogo:
                 "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
@@ -88,12 +89,14 @@
             .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
             .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
             .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+            .graph-container{
+            margin-top: 20px;
+            border: 1px solid #000;
+            }
+            
         `,
         };
 
-        const dataList = Array.isArray(data) ? data : [data];
-        const viewTemplate = dataList[0]?.viewTemplate;
-        const staticData = []; // Function to return attendance/mark based on status
         function getAttendanceOrMark(status, mark) {
             const attendanceValue = {
                 Absent: "AB",
@@ -357,112 +360,6 @@
         `;
         }
 
-        function generateGraph(studentPerformanceData, containerId) {
-            const graphContainer = document.getElementById(containerId);
-            if (!graphContainer) {
-                console.error(`Element with id '${containerId}' not found.`);
-                return;
-            }
-
-            const canvas = document.createElement("canvas");
-            canvas.width = 600;
-            canvas.style.height = "300px";
-            canvas.style.maxHeight = "300px";
-            canvas.style.border = "1px solid black";
-            graphContainer.appendChild(canvas);
-
-            const ctx = canvas.getContext("2d");
-            if (!ctx) {
-                console.error("Failed to get 2D context.");
-                return;
-            }
-
-            // Sort data by maxObtainedMark in ascending order
-            const sortedData = [...studentPerformanceData].sort(
-                (a, b) => b.maxObtainedMark - a.maxObtainedMark
-            );
-
-            // Prepare the data in descending order
-            const labels = sortedData.map(
-                (s) => s.subjectName.charAt(0) + s.subjectName.slice(1).toLowerCase()
-            );
-            const marks = sortedData.map((s) => s.maxObtainedMark * 5);
-            const maxMarks = sortedData.map((s) => s.maxMark * 5);
-            const averageMarks = sortedData.map((s) => s.averageObtainedMark * 5);
-
-            // Create the chart
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "Average",
-                            data: averageMarks,
-                            backgroundColor: "rgba(255, 192, 203, 0.6)",
-                            borderColor: "rgba(255, 192, 203, 0.6)",
-                            borderWidth: 1,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.7,
-                            order: 1,
-                        },
-                        {
-                            label: "Marks",
-                            data: marks,
-                            backgroundColor: "rgb(0, 0, 0)",
-                            borderColor: "rgb(0, 0, 0)",
-                            borderWidth: 1,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.7,
-                            order: 2,
-                        },
-                        {
-                            label: "Highest",
-                            data: maxMarks,
-                            backgroundColor: "rgba(176, 224, 230, 0.6)",
-                            borderColor: "rgba(176, 224, 230, 0.6)",
-                            borderWidth: 1,
-                            barPercentage: 0.8,
-                            categoryPercentage: 0.7,
-                            order: 3,
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: "bottom",
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                            },
-                        },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 105,
-                            ticks: {
-                                stepSize: 5,
-                            },
-                            grid: {
-                                display: true,
-                                color: "rgba(0, 0, 0, 0.1)",
-                            },
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                            },
-                        },
-                    },
-                },
-            });
-        }
-
 
         function generateRemark(remark) {
             return `
@@ -566,114 +463,216 @@ ${element.header
             `;
         }
 
-        // Generate co-scholastic table
-
-        // Set student data
-        const multipleStudents = viewTemplate ? staticData : dataList;
-        const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
 
 
-        multipleStudents?.forEach((element, index) => {
-            const singleStudentHtml = document.createElement("div");
-            const uniqueGraphId = `graph-container-${index}`;
-            const script = document.createElement("script");
-            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
-            script.onload = () => {
-                // Call a function to render the chart once the script is loaded
-                generateGraph(element?.studentPerfromanceData, uniqueGraphId);
-            };
-            document.head.appendChild(script);
-            singleStudentHtml.style.pageBreakAfter = "always";
-            generateGraph(element?.studentPerfromanceData)
-            const termConfig =
-                element?.markData?.markSheetTerms?.map((term) => {
-                    let temp = {};
-                    temp["headerName"] = term?.headerName;
-                    temp["subHeaderName"] = term?.subHeaderName;
-                    return temp;
-                }) || [];
+        function generateStudentReport(element, graphId) {
+            const termConfig = element?.markData?.markSheetTerms?.map(term => ({
+                headerName: term?.headerName,
+                subHeaderName: term?.subHeaderName
+            })) || [];
 
-            singleStudentHtml.innerHTML = `
-            <style type="text/css">${config.styles}</style>
-            <page orientation="portrait" format="A4" margin="0">
-                <div class="container">
-                   ${generateHeader(element)}
-                     <h4 style="background-color : #c1e0e0 ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
-                }</h4> 
-                    ${generateStudentInfo(element?.student)}
+            return `
+        <style type="text/css">${config.styles}</style>
+        <page orientation="portrait" format="A4" margin="0">
+            <div class="container">
+                ${generateHeader(element)}
+                <h4 style="background-color: #c1e0e0; border: 1px solid black; text-align: center; font-size: 14px">
+                    PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""}
+                </h4>
+                ${generateStudentInfo(element?.student)}
 
-
-                
-
-                    <div class="section">
-                        <h3 style="text-align: center; font-size: 13px;background-color : #c1e0e0; border: 1px solid black ">SCHOLASTIC REPORT</h3>
-                        ${generateScholasticTable(
-                    element?.markData
-                        ?.subjectWiseMarkSheetReportResponses,
-                    element?.baseTermData?.subject,
-                    termConfig
-                )}
-
-
-                    </div>
-
-                    
-                    <div class="section">
-                                        ${generateAdditionalTable(element?.baseTermData?.subject)}
-</div>
-
-                   
-
-                    <div  style="width: 100%; display: flex;">
-
-                        <div class="section"  style=" border-left: 1px solid black; width: 50%">
-                                 ${generateCoScholasticTable(
-                    element?.baseTermData?.subject
-                )}
-                        </div>
-
-                        <div class="section" style="width: 50%">
-                            <h3 style="text-align: center; font-size: 12px;background-color: #c1e0e0; border: 1px solid black; padding: 2px;text-transform: uppercase">
-                                ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
-                            </h3>
-                            <div id="${uniqueGraphId}"></div>
-                        </div>
-                    </div>
-
-
-                    <div class="section">
-                        ${generateRemark(element?.baseTermData?.remarksEntry)}
-                    </div>
-
-                     <div class="section">
-
-                            ${generateGradingTable()}
-                            <div style="font-size: 12px;display: flex;justify-content: space-between">
-                                <span style="font-weight: bold">
-                                Date : ${element?.printDate || new Date().toLocaleDateString()}
-                                </span>
-                                <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
-                    (field) => field?.title === "Attendance"
-                )?.value || element?.student?.attendance
-                } </span>
-                                </div>
-                    </div>
-
-
-
-                    ${generateSignature()}
-
-
+                <div class="section">
+                    <h3 style="text-align: center; font-size: 13px; background-color: #c1e0e0; border: 1px solid black">
+                        SCHOLASTIC REPORT
+                    </h3>
+                    ${generateScholasticTable(
+                element?.markData?.subjectWiseMarkSheetReportResponses,
+                element?.baseTermData?.subject,
+                termConfig
+            )}
                 </div>
-            </page>
-        `;
-            studentHtml.appendChild(singleStudentHtml);
+
+                <div class="section">
+                    ${generateAdditionalTable(element?.baseTermData?.subject)}
+                </div>
+
+                <div style="width: 100%; display: flex;">
+                    <div class="section" style="border-left: 1px solid black; width: 50%">
+                        ${generateCoScholasticTable(element?.baseTermData?.subject)}
+                    </div>
+
+                    <div class="section" style="width: 50%">
+                        <h3 style="text-align: center; font-size: 12px; background-color: #c1e0e0; border: 1px solid black; padding: 2px; text-transform: uppercase">
+                            ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+                        </h3>
+                        <div id="${graphId}">
+                            
+                            </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    ${generateRemark(element?.baseTermData?.remarksEntry)}
+                </div>
+
+                <div class="section">
+                    ${generateGradingTable()}
+                    <div style="font-size: 12px; display: flex; justify-content: space-between">
+                        <span style="font-weight: bold">
+                            Date: ${element?.printDate || new Date().toLocaleDateString()}
+                        </span>
+                        <span style="font-weight: bold">
+                            Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
+                field => field?.title === "Attendance"
+            )?.value || element?.student?.attendance}
+                        </span>
+                    </div>
+                </div>
+
+                ${generateSignature()}
+            </div>
+        </page>
+    `;
+        }
+
+        function generateGraph(studentPerformanceData, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = 378;
+            canvas.height = 250;
+            canvas.style.border = "1px solid black";
+            canvas.style.paddingTop = "10px";
+            container.appendChild(canvas);
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            // Sort data by maxObtainedMark in descending order
+            const sortedData = [...studentPerformanceData].sort(
+                (a, b) => b.maxObtainedMark - a.maxObtainedMark
+            );
+
+            // Prepare data
+            const labels = sortedData.map(s => s.subjectName.charAt(0) + s.subjectName.slice(1).toLowerCase());
+            const marks = sortedData.map(s => s.maxObtainedMark * 5);
+            const maxMarks = sortedData.map(s => s.maxMark * 5);
+            const averageMarks = sortedData.map(s => s.averageObtainedMark * 5);
+
+            // Chart configuration
+            const barWidth = 7;
+            const barGap = 35;
+            const chartHeight = 100;
+            const maxBarHeight = 100;
+            const xOffset = 40;
+            const topPadding = 3; // Add top padding to accommodate y-axis labels
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid and Y-axis values
+            ctx.beginPath();
+
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillStyle = 'black';
+            ctx.font = "10px Arial";
+            const yStep = maxBarHeight / 5;
+            for (let i = 0; i <= 5; i++) {
+                const y = (chartHeight / 5) * i;
+                ctx.moveTo(0, chartHeight - y + topPadding);
+                ctx.lineTo(canvas.width, chartHeight - y + topPadding);
+                ctx.stroke();
+
+                // Add y-axis values
+                const yValue = Math.round(yStep * i);
+                ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
+            }
+
+            // Draw bars for each subject
+            sortedData.forEach((data, index) => {
+                const x = xOffset + index * (barWidth + barGap);
+                const averageHeight = (averageMarks[index] / maxBarHeight) * chartHeight;
+                const marksHeight = (marks[index] / maxBarHeight) * chartHeight;
+                const maxMarksHeight = (maxMarks[index] / maxBarHeight) * chartHeight;
+
+                // Average bar
+                ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+                ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
+
+                // Marks bar
+                ctx.fillStyle = 'black';
+                ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - marksHeight, barWidth, marksHeight);
+
+                // Max Marks bar
+                ctx.fillStyle = 'rgba(176, 224, 230, 0.6)';
+                ctx.fillRect(x + 2 * (barWidth + 5), chartHeight + topPadding - maxMarksHeight, barWidth, maxMarksHeight);
+
+                // Diagonal Label
+                ctx.save();
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'right';
+                ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding); // Positioning the label
+                ctx.rotate(-Math.PI / 4); // Rotate 45 degrees
+                ctx.fillText(labels[index], 0, 0);
+                ctx.restore();
+            });
+
+            // Draw legend
+            ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+            ctx.fillRect(xOffset, canvas.height - 30, 10, 10);
+            ctx.fillStyle = 'black';
+            ctx.fillText("Average", xOffset + 15, canvas.height - 20);
+
+            ctx.fillStyle = 'black';
+            ctx.fillRect(xOffset + 80, canvas.height - 30, 10, 10);
+            ctx.fillText("Marks", xOffset + 95, canvas.height - 20);
+
+            ctx.fillStyle = 'rgba(176, 224, 230, 0.6)';
+            ctx.fillRect(xOffset + 160, canvas.height - 30, 10, 10);
+            ctx.fillStyle = 'black';
+            ctx.fillText("Highest", xOffset + 175, canvas.height - 20);
+        }
 
 
 
+
+
+        // Process each student
+        dataList.forEach((element, index) => {
+            // Create container for this student
+            const studentContainer = document.createElement("div");
+            studentContainer.className = "student-report";
+            studentContainer.style.pageBreakAfter = "always";
+
+            // Create graph container with unique ID
+            const graphContainer = document.createElement("div");
+            const uniqueGraphId = `graph-container-${index}`;
+            graphContainer.id = uniqueGraphId;
+            graphContainer.className = 'graph-container';
+
+
+
+
+
+
+
+            // Generate the HTML content for this student
+            const studentContent = generateStudentReport(element, uniqueGraphId);
+            studentContainer.innerHTML = studentContent;
+
+            // Add the containers to the page
+            studentHtml.appendChild(studentContainer);
+
+            // Generate the graph after the container is in the DOM
+            if (element?.studentPerfromanceData) {
+                generateGraph(element.studentPerfromanceData, uniqueGraphId);
+            }
         });
     };
+
+
+
 
 </script>
 
@@ -2992,7 +2991,7 @@ ${element.header
                 },
             ],
         },
-        ,
+
         {
             student: {
                 dob: "30-04-0015",
@@ -5304,7 +5303,6 @@ ${element.header
                 },
             ],
         },
-
 
     ]);
 </script>
