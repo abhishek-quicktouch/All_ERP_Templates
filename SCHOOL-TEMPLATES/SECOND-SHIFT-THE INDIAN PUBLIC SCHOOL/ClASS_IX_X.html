@@ -24,11 +24,12 @@
             schoolLogo:
                 "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
             schoolLogo2:
-                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
-            schoolName: "THE INDIAN SCHOOL",
-            schoolAddress: `<h5 >J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
-                <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
-                <h5 >EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
+                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-30T06_04_29_303619805.png",
+            schoolName: "THE INDIAN SCHOOL-SECOND SHIFT",
+            schoolAddress: `<h5 >Josip Broz Tito Marg,New Delhi - 110049,</h5>
+                <h5>PH.:01126257551 / 01126257552, </h5>
+                <h5 >EmailID :contactus@theindianschool-secondshift.in </h5>
+                <h5>Website :www.theindianschool-secondshift.in</5>`,
             studentInfoFields: [
                 {
                     label: "NAME",
@@ -151,10 +152,7 @@
                         : ""
                     }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+                        ". "
                         : ""
                     }`;
 
@@ -341,7 +339,7 @@ ${element.header
                         ? element.header
                         : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
-                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <h2 style="color: #2b595e" >${config.schoolName}</h2>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
@@ -708,7 +706,7 @@ ${element.header
             // Generate the graph after the container is in the DOM
             const graphContainerElement = document.getElementById(uniqueGraphId);
             if (graphContainerElement && graphSubjects.length > 0) {
-                generateGraph(graphContainerElement, graphSubjects, element?.studentPerfromanceData);
+                generateGraph(graphContainerElement, graphSubjects, element?.studentPerfromanceData?.classWiseMarkResponse);
             }
         });
     };
@@ -3118,64 +3116,293 @@ ${element.header
             "header": null,
             "footer": null,
             "printDate": "29-10-2024",
-            "studentPerfromanceData": [
-                {
-                    "subjectName": "ENGLISH",
-                    "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
-                    "maxMark": 5,
-                    "maxObtainedMark": 19.96,
-                    "averageObtainedMark": 12.755843373493986
-                },
-                {
-                    "subjectName": "HINDI",
-                    "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
-                    "maxMark": 20,
-                    "maxObtainedMark": 19.439999999999998,
-                    "averageObtainedMark": 10.349743589743593
-                },
-                {
-                    "subjectName": "SOCIAL SCIENCE",
-                    "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
-                    "maxMark": 20,
-                    "maxObtainedMark": 19.75,
-                    "averageObtainedMark": 14.11265060240964
-                },
-                {
-                    "subjectName": "SCIENCE",
-                    "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
-                    "maxMark": 20,
-                    "maxObtainedMark": 19.71,
-                    "averageObtainedMark": 11.725240963855432
-                },
-                {
-                    "subjectName": "FRENCH",
-                    "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                    "maxMark": 20,
-                    "maxObtainedMark": 19.96,
-                    "averageObtainedMark": 16.968387096774194
-                },
-                {
-                    "subjectName": "MATHS",
-                    "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
-                    "maxMark": 20,
-                    "maxObtainedMark": 20,
-                    "averageObtainedMark": 13.469216867469898
-                },
-                {
-                    "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                    "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-                    "maxMark": 5,
-                    "maxObtainedMark": 5,
-                    "averageObtainedMark": 4.264705882352941
-                },
-                {
-                    "subjectName": "SANSKRIT",
-                    "subjectUid": "f81600d4-a295-478d-b814-73d53e9430ee",
-                    "maxMark": 20,
-                    "maxObtainedMark": 19.17,
-                    "averageObtainedMark": 19.17
-                }
-            ]
+            "studentPerfromanceData": {
+                "classWiseMarkResponse": [
+                    {
+                        "subjectName": "ENGLISH",
+                        "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 94.5,
+                        "averageObtainedMark": 53.44921875,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PHYSICS",
+                        "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+                        "maxMark": 95.0,
+                        "maxObtainedMark": 77.0,
+                        "averageObtainedMark": 33.93846153846154,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "CHEMISTRY",
+                        "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+                        "maxMark": 95.0,
+                        "maxObtainedMark": 81.0,
+                        "averageObtainedMark": 43.646153846153844,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "MATHS",
+                        "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 101.5,
+                        "averageObtainedMark": 41.955882352941174,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "COMPUTER SCIENCE",
+                        "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+                        "maxMark": 95.0,
+                        "maxObtainedMark": 80.0,
+                        "averageObtainedMark": 46.65,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "ENGLISH PR.",
+                        "subjectUid": "d63d7fda-0c47-497b-8555-3248c7082013",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 20.0,
+                        "averageObtainedMark": 15.106382978723405,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "MATHS PR.",
+                        "subjectUid": "92de4f9c-738f-4bdc-a195-024f4f15f702",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 18.0,
+                        "averageObtainedMark": 12.294117647058824,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PHYSICS PR.",
+                        "subjectUid": "223ebfc3-cfb4-4742-b16b-0c7f8dc9eab7",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 26.0,
+                        "averageObtainedMark": 18.815384615384616,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "CHEMISTRY PR.",
+                        "subjectUid": "5724fada-656b-4776-bcbc-f5ef5b8d8397",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 26.0,
+                        "averageObtainedMark": 16.984615384615385,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "COMPUTER SCIENCE PR.",
+                        "subjectUid": "1977b4a3-cfc9-4cf6-89cb-0900bc662442",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 25.0,
+                        "averageObtainedMark": 13.741379310344827,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "ECONOMICS",
+                        "subjectUid": "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 89.0,
+                        "averageObtainedMark": 49.91447368421053,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "ECONOMICS PR.",
+                        "subjectUid": "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 19.0,
+                        "averageObtainedMark": 11.263157894736842,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "BIOLOGY",
+                        "subjectUid": "781260ae-32a1-4ab3-a83d-f71b791cd079",
+                        "maxMark": 95.0,
+                        "maxObtainedMark": 82.0,
+                        "averageObtainedMark": 46.666666666666664,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "BIOLOGY PR.",
+                        "subjectUid": "187ce5ee-44aa-460b-a900-9b65499146a0",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 23.0,
+                        "averageObtainedMark": 19.729166666666668,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PSYCHOLOGY",
+                        "subjectUid": "d5363c2f-fcb2-4742-bcb7-5ba62755e7ef",
+                        "maxMark": 95.0,
+                        "maxObtainedMark": 84.0,
+                        "averageObtainedMark": 56.706896551724135,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PSYCHOLOGY PR.",
+                        "subjectUid": "32547535-8a53-4d46-9e86-02adfadec2b9",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 30.0,
+                        "averageObtainedMark": 23.93103448275862,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "BUSINESS STUDIES",
+                        "subjectUid": "c747db84-8d36-4dc8-8d7c-1b32354eead7",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 90.0,
+                        "averageObtainedMark": 55.8,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "ACCOUNTANCY",
+                        "subjectUid": "ef6629f6-b9c6-413d-9cfb-ee4e3de77353",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 95.0,
+                        "averageObtainedMark": 53.666666666666664,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "ACCOUNTANCY PR.",
+                        "subjectUid": "819ed474-c497-487c-80bb-cd640750bb3e",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 19.0,
+                        "averageObtainedMark": 13.688888888888888,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "BUSINESS STUDIES PR.",
+                        "subjectUid": "9b570028-bf69-49ff-abfd-6ec0ed8660d0",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 20.0,
+                        "averageObtainedMark": 14.822222222222223,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "POLITICAL SCIENCE",
+                        "subjectUid": "59d10a97-413b-4842-86aa-18639407403d",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 96.5,
+                        "averageObtainedMark": 49.02127659574468,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "HISTORY",
+                        "subjectUid": "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+                        "maxMark": 105.0,
+                        "maxObtainedMark": 102.5,
+                        "averageObtainedMark": 51.191489361702125,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "SEWA  AND WORK EDUCATION",
+                        "subjectUid": "e07f3c70-d36d-4d92-8cb5-cf3f2fa345ec",
+                        "maxMark": 100.0,
+                        "maxObtainedMark": 100.0,
+                        "averageObtainedMark": 100.0,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "POLITICAL SCIENCE PR.",
+                        "subjectUid": "e932a402-b53d-454c-899b-5e23d6865288",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 16.0,
+                        "averageObtainedMark": 9.97872340425532,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "HISTORY PR.",
+                        "subjectUid": "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
+                        "maxMark": 20.0,
+                        "maxObtainedMark": 19.0,
+                        "averageObtainedMark": 10.914893617021276,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PHYSICAL EDUCATION",
+                        "subjectUid": "ce9798fe-053a-41c4-823d-563db70aae33",
+                        "maxMark": 70.0,
+                        "maxObtainedMark": 50.5,
+                        "averageObtainedMark": 37.833333333333336,
+                        "attachmentName": null
+                    },
+                    {
+                        "subjectName": "PHYSICAL EDUCATION PR.",
+                        "subjectUid": "075ee4fc-1da7-44c7-aec4-96d8e13eced1",
+                        "maxMark": 30.0,
+                        "maxObtainedMark": 23.0,
+                        "averageObtainedMark": 20.166666666666668,
+                        "attachmentName": null
+                    }
+                ],
+                "groupedClassAttachmentResponse": [
+                    {
+                        "attachmentName": "ENGLISH",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 114.5
+                    },
+                    {
+                        "attachmentName": "BUSINESS STUDIES",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 110.0
+                    },
+                    {
+                        "attachmentName": "ACCOUNTANCY",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 114.0
+                    },
+                    {
+                        "attachmentName": "PSYCHOLOGY",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 114.0
+                    },
+                    {
+                        "attachmentName": "PHYSICAL EDUCATION",
+                        "totalMaxMark": 100.0,
+                        "totalObtainedMark": 73.5
+                    },
+                    {
+                        "attachmentName": "MATHS",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 119.5
+                    },
+                    {
+                        "attachmentName": "COMPUTER SCIENCE",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 105.0
+                    },
+                    {
+                        "attachmentName": "POLITICAL SCIENCE",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 112.5
+                    },
+                    {
+                        "attachmentName": "BIOLOGY",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 105.0
+                    },
+                    {
+                        "attachmentName": "CHEMISTRY",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 107.0
+                    },
+                    {
+                        "attachmentName": "ECONOMICS",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 108.0
+                    },
+                    {
+                        "attachmentName": "PHYSICS",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 103.0
+                    },
+                    {
+                        "attachmentName": "HISTORY",
+                        "totalMaxMark": 125.0,
+                        "totalObtainedMark": 121.5
+                    }
+                ]
+            }
         },
 
 
