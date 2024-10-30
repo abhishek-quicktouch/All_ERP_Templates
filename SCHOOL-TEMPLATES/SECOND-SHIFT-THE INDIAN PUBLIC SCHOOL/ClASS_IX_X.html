@@ -28,7 +28,7 @@
             schoolName: "THE INDIAN SCHOOL",
             schoolAddress: `<h5 >J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
                 <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
-                <h5 >EmailID : contactus@theindianschool.in Website : www.theindianschool.in</h5>`,
+                <h5 >EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
             studentInfoFields: [
                 {
                     label: "NAME",
@@ -151,7 +151,10 @@
                         : ""
                     }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-                        ". "
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
                         : ""
                     }`;
 
