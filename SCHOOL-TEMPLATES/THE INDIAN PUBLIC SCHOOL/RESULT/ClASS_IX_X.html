@@ -129,11 +129,7 @@
 
             function generateStudentInfo(student) {
                 // Generate full address
-                let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
-                    ", "
-                    : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+                let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.street
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
                         ", "
                         : ""
@@ -141,17 +137,9 @@
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
                         ", "
                         : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse
-                            ?.landmark + ", "
-                        : ""
                     }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
                         ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-                        ". "
                         : ""
                     }`;
 
