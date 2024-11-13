@@ -12,10 +12,6 @@
 </body>
 <script>
   window.SetTemplateData = function (data) {
-
-
-
-
     const config = {
       schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-11T05_17_09_947620174.jpeg",
       schoolName: `<span style="color: red">SCORE WELL</span><span style="color: blue"> INTERNATIONAL SCHOOL</span>`,
@@ -250,6 +246,7 @@
 
       const overallPercentage = ((totalMarksObtained / totalPossibleMarks) * 100).toFixed(2);
       const overallGrade = utils.calculateGrade(overallPercentage);
+      const overAllAttendancePercentage = (remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value / remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value * 100).toFixed(2)
 
       return `
           <table>
@@ -271,49 +268,50 @@
               ${rows}
 
               <tr>
-              <td> 
+              <td style="font-weight: bold;"> 
               TOTAL   
               </td> 
               <td colspan=${termConfig.length}>
                  
               </td>
-              <td >
+              <td style="font-weight: bold;">
                  ${totalMarksObtained}
               </td>  
               </tr>
                <tr>
-              <td> 
+              <td style="font-weight: bold;"> 
               %   
               </td> 
-              <td colspan=${termConfig.length}>
-                 
+              <td colspan=${termConfig.length} style="font-weight: bold;">
+                 Overall Percentage
               </td>
-              <td >
+              <td style="font-weight: bold;">
                  ${overallPercentage}%
               </td>  
               </tr>
 
   <tr>
-    <td  >
+              <td style="padding:0px;">
                Total Working Days
               </td>  
-               <td >
-               ${remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value || "-"}
+               <td colspan=${termConfig.length} style="padding:0px;">
+                <div style="width:100%; display:flex;padding:0px; margin:0px; align-items:center;">
+                  <div style="width:25%; border-right:1px solid; padding:3px; margin:0px;">
+                    ${remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value || "-"}  
+                  </div>
+                  <div style="width:25%; border-right:1px solid; padding:3px; margin:0px;">
+                    Present Days  
+                  </div>
+                  <div style="width:25%; border-right:1px solid; padding:3px; margin:0px;">
+                     ${remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value || "-"}  
+                  </div>
+                  <div style="width:25%; padding:3px; margin:0px;">Attendance %</div>
+                </div>
               </td> 
-              <td> 
-              Present Days   
-              </td> 
-              <td >
-                 ${remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value || "-"
-        }
-              </td>
-              <td> 
-              Percentage - 
-             
-                 ${(remarksEntry?.fields?.find((item) => item?.title === "PRESENT DAYS")?.value / remarksEntry?.fields?.find((item) => item?.title === "WORKING DAYS")?.value * 100).toFixed(2) || "-"}%
-              </td>
-              
-              </tr>
+              <td style="padding:0px;">
+                 ${isNaN(overAllAttendancePercentage) ? 0 : overAllAttendancePercentage || "-"}%
+                </td>
+    </tr>
 
 
               <tr>
@@ -357,7 +355,6 @@
         for (let i = 0; i < categorySubjects.length; i++) {
           const leftSubject = categorySubjects[i];
 
-          console.log(leftSubject, "fffffffffffff leftSubject")
           tableContent1 += `
           <tr>
               <td style= "text-align: left;">${leftSubject?.subjectAllResponse?.subjectName || ""}</td>
@@ -415,7 +412,7 @@
         </tr>
         <tr>
             <td style="width: 10%; text-align: center;">A+</td>
-            <td style="width: 10%; text-align: center;">19-50</td>
+            <td style="width: 10%; text-align: center;">31-50</td>
         </tr>
         <tr>
             <td style="width: 10%; text-align: center;">A</td>

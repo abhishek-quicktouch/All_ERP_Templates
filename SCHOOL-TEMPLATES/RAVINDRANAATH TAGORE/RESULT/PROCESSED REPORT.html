@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result Template</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Result</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const printDate = "22-03-2024";
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+          Exempted: "EX",
+          NA: "NA",
+        };
+
+        const convertData = (dataList) => {
+          const res = dataList?.map((data) => {
+            return {
+              academicSession: {
+                year: data?.markData?.academicSession || "",
+                reportName: data?.markData?.markSheetName || "",
+                class: data?.markData?.className || "",
+                classTeacher: "",
+              },
+              studentInfo: data?.student,
+              studentResponse: data?.markData,
+              printDate: data?.printDate,
+              remarks: data?.baseTermData?.remarksEntry || "",
+              header: data?.header || "",
+              footer: data?.footer || "",
+            };
+          });
+          return res;
+        };
+
+        const multipleStudents = convertData(dataList);
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+          const mainResult = v?.studentResponse ?? [];
+          const studentDetails = v.studentInfo;
+          const studentRemarks = v?.remarks;
+          console.log(mainResult, "llllllllll");
+          let presentDays =
+            studentRemarks?.fields?.find(
+              (val) => val?.title == "TOTAL PRESENT DAYS"
+            )?.value || 0;
+
+          let workingDays =
+            studentRemarks?.fields?.find(
+              (val) => val?.title == "TOTAL WORKING DAYS"
+            )?.value || 0;
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `<page orientation="portrait" format="A4" margin="0">
+                  <style type="text/css">
+                    @page {
+                      size: A4;
+                    }
+
+                    * {
+                      margin: 0px;
+                      padding: 0px;
+                      color: #000;
+                    }
+
+                    td {
+                      padding-left: 1mm;
+                      padding-right: 1mm;
+                      padding-top: 2mm;
+                      padding-bottom: 2mm;
+                      font-size: 9pt;
+                      color: #000000;
+                      font-family: Arial, Helvetica, sans-serif;
+                    }
+
+                    th {
+                      padding-left: 1mm;
+                      padding-right: 1mm;
+                      padding-top: 2mm;
+                      padding-bottom: 2mm;
+                      background: #e7e7e7;
+                      font-family: Arial, Helvetica, sans-serif;
+                    }
+
+                    .signImg {
+                      width: 150px;
+                      height: auto;
+                    }
+
+                    @media print {
+                      @page {
+                        margin: 5mm;
+                        size: A4;
+                      }
+
+                      .signImg {
+                        width: 150px;
+                        height: auto;
+                      }
+                    }
+                  </style>
+
+                  
+                  <!-- logo and Name section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td valign="top" rowspan="2" align="left" style="width:15%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width:100%;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/news/images/UploadFile2024-11-07T05_15_06_651340340.jpeg" /></td>
+				<td align="center" style="width:85%; padding-top:0mm; padding-bottom:2mm;">
+					<span style="font-size:10pt; font-weight:bold; padding-top:5mm; font-family: 'Courier New', monospace;">Sri chatrapati Shivaji Maharaj Education Society®</span><br/>
+          <span style="font-size:24pt; font-weight:bold; padding-top:5mm;">Sri Ravindranath Tagore School</span>
+					<br/><span style="color: #000000;  font-weight:bold; font-size:10pt; line-height: 140%;">Gyan Boudi,Vijyapur-586101</span>
+          <br/><span style="color: #000000;  font-weight:bold; font-size:10pt; line-height: 140%;">Phone No. : 08352272933/271148</span>
+          <br/><span style="color: #000000;  font-weight:bold; font-size:10pt; line-height: 140%;">Email : rtschoolbijapur@gmail.com</span>
+					<br/>
+					</td>
+			</tr>
+			<tr>
+				<td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<col style="width: 10%"/>
+				<col style="width: 80%"/>
+				<col style="width: 10%"/>
+				<tr>
+					<td style="width:10%;">&nbsp;</td>
+					<td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt;">Academic Session : ${
+            mainResult?.academicSession
+          }</td>
+					<td style="width:10%;">&nbsp;</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>	
+		<!--// logo and Name section -->
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+                  <table cellspacing="0" style="width: 100%; border: solid 0.264583333mm #000000;">
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0">
+                            <tr>
+                                <td style="width:40%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails?.studentName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails?.admissionNo
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.fatherName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS/SECTION</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.className
+                                }-${studentDetails.sectionName}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.motherName
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.rollNo
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="width:50%;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  studentDetails.dob
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                  
+                    <td style="width:50%; border-left: solid 0.264583333mm #000000;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td style="width:40%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
+                                <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
+                                  (presentDays) +
+                                  "/" +
+                                  (workingDays)
+                                }</td>
+                            </tr>
+                        </table>
+                    </td>
+                    </tr>
+                    </table>
+                             
+                              <table cellspacing="0" style="width:100%;">
+                  	<tr>
+                  		<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:1mm;">&nbsp;</div></td>
+                  	</tr>
+                  </table>
+                
+                  <!-- Term -->	
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="center" style="width:100%; padding-left:0mm; padding-right:0mm; padding-bottom:2mm; text-align:center; font-size:11pt; font-weight:bold; color:#000000;">(Academic Performance: Scholastic Area)</td>
+			</tr>
+		</table>
+		<!--// Term -->
+                
+                    <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                  	<tr style="background-color:#e7e7e7;">
+                  		<td rowspan="2" align="center" style="width:20%; font-weight:bold; font-size:10pt; line-height: 140%;">SUBJECT<br>PAPERS</td>
+                  		<td colspan="3" align="center" style="width:40%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">${
+                        v?.studentResponse?.markSheetName
+                      }</td>
+                    
+                  		<td rowspan="2" align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt; line-height: 140%;">Total<br>100</td>
+                  		<td rowspan="2" align="center" style="width:10%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">Grade</td>
+                  	</tr>
+                  	<tr style="background-color:#e7e7e7;">
+                      ${mainResult?.markSheetTerms
+                        ?.map(
+                          (
+                            val,
+                            index,
+                            arr
+                          ) => `<td align="center" style="width:10%; border-left: solid 0.264583333mm #000000;  border-top: solid 0.264583333mm #000000; ">
+                  		<div style="height:6mm; text-align:center; width:100%; line-height:130%; font-weight:bold;">${val.headerName}</div>
+                      			<div style=" width:100%; text-align:center; font-size:8pt; font-weight:bold;">${val.subHeaderName}</div>
+                          
+                  		</td>`
+                        )
+                        .join("")}
+                    
+                  	</tr>
+                    ${mainResult?.subjectWiseMarkSheetReportResponses
+                      ?.map(
+                        (val) => `<tr>
+                  		<td align="center" style="width:20%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${
+                        val.subjectName
+                      }</td>
+                    
+                      ${val.markSheetReport
+                        ?.map(
+                          (ele) => `
+                        <td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000; font-weight:${ele?.status ? "bold": null}">${
+                            ele?.status? attendanceValue[ele?.status] ? attendanceValue[ele?.status] : ele?.status  : ele.grade
+                        }</td>`
+                        )
+                        .join("")}
+                      
+                  		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                        val.grade
+                      }</td>
+                  		<td align="center" style="width:10%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${
+                        val.grade
+                      }</td>
+                  	</tr>`
+                      )
+                      .join("")}
+                  </table>
+                
+                  <!-- // Main Subject Table -->
+                
+	            	<table cellspacing="0" style="width:100%;">
+	            		<tr>
+	            			<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+	            		</tr>
+	            	</table>
+
+                <!-- teacher remarks -->	
+		<table style="width:100%; border:solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" colspan="2" style="border-right:solid 0.264583333mm #000000; padding:2px; text-align:center; font-weight:bold;">
+				  ATTENDANCE
+				</td>
+        <td align="left" rowspan="3" style=" padding:2px; text-align:center; font-weight:bold;">
+				  OVERALL GRADE : ${mainResult.overAllGrade}
+				</td>
+			</tr>
+      <tr>
+				<td align="left" style="border-left:solid 0.264583333mm #000000; border-top:solid 0.264583333mm #000000; padding:2px; text-align:center; font-weight:bold; border-left:none;">
+				  Total Attendance of the Student
+				</td>
+        <td align="left" style="border:solid 0.264583333mm #000000; border-bottom:none; padding:2px; text-align:center; font-weight:bold;">
+				  ${presentDays}
+				</td>
+			</tr>
+      <tr>
+				<td align="left" style="border:solid 0.264583333mm #000000; border-bottom:none; border-right:none; border-left:none; padding:2px; text-align:center; font-weight:bold;">
+				  Total Working Days
+				</td>
+        <td align="left" style="border:solid 0.264583333mm #000000; border-bottom:none; padding:2px; text-align:center; font-weight:bold;">
+				 ${workingDays}
+				</td>
+			</tr>
+		</table>
+		<!--// teacher remarks -->
+              
+               
+                
+            <table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 18px; text-align: center; margin: 0px;">
+    <tr>
+        <td colspan="5" style="font-weight: bold; font-size: 14px; padding: 2px; text-align: center; border: solid 0.264583333mm #000000;">
+            5-Point Grading Scale for Scholastic Area
+        </td>
+    </tr>
+    <tr style="background-color: #f2f2f2; font-weight: bold;">
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">A+</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">A</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">B+</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">B</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">C</td>
+    </tr>
+    <tr>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">90-100</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">70-89.99</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">50-69.99</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">30-49.99</td>
+        <td style="border: solid 0.264583333mm #000000; padding: 2px;">0-29.99</td>
+    </tr>
+</table>
+		<!--// bottom grades -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:5mm;">&nbsp;</div></td>
+			</tr>
+		</table>
+			
+		<!-- Sign. section -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+					<tr>
+						<td align="right" colspan="3" style="width:100%; padding-bottom:5mm;"><strong>Date</strong> : ${
+              v?.printDate || printDate
+            }</td>
+					</tr>
+					<tr>
+						<td valign="top" align="center" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Class Teacher</strong></td>
+						<td valign="top" align="center" style="width:34%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Parent's Sign</strong></td>
+						<td valign="top" align="center" style="width:33%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><br><strong style="border-bottom:solid 0.264583333mm #000000; font-size:10pt;">Principal</strong></td>
+					</tr>
+					
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// Sign. section -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+		</table>	
+			
+		<!-- copyright -->
+		<table style="width:100%;" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+				<table cellspacing="0" style="width:100%;">
+				<tr>
+					<td align="left" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">&#169; Sri Rabindranath Tagore School</td>
+				</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		<!--// copyright -->
+
+               
+                </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          printDate: "27-10-2024",
+          student: {
+            dob: "07-04-2009",
+            admissionNo: "179",
+            studentName: "Shreya Gupta",
+            className: "I",
+            sectionName: "A",
+            rollNo: 0,
+            fatherName: "SANTOSH KUMAR",
+            motherName: "",
+            attendance: "131.0/154",
+            boardRollNumber: "",
+            studentInfoResponse: [
+              {
+                id: 74662,
+                userUid: "9b80dc70-bb6b-40df-9758-87d1531372f4",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "d1c3f823-5daf-4621-bdb9-94e36664d66c",
+                studentId: "179",
+                studentName: "Shreya Gupta",
+                fatherName: "SANTOSH KUMAR",
+                motherName: "",
+                dob: "07-04-2009",
+                gender: "Female",
+                studentAdhaarcard: "",
+                joiningClass: "UKG",
+                joiningSections: "A",
+                joiningDate: "01-01-2022",
+                plotNumber: "",
+                area: "",
+                city: "",
+                state: "",
+                pincode: null,
+                phone1: "",
+                rollNo: 0,
+                emergencyNumber: "",
+                mobileNumber: "9931205527",
+                studentEmail: null,
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "",
+                fatherCity: "",
+                fatherState: "",
+                fatherPincode: null,
+                fatherPhone: null,
+                fatherMobile: "9931205527",
+                fatherEmail: null,
+                fatherAdhaarNumber: null,
+                schoolUid: "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "",
+                motherCity: "",
+                motherState: "",
+                motherPincode: null,
+                motherPhone: null,
+                motherMobile: null,
+                motherEmail: null,
+                motherAdhaarNumber: null,
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: "gd2OpT",
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: null,
+                classTeacherUserName: null,
+                classes: "I",
+                classUid: null,
+                sections: "A",
+                group: null,
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2023-2024",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: ["string"],
+                attached: true,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "QuickCampus",
+                editedUser: "RGSADMIN",
+                createddate: "2023-04-04 04:44:13.374956",
+                editeddate: "2023-05-04 15:23:22.545661",
+                studentAddressResponse: {
+                  uid: "5098f80e-ce2e-4b41-b8b6-291a7751eeba",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                fatherAddressResponse: {
+                  uid: "4742f332-3f95-4736-b134-14825acdadea",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_F179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                motherAddressResponse: {
+                  uid: "40d15545-5f94-4354-89db-1d7a8964e8ab",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "RGS117_M179",
+                  createdDate: "04-05-2023 08:51 PM",
+                  editedDate: "04-05-2023 08:51 PM",
+                  createdBy: "RGSADMIN",
+                  editedBy: "RGSADMIN",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: null,
+              },
+            ],
+            classTeacher: "",
+            classTeacherUserName: "",
+          },
+          markData: {
+            academicSession: "2024-25",
+            admissionNo: "239522154",
+            studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+            studentName: "Shahida Mattesab Mulla",
+            rollNo: 0,
+            fatherName: "NA",
+            className: "II",
+            sectionName: "B",
+            terms: "SA-1",
+            markSheetName: "TERM 1",
+            overAllRank: "1",
+            markSheetTerms: [
+              {
+                id: 1238,
+                headerName: "FA 1",
+                subHeaderName: "15",
+                priority: 1,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 15,
+                terms: ["FA-1"],
+              },
+              {
+                id: 1239,
+                headerName: "FA 2",
+                subHeaderName: "15",
+                priority: 2,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 15,
+                terms: ["FA-2"],
+              },
+              {
+                id: 1240,
+                headerName: "SA 1",
+                subHeaderName: "20",
+                priority: 3,
+                bestOf: 0,
+                decimalPlaces: 0,
+                weightage: 20,
+                terms: ["SA-1"],
+              },
+            ],
+            subjectWiseMarkSheetReportResponses: [
+              {
+                subjectUid: "2026cf58-bb22-4e5a-ab18-df12a5f89ec8",
+                subjectName: "I Language (English)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "2026cf58-bb22-4e5a-ab18-df12a5f89ec8",
+                    subjectName: "I Language (English)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 2,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "2026cf58-bb22-4e5a-ab18-df12a5f89ec8",
+                    subjectName: "I Language (English)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 13,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "2026cf58-bb22-4e5a-ab18-df12a5f89ec8",
+                    subjectName: "I Language (English)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 15,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 30,
+                total: 50,
+                percentage: 60,
+                grade: "B+",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 1,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "1aed962f-9e4c-4e88-b2d8-9732ab4095e2",
+                subjectName: "II Language( Kannada)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "1aed962f-9e4c-4e88-b2d8-9732ab4095e2",
+                    subjectName: "II Language( Kannada)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 4,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "1aed962f-9e4c-4e88-b2d8-9732ab4095e2",
+                    subjectName: "II Language( Kannada)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 12,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "1aed962f-9e4c-4e88-b2d8-9732ab4095e2",
+                    subjectName: "II Language( Kannada)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 17,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 33,
+                total: 50,
+                percentage: 66,
+                grade: "B+",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 2,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "ab85721c-629c-44f6-b34b-bb7e1b0ac56f",
+                subjectName: "III Language (Hindi)",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ab85721c-629c-44f6-b34b-bb7e1b0ac56f",
+                    subjectName: "III Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 2,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ab85721c-629c-44f6-b34b-bb7e1b0ac56f",
+                    subjectName: "III Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 13,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ab85721c-629c-44f6-b34b-bb7e1b0ac56f",
+                    subjectName: "III Language (Hindi)",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 19,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 34,
+                total: 50,
+                percentage: 68,
+                grade: "B+",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 3,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "ac1d14ad-f3a6-4f4e-90d8-203de2dafc38",
+                subjectName: "Mathematics",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ac1d14ad-f3a6-4f4e-90d8-203de2dafc38",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 14,
+                    grade: "A+",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ac1d14ad-f3a6-4f4e-90d8-203de2dafc38",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 1,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "ac1d14ad-f3a6-4f4e-90d8-203de2dafc38",
+                    subjectName: "Mathematics",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 15,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 30,
+                total: 50,
+                percentage: 60,
+                grade: "B+",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 4,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "f768eeaa-7385-4d9e-b974-934f1f45345f",
+                subjectName: "EVS",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "f768eeaa-7385-4d9e-b974-934f1f45345f",
+                    subjectName: "EVS",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 13,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "f768eeaa-7385-4d9e-b974-934f1f45345f",
+                    subjectName: "EVS",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 0,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "f768eeaa-7385-4d9e-b974-934f1f45345f",
+                    subjectName: "EVS",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 9,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 22,
+                total: 50,
+                percentage: 44,
+                grade: "B",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 5,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "0139f025-7b19-4269-9514-0d5683f95127",
+                subjectName: "Physical Education",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "0139f025-7b19-4269-9514-0d5683f95127",
+                    subjectName: "Physical Education",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 11,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "0139f025-7b19-4269-9514-0d5683f95127",
+                    subjectName: "Physical Education",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 13,
+                    grade: "A",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "0139f025-7b19-4269-9514-0d5683f95127",
+                    subjectName: "Physical Education",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 7,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                ],
+                marksObtained: 31,
+                total: 50,
+                percentage: 62,
+                grade: "B+",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 6,
+                decimalPlaces: 0,
+                visible: false,
+              },
+              {
+                subjectUid: "8cd2b031-50cd-430d-935f-a5da2451169f",
+                subjectName: "Drawing",
+                subjectNature: "Theory",
+                markSheetReport: [
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "8cd2b031-50cd-430d-935f-a5da2451169f",
+                    subjectName: "Drawing",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 0,
+                    grade: "C",
+                    status: "Absent",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1238,
+                      headerName: "FA 1",
+                      subHeaderName: "15",
+                      priority: 1,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "8cd2b031-50cd-430d-935f-a5da2451169f",
+                    subjectName: "Drawing",
+                    subjectNature: "Theory",
+                    max: 15,
+                    obtained: 6,
+                    grade: "B",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1239,
+                      headerName: "FA 2",
+                      subHeaderName: "15",
+                      priority: 2,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 15,
+                      terms: ["FA-2"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: true,
+                  },
+                  {
+                    studentInfoUid: "1c4cb7b3-41a8-4ee4-8510-1b700c5bdb54",
+                    admissionNo: "239522154",
+                    studentName: "Shahida Mattesab Mulla",
+                    rollNo: 0,
+                    fatherName: "NA",
+                    className: "II",
+                    sectionName: "B",
+                    classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+                    terms: "SA-1",
+                    subjectUid: "8cd2b031-50cd-430d-935f-a5da2451169f",
+                    subjectName: "Drawing",
+                    subjectNature: "Theory",
+                    max: 20,
+                    obtained: 4,
+                    grade: "C",
+                    status: "",
+                    markSheetName: "TERM 1",
+                    attachmentName: "",
+                    session: "2024-25",
+                    decimalPlaces: 0,
+                    markSheetTermResponse: {
+                      id: 1240,
+                      headerName: "SA 1",
+                      subHeaderName: "20",
+                      priority: 3,
+                      bestOf: 0,
+                      decimalPlaces: 0,
+                      weightage: 20,
+                      terms: ["SA-1"],
+                    },
+                    visible: false,
+                    graded: false,
+                    pass: false,
+                  },
+                ],
+                marksObtained: 10,
+                total: 50,
+                percentage: 20,
+                grade: "C",
+                className: "II",
+                sectionName: "B",
+                terms: "SA-1",
+                markSheetName: "TERM 1",
+                subjectPrt: 7,
+                decimalPlaces: 0,
+                visible: false,
+              },
+            ],
+            marksObtained: 190,
+            total: 350,
+            percentage: 54,
+            overAllGrade: "B+",
+            visible: false,
+          },
+          header: ``,
+          footer: ``,
+          remarks: {
+            uid: "489fa01f-4c27-4e7e-b715-2862626a92e4",
+            terms: ["PERIODIC TEST 2"],
+            studentId: "V-4688",
+            studentName: "Aarav Sachdeva",
+            rollNumber: 0,
+            classSectionUid: "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+            classSection: "X-A",
+            description:
+              "Aarav needs to assume greater responsibility for establishing and maintaining an effective study and homework routine.",
+            fields: [
+              {
+                uid: "203ac76a-e77f-4ac8-ab1c-6a0924502904",
+                title: "Accountancy",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "b20e3dc7-b539-4085-805b-b20fbf93f429",
+                title: "Applied Maths",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "a97deab6-513c-4fd8-aa08-629706aed8aa",
+                title: "Attendance",
+                type: "OPEN",
+                value: "105/121",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "837e6762-34eb-46dd-9f85-46e92674a707",
+                title: "Biology",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "74be6e7d-4872-4349-b1bc-681ed5498feb",
+                title: "Business Studies",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "78a0ce0d-569e-4119-b8e1-6ce7a12a255e",
+                title: "Chemistry",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "4c6ab83a-cee9-4130-abb0-ebf430dcf9a8",
+                title: "Computer Science",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "16ea3e4c-c9ea-4936-b269-838dcd8875cb",
+                title: "Economics",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "04a493e4-4e2e-4fe2-8391-8b827d9bbb7b",
+                title: "English",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "61a35fd4-19fd-4fe8-845d-411e9604547b",
+                title: "Fashion Studies",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "9b0b60b1-5550-4822-b3d4-89967a471fcc",
+                title: "History",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "5bf03bc8-5002-48e7-b84d-15f778886fa4",
+                title: "Informatics Practices",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "717e1ba1-c28c-4427-b2e0-292d6a96e8db",
+                title: "Mathematics",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "fb66041b-a89c-4f36-a9ee-47b5d025e465",
+                title: "Physical Education",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "ee0e37df-2930-41f5-9df0-c8894bca3aad",
+                title: "Physics",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "ab3b4544-0c08-4985-b87c-117209918c70",
+                title: "Political Science",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "c7514c27-85a3-437b-bed6-338f68e81ed2",
+                title: "Psychology",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+              {
+                uid: "041dba83-3062-4aeb-887e-6c174ab67892",
+                title: "Sociology",
+                type: "OPEN",
+                value: "",
+                masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                masterName: "Remarks",
+              },
+            ],
+            status: true,
+            createdUser: "DennisSimon_526117",
+            editedUser: "DennisSimon_526117",
+            createdDate: "19-10-2024 12:18 PM",
+            editedDate: "21-10-2024 10:14 AM",
+          },
+          baseTermData: {
+            studentAcademic: {
+              dob: "09-11-2009",
+              admissionNo: "V-4688",
+              studentName: "Aarav Sachdeva",
+              className: "X",
+              sectionName: "A",
+              rollNo: 0,
+              fatherName: "Bharat Sachdeva",
+              motherName: "Anupama Sachdeva",
+              attendance: "0.0/0",
+              boardRollNumber: "",
+              studentInfoResponse: [
+                {
+                  id: 321276,
+                  userUid: "39e67359-767c-4269-97e9-5b5e5d5cd56e",
+                  userName: null,
+                  fatherUserName: null,
+                  motherUserName: null,
+                  guardianUserName: null,
+                  uid: "9dc977ea-0503-4b7f-857f-867036d43cd3",
+                  studentId: "V-4688",
+                  exAdmissionNo: null,
+                  studentName: "Aarav Sachdeva",
+                  fatherName: "Bharat Sachdeva",
+                  motherName: "Anupama Sachdeva",
+                  dob: "09-11-2009",
+                  gender: "NA",
+                  studentAdhaarcard: "",
+                  joiningClass: "X",
+                  joiningSections: "A",
+                  joiningDate: "18-09-2024",
+                  plotNumber: "",
+                  area: "Kalkaji Near Deshbahu College",
+                  city: "New Delhi",
+                  state: "Delhi",
+                  pincode: "100019",
+                  phone1: null,
+                  rollNo: 0,
+                  emergencyNumber: "",
+                  mobileNumber: "9999013087",
+                  studentEmail: null,
+                  religion: "",
+                  category: "",
+                  minority: "",
+                  motherTongue: "",
+                  idMark: "",
+                  height: "",
+                  weight: "",
+                  physicalDisability: "",
+                  bloodGroup: "",
+                  healthRemark: "",
+                  siblingDetails: "",
+                  alumni: "",
+                  siblingResponse: [],
+                  fatherOccupation: "",
+                  fatherQualification: "",
+                  fatherOrganization: "",
+                  fatherDesignation: "",
+                  fatherIncome: "",
+                  fatherArea: "NA",
+                  fatherCity: "NA",
+                  fatherState: "NA",
+                  fatherPincode: "",
+                  fatherPhone: null,
+                  fatherMobile: "9999013087",
+                  fatherEmail: null,
+                  fatherAdhaarNumber: "",
+                  schoolUid: "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+                  motherQualification: "",
+                  motherOccupation: "",
+                  motherOrganization: "",
+                  motherDesignation: "",
+                  motherIncome: "",
+                  motherArea: "NA",
+                  motherCity: "NA",
+                  motherState: "NA",
+                  motherPincode: "",
+                  motherPhone: null,
+                  motherMobile: "9999013087",
+                  motherEmail: null,
+                  motherAdhaarNumber: "",
+                  guardianName: null,
+                  relation: null,
+                  guardianOccupation: null,
+                  guardianPhone: null,
+                  guardianMobile: null,
+                  guardianEmail: null,
+                  guardianAddress: null,
+                  leavingDate: null,
+                  previousSchoolName: null,
+                  otp: null,
+                  schoolName: "Demo Public School",
+                  remark: null,
+                  classTeacher: "",
+                  classTeacherUserName: "",
+                  classes: "X",
+                  classUid: null,
+                  sections: "A",
+                  group: null,
+                  wing: "NA",
+                  status: "Studying",
+                  academicSession: "2024-2025",
+                  joiningStatus: "New",
+                  houses: null,
+                  certificates: "",
+                  certificatesList: [],
+                  caste: "",
+                  listOfDocuments: null,
+                  attached: false,
+                  required: false,
+                  submitted: false,
+                  studentHostel: [],
+                  studentConcession: [],
+                  studentTransport: [],
+                  studentAadharCard: null,
+                  fatherAadharCard: null,
+                  motherAadharCard: null,
+                  studentImage: null,
+                  fatherImage: null,
+                  motherImage: null,
+                  guardianImage: null,
+                  birthCertificate: null,
+                  classSectionUid: "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                  aluminiProof: null,
+                  siblingProof: null,
+                  residenceProof: null,
+                  firstBornChildProof: null,
+                  medicalFitnessCertificate: null,
+                  fatherQualificationProof: null,
+                  motherQualificationProof: null,
+                  casteCertificate: null,
+                  createdUser: "SimranjeetKaur_522590",
+                  editedUser: "SimranjeetKaur_522590",
+                  createddate: "2024-09-18 10:55:10.806133",
+                  editeddate: "2024-09-18 10:55:10.806133",
+                  permanentEducationNumber: null,
+                  studentAddressResponse: {
+                    uid: "08f91fb0-acfa-41b9-9d45-da62ea765b62",
+                    houseNo: null,
+                    area: "Kalkaji Near Deshbahu College",
+                    landmark: null,
+                    city: "New Delhi",
+                    district: null,
+                    state: "Delhi",
+                    poPs: null,
+                    pincode: 100019,
+                    street: "H - 30",
+                    userName: "DIS896_V-4688",
+                    createdDate: "18-09-2024 04:25 PM",
+                    editedDate: "18-09-2024 04:25 PM",
+                    createdBy: "SimranjeetKaur_522590",
+                    editedBy: "SimranjeetKaur_522590",
+                  },
+                  fatherAddressResponse: {
+                    uid: "2d37dde2-4690-4113-b7f1-243a22ac9dd1",
+                    houseNo: null,
+                    area: "NA",
+                    landmark: null,
+                    city: "NA",
+                    district: null,
+                    state: "NA",
+                    poPs: null,
+                    pincode: 0,
+                    street: null,
+                    userName: null,
+                    createdDate: "18-09-2024 04:25 PM",
+                    editedDate: "18-09-2024 04:25 PM",
+                    createdBy: "SimranjeetKaur_522590",
+                    editedBy: "SimranjeetKaur_522590",
+                  },
+                  motherAddressResponse: {
+                    uid: "27034941-08a1-4703-a120-f86191a08254",
+                    houseNo: null,
+                    area: "NA",
+                    landmark: null,
+                    city: "NA",
+                    district: null,
+                    state: "NA",
+                    poPs: null,
+                    pincode: 0,
+                    street: null,
+                    userName: null,
+                    createdDate: "18-09-2024 04:25 PM",
+                    editedDate: "18-09-2024 04:25 PM",
+                    createdBy: "SimranjeetKaur_522590",
+                    editedBy: "SimranjeetKaur_522590",
+                  },
+                  guardianAddressResponse: null,
+                  correspondenceAddressResponse: null,
+                },
+              ],
+              classTeacher: "",
+              classTeacherUserName: "",
+              permanentEducationNumber: null,
+              school: {
+                uid: "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+                apikey: "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+                schoolName: "The Indian School",
+                schoolAbb: "DIS",
+                educationBoard: null,
+                registrationNo: null,
+                plotNumber: "NA",
+                area: "Josip Broz Tito Marg",
+                city: "New Delhi",
+                pincode: "110049",
+                state: "Delhi",
+                phoneNo1: "1126265956",
+                phoneNo2: "1126265957",
+                contactName: "Simranjeet",
+                contactMobile: "9711140936",
+                contactEmail: "simranjeet@theindianschool.in",
+                schoolCode: null,
+                pfCode: null,
+                societyManagement: null,
+                language: null,
+                schoolLogo: null,
+                schoolFavicon: null,
+                enabled: true,
+                subDomain: null,
+                website: "www.theindianschool.in",
+                schemaPrefix: null,
+                editedDate: "28-10-2024 07:06 PM",
+                editedUser: "QuickCampus",
+                visitorSchool: false,
+                clientSchoolId: null,
+                cscId: null,
+                onlinePaymentEnabled: false,
+                registrationSeries: null,
+                underTakingDetails: null,
+                formNumberStart: null,
+                sessionResponse: null,
+                schoolLogoUrl: null,
+                printAcknowledge: false,
+                wabaId: "",
+                phoneNumberId: "",
+                whatsappApiKey: "",
+                isQuickCampusWhatsapp: false,
+                whatsAppEnabled: false,
+                smsenabled: false,
+                notificationEnabled: true,
+                loanEnabled: false,
+              },
+            },
+            subject: [
+              {
+                subjectAllResponse: {
+                  uid: "2026cf58-bb22-4e5a-ab18-df12a5f89ec8",
+                  subjectName: "I Language (English)",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:15:12.445299",
+                  editeddate: "2024-10-17 05:28:33.260555",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 11,
+                percentage: 73.33333333333333,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 1,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "1aed962f-9e4c-4e88-b2d8-9732ab4095e2",
+                  subjectName: "II Language( Kannada)",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:15:22.556079",
+                  editeddate: "2024-10-17 05:11:50.105889",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 13,
+                percentage: 86.66666666666667,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 2,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "ab85721c-629c-44f6-b34b-bb7e1b0ac56f",
+                  subjectName: "III Language (Hindi)",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:15:34.402119",
+                  editeddate: "2024-10-17 05:12:24.485153",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 14,
+                percentage: 93.33333333333333,
+                grade: "A+",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 3,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "ac1d14ad-f3a6-4f4e-90d8-203de2dafc38",
+                  subjectName: "Mathematics",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:16:04.410732",
+                  editeddate: "2024-10-15 06:16:04.409505",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 11,
+                percentage: 73.33333333333333,
+                grade: "A",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 4,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "f768eeaa-7385-4d9e-b974-934f1f45345f",
+                  subjectName: "EVS",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-17 05:14:21.29288",
+                  editeddate: "2024-10-17 05:14:21.292323",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 7,
+                percentage: 46.666666666666664,
+                grade: "B",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 5,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "0139f025-7b19-4269-9514-0d5683f95127",
+                  subjectName: "Physical Education",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:16:56.031869",
+                  editeddate: "2024-10-15 06:16:56.03146",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 5,
+                percentage: 33.333333333333336,
+                grade: "B",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 6,
+                scholastic: true,
+                added: true,
+              },
+              {
+                subjectAllResponse: {
+                  uid: "8cd2b031-50cd-430d-935f-a5da2451169f",
+                  subjectName: "Drawing",
+                  nature: "Theory",
+                  natureUid: "bd905ae8-b5a3-4eb1-9896-11dea75b51da",
+                  cbseVIIICode: "",
+                  cbseXCode: "",
+                  cbseXIICode: "",
+                  status: true,
+                  parent: [],
+                  parentName: [],
+                  haveChild: false,
+                  createdUser: "QuickCampus",
+                  editedUser: "QuickCampus",
+                  createddate: "2024-10-15 06:17:30.249451",
+                  editeddate: "2024-10-15 07:17:46.782053",
+                },
+                termName: "SA-1",
+                max: 15,
+                markObtained: 3,
+                percentage: 20,
+                grade: "C",
+                remarkStatus: "",
+                attachmentName: "",
+                additional: false,
+                priority: 7,
+                scholastic: true,
+                added: true,
+              },
+            ],
+            remarksEntry: {
+              uid: "e8388a67-1e1f-495e-8d7d-cc3ae9e141f6",
+              terms: ["SA-1"],
+              studentId: "239522154",
+              studentName: "Shahida Mattesab Mulla",
+              rollNumber: 0,
+              classSectionUid: "21c775c2-1d5a-425b-a6e8-9109be6be740",
+              classSection: "II-B",
+              description: "very good",
+              fields: [
+                {
+                  uid: "2c063982-3ab1-44e4-91fe-a00f8fa23e76",
+                  title: "TOTAL PRESENT DAYS",
+                  type: "NUMERIC",
+                  value: "45",
+                  masterUid: "b9ce43c9-4ebe-4e20-9b88-19f71c1ad648",
+                  masterName: "ATTENDANCE",
+                },
+                {
+                  uid: "66d6628f-f687-4299-bf02-3ecba9018178",
+                  title: "TOTAL WORKING DAYS",
+                  type: "NUMERIC",
+                  value: "50",
+                  masterUid: "b9ce43c9-4ebe-4e20-9b88-19f71c1ad648",
+                  masterName: "ATTENDANCE",
+                },
+              ],
+              status: true,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createdDate: "07-11-2024 10:27 AM",
+              editedDate: "07-11-2024 10:27 AM",
+            },
+            school: {
+              uid: "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              apikey: "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+              schoolName: "The Indian School",
+              schoolAbb: "DIS",
+              educationBoard: null,
+              registrationNo: null,
+              plotNumber: "NA",
+              area: "Josip Broz Tito Marg",
+              city: "New Delhi",
+              pincode: "110049",
+              state: "Delhi",
+              phoneNo1: "1126265956",
+              phoneNo2: "1126265957",
+              contactName: "Simranjeet",
+              contactMobile: "9711140936",
+              contactEmail: "simranjeet@theindianschool.in",
+              schoolCode: null,
+              pfCode: null,
+              societyManagement: null,
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: null,
+              website: "www.theindianschool.in",
+              schemaPrefix: null,
+              editedDate: "28-10-2024 07:06 PM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: false,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              wabaId: "",
+              phoneNumberId: "",
+              whatsappApiKey: "",
+              isQuickCampusWhatsapp: false,
+              whatsAppEnabled: false,
+              smsenabled: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+            },
+            promotedClass: null,
+            promotedSection: null,
+            perSignedUrlResponse: {
+              url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIS896/student-info/V-4688/student/images/V-4688.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241029T071642Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241029%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=bae7b8e4fd1ea057c40c7311b91c8424a10dadd0b3b35ec190cdcf2236bd60ae",
+              fileName: "V-4688.png",
+            },
+            pass: false,
+            status_code: 200,
+          },
+        },
+      ]);
+    </script>
+  </body>
+</html>
