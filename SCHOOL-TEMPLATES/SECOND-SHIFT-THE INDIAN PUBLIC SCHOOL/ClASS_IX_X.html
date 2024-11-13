@@ -16,64 +16,67 @@
 </body>
 <script>
     window.SetTemplateData = function (data) {
-        const dataList = Array.isArray(data) ? data : [data];
-        const studentHtml = document.getElementById("studentsList");
+      console.log(data, "fffffffffffffff data");
 
-        studentHtml.innerHTML = ''; // Clear existing content
-        const config = {
-            schoolLogo:
+      const dataList = Array.isArray(data) ? data : [data];
+      const studentHtml = document.getElementById("studentsList");
+
+      studentHtml.innerHTML = ""; // Clear existing content
+      const config = {
+        schoolLogo:
                 "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
             schoolLogo2:
-                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
-            schoolName: "THE INDIAN SCHOOL",
-            schoolAddress: `<h5 >J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
-                <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
-                <h5 >EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
-            studentInfoFields: [
-                {
-                    label: "NAME",
-                    key: "studentName",
-                    additionalInfo: { label: "CLASS & SECTION", key: "className" },
-                },
-                {
-                    label: "FATHER'S NAME",
-                    key: "fatherName",
-                    additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
-                },
-                {
-                    label: "MOTHER'S NAME",
-                    key: "motherName",
-                    additionalInfo: { label: "D.O.B", key: "dob" },
-                },
-                {
-                    label: "ADDRESS",
-                    key: "address",
-                },
-            ],
-            gradingScale: "on 8-point (A1-E) Grading Scale",
-            gradeScale: [
-                { minPercentage: 91, grade: "A1" },
-                { minPercentage: 81, grade: "A2" },
-                { minPercentage: 71, grade: "B1" },
-                { minPercentage: 61, grade: "B2" },
-                { minPercentage: 51, grade: "C1" },
-                { minPercentage: 41, grade: "C2" },
-                { minPercentage: 33, grade: "D" },
-                { minPercentage: 0, grade: "E" },
-            ],
-            scholasticConfig: {
-                nature: "THEORY",
-            },
-            coScholasticConfig: {
-                nature: "1B Scholastic",
-            },
-            coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
-            signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
-            footnotes: [
-                "*S.E.A - Subject Enrichment Activity",
-                "*M.A - Multiple Assessment",
-            ],
-            styles: `
+                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-30T06_04_29_303619805.png",
+            schoolName: "THE INDIAN SCHOOL-SECOND SHIFT",
+            schoolAddress: `<h5 >Josip Broz Tito Marg,New Delhi - 110049,</h5>
+                <h5>PH.:01126257551 / 01126257552, FAX : 011-26253185</h5>
+                <h5 >EmailID : contactus@theindianschool-secondshift.in </h5>
+<h5>Website: www.theindianschool-secondshift.in </5>`,
+        studentInfoFields: [
+          {
+            label: "NAME",
+            key: "studentName",
+            additionalInfo: { label: "CLASS & SECTION", key: "className" },
+          },
+          {
+            label: "FATHER'S NAME",
+            key: "fatherName",
+            additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
+          },
+          {
+            label: "MOTHER'S NAME",
+            key: "motherName",
+            additionalInfo: { label: "D.O.B", key: "dob" },
+          },
+          {
+            label: "ADDRESS",
+            key: "address",
+          },
+        ],
+        gradingScale: "on 8-point (A1-E) Grading Scale",
+        gradeScale: [
+          { minPercentage: 91, grade: "A1" },
+          { minPercentage: 81, grade: "A2" },
+          { minPercentage: 71, grade: "B1" },
+          { minPercentage: 61, grade: "B2" },
+          { minPercentage: 51, grade: "C1" },
+          { minPercentage: 41, grade: "C2" },
+          { minPercentage: 33, grade: "D" },
+          { minPercentage: 0, grade: "E" },
+        ],
+        scholasticConfig: {
+          nature: "THEORY",
+        },
+        coScholasticConfig: {
+          nature: "1B Scholastic",
+        },
+        coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
+        signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+        footnotes: [
+          "*S.E.A - Subject Enrichment Activity",
+          "*M.A - Multiple Assessment",
+        ],
+        styles: `
             @page { size: A4; margin: 10mm; }
             @media print { @page { margin: auto; size: A4; } }
             body { font-family: Arial, sans-serif; }
@@ -90,163 +93,160 @@
             .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
             .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
             .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
-           
-            
-        `,
-        };
+    `,
+      };
 
+      // Process each student
+      dataList.forEach((element, index) => {
+        let graphSubjects = [];
 
+        function getAttendanceOrMark(status, mark) {
+          const attendanceValue = {
+            Absent: "AB",
+            Medical: "M",
+            Sports: "S",
+            Leave: "L",
+            "Late Admission": "LA",
+            Exempted: "EX",
+            NA: "NA",
+          };
+          return attendanceValue[status] || mark || "-";
+        }
 
-
-        // Process each student
-        dataList.forEach((element, index) => {
-
-            let graphSubjects = [];
-
-
-            function getAttendanceOrMark(status, mark) {
-                const attendanceValue = {
-                    Absent: "AB",
-                    Medical: "M",
-                    Sports: "S",
-                    Leave: "L",
-                    "Late Admission": "LA",
-                    Exempted: "EX",
-                    NA: "NA",
-                };
-                return attendanceValue[status] || mark || "-";
+        // Calculate grade based on percentage
+        function calculateGrade(percentage) {
+          for (const grade of config.gradeScale) {
+            if (percentage >= grade.minPercentage) {
+              return grade.grade;
             }
+          }
+          return "F";
+        }
 
-            // Calculate grade based on percentage
-            function calculateGrade(percentage) {
-                for (const grade of config.gradeScale) {
-                    if (percentage >= grade.minPercentage) {
-                        return grade.grade;
-                    }
-                }
-                return "F";
-            }
+        function generateStudentInfo(student) {
+          // Generate full address
+          let fullAddress = `${
+            student?.studentInfoResponse[0]?.studentAddressResponse?.street
+              ? student?.studentInfoResponse[0]?.studentAddressResponse
+                  ?.street + ", "
+              : ""
+          }${
+            student?.studentInfoResponse[0]?.studentAddressResponse?.area
+              ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+                ", "
+              : ""
+          }${
+            student?.studentInfoResponse[0]?.studentAddressResponse?.city
+              ? student?.studentInfoResponse[0]?.studentAddressResponse?.city
+              : ""
+          }`;
 
-            function generateStudentInfo(student) {
-                // Generate full address
-                let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
-                    ", "
-                    : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse
-                            ?.landmark + ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-                        : ""
-                    }`;
-
-                // Generate table with student info
-                return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+          // Generate table with student info
+          return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
         ${config.studentInfoFields
-                        .map(
-                            (field) => `
+          .map(
+            (field) => `
                     <tr>
-                        <th style="width: 25%; text-align: left">${field?.label
+                        <th style="width: 25%; text-align: left">${
+                          field?.label
+                        }</th>
+                        ${
+                          field?.label?.toLowerCase() === "address"
+                            ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
+                            : `  <td style="width: 25%;"> : ${
+                                student?.[field?.key] || ""
+                              } </td> `
+                        }   
+                        ${
+                          field?.additionalInfo
+                            ? field?.additionalInfo?.label === "CLASS & SECTION"
+                              ? `<th style="width: 25%; text-align: left">${
+                                  field?.additionalInfo?.label
                                 }</th>
-                        ${field?.label?.toLowerCase() === "address"
-                                    ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
-                                    : `  <td style="width: 25%;"> : ${student?.[field?.key] || ""
-                                    } </td> `
-                                }   
-                        ${field?.additionalInfo
-                                    ? field?.additionalInfo?.label === "CLASS & SECTION"
-                                        ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
-                                        }</th>
-                                <td style="width: 25%;"> : ${student?.["className"] || ""
-                                        }-${student?.["sectionName"] || ""}</td>
+                                <td style="width: 25%;"> : ${
+                                  student?.["className"] || ""
+                                }-${student?.["sectionName"] || ""}</td>
                             `
-                                        : `
-                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
-                                        }</th>
-                                <td style="width: 25%;"> : ${student?.[field?.additionalInfo?.key] || ""
-                                        }</td>
+                              : `
+                                <th style="width: 25%; text-align: left">${
+                                  field?.additionalInfo?.label
+                                }</th>
+                                <td style="width: 25%;"> : ${
+                                  student?.[field?.additionalInfo?.key] || ""
+                                }</td>
                             `
-                                    : ""
-                                }
+                            : ""
+                        }
                     </tr>
                 `
-                        )
-                        .join("")}
+          )
+          .join("")}
     </table>`;
-            }
+        }
 
-            // Generate scholastic table
+        // Generate scholastic table
 
-            function generateAdditionalTable(subjects) {
-                return `<table style="width: 100%;font-size: 12px;  ">
+        function generateAdditionalTable(subjects) {
+          return `<table style="width: 100%;font-size: 12px;  ">
         <tr style="background-color: #e4f2f2">
             <th style="width: 60%;">SUBJECT</th>
             <th style="width: 20%; text-align: center">PT-2</th>
             <th style="width: 20%; text-align: center">GRADE</th>
         </tr>
         ${subjects
-                        .filter((subject) => subject?.additional)
-                        .map(
-                            (subject) => `
+          .filter((subject) => subject?.additional)
+          .map(
+            (subject) => `
                     <tr>
-                        <td style="width: 60%;">${subject?.subjectAllResponse?.subjectName || ""
-                                }</td>
-                        <td style="width: 20%; text-align: center; font-weight:${subject.remarkStatus ? "bold" : "normal"
-                                }">${subject.remarkStatus || subject?.markObtained || "-"
-                                }</td>
-                        <td style="width: 20%; text-align: center">${subject?.grade || ""
-                                }</td>
+                        <td style="width: 60%;">${
+                          subject?.subjectAllResponse?.subjectName || ""
+                        }</td>
+                        <td style="width: 20%; text-align: center; font-weight:${
+                          subject.remarkStatus ? "bold" : "normal"
+                        }">${
+              subject.remarkStatus || subject?.markObtained || "-"
+            }</td>
+                        <td style="width: 20%; text-align: center">${
+                          subject?.grade || ""
+                        }</td>
                     </tr>
                 `
-                        )
-                        .join("")}
+          )
+          .join("")}
     </table>`;
-            }
+        }
 
-            function generateCoScholasticTable(subjects) {
-                console.log(subjects, "fffffffffffffff subjects");
-                const coScholasticSubjects = subjects?.filter(
-                    (subject) =>
-                        subject?.subjectAllResponse?.nature ===
-                        config.coScholasticConfig.nature
-                );
+        function generateCoScholasticTable(subjects) {
+          const coScholasticSubjects = subjects?.filter(
+            (subject) =>
+              subject?.subjectAllResponse?.nature ===
+              config.coScholasticConfig.nature
+          );
 
-                let tableContent = "";
-                console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
-                for (let i = 0; i < coScholasticSubjects.length; i++) {
-                    const leftSubject = coScholasticSubjects[i];
-                    // console.log(leftSubject, "fffffffffffff leftSubject");
-                    tableContent += `
+          let tableContent = "";
+          console.log(
+            coScholasticSubjects,
+            "ffffffffffff coScholasticSubjects"
+          );
+          for (let i = 0; i < coScholasticSubjects.length; i++) {
+            const leftSubject = coScholasticSubjects[i];
+            // console.log(leftSubject, "fffffffffffff leftSubject");
+            tableContent += `
                 <tr>
-                    <td style="width: 80%;">${leftSubject?.subjectAllResponse?.subjectName || ""
-                        }</td>
-                    <td style="width: 20%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"
-                        }">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
-                        }</td>
+                    <td style="width: 80%;">${
+                      leftSubject?.subjectAllResponse?.subjectName || ""
+                    }</td>
+                    <td style="width: 20%; text-align: center; font-weight:${
+                      leftSubject.remarkStatus ? "bold" : "normal"
+                    }">${
+              leftSubject?.remarkStatus || leftSubject?.grade || "-"
+            }</td>
                     
                 </tr>
             `;
-                }
+          }
 
-                return `
+          return `
             <table style="width: 100%;">
                 <tr>
                     <th colspan="2" style="border: none; background-color: #c1e0e0">
@@ -264,28 +264,28 @@
                 ${tableContent}
             </table>
         `;
-            }
+        }
 
-
-            function generateRemark(remark) {
-                return `
+        function generateRemark(remark) {
+          return `
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #c1e0e0"> 
             <th style="">CLASS TEACHER'S REMARKS</th>
         <tr>
-            <th style="text-align: left">${remark?.description ||
-                    remark?.field?.find((f) => f?.title === "Teacher's Remarks")
-                        .value ||
-                    "-"
-                    }</th>
+            <th style="text-align: left">${
+              remark?.description ||
+              remark?.field?.find((f) => f?.title === "Teacher's Remarks")
+                .value ||
+              "-"
+            }</th>
             
         </tr>
     </table>
     `;
-            }
+        }
 
-            function generateGradingTable() {
-                return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        function generateGradingTable() {
+          return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <tr>
             <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
                 INSTRUCTIONS
@@ -332,58 +332,60 @@
         </tr>
     </table>
 `;
-            }
+        }
 
-            function generateHeader(element) {
-                return ` <div class="header">
+        function generateHeader(element) {
+          return ` <div class="header">
             
-${element.header
-                        ? element.header
-                        : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+${
+  element.header
+    ? element.header
+    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
-                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <h2 style="color: #2b595e" >${config.schoolName}</h2>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
             `
-                    }
+}
 
              
 </div>`;
-            }
+        }
 
-            function generateSignature() {
-                return `
+        function generateSignature() {
+          return `
              <div class="signatures">
                         ${config.signatures
-                        .map(
+                          .map(
                             (sig) => `
                             <div>
                                
                                 <p style="vertical-align: bottom">${sig}</p>
                             </div>
                         `
-                        )
-                        .join("")}
+                          )
+                          .join("")}
                     </div>
             `;
-            }
+        }
 
+        function generateStudentReport(element, graphId) {
+          const termConfig =
+            element?.markData?.markSheetTerms?.map((term) => ({
+              headerName: term?.headerName,
+              subHeaderName: term?.subHeaderName,
+            })) || [];
 
-
-            function generateStudentReport(element, graphId,) {
-                const termConfig = element?.markData?.markSheetTerms?.map(term => ({
-                    headerName: term?.headerName,
-                    subHeaderName: term?.subHeaderName
-                })) || [];
-
-                return `
+          return `
         <style type="text/css">${config.styles}</style>
         <page orientation="portrait" format="A4" margin="0">
             <div class="container">
                 ${generateHeader(element)}
                 <h4 style="background-color: #c1e0e0; border: 1px solid black; text-align: center; font-size: 14px">
-                    PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""}
+                    PROGRESS REPORT- SESSION ${
+                      element?.markData?.academicSession || ""
+                    }
                 </h4>
                 ${generateStudentInfo(element?.student)}
 
@@ -392,10 +394,10 @@ ${element.header
                         SCHOLASTIC REPORT
                     </h3>
                     ${generateScholasticTable(
-                    element?.markData?.subjectWiseMarkSheetReportResponses,
-                    element?.baseTermData?.subject,
-                    termConfig
-                )}
+                      element?.markData?.subjectWiseMarkSheetReportResponses,
+                      element?.baseTermData?.subject,
+                      termConfig
+                    )}
                 </div>
 
                 <div class="section">
@@ -404,16 +406,20 @@ ${element.header
 
                 <div style="width: 100%; display: flex;">
                     <div class="section" style="border-left: 1px solid black; width: 50%">
-                        ${generateCoScholasticTable(element?.baseTermData?.subject)}
+                        ${generateCoScholasticTable(
+                          element?.baseTermData?.subject
+                        )}
                     </div>
 
                     <div class="section" style="width: 50%">
                         <h3 style="text-align: center; font-size: 12px; background-color: #c1e0e0; border: 1px solid black; padding: 2px; text-transform: uppercase">
-                            ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+                            ${
+                              element?.student?.studentName || "STUDENT"
+                            }'S PERFORMANCE ANALYSIS
                         </h3>
-                        <div id="${graphId}" style="border: 1px solid black">
-                            
-                            </div>
+                        <div id="${graphId}">
+                            <div id="${graphId}"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -425,12 +431,17 @@ ${element.header
                     ${generateGradingTable()}
                     <div style="font-size: 12px; display: flex; justify-content: space-between">
                         <span style="font-weight: bold">
-                            Date: ${element?.printDate || new Date().toLocaleDateString()}
+                            Date: ${
+                              element?.printDate ||
+                              new Date().toLocaleDateString()
+                            }
                         </span>
                         <span style="font-weight: bold">
-                            Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
-                    field => field?.title === "Attendance"
-                )?.value || element?.student?.attendance}
+                            Attendance: ${
+                              element?.baseTermData?.remarksEntry?.fields?.find(
+                                (field) => field?.title === "Attendance"
+                              )?.value || element?.student?.attendance
+                            }
                         </span>
                     </div>
                 </div>
@@ -439,284 +450,351 @@ ${element.header
             </div>
         </page>
     `;
-            }
+        }
 
+        function generateScholasticTable(
+          subjects,
+          baseTermSubject,
+          termConfig
+        ) {
+          let totalMarksObtained = 0;
+          let totalPossibleMarks = 0;
+          let totalSubheader = 0;
+          termConfig.forEach((term) => {
+            totalSubheader += Number(term.subHeaderName.replace(/\D/g, ""));
+          });
 
+          const scholasticSubjects = subjects?.filter(
+            (subject) =>
+              subject?.subjectNature === config.scholasticConfig.nature &&
+              subject?.subjectName !== "ARTIFICIAL INTELLIGENCE"
+          );
 
+          const rows = scholasticSubjects
+            ?.map((subject) => {
+              let subjectTotal = 0;
+              let subjectMaxTotal = 0;
+              const marks = {};
 
-
-            function generateScholasticTable(subjects, baseTermSubject, termConfig) {
-                let totalMarksObtained = 0;
-                let totalPossibleMarks = 0;
-                let totalSubheader = 0;
-                termConfig.forEach((term) => {
-                    totalSubheader += Number(term.subHeaderName.replace(/\D/g, ""));
+              subject?.markSheetReport?.forEach((report) => {
+                const termName = report?.markSheetTermResponse?.headerName;
+                marks[termName] = {
+                  obtained: getAttendanceOrMark(
+                    report?.status,
+                    report?.obtained
+                  ), // Use getAttendanceOrMark function
+                  max: report?.max || "-",
+                };
+                subjectTotal += Number(report?.obtained) || 0;
+                subjectMaxTotal += Number(report?.max) || 0;
+              });
+            //   if (subjectTotal > 0 && subjectMaxTotal > 0) {
+                graphSubjects.push({
+                  subject: subject.subjectName,
+                  marks: subjectTotal,
+                  maxPossible: subjectMaxTotal,
+                  percentage: (subjectTotal / subjectMaxTotal) * 100,
                 });
+            //   }
+              totalMarksObtained += subjectTotal;
+              totalPossibleMarks += subjectMaxTotal;
 
-                const scholasticSubjects = subjects?.filter(
-                    (subject) =>
-                        subject?.subjectNature === config.scholasticConfig.nature &&
-                        subject?.subjectName !== "ARTIFICIAL INTELLIGENCE"
-                );
+              const percentage = (subjectTotal / subjectMaxTotal) * 100;
+              const grade = calculateGrade(percentage);
 
+              // Get data for the new column from baseTermSubject
 
+              const bestTermMark = getAttendanceOrMark(
+                baseTermSubject?.find(
+                  (term) =>
+                    term?.subjectAllResponse?.subjectName ===
+                    subject?.subjectName
+                )?.remarkStatus,
+                baseTermSubject?.find(
+                  (term) =>
+                    term?.subjectAllResponse?.subjectName ===
+                    subject?.subjectName
+                )?.markObtained
+              );
 
-                const rows = scholasticSubjects
-                    ?.map((subject) => {
-                        let subjectTotal = 0;
-                        let subjectMaxTotal = 0;
-                        const marks = {};
-
-                        subject?.markSheetReport?.forEach((report) => {
-                            const termName = report?.markSheetTermResponse?.headerName;
-                            marks[termName] = {
-                                obtained: getAttendanceOrMark(report?.status, report?.obtained), // Use getAttendanceOrMark function
-                                max: report?.max || "-",
-                            };
-                            subjectTotal += Number(report?.obtained) || 0;
-                            subjectMaxTotal += Number(report?.max) || 0;
-                        });
-                        if (subjectTotal > 0 && subjectMaxTotal > 0) {
-                            graphSubjects.push({
-                                subject: subject.subjectName,
-                                marks: subjectTotal,
-                                maxPossible: subjectMaxTotal,
-                                percentage: (subjectTotal / subjectMaxTotal) * 100
-                            });
-                        }
-                        totalMarksObtained += subjectTotal;
-                        totalPossibleMarks += subjectMaxTotal;
-
-                        const percentage = (subjectTotal / subjectMaxTotal) * 100;
-                        const grade = calculateGrade(percentage);
-
-                        // Get data for the new column from baseTermSubject
-
-                        const bestTermMark = getAttendanceOrMark(
-                            baseTermSubject?.find(
-                                (term) =>
-                                    term?.subjectAllResponse?.subjectName === subject?.subjectName
-                            )?.remarkStatus,
-                            baseTermSubject?.find(
-                                (term) =>
-                                    term?.subjectAllResponse?.subjectName === subject?.subjectName
-                            )?.markObtained
-                        );
-
-                        return `
+              return `
                 <tr>
                     <td style="font-weight:bold">${subject?.subjectName}</td>
-                    <td style="text-align:center; font-weight:${isNaN(bestTermMark) ? "bold" : "normal"
-                            }">${bestTermMark}</td> 
+                    <td style="text-align:center; font-weight:${
+                      isNaN(bestTermMark) ? "bold" : "normal"
+                    }">${bestTermMark}</td> 
                     ${termConfig
-                                .map(
-                                    (term) => `
-                            <td style="font-weight:${isNaN(marks[term.headerName]?.obtained)
-                                            ? "bold"
-                                            : "normal"
-                                        };
-                            text-align:center">${isNaN(marks[term.headerName]?.obtained)
-                                            ? marks[term.headerName]?.obtained
-                                            : marks[term.headerName]?.obtained || "-"
-                                        }</td>`
-                                )
-                                .join("")}
-                    <td style="text-align:center">${subjectTotal.toFixed(2)}</td>
+                      .map(
+                        (term) => `
+                            <td style="font-weight:${
+                              isNaN(marks[term.headerName]?.obtained)
+                                ? "bold"
+                                : "normal"
+                            };
+                            text-align:center">${
+                              isNaN(marks[term.headerName]?.obtained)
+                                ? marks[term.headerName]?.obtained
+                                : marks[term.headerName]?.obtained || "-"
+                            }</td>`
+                      )
+                      .join("")}
+                    <td style="text-align:center">${subjectTotal.toFixed(
+                      2
+                    )}</td>
                     <td style="text-align:center">${grade}</td>
                 </tr>
             `;
-                    })
-                    .join("");
+            })
+            .join("");
 
-                const overallPercentage =
-                    (totalMarksObtained / totalPossibleMarks) * 100;
-                const overallGrade = calculateGrade(overallPercentage);
+          const overallPercentage =
+            (totalMarksObtained / totalPossibleMarks) * 100;
+          const overallGrade = calculateGrade(overallPercentage);
 
-                return `
+          return `
         <table>
             <tr style="background-color: #e4f2f2">
                 <th rowspan="2" style="text-align: center; width: 30%;">SUBJECT</th>
                 <!-- New header for best term -->
-                <th colspan="${termConfig.length + 3
-                    }" style="text-align: center;">TERM 1 (20 Marks)</th>
+                <th colspan="${
+                  termConfig.length + 3
+                }" style="text-align: center;">TERM 1 (20 Marks)</th>
             </tr>
             <tr style="background-color: #e4f2f2">
                  <th  style="text-align: center; width: 10%;">PT-2 <br/> (60)</th>
                 ${termConfig
-                        .map(
-                            (term) =>
-                                `<th style="text-align: center; width: 10%;">${term.headerName} ${term.subHeaderName}</th>`
-                        )
-                        .join("")}
+                  .map(
+                    (term) =>
+                      `<th style="text-align: center; width: 10%;">${term.headerName} ${term.subHeaderName}</th>`
+                  )
+                  .join("")}
                 <th style="text-align: center;width: 10%;">Marks Out of (${totalSubheader})</th>
                 <th style="text-align: center; width: 10%;">GRADE</th>
             </tr>
             ${rows}
         </table>
     `;
+        }
 
-            }
+        function generateGraph(
+          subjects,
+          studentPerformanceData,
+          uniqueGraphId
+        ) {
+          if ( !subjects || !studentPerformanceData) {
+            console.error("Invalid inputs provided");
+            return;
+          }
+
+          const filteredSubjects = subjects
+            .filter((subject) =>
+              studentPerformanceData.some(
+                (data) => data.subjectName === subject.subject
+              )
+            )
+            .map((subject) => {
+              const performanceData = studentPerformanceData.find(
+                (data) => data.subjectName === subject.subject
+              );
+              return {
+                subjectName: subject?.subject,
+                maxMark: performanceData.maxMark,
+                maxObtainedMark: performanceData.maxObtainedMark,
+                averageObtainedMark: performanceData.averageObtainedMark,
+                actualObtained: subject?.marks
+              };
+            });
+
+          const chartContainer = document.getElementById(uniqueGraphId);
+          chartContainer.innerHTML = "";
+
+          // Set container styles
+          chartContainer.style.display = "flex";
+          chartContainer.style.flexDirection = "column";
+          chartContainer.style.alignItems = "center";
+          chartContainer.style.width = "100%";
+          chartContainer.style.height = "250px";
+          chartContainer.style.backgroundColor = "#f0f0f0";
+          chartContainer.style.padding = "0px";
+
+          // Y-axis container
+          const yAxisContainer = document.createElement("div");
+          Object.assign(yAxisContainer.style, {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            height: "170px",
+            marginRight: "10px",
+            padding:"0px"
+          });
+
+          // Adding y-axis labels (100 to 0)
+          [100, 80, 60, 40, 20, 0].forEach((value) => {
+            const yLabel = document.createElement("div");
+            yLabel.textContent = value
+            Object.assign(yLabel.style, {
+              fontSize: "10px",
+              color: "#333",
+              textAlign: "right",
+            });
+            yAxisContainer.appendChild(yLabel);
+          });
+
+          // Main container to hold y-axis and bar graph
+          const mainContainer = document.createElement("div");
+          mainContainer.style.display = "flex";
+          mainContainer.style.alignItems = "flex-end";
+          chartContainer.appendChild(mainContainer);
+          mainContainer.appendChild(yAxisContainer);
+
+          // Bar graph container
+          const barGraph = document.createElement("div");
+          Object.assign(barGraph.style, {
+            display: "flex",
+            alignItems: "flex-end",
+            gap: "5px",
+            height: "100%",
+            width: "100%",
+            backgroundColor: "#ffffff",
+            padding: "0px",
+            boxSizing: "border-box",
+            overflow: "hidden",
+          });
+          mainContainer.appendChild(barGraph);
+
+          const barLabels = document.createElement("div");
+          Object.assign(barLabels.style, {
+            display: "flex",
+            justifyContent: "space-around",
+            width: "90%",
+            marginTop: "10px",
+          });
+          chartContainer.appendChild(barLabels);
+
+          filteredSubjects.forEach((subject) => {
+            const subjectGroup = document.createElement("div");
+            Object.assign(subjectGroup.style, {
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-end",
+              gap: "2px",
+              width: "50px",
+              height: "100%",
+            });
+
+            const averageBar = document.createElement("div");
+            Object.assign(averageBar.style, {
+              width: "10px",
+              backgroundColor: "#4CAF50",
+              height: `${
+                (subject.averageObtainedMark / subject.maxMark) * 100
+              }%`,
+            });
+
+            const maxObtainedBar = document.createElement("div");
+            Object.assign(maxObtainedBar.style, {
+              width: "10px",
+              backgroundColor: "#FFA726",
+              height: `${(subject.actualObtained / subject.maxMark) * 100}%`,
+            });
+
+            const maxMarkBar = document.createElement("div");
+            Object.assign(maxMarkBar.style, {
+              width: "10px",
+              backgroundColor: "#2196F3",
+              height: `${(subject.maxObtainedMark / subject.maxMark) * 100}%`,
+            });
+
+            subjectGroup.appendChild(averageBar);
+            subjectGroup.appendChild(maxObtainedBar);
+            subjectGroup.appendChild(maxMarkBar);
+            barGraph.appendChild(subjectGroup);
+
+            const label = document.createElement("div");
+            label.innerText = subject.subjectName;
+            Object.assign(label.style, {
+              fontSize: "9px",
+              textAlign: "center",
+              marginTop: "5px",
+              transform: "rotate(-30deg)",
+              wordBreak: "break-word",
+              width: "50px",
+            });
+            barLabels.appendChild(label);
+          });
+
+          const legend = document.createElement("div");
+          Object.assign(legend.style, {
+            display: "flex",
+            gap: "15px",
+            marginTop: "20px",
+            alignItems: "center",
+          });
+          chartContainer.appendChild(legend);
+
+          const legendData = [
+            { color: "#4CAF50", label: "Average Obtained" },
+            { color: "#FFA726", label: "Marks Obtained" },
+            { color: "#2196F3", label: "Highest Obtained" },
+          ];
+
+          legendData.forEach((item) => {
+            const legendItem = document.createElement("div");
+            Object.assign(legendItem.style, {
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+            });
+
+            const legendColor = document.createElement("div");
+            Object.assign(legendColor.style, {
+              width: "10px",
+              height: "10px",
+              backgroundColor: item.color,
+              display: "inline-block",
+            });
+
+            const legendTextContainer = document.createElement("span");
+            legendTextContainer.textContent = item.label;
+            Object.assign(legendTextContainer.style, {
+              fontSize: "10px",
+              color: "#333",
+              fontWeight: "bold",
+              marginLeft: "5px",
+            });
+
+            legendItem.appendChild(legendColor);
+            legendItem.appendChild(legendTextContainer);
+            legend.appendChild(legendItem);
+          });
+        }
+
+        // Create container for this student
+        const studentContainer = document.createElement("div");
+        studentContainer.className = "student-report";
+        studentContainer.style.pageBreakAfter = "always";
+        // graphSubjects = [];
+
+        const uniqueGraphId = `graph-container-${index}`;
+
+        // Generate the HTML content for this student
+        const studentContent = generateStudentReport(element, uniqueGraphId);
+        studentContainer.innerHTML = studentContent;
+
+        // Add the containers to the page
+        studentHtml.appendChild(studentContainer);
 
 
-            function generateGraph(graphContainer, subjects, studentPerformanceData) {
-                // Input validation
-                if (!graphContainer || !subjects || !studentPerformanceData) {
-                    console.error('Invalid inputs provided');
-                    return;
-                }
-
-                // Create and setup canvas
-                const canvas = document.createElement("canvas");
-                canvas.width = 378;
-                canvas.height = 237;
-                canvas.style.paddingTop = "5px";
-                graphContainer.appendChild(canvas);
-
-                const ctx = canvas.getContext("2d");
-                if (!ctx) return;
-
-                // Filter subjects to include only those present in both arrays
-                const filteredSubjects = subjects.filter(subject =>
-                    studentPerformanceData.some(data => data.subjectName === subject.subject)
-                ).map(subject => {
-                    // Combine subject data from both arrays
-                    const performanceData = studentPerformanceData.find(data => data.subjectName === subject.subject);
-                    return {
-                        subjectName: subject.subject,
-                        marks: subject.marks,
-                        maxPossible: subject.maxPossible,
-                        percentage: subject.percentage,
-                        maxObtainedMark: performanceData.maxObtainedMark,
-                        averageObtainedMark: performanceData.averageObtainedMark,
-                        maxMark: performanceData.maxMark
-                    };
-                });
-
-                // Chart configuration
-                const barWidth = 10;
-                const barGap = 40;
-                const chartHeight = 100;
-                const maxBarHeight = 100;
-                const xOffset = 40;
-                const topPadding = 3;
-
-                // Clear canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Draw grid and Y-axis values
-                ctx.beginPath();
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.fillStyle = 'black';
-                ctx.font = "10px Arial";
-
-                // Draw horizontal grid lines and y-axis labels
-                const yStep = maxBarHeight / 5;
-                for (let i = 0; i <= 5; i++) {
-                    const y = (chartHeight / 5) * i;
-
-                    // Draw grid line
-                    ctx.beginPath();
-                    ctx.moveTo(xOffset, chartHeight - y + topPadding);
-                    ctx.lineTo(canvas.width, chartHeight - y + topPadding);
-                    ctx.stroke();
-
-                    // Add y-axis value
-                    const yValue = Math.round((maxBarHeight / 5) * i);
-                    ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
-                }
-
-                // Draw bars for each filtered subject
-                filteredSubjects.forEach((subject, index) => {
-                    const x = xOffset + index * (barWidth + barGap);
-
-                    // Calculate heights based on marks and maxObtainedMark relative to maxPossible and maxMark
-                    const markHeight = (subject.marks * 5);
-                    const averageHeight = (subject.averageObtainedMark * 5);
-                    const highestHeight = subject.maxMark * 5;
-
-                    // Draw average bar (pink)
-                    ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-                    ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
-
-                    // Draw marks bar (black)
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - markHeight, barWidth, markHeight);
-
-                    ctx.fillStyle = 'rgb(193, 224, 224)';
-                    ctx.fillRect(x + barWidth + 20, chartHeight + topPadding - highestHeight, barWidth, highestHeight);
-
-                    // Draw subject label
-                    ctx.save();
-                    ctx.fillStyle = 'black';
-                    ctx.textAlign = 'right';
-                    ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
-                    ctx.rotate(-Math.PI / 4); // Rotate 45 degrees
-
-                    // Format subject name (first letter capital, rest lowercase)
-                    const label = subject.subjectName.charAt(0) + subject.subjectName.slice(1).toLowerCase();
-                    ctx.fillText(label, 0, 0);
-                    ctx.restore();
-                });
-
-                // Draw legend
-                const legendY = canvas.height - 30;
-                const legendSpacing = 80;
-
-                // Average legend item
-                ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-                ctx.fillRect(xOffset, legendY, 10, 10);
-                ctx.fillStyle = 'black';
-                ctx.fillText("Average", xOffset + 15, legendY + 10);
-
-                // Marks legend item
-                ctx.fillStyle = 'black';
-                ctx.fillRect(xOffset + legendSpacing, legendY, 10, 10);
-                ctx.fillText("Marks", xOffset + legendSpacing + 15, legendY + 10);
-
-                // Highest legend item
-                ctx.fillStyle = 'rgb(193, 224, 224)';
-                ctx.fillRect(xOffset + legendSpacing + legendSpacing, legendY, 10, 10);
-                ctx.fillStyle = "black";
-                ctx.fillText("Highest", xOffset + legendSpacing + legendSpacing + 15, legendY + 10);
-            }
-            // Create container for this student
-            const studentContainer = document.createElement("div");
-            studentContainer.className = "student-report";
-            studentContainer.style.pageBreakAfter = "always";
-            // graphSubjects = [];
-
-            // Create graph container with unique ID
-            const graphContainer = document.createElement("div");
-            const uniqueGraphId = `graph-container-${index}`;
-            graphContainer.id = uniqueGraphId;
-            graphContainer.className = 'graph-container';
-
-
-
-
-
-
-
-
-            // Generate the HTML content for this student
-            const studentContent = generateStudentReport(element, uniqueGraphId);
-            studentContainer.innerHTML = studentContent;
-
-            // Add the containers to the page
-            studentHtml.appendChild(studentContainer);
-
-            // Generate the graph after the container is in the DOM
-            const graphContainerElement = document.getElementById(uniqueGraphId);
-            if (graphContainerElement && graphSubjects.length > 0) {
-                generateGraph(graphContainerElement, graphSubjects, element?.studentPerfromanceData);
-            }
-        });
+        if ( graphSubjects.length > 0) {
+          generateGraph(
+            graphSubjects,
+            element?.studentPerfromanceData?.classWiseMarkResponse,
+            uniqueGraphId
+          );
+        }
+      });
     };
-
-
-
-
-</script>
+  </script>
 
 <script></script>
 

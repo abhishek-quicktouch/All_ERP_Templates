@@ -6,12 +6,11 @@
     <title>Fee Receipt</title>
   </head>
   <body>
-    <div id="studentsList">
+    <div id="studentsList" style="display: flex; flex-wrap: wrap">
       Student Fee
     </div>
     <script>
-     window.SetTemplateData = function (dataList) {
-        console.log(dataList)
+      window.SetTemplateData = function (dataList) {
         function convertNumberToWords(number) {
           const units = [
             "",
@@ -163,7 +162,7 @@
         const multipleStudents = dataList;
         const studentHtml = document.getElementById("studentsList");
         studentHtml.innerHTML = ``;
-        multipleStudents?.forEach((element) => {
+        multipleStudents?.forEach((element, mainIndex) => {
           const basicDetails = {
             academicSession:
               element?.student?.studentInfoResponse?.[0]?.academicSession,
@@ -217,7 +216,7 @@
                 : ""
             }`,
           };
-          
+
           const feeDetails = element?.contentRequest;
           const studentDetails = element?.student;
           const componentTotal = (component) => {
@@ -226,17 +225,14 @@
               0
             );
           };
-
-          console.log(
-            element,
-            basicDetails,
-            feeDetails,
-            dataList,
-            "ddddddddddddd"
-          );
-
           const singleStudentHtml = document.createElement("div");
-          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.style.pageBreakAfter =
+            mainIndex % 4 == 3 ? "always" : "";
+            singleStudentHtml.style.maxWidth="50%"
+          Object.assign(singleStudentHtml.style, {
+            flex: "1 1 50%",
+            minHeight:"50%"
+          });
           singleStudentHtml.innerHTML = `<style type="text/css">
    @page {
    size: A4
@@ -281,17 +277,16 @@
                <tr>
                    <td style="width: 15%; align="left" >
 
-                    <img style='width:90px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T09_39_57_281599227.png"/>
+                    <img style='width:90px; height:95px;' src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-12T09_30_55_217335591.png"/>
 
                     </td>
                   <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
-                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">N.R.K PUBLIC SCHOOL</span>
+                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">ALCHEMY PUBLIC SCHOOL</span>
                      <br/>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">A Unit of "Nazir Ruknuddin Educational And welfare society"
+                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">Gadwa Bazar, Via- Sheohar Dist, Sheohar, Bihar
                         </span></br>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">At. Barkurwa, PO-Sonwal,PS-Paharpur, Distt.-East Champaran, Bihar Pin 845425
-                        </span></br>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">Affiliated to C.B.S.E, Board New Delhi &nbsp &nbsp Affiliation No. 331201 School No. 67015
+                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">Affiliated to C.B.S.E
                         </span>
                   </td>
                </tr>
@@ -306,9 +301,6 @@
             <table cellspacing="0" style="width:100%;">
                <tr>
                   <th align="center" style="width:100%; font-weight:bold; text-transform:uppercase;">Fee Receipt</th>
-               </tr>
-               <tr>
-                  <td align="center" style="width:100%; font-size:12pt; font-weight:bold;"><u>Student Copy</u></td>
                </tr>
             </table>
             <table style="width:100%;" cellspacing="0" cellpadding="0">
@@ -518,7 +510,9 @@
                <tr>
                   <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
                   <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
-                    feeDetails?.netAmount ? feeDetails?.netAmount-feeDetails.netReceived : feeDetails?.totalAmount-feeDetails.netReceived
+                    feeDetails?.netAmount
+                      ? feeDetails?.netAmount - feeDetails.netReceived
+                      : feeDetails?.totalAmount - feeDetails.netReceived
                   }</td>
                </tr>
             </table>
@@ -526,7 +520,9 @@
             <table cellspacing="0" style="width:100%;">
                <div style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-align:right; font-family: math; display:flex; justify-content:space-between;">
                   <div style="padding:0px 5px;text-align:left;margin-top:2mm;">
-                     <p style="margin-bottom:3px;">Date: ${feeDetails?.feeDate} </p>
+                     <p style="margin-bottom:3px;">Date: ${
+                       feeDetails?.feeDate
+                     } </p>
                      <p>Time: ${feeDetails?.feeTime}</p>   
                   </div>
                   <div style="margin-top:10mm;">Fee Clerk Signature</div>
@@ -547,289 +543,7 @@
             </table> -->
             <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
                <tr>
-                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T09_25_53_142870374.jpeg" style="width: 80px;"> <br><strong>Payment QR</strong></td>
-                  <td align="center" style="width:34%;">&nbsp;</td>
-                  <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
-               </tr>
-            </table>
-            <!--// end left Student Copy -->
-         </td>
-
-         <td valign="top" align="left" style="width: 2%; padding-left:0mm; padding-top:0mm; padding-bottom:0mm;">&nbsp;</td>
-         <td valign="top" align="left" style="width: 2%; padding-left:0mm; padding-top:0mm; padding-bottom:0mm; border-left: dashed 0.264583333mm #000000;">&nbsp;</td>
-         <td valign="top" align="left" style="width: 48%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-            <!-- start left Student Copy -->
-           <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
-               <tr>
-                   <td style="width: 15%; align="left" >
-
-                    <img style='width:90px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T09_39_57_281599227.png"/>
-
-                    </td>
-                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
-                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">N.R.K PUBLIC SCHOOL</span>
-                     <br/>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">A Unit of "Nazir Ruknuddin Educational And welfare society"
-                        </span></br>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">At. Barkurwa, PO-Sonwal,PS-Paharpur, Distt.-East Champaran, Bihar Pin 845425
-                        </span></br>
-                     <span style="font-weight:bold; font-size:7.5pt; line-height: 140%; padding-top:5mm;">Affiliated to C.B.S.E, Board New Delhi &nbsp &nbsp Affiliation No. 331201 School No. 67015
-                        </span>
-                  </td>
-               </tr>
-            </table>
-            <table cellspacing="0" style="width:100%;">
-               <tr>
-                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                     <div style="height:2mm;">&nbsp;</div>
-                  </td>
-               </tr>
-            </table>
-            <table cellspacing="0" style="width:100%;">
-               <tr>
-                  <th align="center" style="width:100%; font-weight:bold; text-transform:uppercase;">Fee Receipt</th>
-               </tr>
-               <tr>
-                  <td align="center" style="width:100%; font-size:12pt; font-weight:bold;"><u>Office Copy</u></td>
-               </tr>
-            </table>
-            <table style="width:100%;" cellspacing="0" cellpadding="0">
-               <tbody>
-                  <tr>
-                     <td align="left" valign="bottom" style="padding-top:0mm; padding-bottom:0mm;">
-                        <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:10pt; line-height: 140%; font-weight: bold;">Receipt Number: 
-                        </span>${feeDetails?.receiptNo}
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-            <table cellspacing="0" style="width:100%;">
-               <tr>
-                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                     <div style="height:2mm;">&nbsp;</div>
-                  </td>
-               </tr>
-            </table>
-            <!-- student basic details -->
-            <table cellspacing="0" style="width: 100%;">
-               <tr>
-                  <td style="width:60%;">
-                     <table width="100%" border="0" cellspacing="0" >
-                        <tr>
-                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.studentName
-                           } (${basicDetails?.admissionNo})</td>
-                        </tr>
-                     </table>
-                  </td>
-                  <td style="width:60%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Month</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${paymentMonth(
-                             feeDetails?.feeDate
-                           )}</td>
-                        </tr>
-                     </table>
-                  </td>
-               </tr>
-               <tr>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.fatherName
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.classSection
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-               </tr>
-               <tr>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.userName
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Id</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeMode == "ONLINE"
-                               ? feeDetails?.feeUid
-                               : ""
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-               </tr>
-               <tr>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeModeRemark ?? ""
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? ` <td style="width:50%;">
-                        <table
-                          width="100%"
-                          border="0"
-                          cellspacing="0"
-                          cellpadding="0"
-                        >
-                          <tr>
-                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                              ${feeDetails?.feeMode} Number
-                            </td>
-                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                              : $
-                              {feeDetails?.feeModeNumber ?? feeDetails?.modeNo}
-                            </td>
-                          </tr>
-                        </table>
-                      </td>`
-                      : ""
-                  }
-               </tr>
-               <tr>
-                  <td style="width:50%;">
-                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.paidInstallmentsName
-                           }</td>
-                        </tr>
-                     </table>
-                  </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? `  <td style="width:50%;">
-                        <table
-                          width="100%"
-                          border="0"
-                          cellspacing="0"
-                          cellpadding="0"
-                        >
-                          <tr>
-                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                              ${feeDetails?.feeMode} Date
-                            </td>
-                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                              : $
-                              {feeDetails?.feeModeDate ?? feeDetails?.modeDate}
-                            </td>
-                          </tr>
-                        </table>
-                      </td>`
-                      : ""
-                  }
-               </tr>
-            </table>
-            <!--// student basic details -->
-            <table cellspacing="0" style="width:100%;">
-               <tr>
-                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                     <div style="height:2mm;">&nbsp;</div>
-                  </td>
-               </tr>
-            </table>
-            <!-- Main Table -->
-            <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
-               <tr>
-                  <td align="center" style="width:10%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">S.No.</td>
-                  <td align="left" style="width:40%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Description</td>
-                  <td align="right" style="width:30%; border-bottom: solid 0.264583333mm #000000; border-right: solid 0.264583333mm #000000; font-weight:bold;">Due ₹</td>
-                  <td align="right" style="width:20%; border-bottom: solid 0.264583333mm #000000; font-weight:bold;">Paid ₹</td>
-               </tr>
-              ${feeDetails?.studentFeeCollectionReceiptList
-                ?.map(
-                  (val, ind) => `
-               <tr>
-                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${
-                    ind + 1
-                  }</td>
-                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentName
-                  }</td>
-                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentAmount
-                  }</td>
-                  <td align="right" style="width:20%;">${
-                    val.componentReceived
-                  }</td>
-               </tr>
-               `
-                )
-                .join("")}
-               <tr>
-                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Payment Mode</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${
-                    feeDetails.feeMode
-                  }</td>
-               </tr>
-               <tr>
-                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total Received</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
-                    feeDetails.netReceived
-                  }</td>
-               </tr>
-               <tr>
-                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
-                    feeDetails?.netAmount ? feeDetails?.netAmount-feeDetails.netReceived : feeDetails?.totalAmount-feeDetails.netReceived
-                  }</td>
-               </tr>
-            </table>
-            <!--// Main Table -->
-            <table cellspacing="0" style="width:100%;">
-               <div style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-align:right; font-family: math; display:flex; justify-content:space-between;">
-                  <div style="padding:0px 5px;text-align:left;margin-top:2mm;">
-                     <p style="margin-bottom:3px;">Date: ${feeDetails?.feeDate} </p>
-                     <p>Time: ${feeDetails?.feeTime}</p>   
-                  </div>
-                  <div style="margin-top:10mm;">Fee Clerk Signature</div>
-               </div>
-            </table>
-            <table cellspacing="0" cellpadding="0" style="width:100%;">
-               <tr>
-                  <td width="100%" align="center" valign="top" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:150%; font-weight:bold; text-align: center;">Note: It is an e-generated receipt.</td>
-               </tr>
-            </table>
-            <!--// Important Note -->
-            <!-- <table cellspacing="0" style="width:100%;">
-               <tr>
-                  <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
-                     <div style="height:15mm;">&nbsp;</div>
-                  </td>
-               </tr>
-            </table> -->
-            <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
-               <tr>
-                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T09_25_53_142870374.jpeg" style="width: 80px;"> <br><strong>Payment QR</strong></td>
+                  <td align="center" style="width:33%;">&nbsp;</td>
                   <td align="center" style="width:34%;">&nbsp;</td>
                   <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
                </tr>
@@ -844,7 +558,7 @@
           studentHtml.appendChild(singleStudentHtml);
         });
       };
-      </script>
+    </script>
     <script>
       window.SetTemplateData([
         {

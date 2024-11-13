@@ -13,228 +13,119 @@
   </div>
 </body>
 <script>
-
-
-
-  window.SetTemplateData = function (data) {
-    const config = {
-      schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
-      schoolLogo2: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
-      schoolName: "THE INDIAN SCHOOL",
-      schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+window.SetTemplateData = function (data) {
+      const config = {
+        schoolLogo:
+          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+        schoolLogo2:
+          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+        schoolName: "THE INDIAN SCHOOL",
+        schoolAddress: `<h5 >J.B. TITO Marg, SADIQ NAGAR, NEW DELHI - 110049</h5>
                 <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
-                <h5>EmailID : contactus@theindianschool.in Website :www.theindianschool.in</h5>`,
-      studentInfoFields: [
+                <h5 >EmailID : contactus@theindianschool.in Website : www.theindianschool.in</h5>`,
+        studentInfoFields: [
         { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
-        { label: "FATHER'S NAME", key: "fatherName", additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" } },
-        { label: "MOTHER'S NAME", key: "motherName", additionalInfo: { label: "D.O.B", key: "dob" } },
-        { label: "ADDRESS", key: "address" }
-      ],
-      gradingScale: "on 8-point (A1-E) Grading Scale",
-      gradeScale: [
-        { minPercentage: 91, grade: "A1" },
-        { minPercentage: 81, grade: "A2" },
-        { minPercentage: 71, grade: "B1" },
-        { minPercentage: 61, grade: "B2" },
-        { minPercentage: 51, grade: "C1" },
-        { minPercentage: 41, grade: "C2" },
-        { minPercentage: 33, grade: "D" },
-        { minPercentage: 0, grade: "E" }
-      ],
-      scholasticConfig: { nature: "THEORY" },
-      coScholasticConfig: { nature: "1B Scholastic" },
-      signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
-      styles: `
-      @page { size: A4; margin: 10mm; }
-      @media print { @page { margin: auto; size: A4; } }
-      body { font-family: Arial, sans-serif; }
-      .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-      .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
-      .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
-      .header img { max-width: 100px; }
-      .section { margin: 1mm; }
-      .section table { width: 100%; border-collapse: collapse; }
-      .section table, .section th, .section td { border: 1px solid #000; }
-      .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
-      .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
-      .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
-      .signatures div { font-size: 13px; margin: 0px; padding: 0px; text-align: center; }
-      .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
-    `
-    };
-
-    // Helper function to generate graph
-    function generateGraph(graphContainer, subjects, studentPerformanceData) {
-      if (!graphContainer || !subjects || !studentPerformanceData) {
-        console.error('Invalid inputs provided');
-        return;
-      }
-
-      console.log(subjects, studentPerformanceData, "fffffffff studentPerformanceData")
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 740;
-      canvas.height = 237;
-      canvas.style.paddingTop = "10px";
-      graphContainer.appendChild(canvas);
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      const filteredSubjects = subjects.filter(subject =>
-        studentPerformanceData.some(data => data.subjectName === subject.subject)
-      ).map(subject => {
-        const performanceData = studentPerformanceData.find(data => data.subjectName === subject.subject);
-        return {
-          subjectName: subject.subject,
-          marks: subject.marks,
-          maxPossible: subject.maxPossible,
-          percentage: subject.percentage,
-          maxObtainedMark: performanceData.maxObtainedMark,
-          averageObtainedMark: performanceData.averageObtainedMark,
-          maxMark: performanceData.maxMark
-        };
-      });
-
-      // Chart configuration
-      const barWidth = 10;
-      const barGap = 60;
-      const chartHeight = 100;
-      const maxBarHeight = 100;
-      const xOffset = 40;
-      const topPadding = 3;
-
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw grid and Y-axis values
-      ctx.beginPath();
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-      ctx.fillStyle = 'black';
-      ctx.font = "10px Arial";
-
-      // Draw horizontal grid lines and y-axis labels
-      const yStep = maxBarHeight / 5;
-      for (let i = 0; i <= 5; i++) {
-        const y = (chartHeight / 5) * i;
-        ctx.beginPath();
-        ctx.moveTo(xOffset, chartHeight - y + topPadding);
-        ctx.lineTo(canvas.width, chartHeight - y + topPadding);
-        ctx.stroke();
-        const yValue = Math.round((maxBarHeight / 5) * i);
-        ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
-      }
-
-      // Draw bars for each filtered subject
-      filteredSubjects.forEach((subject, index) => {
-        const x = xOffset + index * (barWidth + barGap);
-        const markHeight = (subject.marks * 5);
-        const averageHeight = (subject.averageObtainedMark * 5);
-        const highestHeight = subject.maxMark * 5;
-
-        // Draw average bar (pink)
-        ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-        ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
-
-        // Draw marks bar (black)
-        ctx.fillStyle = 'black';
-        ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - markHeight, barWidth, markHeight);
-
-        // Draw highest bar (blue-gray)
-        ctx.fillStyle = 'rgb(193, 224, 224)';
-        ctx.fillRect(x + barWidth + 20, chartHeight + topPadding - highestHeight, barWidth, highestHeight);
-
-        // Draw subject label
-        ctx.save();
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'right';
-        ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
-        ctx.rotate(-Math.PI / 4);
-        const label = subject.subjectName.charAt(0) + subject.subjectName.slice(1).toLowerCase();
-        ctx.fillText(label, 0, 0);
-        ctx.restore();
-      });
-
-      // Draw legend
-      const legendY = canvas.height - 30;
-      const legendSpacing = 80;
-
-      // Average legend
-      ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-      ctx.fillRect(xOffset, legendY, 10, 10);
-      ctx.fillStyle = 'black';
-      ctx.fillText("Average", xOffset + 15, legendY + 10);
-
-      // Marks legend
-      ctx.fillStyle = 'black';
-      ctx.fillRect(xOffset + legendSpacing, legendY, 10, 10);
-      ctx.fillText("Marks", xOffset + legendSpacing + 15, legendY + 10);
-
-      // Highest legend
-      ctx.fillStyle = 'rgb(193, 224, 224)';
-      ctx.fillRect(xOffset + legendSpacing + legendSpacing, legendY, 10, 10);
-      ctx.fillStyle = "black";
-      ctx.fillText("Highest", xOffset + legendSpacing + legendSpacing + 15, legendY + 10);
-    }
-
-    function getAttendanceOrMark(status, mark) {
-      const attendanceValue = {
-        Absent: "AB",
-        Medical: "M",
-        Sports: "S",
-        Leave: "L",
-        "Late Admission": "LA",
-        Exempted: "EX",
-        NA: "NA",
-        "Not Submitted": "NS"
+          {
+            label: "FATHER'S NAME",
+            key: "fatherName",
+            additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
+          },
+          {
+            label: "MOTHER'S NAME",
+            key: "motherName",
+            additionalInfo: { label: "D.O.B", key: "dob" },
+          },
+          {
+            label: "ADDRESS",
+            key: "address",
+          },
+        ],
+        gradingScale: "on 8-point (A1-E) Grading Scale",
+        gradeScale: [
+          { minPercentage: 91, grade: "A1" },
+          { minPercentage: 81, grade: "A2" },
+          { minPercentage: 71, grade: "B1" },
+          { minPercentage: 61, grade: "B2" },
+          { minPercentage: 51, grade: "C1" },
+          { minPercentage: 41, grade: "C2" },
+          { minPercentage: 33, grade: "D" },
+          { minPercentage: 0, grade: "E" },
+        ],
+        scholasticConfig: {
+          nature: "THEORY",
+        },
+        coScholasticConfig: {
+          nature: "1B Scholastic",
+        },
+        coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
+        signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+        footnotes: [
+          "*S.E.A - Subject Enrichment Activity",
+          "*M.A - Multiple Assessment",
+        ],
+        styles: `
+            @page { size: A4; margin: 10mm; }
+            @media print { @page { margin: auto; size: A4; } }
+            body { font-family: Arial, sans-serif; }
+            .container { width: 100%; max-width: 800px;  margin: 0 auto; padding: 20px; box-sizing: border-box; }
+            .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+            .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; } 
+            .header img { max-width: 100px; }
+            .section { margin: 1mm; }
+            .section table { width: 100%; border-collapse: collapse; }
+            .section table, .section th, .section td { border: 1px solid #000; }
+            .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
+            .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+            .remarks { margin :0px; }
+            .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+            .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
+            .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+        `,
       };
-      return attendanceValue[status] || mark || "-";
-    }
 
-    function calculateGrade(percentage) {
-      for (const grade of config.gradeScale) {
-        if (percentage >= grade.minPercentage) {
-          return grade.grade;
-        }
+      const dataList = Array.isArray(data) ? data : [data];
+      const viewTemplate = dataList[0]?.viewTemplate;
+      const staticData = []; // Function to return attendance/mark based on status
+      function getAttendanceOrMark(status, mark) {
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+          Exempted: "EX",
+          NA: "NA",
+          "Not Submitted": "NS",
+        };
+        return attendanceValue[status] || mark || "-";
       }
-      return "F";
-    }
 
-    // Rest of your existing functions (generateStudentInfo, generateScholasticTable, etc.)
-    // ... [Previous functions remain the same]
+      // Calculate grade based on percentage
+      function calculateGrade(percentage) {
+        for (const grade of config.gradeScale) {
+          if (percentage >= grade.minPercentage) {
+            return grade.grade;
+          }
+        }
+        return "F";
+      }
 
-    function generateStudentInfo(student) {
-      // Generate full address
-      let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
-        ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
-        ", "
-        : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
-          ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
-          ", "
-          : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
-          ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
-          ", "
-          : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
-          ? student?.studentInfoResponse[0]?.studentAddressResponse
-            ?.landmark + ", "
-          : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
-          ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
-          ", "
-          : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
-          ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-          ", "
-          : ""
-        }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-          ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-          : ""
-        }`;
+      function generateStudentInfo(student) {
+        // Generate full address
+        let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.city
+                        : ""
+                    }`;
 
-      // Generate table with student info
+        // Generate table with student info
       return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
         ${config.studentInfoFields
           .map(
@@ -269,105 +160,133 @@
     </table>`;
     }
 
-    // Generate scholastic table
-    function generateScholasticTable(subjects) {
-      let totalMarksObtained = 0;
-      let grandTotalMarks = 0;
-      let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
-      let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
+      // Generate scholastic table
+      function generateScholasticTable(
+        subjects,
+        config,
+        studentPerfromanceData
+      ) {
+        let totalMarksObtained = 0;
+        let grandTotalMarks = 0;
+        let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
+        let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
+        // Group subjects by attachmentName and their parts (Theory or Practical)
+        const groupedSubjects = subjects.reduce((acc, subject) => {
+          const attachmentName =
+            subject?.markSheetReport[0]?.attachmentName || "";
+          const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
 
-      // Group subjects by attachmentName and their parts (Theory or Practical)
-      const groupedSubjects = subjects.reduce((acc, subject) => {
-        const attachmentName =
-          subject?.markSheetReport[0]?.attachmentName || "";
-        const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
-
-        if (attachmentName) {
-          if (!acc[attachmentName]) {
-            acc[attachmentName] = { theory: null, practical: null };
+          if (attachmentName) {
+            if (!acc[attachmentName]) {
+              acc[attachmentName] = { theory: null, practical: null };
+            }
+            if (subject?.subjectNature?.toLowerCase()=="theory") {
+              acc[attachmentName].theory = subject;
+            } else if (subject?.subjectNature?.toLowerCase()=="practical") {
+              acc[attachmentName].practical = subject;
+            }
           }
-          if (subjectPart % 2 !== 0) {
-            acc[attachmentName].theory = subject;
-          } else if (subjectPart % 2 === 0) {
-            acc[attachmentName].practical = subject;
-          }
-        }
-        return acc;
-      }, {});
+          return acc;
+        }, {});
 
-      const rows = Object.entries(groupedSubjects)
-        .map(([attachmentName, parts]) => {
-          let unitTestMarks = 0;
-          let halfYearlyTheory = 0;
-          let halfYearlyPractical = 0;
-          let subjectTotal = 0;
+        let allsubjects = subjects
+          ?.filter((el) => el?.subjectNature == "THEORY")
+          ?.map((el) => el?.subjectName);
+        let filteredPerformanceData = (
+          studentPerfromanceData?.groupedClassAttachmentResponse || []
+        )?.filter((t) => allsubjects?.some((el) => el == t?.attachmentName));
+        const rows = Object.entries(groupedSubjects)
+          .map(([attachmentName, parts]) => {
+            let unitTestMarks = 0;
+            let halfYearlyTheory = 0;
+            let halfYearlyPractical = 0;
+            let subjectTotal = 0;
 
-          if (parts.theory) {
-            const theoryReports = parts.theory.markSheetReport;
-            theoryReports.forEach((report) => {
-              const termName =
-                report?.markSheetTermResponse?.headerName
-                  ?.trim()
-                  .toLowerCase() || "";
-              const marksObtained = report?.obtained || 0;
+            if (parts.theory) {
+              const theoryReports = parts.theory.markSheetReport;
+              theoryReports.forEach((report) => {
+                const termName =
+                  report?.markSheetTermResponse?.headerName
+                    ?.trim()
+                    .toLowerCase() || "";
+                const marksObtained = report?.obtained || 0;
 
-              // Match term names in a case-insensitive manner
-              if (termName === "u.t -1") {
-                unitTestMarks = report?.status ? getAttendanceOrMark(report?.status, marksObtained) : marksObtained;
-              } else if (termName === "half yearly") {
-                halfYearlyTheory = report?.status ? getAttendanceOrMark(report?.status, marksObtained) : marksObtained;
-                totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
-              }
-              subjectTotal += marksObtained;
-            });
-          }
+                // Match term names in a case-insensitive manner
+                if (termName === "u.t -1") {
 
-          if (parts.practical) {
-            const practicalReports = parts.practical.markSheetReport;
-            practicalReports.forEach((report) => {
-              const termName =
-                report?.markSheetTermResponse?.headerName
-                  ?.trim()
-                  .toLowerCase() || "";
-              const marksObtained = report?.obtained || 0;
+                  unitTestMarks = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                } else if (termName === "half yearly") {
+                  halfYearlyTheory = report?.status
+                    ? getAttendanceOrMark(report?.status, marksObtained)
+                    : marksObtained;
+                  totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
+                }
+                subjectTotal += marksObtained;
+              });
+            }
 
-              if (termName === "half yearly") {
-                halfYearlyPractical = report?.status ? getAttendanceOrMark(report?.status, marksObtained) : marksObtained;
-                totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
-              }
-              subjectTotal += marksObtained;
-            });
-          }
+            if (parts.practical) {
+              const practicalReports = parts.practical.markSheetReport;
+              practicalReports.forEach((report) => {
+                const termName =
+                  report?.markSheetTermResponse?.headerName
+                    ?.trim()
+                    .toLowerCase() || "";
+                const marksObtained = report?.obtained || 0;
 
-          totalMarksObtained += subjectTotal;
-          grandTotalMarks += 100; // Assuming the total is always out of 100 for the grand total
+                if (termName === "half yearly") {
+                  halfYearlyPractical = report?.status
+                    ? getAttendanceOrMark(report?.status, marksObtained)
+                    : marksObtained;
+                  totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
+                }
+                subjectTotal += marksObtained;
+              });
+            }
 
-          // Render table row for each subject
-          return `
+            totalMarksObtained += subjectTotal;
+            grandTotalMarks += 100; // Assuming the total is always out of 100 for the grand total
+
+            // Render table row for each subject
+            return `
             <tr>
                 <td style="text-transform:uppercase; font-weight:bold;">${attachmentName}</td>
-                <td style="text-align:center; font-weight:${isNaN(unitTestMarks) ? "bold" : ""}">${unitTestMarks}</td>
-                <td style="text-align:center; font-weight:${isNaN(halfYearlyTheory) ? "bold" : ""}">${halfYearlyTheory}</td>
-                <td style="text-align:center; font-weight:${isNaN(halfYearlyPractical) ? "bold" : ""}">${halfYearlyPractical}</td>
-                <td style="text-align:center">${(isNaN(halfYearlyTheory) ? 0 : halfYearlyTheory) + (isNaN(halfYearlyPractical) ? 0 : halfYearlyPractical)
-            }</td>
-                <td style="text-align:center">${subjectTotal}</td>
+                <td style="text-align:center; font-weight:${
+                  isNaN(unitTestMarks) ? "bold" : ""
+                }">${unitTestMarks}</td>
+                <td style="text-align:center; font-weight:${
+                  isNaN(halfYearlyTheory) ? "bold" : ""
+                }">${halfYearlyTheory}</td>
+                <td style="text-align:center; font-weight:${
+                  isNaN(halfYearlyPractical) ? "bold" : ""
+                }">${halfYearlyPractical}</td>
+                <td style="text-align:center">${(
+                  (isNaN(halfYearlyTheory) ? 0 : halfYearlyTheory) +
+                  (isNaN(halfYearlyPractical) ? 0 : halfYearlyPractical)
+                ).toFixed(1)}</td>
+                <td style="text-align:center">${
+                  filteredPerformanceData?.find(
+                    (el) => el?.attachmentName == attachmentName
+                  )?.highestObtainedMark || "-"
+                }</td>
             </tr>
             `;
-        })
-        .join("");
+          })
+          .join("");
 
-      const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
-      const overallGrade = calculateGrade(overallPercentage);
+        const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
+        const overallGrade = calculateGrade(overallPercentage);
 
-      // Render the final table
-      return `
+        // Render the final table
+        return `
     <table>
         <tr  > <td colspan="6" style="background-color: #fff ; font-weight:bold; font-size: 13px ;text-align: center"> ACADEMIC PERFORMANCE </td> </tr>
         <tr style="background-color: #fff">
             <th rowspan="2" style="text-align: center; width: 30%;">SUBJECTS</th>
             <th rowspan="2" style="text-align: center;width: 14%;">Unit Test-1<br/> (25)</th>
-            <th colspan="4" style="text-align: center;">Half Yearly (50)</th>
+            <th colspan="4" style="text-align: center;">Half Yearly</th>
         </tr>
         <tr style="background-color: #fff">
             <th style="text-align: center;width: 14%;">Theory (80/70/30)</th>
@@ -381,8 +300,8 @@
             <td></td>
             
             <td colspan="3" style="text-align:center">${(
-          totalHalfYearlyTheory + totalHalfYearlyPractical
-        ).toFixed(2)} (${(
+              totalHalfYearlyTheory + totalHalfYearlyPractical
+            ).toFixed(2)} (${(
           ((totalHalfYearlyTheory + totalHalfYearlyPractical) /
             grandTotalMarks) *
           100
@@ -391,35 +310,36 @@
         </tr>
     </table>
     `;
-    }
+      }
 
-    // Helper function to calculate grade based on percentage
+      // Helper function to calculate grade based on percentage
 
-    function generateCoScholasticTable(subjects) {
-      const coScholasticSubjects = subjects?.filter(
-        (subject) =>
-          subject?.subjectAllResponse?.nature ===
-          config.coScholasticConfig.nature
-      );
+      function generateCoScholasticTable(subjects) {
+        const coScholasticSubjects = subjects?.filter(
+          (subject) =>
+            subject?.subjectAllResponse?.nature ===
+            config.coScholasticConfig.nature
+        );
 
-      let tableContent = "";
-      // console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
-      for (let i = 0; i < coScholasticSubjects.length; i++) {
-        const leftSubject = coScholasticSubjects[i];
-        // console.log(leftSubject, "fffffffffffff leftSubject")
-        tableContent += `
+        let tableContent = "";
+        for (let i = 0; i < coScholasticSubjects.length; i++) {
+          const leftSubject = coScholasticSubjects[i];
+          tableContent += `
                 <tr>
-                    <td style="width: 70%;">${leftSubject?.subjectAllResponse?.subjectName || ""
-          }</td>
-                    <td style="width: 30%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"
-          }">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
+                    <td style="width: 70%;">${
+                      leftSubject?.subjectAllResponse?.subjectName || ""
+                    }</td>
+                    <td style="width: 30%; text-align: center; font-weight:${
+                      leftSubject.remarkStatus ? "bold" : "normal"
+                    }">${
+            leftSubject?.remarkStatus || leftSubject?.grade || "-"
           }</td>
                     
                 </tr>
             `;
-      }
+        }
 
-      return `
+        return `
             <table>
                 
                 <tr style="background-color: #fff">
@@ -430,10 +350,10 @@
                 ${tableContent}
             </table>
         `;
-    }
+      }
 
-    function generateRemark(remark) {
-      return `
+      function generateRemark(remark) {
+        return `
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: left">GENERAL REMARKS</th>
@@ -443,58 +363,65 @@
         </tr>
     </table>
     `;
-    }
+      }
 
-    function generateSubjectRemark(remark, sub) {
-      let theorySub = sub?.filter(el => el?.subjectNature == "THEORY")?.map(el => el?.subjectName)
-      console.log(
-        remark?.fields,
-        theorySub,
-        "llllllll"
-      );
-      return `
+      function generateSubjectRemark(remark, sub) {
+        let theorySub = sub
+          ?.filter((el) => el?.subjectNature == "THEORY")
+          ?.map((el) => el?.subjectName);
+        return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
-            <th colspan="2" style="text-align: center">STUDENT'S REMARKS</th>
+            <th colspan="2" style="text-align: center">STUDENT'S PROFILE</th>
             </tr>
-            ${theorySub?.map(el => {
-        return remark?.fields?.map((f) =>
-          f?.value && el?.toLowerCase()?.includes(f?.title?.toLowerCase())
-            ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${f?.title || ""
-            }</td><td style="width: 80%">${f?.value || ""}</td></tr>`
-            : ""
-        )?.join("")
-      })?.join("")}
+            ${theorySub
+              ?.map((el) => {
+                return remark?.fields
+                  ?.map((f) =>
+                    f?.value &&
+                    el?.toLowerCase()?.includes(f?.title?.toLowerCase())
+                      ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${
+                          f?.title || ""
+                        }</td><td style="width: 80%">${
+                          f?.value || ""
+                        }</td></tr>`
+                      : ""
+                  )
+                  ?.join("");
+              })
+              ?.join("")}
        
     </table>
     `;
-    }
+      }
 
-    function generatePrincipalRemark(remark) {
-      return `
+      function generatePrincipalRemark(remark) {
+        return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: left">PRINCIPAL'S REMARKS</th>
             </tr>
-            ${remark?.masterName === "PRINCIPAL'S REMARKS"
-          ? remark?.fields
-            ?.map(
-              (f) =>
-                `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""
-                }</td></tr>`
-            )
-            .join("")
-          : ""
-        }
+            ${
+              remark?.masterName === "PRINCIPAL'S REMARKS"
+                ? remark?.fields
+                    ?.map(
+                      (f) =>
+                        `<tr  style="background-color: #fff, min-height: 20px;"><td>${
+                          f?.value || ""
+                        }</td></tr>`
+                    )
+                    .join("")
+                : ""
+            }
        
     </table>
     `;
-    }
+      }
 
-    function generateGradingTable() {
-      return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+      function generateGradingTable() {
+        return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <tr>
             <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
                 INSTRUCTIONS
@@ -541,122 +468,133 @@
         </tr>
     </table>
 `;
-    }
+      }
 
-    function generateHeader(element) {
-      return ` <div class="header">
+      function generateHeader(element) {
+        return ` <div class="header">
             
-${element.header
-          ? element.header
-          : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+${
+  element.header
+    ? element.header
+    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
                         <h1 style="color: #2b595e" >${config.schoolName}</h1>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
             `
-        }
+}
 
              
 </div>`;
-    }
+      }
 
-    function generateSignature() {
-      return `
+      function generateSignature() {
+        return `
              <div class="signatures">
                         ${config.signatures
-          .map(
-            (sig) => `
+                          .map(
+                            (sig) => `
                             <div>
                                
                                 <p style="vertical-align: bottom">${sig}</p>
                             </div>
                         `
-          )
-          .join("")}
+                          )
+                          .join("")}
                     </div>
             `;
-    }
-
-
-    const multipleStudents = data;
-    const studentHtml = document.getElementById("studentsList");
-    studentHtml.innerHTML = ``;
-
-    multipleStudents?.forEach((element) => {
-      const singleStudentHtml = document.createElement("div");
-      singleStudentHtml.style.pageBreakAfter = "always";
-
-      const termConfig = element?.markData?.markSheetTerms?.map((term) => ({
-        headerName: term?.headerName,
-        subHeaderName: term?.subHeaderName
-      })) || [];
-
-      const graphId = `graph-${element?.student?.studentId || Math.random()}`;
-
-      singleStudentHtml.innerHTML = `
-      <style type="text/css">${config.styles}</style>
-      <page orientation="portrait" format="A4" margin="0">
-        <div class="container">
-          ${generateHeader(element)}
-          <h4 style="background-color: #fff; border: 1px solid black; text-align: center; font-size: 14px">
-            PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""}
-          </h4>
-          ${generateStudentInfo(element?.student)}
-          <div class="section">
-            ${generateScholasticTable(element?.markData?.subjectWiseMarkSheetReportResponses, termConfig)}
-          </div>
-          <div class="section">
-            ${generateCoScholasticTable(element?.baseTermData?.subject)}
-          </div>
-          <div class="section">
-            ${generateRemark(element?.baseTermData?.remarksEntry)}
-          </div>
-          
-           
-         
-          <div class="section">
-            ${generateSubjectRemark(element?.baseTermData?.remarksEntry, element?.markData?.subjectWiseMarkSheetReportResponses)}
-          </div>
-          <div class="section">
-            <div style="font-size: 12px; display:flex; justify-content: space-between">
-              <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()}</span>
-              <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
-        field => field?.title === "Attendance"
-      )?.value || element?.student?.attendance}</span>
-            </div>
-          </div>
-          ${generateSignature()}
-        </div>
-      </page>
-    `;
-
-      studentHtml.appendChild(singleStudentHtml);
-
-      // Generate graph after the container is added to the DOM
-      const graphContainer = document.getElementById(graphId);
-      if (graphContainer && element?.markData?.subjectWiseMarkSheetReportResponses) {
-        // Prepare data for graph
-        const subjects = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
-          subject: subject.markSheetReport[0]?.attachmentName,
-          marks: subject.markSheetReport[0]?.obtained || 0,
-          maxPossible: subject.markSheetReport[0]?.maxMark || 100,
-          percentage: (subject.markSheetReport[0]?.obtained / subject.markSheetReport[0]?.maxMark) * 100 || 0
-        }));
-
-        // const performanceData = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
-        //   subjectName: subject.attachmentName,
-        //   maxObtainedMark: subject.markSheetReport[0]?.maxMark || 100,
-        //   averageObtainedMark: subject.markSheetReport[0]?.obtained || 0,
-        //   maxMark: subject.markSheetReport[0]?.maxMark || 100
-        // }));
-
-
       }
-    });
-  };
+
+      // Generate co-scholastic table
+
+      // Set student data
+      const multipleStudents = viewTemplate ? staticData : dataList;
+      const studentHtml = document.getElementById("studentsList");
+      studentHtml.innerHTML = ``;
+
+      multipleStudents?.forEach((element) => {
+        const singleStudentHtml = document.createElement("div");
+        singleStudentHtml.style.pageBreakAfter = "always";
+
+        const termConfig =
+          element?.markData?.markSheetTerms?.map((term) => {
+            let temp = {};
+            temp["headerName"] = term?.headerName;
+            temp["subHeaderName"] = term?.subHeaderName;
+            return temp;
+          }) || [];
+
+        singleStudentHtml.innerHTML = `
+            <style type="text/css">${config.styles}</style>
+            <page orientation="portrait" format="A4" margin="0">
+                <div class="container">
+                   ${generateHeader(element)}
+    <h4 style="background-color : #fff ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${
+      element?.markData?.academicSession || ""
+    }</h4> 
+                       ${generateStudentInfo(element?.student)}
 
 
+                
+
+                    <div class="section">
+                        
+                        ${generateScholasticTable(
+                          element?.markData
+                            ?.subjectWiseMarkSheetReportResponses,
+                          termConfig,
+                          element?.studentPerfromanceData
+                        )}
+
+                    </div>
+
+
+                    <div class="section">
+                        ${generateCoScholasticTable(
+                          element?.baseTermData?.subject
+                        )}
+                    </div>
+<div class="section">
+                   ${generateRemark(element?.baseTermData?.remarksEntry)}
+                   </div>
+
+<div class="section">
+${generateSubjectRemark(
+  element?.baseTermData?.remarksEntry,
+  element?.markData?.subjectWiseMarkSheetReportResponses
+)}
+    </div>
+    <div class="section">
+      
+    </div>
+
+                   <div class="section">
+
+                   
+                   <div style="font-size: 12px; display:flex; justify-content: space-between">
+                    <span style="font-weight: bold">ISSUED DATE: ${
+                      element?.printDate || new Date().toLocaleDateString()
+                    } </span>
+                    <span style="font-weight: bold">Attendance: ${
+                      element?.baseTermData?.remarksEntry?.fields?.find(
+                        (field) => field?.title === "Attendance"
+                      )?.value || element?.student?.attendance
+                    } </span>
+                    </div>
+</div>
+                   
+${generateSignature()}
+
+
+                  
+                </div>
+            </page>
+        `;
+
+        studentHtml.appendChild(singleStudentHtml);
+      });
+    };
 </script>
 
 <script>
@@ -3213,309 +3151,94 @@ ${element.header
       "header": null,
       "footer": null,
       "printDate": "29-10-2024",
-      "studentPerfromanceData": [
+      "studentPerfromanceData": {
+    "classWiseMarkResponse": [
         {
-          "subjectName": "ENGLISH",
-          "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
-          "maxMark": 105,
-          "maxObtainedMark": 97,
-          "averageObtainedMark": 66.29447852760737
+            "subjectName": "ENGLISH",
+            "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            "maxMark": 20,
+            "maxObtainedMark": 19.83,
+            "averageObtainedMark": 14.504742857142869,
+            "attachmentName": null
         },
         {
-          "subjectName": "PHYSICS",
-          "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
-          "maxMark": 95,
-          "maxObtainedMark": 77,
-          "averageObtainedMark": 39.261538461538464
+            "subjectName": "HINDI",
+            "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+            "maxMark": 20,
+            "maxObtainedMark": 19.53,
+            "averageObtainedMark": 12.698750000000002,
+            "attachmentName": null
         },
         {
-          "subjectName": "CHEMISTRY",
-          "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
-          "maxMark": 95,
-          "maxObtainedMark": 81,
-          "averageObtainedMark": 43.646153846153844
+            "subjectName": "SOCIAL SCIENCE",
+            "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+            "maxMark": 20,
+            "maxObtainedMark": 19.71,
+            "averageObtainedMark": 13.194171428571439,
+            "attachmentName": null
         },
         {
-          "subjectName": "MATHS",
-          "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
-          "maxMark": 105,
-          "maxObtainedMark": 101.5,
-          "averageObtainedMark": 43.731884057971016
+            "subjectName": "SCIENCE",
+            "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+            "maxMark": 20,
+            "maxObtainedMark": 18.5,
+            "averageObtainedMark": 11.754285714285716,
+            "attachmentName": null
         },
         {
-          "subjectName": "COMPUTER SCIENCE",
-          "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
-          "maxMark": 95,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 46.65
+            "subjectName": "MATHS",
+            "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+            "maxMark": 20,
+            "maxObtainedMark": 19.54,
+            "averageObtainedMark": 12.863542857142864,
+            "attachmentName": null
         },
         {
-          "subjectName": "SOCIAL AND EMOTIONAL SKILLS",
-          "subjectUid": "34ce772c-70ff-4be0-995f-c5c8c31c6302",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 72.65114754098354
+            "subjectName": "ARTIFICIAL INTELLIGENCE",
+            "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
+            "maxMark": 5,
+            "maxObtainedMark": 4.83,
+            "averageObtainedMark": 3.113314285714282,
+            "attachmentName": null
         },
         {
-          "subjectName": "GENERAL STUDIES",
-          "subjectUid": "e5556989-dfa8-4315-8ae6-b631d41f4807",
-          "maxMark": 100,
-          "maxObtainedMark": 100,
-          "averageObtainedMark": 88.72676056338022
+            "subjectName": "HEALTH AND PHYSICAL EDUCATION",
+            "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
+            "maxMark": 5,
+            "maxObtainedMark": 5,
+            "averageObtainedMark": 4.182857142857143,
+            "attachmentName": null
         },
         {
-          "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-          "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-          "maxMark": 100,
-          "maxObtainedMark": 100,
-          "averageObtainedMark": 86.47211267605624
+            "subjectName": "FRENCH",
+            "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
+            "maxMark": 20,
+            "maxObtainedMark": 19.92,
+            "averageObtainedMark": 18.18259259259259,
+            "attachmentName": null
         },
         {
-          "subjectName": "ART EDUCATION",
-          "subjectUid": "57a303c0-06ed-474c-b75f-a44619cdc81d",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 70.394
-        },
-        {
-          "subjectName": "WORK EXPERIENCE",
-          "subjectUid": "7353c069-b0ba-4a88-b1c7-7a0e13a3e361",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 71.99500000000002
-        },
-        {
-          "subjectName": "ENGLISH PR.",
-          "subjectUid": "d63d7fda-0c47-497b-8555-3248c7082013",
-          "maxMark": 20,
-          "maxObtainedMark": 20,
-          "averageObtainedMark": 15.214723926380367
-        },
-        {
-          "subjectName": "MATHS PR.",
-          "subjectUid": "92de4f9c-738f-4bdc-a195-024f4f15f702",
-          "maxMark": 20,
-          "maxObtainedMark": 18,
-          "averageObtainedMark": 12.26086956521739
-        },
-        {
-          "subjectName": "PHYSICS PR.",
-          "subjectUid": "223ebfc3-cfb4-4742-b16b-0c7f8dc9eab7",
-          "maxMark": 30,
-          "maxObtainedMark": 26,
-          "averageObtainedMark": 18.815384615384616
-        },
-        {
-          "subjectName": "CHEMISTRY PR.",
-          "subjectUid": "5724fada-656b-4776-bcbc-f5ef5b8d8397",
-          "maxMark": 30,
-          "maxObtainedMark": 26,
-          "averageObtainedMark": 16.984615384615385
-        },
-        {
-          "subjectName": "COMPUTER SCIENCE PR.",
-          "subjectUid": "1977b4a3-cfc9-4cf6-89cb-0900bc662442",
-          "maxMark": 30,
-          "maxObtainedMark": 25,
-          "averageObtainedMark": 13.283333333333333
-        },
-        {
-          "subjectName": "Art education - performing and visual arts",
-          "subjectUid": "5ca07149-6876-49c5-9ad5-cbb2c7770b15",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 67.40196721311467
-        },
-        {
-          "subjectName": "Participation in school events",
-          "subjectUid": "df28415f-15f8-49eb-8e60-63e60dc4faa0",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 68.45180327868844
-        },
-        {
-          "subjectName": "ECONOMICS",
-          "subjectUid": "33f3d42f-2474-4c4d-a91e-125487dd67ca",
-          "maxMark": 105,
-          "maxObtainedMark": 89,
-          "averageObtainedMark": 49.006410256410255
-        },
-        {
-          "subjectName": "SEWA  AND WORK EDUCATION",
-          "subjectUid": "e07f3c70-d36d-4d92-8cb5-cf3f2fa345ec",
-          "maxMark": 100,
-          "maxObtainedMark": 100,
-          "averageObtainedMark": 80.63580645161288
-        },
-        {
-          "subjectName": "DISCIPLINE",
-          "subjectUid": "2ff038e1-c337-476b-a203-0ceb1b34f896",
-          "maxMark": 80,
-          "maxObtainedMark": 80,
-          "averageObtainedMark": 77.41774193548386
-        },
-        {
-          "subjectName": "ECONOMICS PR.",
-          "subjectUid": "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
-          "maxMark": 20,
-          "maxObtainedMark": 19,
-          "averageObtainedMark": 10.974358974358974
-        },
-        {
-          "subjectName": "BIOLOGY",
-          "subjectUid": "781260ae-32a1-4ab3-a83d-f71b791cd079",
-          "maxMark": 95,
-          "maxObtainedMark": 82,
-          "averageObtainedMark": 46.666666666666664
-        },
-        {
-          "subjectName": "BIOLOGY PR.",
-          "subjectUid": "187ce5ee-44aa-460b-a900-9b65499146a0",
-          "maxMark": 30,
-          "maxObtainedMark": 23,
-          "averageObtainedMark": 19.729166666666668
-        },
-        {
-          "subjectName": "PSYCHOLOGY",
-          "subjectUid": "d5363c2f-fcb2-4742-bcb7-5ba62755e7ef",
-          "maxMark": 95,
-          "maxObtainedMark": 84,
-          "averageObtainedMark": 57.017857142857146
-        },
-        {
-          "subjectName": "PSYCHOLOGY PR.",
-          "subjectUid": "32547535-8a53-4d46-9e86-02adfadec2b9",
-          "maxMark": 30,
-          "maxObtainedMark": 30,
-          "averageObtainedMark": 23.928571428571427
-        },
-        {
-          "subjectName": "PHYSICAL EDUCATION",
-          "subjectUid": "ce9798fe-053a-41c4-823d-563db70aae33",
-          "maxMark": 95,
-          "maxObtainedMark": 76.5,
-          "averageObtainedMark": 49.145161290322584
-        },
-        {
-          "subjectName": "PHYSICAL EDUCATION PR.",
-          "subjectUid": "075ee4fc-1da7-44c7-aec4-96d8e13eced1",
-          "maxMark": 30,
-          "maxObtainedMark": 25,
-          "averageObtainedMark": 21
-        },
-        {
-          "subjectName": "BUSINESS STUDIES",
-          "subjectUid": "c747db84-8d36-4dc8-8d7c-1b32354eead7",
-          "maxMark": 105,
-          "maxObtainedMark": 90,
-          "averageObtainedMark": 55.8
-        },
-        {
-          "subjectName": "ACCOUNTANCY",
-          "subjectUid": "ef6629f6-b9c6-413d-9cfb-ee4e3de77353",
-          "maxMark": 105,
-          "maxObtainedMark": 95,
-          "averageObtainedMark": 53.666666666666664
-        },
-        {
-          "subjectName": "APPLIED  MATHS",
-          "subjectUid": "9a6140a5-b847-4f19-86f8-6e6c8b104014",
-          "maxMark": 105,
-          "maxObtainedMark": 76,
-          "averageObtainedMark": 37.64
-        },
-        {
-          "subjectName": "ACCOUNTANCY PR.",
-          "subjectUid": "819ed474-c497-487c-80bb-cd640750bb3e",
-          "maxMark": 20,
-          "maxObtainedMark": 19,
-          "averageObtainedMark": 13.688888888888888
-        },
-        {
-          "subjectName": "BUSINESS STUDIES PR.",
-          "subjectUid": "9b570028-bf69-49ff-abfd-6ec0ed8660d0",
-          "maxMark": 20,
-          "maxObtainedMark": 20,
-          "averageObtainedMark": 14.822222222222223
-        },
-        {
-          "subjectName": "APPLIED MATHS Pr.",
-          "subjectUid": "81f94b84-5b5f-45b6-9e0b-aaf8a5489d6d",
-          "maxMark": 20,
-          "maxObtainedMark": 17,
-          "averageObtainedMark": 13.848484848484848
-        },
-        {
-          "subjectName": "POLITICAL SCIENCE",
-          "subjectUid": "59d10a97-413b-4842-86aa-18639407403d",
-          "maxMark": 105,
-          "maxObtainedMark": 96.5,
-          "averageObtainedMark": 47.074074074074076
-        },
-        {
-          "subjectName": "HISTORY",
-          "subjectUid": "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
-          "maxMark": 105,
-          "maxObtainedMark": 102.5,
-          "averageObtainedMark": 49.26851851851852
-        },
-        {
-          "subjectName": "POLITICAL SCIENCE PR.",
-          "subjectUid": "e932a402-b53d-454c-899b-5e23d6865288",
-          "maxMark": 20,
-          "maxObtainedMark": 16,
-          "averageObtainedMark": 9.314814814814815
-        },
-        {
-          "subjectName": "HISTORY PR.",
-          "subjectUid": "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
-          "maxMark": 20,
-          "maxObtainedMark": 19,
-          "averageObtainedMark": 10.61111111111111
-        },
-        {
-          "subjectName": "PAINTING",
-          "subjectUid": "32d5c07b-95ab-4e27-9e5d-e114c7e4d99a",
-          "maxMark": 30,
-          "maxObtainedMark": 22.5,
-          "averageObtainedMark": 15.75
-        },
-        {
-          "subjectName": "PAINTING PR.",
-          "subjectUid": "ff829378-199f-4b28-bc0c-ecc940034282",
-          "maxMark": 70,
-          "maxObtainedMark": 62,
-          "averageObtainedMark": 49.75
-        },
-        {
-          "subjectName": "SOCIOLOGY",
-          "subjectUid": "fc5e9071-d85a-4ed0-8d11-a8ae2cd79256",
-          "maxMark": 70,
-          "maxObtainedMark": 72.75,
-          "averageObtainedMark": 42.165909090909096
-        },
-        {
-          "subjectName": "SOCIOLOGY PR.",
-          "subjectUid": "ff4755fa-9266-4d24-b11f-2de2754b46a2",
-          "maxMark": 30,
-          "maxObtainedMark": 28.5,
-          "averageObtainedMark": 23.571428571428573
-        },
-        {
-          "subjectName": "FASHION STUDIES",
-          "subjectUid": "0fd23402-8aab-4a19-861e-725483aeee06",
-          "maxMark": 100,
-          "maxObtainedMark": 53.33,
-          "averageObtainedMark": 48.75
-        },
-        {
-          "subjectName": "FASHION STUDIES PR.",
-          "subjectUid": "12883181-e3af-4b26-b4bf-fd20d0b04f70",
-          "maxMark": 80,
-          "maxObtainedMark": 56,
-          "averageObtainedMark": 39.5
+            "subjectName": "SANSKRIT",
+            "subjectUid": "f81600d4-a295-478d-b814-73d53e9430ee",
+            "maxMark": 20,
+            "maxObtainedMark": 18.17,
+            "averageObtainedMark": 17.2525,
+            "attachmentName": null
         }
-      ]
+    ],
+    "groupedClassAttachmentResponse": [
+        {
+            "attachmentName": "MATHS",
+            "totalMaxMark": 20,
+            "highestObtainedMark": 19.54
+        },
+        {
+            "attachmentName": "ENGLISH",
+            "totalMaxMark": 20,
+            "highestObtainedMark": 19.83
+        }
+    ]
+}
     }
 
   ]);
