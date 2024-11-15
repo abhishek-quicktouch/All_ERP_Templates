@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Processed Dynamic School Report Generator Script</title>
+    <title>CLASS II</title>
 
 </head>
 
 <body>
     <div id="studentsList">
-
-        Processed Dynamic School Report Generator Script
+        CLASS_II
     </div>
 </body>
 <script>
@@ -26,12 +25,11 @@
             schoolLogo:
                 "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
             schoolLogo2:
-                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-30T06_04_29_303619805.png",
-            schoolName: "THE INDIAN SCHOOL-SECOND SHIFT",
-            schoolAddress: `<h5 >Josip Broz Tito Marg,New Delhi - 110049,</h5>
-                <h5>PH.:01126257551 / 01126257552, FAX : 011-26253185</h5>
-                <h5 >EmailID : contactus@theindianschool-secondshift.in </h5>
-<h5>Website: www.theindianschool-secondshift.in </5>`,
+                "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+            schoolName: "THE INDIAN SCHOOL",
+            schoolAddress: `<h5 >J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
+                <h5 >EmailID : contactus@theindianschool.in Website : www.theindianschool.in</h5>`,
             studentInfoFields: [
                 {
                     label: "NAME",
@@ -126,9 +124,9 @@
             function generateStudentInfo(student) {
                 // Generate full address
                 let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.street
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse
-                            ?.street + ", "
-                        : ""
+                    ? student?.studentInfoResponse[0]?.studentAddressResponse
+                        ?.street + ", "
+                    : ""
                     }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
                         ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
                         ", "
@@ -322,7 +320,7 @@ ${element.header
                         ? element.header
                         : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
-                        <h2 style="color: #2b595e" >${config.schoolName}</h2>
+                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
@@ -587,7 +585,7 @@ ${element.header
                 chartContainer.style.width = "100%";
                 chartContainer.style.height = "250px";
                 chartContainer.style.backgroundColor = "#f0f0f0";
-                chartContainer.style.padding = "0px";
+                chartContainer.style.padding = "2px";
 
                 // Y-axis container
                 const yAxisContainer = document.createElement("div");
@@ -597,13 +595,12 @@ ${element.header
                     justifyContent: "space-between",
                     height: "170px",
                     marginRight: "10px",
-                    padding: "0px"
                 });
 
                 // Adding y-axis labels (100 to 0)
                 [100, 80, 60, 40, 20, 0].forEach((value) => {
                     const yLabel = document.createElement("div");
-                    yLabel.textContent = value
+                    yLabel.textContent = value;
                     Object.assign(yLabel.style, {
                         fontSize: "10px",
                         color: "#333",
@@ -617,6 +614,7 @@ ${element.header
                 mainContainer.style.display = "flex";
                 mainContainer.style.alignItems = "flex-end";
                 chartContainer.appendChild(mainContainer);
+
                 mainContainer.appendChild(yAxisContainer);
 
                 // Bar graph container
@@ -765,6 +763,9 @@ ${element.header
             }
         });
     };
+
+
+
 </script>
 
 <script></script>
@@ -1017,16 +1018,16 @@ ${element.header
             },
             "markData": {
                 "academicSession": "2024-2025",
-                "admissionNo": "V-4688",
-                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                "studentName": "Aarav Sachdeva",
+                "admissionNo": "S-4962",
+                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                "studentName": "Manan Virmani",
                 "rollNo": 0,
-                "fatherName": "Bharat Sachdeva",
+                "fatherName": "VIVEK VIRMANI",
                 "className": "X",
-                "sectionName": "A",
+                "sectionName": "D",
                 "terms": "PERIODIC TEST 2",
                 "markSheetName": "TERM-I",
-                "overAllRank": "30",
+                "overAllRank": "1",
                 "markSheetTerms": [
                     {
                         "id": 1110,
@@ -1084,21 +1085,21 @@ ${element.header
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
                                 "subjectName": "ENGLISH",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 3.13,
-                                "grade": "B2",
+                                "obtained": 4.54,
+                                "grade": "A2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1116,22 +1117,133 @@ ${element.header
                                         "PERIODIC TEST 2"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
+                            },
+                            {
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
+                                "rollNo": 0,
+                                "fatherName": "VIVEK VIRMANI",
+                                "className": "X",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
+                                "terms": "PERIODIC TEST 2",
+                                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 5,
+                                "obtained": 5,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-2025",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 1111,
+                                    "headerName": "PORTFOLIO",
+                                    "subHeaderName": "(5)",
+                                    "priority": 2,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 5,
+                                    "terms": [
+                                        "PORTFOLIO"
+                                    ]
+                                },
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
+                            },
+                            {
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
+                                "rollNo": 0,
+                                "fatherName": "VIVEK VIRMANI",
+                                "className": "X",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
+                                "terms": "PERIODIC TEST 2",
+                                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 5,
+                                "obtained": 5,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-2025",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 1112,
+                                    "headerName": "SUBJECT ENRICHMENT",
+                                    "subHeaderName": "(5)",
+                                    "priority": 3,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 5,
+                                    "terms": [
+                                        "SUBJECT ENRICHMENT"
+                                    ]
+                                },
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
+                            },
+                            {
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
+                                "rollNo": 0,
+                                "fatherName": "VIVEK VIRMANI",
+                                "className": "X",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
+                                "terms": "PERIODIC TEST 2",
+                                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                                "subjectName": "ENGLISH",
+                                "subjectNature": "THEORY",
+                                "max": 5,
+                                "obtained": 5,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-2025",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
+                                    "id": 1113,
+                                    "headerName": "MULTIPLE ASSESSMENT",
+                                    "subHeaderName": "(5)",
+                                    "priority": 4,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 5,
+                                    "terms": [
+                                        "MULTIPLE ASSESSMENT"
+                                    ]
+                                },
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 3.13,
-                        "total": 5,
-                        "percentage": 62.6,
-                        "grade": "B2",
+                        "marksObtained": 19.54,
+                        "total": 20,
+                        "percentage": 97.7,
+                        "grade": "A1",
                         "className": "X",
-                        "sectionName": "A",
+                        "sectionName": "D",
                         "terms": "PERIODIC TEST 2",
                         "markSheetName": "TERM-I",
                         "subjectPrt": 1,
                         "decimalPlaces": 2,
-                        "visible": false
+                        "visible": true
                     },
                     {
                         "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
@@ -1139,22 +1251,22 @@ ${element.header
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
                                 "subjectName": "HINDI",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 0,
-                                "grade": "E",
-                                "status": "Na",
+                                "obtained": 4.46,
+                                "grade": "A2",
+                                "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-2025",
@@ -1171,27 +1283,27 @@ ${element.header
                                         "PERIODIC TEST 2"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
                                 "subjectName": "HINDI",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 0,
-                                "grade": "E",
-                                "status": "Na",
+                                "obtained": 4,
+                                "grade": "B1",
+                                "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-2025",
@@ -1208,27 +1320,27 @@ ${element.header
                                         "PORTFOLIO"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
                                 "subjectName": "HINDI",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 0,
-                                "grade": "E",
-                                "status": "Na",
+                                "obtained": 5,
+                                "grade": "A1",
+                                "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-2025",
@@ -1245,27 +1357,27 @@ ${element.header
                                         "SUBJECT ENRICHMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
                                 "subjectName": "HINDI",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 0,
-                                "grade": "E",
-                                "status": "Na",
+                                "obtained": 4.6,
+                                "grade": "A1",
+                                "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
                                 "session": "2024-2025",
@@ -1282,188 +1394,22 @@ ${element.header
                                         "MULTIPLE ASSESSMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 0,
+                        "marksObtained": 18.06,
                         "total": 20,
-                        "percentage": 0,
-                        "grade": "E",
+                        "percentage": 90.3,
+                        "grade": "A2",
                         "className": "X",
-                        "sectionName": "A",
+                        "sectionName": "D",
                         "terms": "PERIODIC TEST 2",
                         "markSheetName": "TERM-I",
                         "subjectPrt": 2,
                         "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                        "subjectName": "FRENCH",
-                        "subjectNature": "THEORY",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                                "subjectName": "FRENCH",
-                                "subjectNature": "THEORY",
-                                "max": 5,
-                                "obtained": 2.13,
-                                "grade": "C2",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1110,
-                                    "headerName": "WEIGHTAGE",
-                                    "subHeaderName": "(5)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "PERIODIC TEST 2"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            },
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                                "subjectName": "FRENCH",
-                                "subjectNature": "THEORY",
-                                "max": 5,
-                                "obtained": 4,
-                                "grade": "B",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1111,
-                                    "headerName": "PORTFOLIO",
-                                    "subHeaderName": "(5)",
-                                    "priority": 2,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "PORTFOLIO"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            },
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                                "subjectName": "FRENCH",
-                                "subjectNature": "THEORY",
-                                "max": 5,
-                                "obtained": 4,
-                                "grade": "B",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1112,
-                                    "headerName": "SUBJECT ENRICHMENT",
-                                    "subHeaderName": "(5)",
-                                    "priority": 3,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "SUBJECT ENRICHMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            },
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                                "subjectName": "FRENCH",
-                                "subjectNature": "THEORY",
-                                "max": 5,
-                                "obtained": 4,
-                                "grade": "B",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1113,
-                                    "headerName": "MULTIPLE ASSESSMENT",
-                                    "subHeaderName": "(5)",
-                                    "priority": 4,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "MULTIPLE ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 14.129999999999999,
-                        "total": 20,
-                        "percentage": 70.65,
-                        "grade": "B2",
-                        "className": "X",
-                        "sectionName": "A",
-                        "terms": "PERIODIC TEST 2",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 3,
-                        "decimalPlaces": 2,
-                        "visible": false
+                        "visible": true
                     },
                     {
                         "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
@@ -1471,21 +1417,21 @@ ${element.header
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
                                 "subjectName": "MATHS",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 2.04,
-                                "grade": "D",
+                                "obtained": 4.13,
+                                "grade": "A2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1503,26 +1449,26 @@ ${element.header
                                         "PERIODIC TEST 2"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
                                 "subjectName": "MATHS",
                                 "subjectNature": "THEORY",
                                 "max": 5,
                                 "obtained": 5,
-                                "grade": "A",
+                                "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1540,26 +1486,26 @@ ${element.header
                                         "PORTFOLIO"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
                                 "subjectName": "MATHS",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 3,
-                                "grade": "C",
+                                "obtained": 5,
+                                "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1577,26 +1523,26 @@ ${element.header
                                         "SUBJECT ENRICHMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
                                 "subjectName": "MATHS",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 2.5,
-                                "grade": "C2",
+                                "obtained": 4,
+                                "grade": "B1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1614,22 +1560,22 @@ ${element.header
                                         "MULTIPLE ASSESSMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 12.54,
+                        "marksObtained": 18.13,
                         "total": 20,
-                        "percentage": 62.7,
-                        "grade": "B2",
+                        "percentage": 90.65,
+                        "grade": "A2",
                         "className": "X",
-                        "sectionName": "A",
+                        "sectionName": "D",
                         "terms": "PERIODIC TEST 2",
                         "markSheetName": "TERM-I",
                         "subjectPrt": 6,
                         "decimalPlaces": 2,
-                        "visible": false
+                        "visible": true
                     },
                     {
                         "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
@@ -1637,21 +1583,21 @@ ${element.header
                         "subjectNature": "THEORY",
                         "markSheetReport": [
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
                                 "subjectName": "SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 1.88,
-                                "grade": "D",
+                                "obtained": 4.13,
+                                "grade": "A2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1669,26 +1615,26 @@ ${element.header
                                         "PERIODIC TEST 2"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
                                 "subjectName": "SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 1,
-                                "grade": "E",
+                                "obtained": 4,
+                                "grade": "B1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1706,26 +1652,26 @@ ${element.header
                                         "PORTFOLIO"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
                                 "subjectName": "SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 2,
-                                "grade": "D",
+                                "obtained": 4,
+                                "grade": "B1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1743,80 +1689,25 @@ ${element.header
                                         "SUBJECT ENRICHMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
                                 "subjectName": "SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 1.6,
-                                "grade": "E",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1113,
-                                    "headerName": "MULTIPLE ASSESSMENT",
-                                    "subHeaderName": "(5)",
-                                    "priority": 4,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "MULTIPLE ASSESSMENT"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
-                            }
-                        ],
-                        "marksObtained": 6.48,
-                        "total": 20,
-                        "percentage": 32.4,
-                        "grade": "E",
-                        "className": "X",
-                        "sectionName": "A",
-                        "terms": "PERIODIC TEST 2",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 8,
-                        "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
-                        "subjectName": "SOCIAL SCIENCE",
-                        "subjectNature": "THEORY",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
-                                "subjectName": "SOCIAL SCIENCE",
-                                "subjectNature": "THEORY",
-                                "max": 5,
-                                "obtained": 3.08,
+                                "obtained": 3.5,
                                 "grade": "B2",
                                 "status": "",
                                 "markSheetName": "TERM-I",
@@ -1824,6 +1715,61 @@ ${element.header
                                 "session": "2024-2025",
                                 "decimalPlaces": 2,
                                 "markSheetTermResponse": {
+                                    "id": 1113,
+                                    "headerName": "MULTIPLE ASSESSMENT",
+                                    "subHeaderName": "(5)",
+                                    "priority": 4,
+                                    "bestOf": 0,
+                                    "decimalPlaces": 2,
+                                    "weightage": 5,
+                                    "terms": [
+                                        "MULTIPLE ASSESSMENT"
+                                    ]
+                                },
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
+                            }
+                        ],
+                        "marksObtained": 15.629999999999999,
+                        "total": 20,
+                        "percentage": 78.15,
+                        "grade": "B1",
+                        "className": "X",
+                        "sectionName": "D",
+                        "terms": "PERIODIC TEST 2",
+                        "markSheetName": "TERM-I",
+                        "subjectPrt": 8,
+                        "decimalPlaces": 2,
+                        "visible": true
+                    },
+                    {
+                        "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+                        "subjectName": "SOCIAL SCIENCE",
+                        "subjectNature": "THEORY",
+                        "markSheetReport": [
+                            {
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
+                                "rollNo": 0,
+                                "fatherName": "VIVEK VIRMANI",
+                                "className": "X",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
+                                "terms": "PERIODIC TEST 2",
+                                "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+                                "subjectName": "SOCIAL SCIENCE",
+                                "subjectNature": "THEORY",
+                                "max": 5,
+                                "obtained": 4.63,
+                                "grade": "A1",
+                                "status": "",
+                                "markSheetName": "TERM-I",
+                                "attachmentName": "",
+                                "session": "2024-2025",
+                                "decimalPlaces": 2,
+                                "markSheetTermResponse": {
                                     "id": 1110,
                                     "headerName": "WEIGHTAGE",
                                     "subHeaderName": "(5)",
@@ -1835,26 +1781,26 @@ ${element.header
                                         "PERIODIC TEST 2"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
                                 "subjectName": "SOCIAL SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 0,
-                                "grade": "E",
+                                "obtained": 5,
+                                "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1872,26 +1818,26 @@ ${element.header
                                         "PORTFOLIO"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": false
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
                                 "subjectName": "SOCIAL SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 3,
-                                "grade": "C",
+                                "obtained": 5,
+                                "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1909,26 +1855,26 @@ ${element.header
                                         "SUBJECT ENRICHMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             },
                             {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
+                                "studentInfoUid": "7b25c69d-60f3-421b-8df3-eb2498568ed1",
+                                "admissionNo": "S-4962",
+                                "studentName": "Manan Virmani",
                                 "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
+                                "fatherName": "VIVEK VIRMANI",
                                 "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
+                                "sectionName": "D",
+                                "classSectionUid": "f40bb9aa-d216-4d54-9898-2602101ffc94",
                                 "terms": "PERIODIC TEST 2",
                                 "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
                                 "subjectName": "SOCIAL SCIENCE",
                                 "subjectNature": "THEORY",
                                 "max": 5,
-                                "obtained": 3,
-                                "grade": "C",
+                                "obtained": 5,
+                                "grade": "A1",
                                 "status": "",
                                 "markSheetName": "TERM-I",
                                 "attachmentName": "",
@@ -1946,84 +1892,29 @@ ${element.header
                                         "MULTIPLE ASSESSMENT"
                                     ]
                                 },
-                                "visible": false,
-                                "graded": false,
-                                "pass": true
+                                "visible": true,
+                                "pass": true,
+                                "graded": false
                             }
                         ],
-                        "marksObtained": 9.08,
+                        "marksObtained": 19.63,
                         "total": 20,
-                        "percentage": 45.4,
-                        "grade": "C2",
+                        "percentage": 98.15,
+                        "grade": "A1",
                         "className": "X",
-                        "sectionName": "A",
+                        "sectionName": "D",
                         "terms": "PERIODIC TEST 2",
                         "markSheetName": "TERM-I",
                         "subjectPrt": 9,
                         "decimalPlaces": 2,
-                        "visible": false
-                    },
-                    {
-                        "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-                        "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                        "subjectNature": "1B Scholastic",
-                        "markSheetReport": [
-                            {
-                                "studentInfoUid": "9dc977ea-0503-4b7f-857f-867036d43cd3",
-                                "admissionNo": "V-4688",
-                                "studentName": "Aarav Sachdeva",
-                                "rollNo": 0,
-                                "fatherName": "Bharat Sachdeva",
-                                "className": "X",
-                                "sectionName": "A",
-                                "classSectionUid": "9fc74600-0aa2-4d7c-85d6-df86cd127c82",
-                                "terms": "PERIODIC TEST 2",
-                                "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-                                "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                                "subjectNature": "1B Scholastic",
-                                "max": 5,
-                                "obtained": 4,
-                                "grade": "A",
-                                "status": "",
-                                "markSheetName": "TERM-I",
-                                "attachmentName": "",
-                                "session": "2024-2025",
-                                "decimalPlaces": 2,
-                                "markSheetTermResponse": {
-                                    "id": 1110,
-                                    "headerName": "WEIGHTAGE",
-                                    "subHeaderName": "(5)",
-                                    "priority": 1,
-                                    "bestOf": 0,
-                                    "decimalPlaces": 2,
-                                    "weightage": 5,
-                                    "terms": [
-                                        "PERIODIC TEST 2"
-                                    ]
-                                },
-                                "visible": false,
-                                "graded": true,
-                                "pass": true
-                            }
-                        ],
-                        "marksObtained": 4,
-                        "total": 5,
-                        "percentage": 80,
-                        "grade": "A",
-                        "className": "X",
-                        "sectionName": "A",
-                        "terms": "PERIODIC TEST 2",
-                        "markSheetName": "TERM-I",
-                        "subjectPrt": 12,
-                        "decimalPlaces": 2,
-                        "visible": false
+                        "visible": true
                     }
                 ],
-                "marksObtained": 49.36,
-                "total": 110,
-                "percentage": 44.87,
-                "overAllGrade": "C2",
-                "visible": false
+                "marksObtained": 90.99,
+                "total": 100,
+                "percentage": 90.99,
+                "overAllGrade": "A2",
+                "visible": true
             },
             "remarks": {
                 "uid": "489fa01f-4c27-4e7e-b715-2862626a92e4",

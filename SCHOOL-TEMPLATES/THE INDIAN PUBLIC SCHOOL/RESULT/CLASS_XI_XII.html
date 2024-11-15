@@ -13,57 +13,57 @@
   </div>
 </body>
 <script>
-window.SetTemplateData = function (data) {
-      const config = {
-        schoolLogo:
-          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
-        schoolLogo2:
-          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
-        schoolName: "THE INDIAN SCHOOL",
-        schoolAddress: `<h5 >J.B. TITO Marg, SADIQ NAGAR, NEW DELHI - 110049</h5>
+  window.SetTemplateData = function (data) {
+    const config = {
+      schoolLogo:
+        "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+      schoolLogo2:
+        "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+      schoolName: "THE INDIAN SCHOOL",
+      schoolAddress: `<h5 >J.B. TITO Marg, SADIQ NAGAR, NEW DELHI - 110049</h5>
                 <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
                 <h5 >EmailID : contactus@theindianschool.in Website : www.theindianschool.in</h5>`,
-        studentInfoFields: [
+      studentInfoFields: [
         { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
-          {
-            label: "FATHER'S NAME",
-            key: "fatherName",
-            additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
-          },
-          {
-            label: "MOTHER'S NAME",
-            key: "motherName",
-            additionalInfo: { label: "D.O.B", key: "dob" },
-          },
-          {
-            label: "ADDRESS",
-            key: "address",
-          },
-        ],
-        gradingScale: "on 8-point (A1-E) Grading Scale",
-        gradeScale: [
-          { minPercentage: 91, grade: "A1" },
-          { minPercentage: 81, grade: "A2" },
-          { minPercentage: 71, grade: "B1" },
-          { minPercentage: 61, grade: "B2" },
-          { minPercentage: 51, grade: "C1" },
-          { minPercentage: 41, grade: "C2" },
-          { minPercentage: 33, grade: "D" },
-          { minPercentage: 0, grade: "E" },
-        ],
-        scholasticConfig: {
-          nature: "THEORY",
+        {
+          label: "FATHER'S NAME",
+          key: "fatherName",
+          additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
         },
-        coScholasticConfig: {
-          nature: "1B Scholastic",
+        {
+          label: "MOTHER'S NAME",
+          key: "motherName",
+          additionalInfo: { label: "D.O.B", key: "dob" },
         },
-        coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
-        signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
-        footnotes: [
-          "*S.E.A - Subject Enrichment Activity",
-          "*M.A - Multiple Assessment",
-        ],
-        styles: `
+        {
+          label: "ADDRESS",
+          key: "address",
+        },
+      ],
+      gradingScale: "on 8-point (A1-E) Grading Scale",
+      gradeScale: [
+        { minPercentage: 91, grade: "A1" },
+        { minPercentage: 81, grade: "A2" },
+        { minPercentage: 71, grade: "B1" },
+        { minPercentage: 61, grade: "B2" },
+        { minPercentage: 51, grade: "C1" },
+        { minPercentage: 41, grade: "C2" },
+        { minPercentage: 33, grade: "D" },
+        { minPercentage: 0, grade: "E" },
+      ],
+      scholasticConfig: {
+        nature: "THEORY",
+      },
+      coScholasticConfig: {
+        nature: "1B Scholastic",
+      },
+      coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
+      signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+      footnotes: [
+        "*S.E.A - Subject Enrichment Activity",
+        "*M.A - Multiple Assessment",
+      ],
+      styles: `
             @page { size: A4; margin: 10mm; }
             @media print { @page { margin: auto; size: A4; } }
             body { font-family: Arial, sans-serif; }
@@ -81,51 +81,51 @@ window.SetTemplateData = function (data) {
             .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
             .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
         `,
+    };
+
+    const dataList = Array.isArray(data) ? data : [data];
+    const viewTemplate = dataList[0]?.viewTemplate;
+    const staticData = []; // Function to return attendance/mark based on status
+    function getAttendanceOrMark(status, mark) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+        "Not Submitted": "NS",
       };
+      return attendanceValue[status] || mark || "-";
+    }
 
-      const dataList = Array.isArray(data) ? data : [data];
-      const viewTemplate = dataList[0]?.viewTemplate;
-      const staticData = []; // Function to return attendance/mark based on status
-      function getAttendanceOrMark(status, mark) {
-        const attendanceValue = {
-          Absent: "AB",
-          Medical: "M",
-          Sports: "S",
-          Leave: "L",
-          "Late Admission": "LA",
-          Exempted: "EX",
-          NA: "NA",
-          "Not Submitted": "NS",
-        };
-        return attendanceValue[status] || mark || "-";
-      }
-
-      // Calculate grade based on percentage
-      function calculateGrade(percentage) {
-        for (const grade of config.gradeScale) {
-          if (percentage >= grade.minPercentage) {
-            return grade.grade;
-          }
+    // Calculate grade based on percentage
+    function calculateGrade(percentage) {
+      for (const grade of config.gradeScale) {
+        if (percentage >= grade.minPercentage) {
+          return grade.grade;
         }
-        return "F";
       }
+      return "F";
+    }
 
-      function generateStudentInfo(student) {
-        // Generate full address
-        let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.street
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
-                        ", "
-                        : ""
-                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
-                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.city
-                        : ""
-                    }`;
+    function generateStudentInfo(student) {
+      // Generate full address
+      let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+        ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+        ", "
+        : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.city
+          : ""
+        }`;
 
-        // Generate table with student info
+      // Generate table with student info
       return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
         ${config.studentInfoFields
           .map(
@@ -160,127 +160,123 @@ window.SetTemplateData = function (data) {
     </table>`;
     }
 
-      // Generate scholastic table
-      function generateScholasticTable(
-        subjects,
-        config,
-        studentPerfromanceData
-      ) {
-        let totalMarksObtained = 0;
-        let grandTotalMarks = 0;
-        let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
-        let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
-        // Group subjects by attachmentName and their parts (Theory or Practical)
-        const groupedSubjects = subjects.reduce((acc, subject) => {
-          const attachmentName =
-            subject?.markSheetReport[0]?.attachmentName || "";
-          const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
+    // Generate scholastic table
+    function generateScholasticTable(
+      subjects,
+      config,
+      studentPerfromanceData
+    ) {
+      let totalMarksObtained = 0;
+      let grandTotalMarks = 0;
+      let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
+      let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
+      // Group subjects by attachmentName and their parts (Theory or Practical)
+      const groupedSubjects = subjects.reduce((acc, subject) => {
+        const attachmentName =
+          subject?.markSheetReport[0]?.attachmentName || "";
+        const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
 
-          if (attachmentName) {
-            if (!acc[attachmentName]) {
-              acc[attachmentName] = { theory: null, practical: null };
-            }
-            if (subject?.subjectNature?.toLowerCase()=="theory") {
-              acc[attachmentName].theory = subject;
-            } else if (subject?.subjectNature?.toLowerCase()=="practical") {
-              acc[attachmentName].practical = subject;
-            }
+        if (attachmentName) {
+          if (!acc[attachmentName]) {
+            acc[attachmentName] = { theory: null, practical: null };
           }
-          return acc;
-        }, {});
+          if (subject?.subjectNature?.toLowerCase() == "theory") {
+            acc[attachmentName].theory = subject;
+          } else if (subject?.subjectNature?.toLowerCase() == "practical") {
+            acc[attachmentName].practical = subject;
+          }
+        }
+        return acc;
+      }, {});
 
-        let allsubjects = subjects
-          ?.filter((el) => el?.subjectNature == "THEORY")
-          ?.map((el) => el?.subjectName);
-        let filteredPerformanceData = (
-          studentPerfromanceData?.groupedClassAttachmentResponse || []
-        )?.filter((t) => allsubjects?.some((el) => el == t?.attachmentName));
-        const rows = Object.entries(groupedSubjects)
-          .map(([attachmentName, parts]) => {
-            let unitTestMarks = 0;
-            let halfYearlyTheory = 0;
-            let halfYearlyPractical = 0;
-            let subjectTotal = 0;
+      let allsubjects = subjects
+        ?.filter((el) => el?.subjectNature == "THEORY")
+        ?.map((el) => el?.subjectName);
+      let filteredPerformanceData = (
+        studentPerfromanceData?.groupedClassAttachmentResponse || []
+      )?.filter((t) => allsubjects?.some((el) => el == t?.attachmentName));
+      const rows = Object.entries(groupedSubjects)
+        .map(([attachmentName, parts]) => {
+          let unitTestMarks = 0;
+          let halfYearlyTheory = 0;
+          let halfYearlyPractical = 0;
+          let subjectTotal = 0;
 
-            if (parts.theory) {
-              const theoryReports = parts.theory.markSheetReport;
-              theoryReports.forEach((report) => {
-                const termName =
-                  report?.markSheetTermResponse?.headerName
-                    ?.trim()
-                    .toLowerCase() || "";
-                const marksObtained = report?.obtained || 0;
+          if (parts.theory) {
+            const theoryReports = parts.theory.markSheetReport;
+            theoryReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
 
-                // Match term names in a case-insensitive manner
-                if (termName === "u.t -1") {
+              // Match term names in a case-insensitive manner
+              if (termName === "u.t -1") {
 
-                  unitTestMarks = report?.status
+                unitTestMarks = report?.status
                   ? getAttendanceOrMark(report?.status, marksObtained)
                   : marksObtained;
-                } else if (termName === "half yearly") {
-                  halfYearlyTheory = report?.status
-                    ? getAttendanceOrMark(report?.status, marksObtained)
-                    : marksObtained;
-                  totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
-                }
-                subjectTotal += marksObtained;
-              });
-            }
+              } else if (termName === "half yearly") {
+                halfYearlyTheory = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
 
-            if (parts.practical) {
-              const practicalReports = parts.practical.markSheetReport;
-              practicalReports.forEach((report) => {
-                const termName =
-                  report?.markSheetTermResponse?.headerName
-                    ?.trim()
-                    .toLowerCase() || "";
-                const marksObtained = report?.obtained || 0;
+          if (parts.practical) {
+            const practicalReports = parts.practical.markSheetReport;
+            practicalReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
 
-                if (termName === "half yearly") {
-                  halfYearlyPractical = report?.status
-                    ? getAttendanceOrMark(report?.status, marksObtained)
-                    : marksObtained;
-                  totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
-                }
-                subjectTotal += marksObtained;
-              });
-            }
+              if (termName === "half yearly") {
+                halfYearlyPractical = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
 
-            totalMarksObtained += subjectTotal;
-            grandTotalMarks += 100; // Assuming the total is always out of 100 for the grand total
+          totalMarksObtained += subjectTotal;
+          grandTotalMarks += 100; // Assuming the total is always out of 100 for the grand total
 
-            // Render table row for each subject
-            return `
+          // Render table row for each subject
+          return `
             <tr>
                 <td style="text-transform:uppercase; font-weight:bold;">${attachmentName}</td>
-                <td style="text-align:center; font-weight:${
-                  isNaN(unitTestMarks) ? "bold" : ""
-                }">${unitTestMarks}</td>
-                <td style="text-align:center; font-weight:${
-                  isNaN(halfYearlyTheory) ? "bold" : ""
-                }">${halfYearlyTheory}</td>
-                <td style="text-align:center; font-weight:${
-                  isNaN(halfYearlyPractical) ? "bold" : ""
-                }">${halfYearlyPractical}</td>
+                <td style="text-align:center; font-weight:${isNaN(unitTestMarks) ? "bold" : ""
+            }">${unitTestMarks}</td>
+                <td style="text-align:center; font-weight:${isNaN(halfYearlyTheory) ? "bold" : ""
+            }">${halfYearlyTheory}</td>
+                <td style="text-align:center; font-weight:${isNaN(halfYearlyPractical) ? "bold" : ""
+            }">${halfYearlyPractical}</td>
                 <td style="text-align:center">${(
-                  (isNaN(halfYearlyTheory) ? 0 : halfYearlyTheory) +
-                  (isNaN(halfYearlyPractical) ? 0 : halfYearlyPractical)
-                ).toFixed(1)}</td>
-                <td style="text-align:center">${
-                  filteredPerformanceData?.find(
-                    (el) => el?.attachmentName == attachmentName
-                  )?.highestObtainedMark || "-"
-                }</td>
+              (isNaN(halfYearlyTheory) ? 0 : halfYearlyTheory) +
+              (isNaN(halfYearlyPractical) ? 0 : halfYearlyPractical)
+            ).toFixed(1)}</td>
+                <td style="text-align:center">${filteredPerformanceData?.find(
+              (el) => el?.attachmentName == attachmentName
+            )?.highestObtainedMark || "-"
+            }</td>
             </tr>
             `;
-          })
-          .join("");
+        })
+        .join("");
 
-        const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
-        const overallGrade = calculateGrade(overallPercentage);
+      const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
+      const overallGrade = calculateGrade(overallPercentage);
 
-        // Render the final table
-        return `
+      // Render the final table
+      return `
     <table>
         <tr  > <td colspan="6" style="background-color: #fff ; font-weight:bold; font-size: 13px ;text-align: center"> ACADEMIC PERFORMANCE </td> </tr>
         <tr style="background-color: #fff">
@@ -300,8 +296,8 @@ window.SetTemplateData = function (data) {
             <td></td>
             
             <td colspan="3" style="text-align:center">${(
-              totalHalfYearlyTheory + totalHalfYearlyPractical
-            ).toFixed(2)} (${(
+          totalHalfYearlyTheory + totalHalfYearlyPractical
+        ).toFixed(2)} (${(
           ((totalHalfYearlyTheory + totalHalfYearlyPractical) /
             grandTotalMarks) *
           100
@@ -310,36 +306,33 @@ window.SetTemplateData = function (data) {
         </tr>
     </table>
     `;
-      }
+    }
 
-      // Helper function to calculate grade based on percentage
+    // Helper function to calculate grade based on percentage
 
-      function generateCoScholasticTable(subjects) {
-        const coScholasticSubjects = subjects?.filter(
-          (subject) =>
-            subject?.subjectAllResponse?.nature ===
-            config.coScholasticConfig.nature
-        );
+    function generateCoScholasticTable(subjects) {
+      const coScholasticSubjects = subjects?.filter(
+        (subject) =>
+          subject?.subjectAllResponse?.nature ===
+          config.coScholasticConfig.nature
+      );
 
-        let tableContent = "";
-        for (let i = 0; i < coScholasticSubjects.length; i++) {
-          const leftSubject = coScholasticSubjects[i];
-          tableContent += `
+      let tableContent = "";
+      for (let i = 0; i < coScholasticSubjects.length; i++) {
+        const leftSubject = coScholasticSubjects[i];
+        tableContent += `
                 <tr>
-                    <td style="width: 70%;">${
-                      leftSubject?.subjectAllResponse?.subjectName || ""
-                    }</td>
-                    <td style="width: 30%; text-align: center; font-weight:${
-                      leftSubject.remarkStatus ? "bold" : "normal"
-                    }">${
-            leftSubject?.remarkStatus || leftSubject?.grade || "-"
+                    <td style="width: 70%;">${leftSubject?.subjectAllResponse?.subjectName || ""
+          }</td>
+                    <td style="width: 30%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"
+          }">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
           }</td>
                     
                 </tr>
             `;
-        }
+      }
 
-        return `
+      return `
             <table>
                 
                 <tr style="background-color: #fff">
@@ -350,10 +343,10 @@ window.SetTemplateData = function (data) {
                 ${tableContent}
             </table>
         `;
-      }
+    }
 
-      function generateRemark(remark) {
-        return `
+    function generateRemark(remark) {
+      return `
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: left">GENERAL REMARKS</th>
@@ -363,65 +356,61 @@ window.SetTemplateData = function (data) {
         </tr>
     </table>
     `;
-      }
+    }
 
-      function generateSubjectRemark(remark, sub) {
-        let theorySub = sub
-          ?.filter((el) => el?.subjectNature == "THEORY")
-          ?.map((el) => el?.subjectName);
-        return `
+    function generateSubjectRemark(remark, sub) {
+      let theorySub = sub
+        ?.filter((el) => el?.subjectNature == "THEORY")
+        ?.map((el) => el?.subjectName);
+      return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th colspan="2" style="text-align: center">STUDENT'S PROFILE</th>
             </tr>
             ${theorySub
-              ?.map((el) => {
-                return remark?.fields
-                  ?.map((f) =>
-                    f?.value &&
-                    el?.toLowerCase()?.includes(f?.title?.toLowerCase())
-                      ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${
-                          f?.title || ""
-                        }</td><td style="width: 80%">${
-                          f?.value || ""
-                        }</td></tr>`
-                      : ""
-                  )
-                  ?.join("");
-              })
-              ?.join("")}
+          ?.map((el) => {
+            return remark?.fields
+              ?.map((f) =>
+                f?.value &&
+                  el?.toLowerCase()?.includes(f?.title?.toLowerCase())
+                  ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${f?.title || ""
+                  }</td><td style="width: 80%">${f?.value || ""
+                  }</td></tr>`
+                  : ""
+              )
+              ?.join("");
+          })
+          ?.join("")}
        
     </table>
     `;
-      }
+    }
 
-      function generatePrincipalRemark(remark) {
-        return `
+    function generatePrincipalRemark(remark) {
+      return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: left">PRINCIPAL'S REMARKS</th>
             </tr>
-            ${
-              remark?.masterName === "PRINCIPAL'S REMARKS"
-                ? remark?.fields
-                    ?.map(
-                      (f) =>
-                        `<tr  style="background-color: #fff, min-height: 20px;"><td>${
-                          f?.value || ""
-                        }</td></tr>`
-                    )
-                    .join("")
-                : ""
-            }
+            ${remark?.masterName === "PRINCIPAL'S REMARKS"
+          ? remark?.fields
+            ?.map(
+              (f) =>
+                `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""
+                }</td></tr>`
+            )
+            .join("")
+          : ""
+        }
        
     </table>
     `;
-      }
+    }
 
-      function generateGradingTable() {
-        return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+    function generateGradingTable() {
+      return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <tr>
             <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
                 INSTRUCTIONS
@@ -468,71 +457,69 @@ window.SetTemplateData = function (data) {
         </tr>
     </table>
 `;
-      }
+    }
 
-      function generateHeader(element) {
-        return ` <div class="header">
+    function generateHeader(element) {
+      return ` <div class="header">
             
-${
-  element.header
-    ? element.header
-    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+${element.header
+          ? element.header
+          : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
                         <h1 style="color: #2b595e" >${config.schoolName}</h1>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
             `
-}
+        }
 
              
 </div>`;
-      }
+    }
 
-      function generateSignature() {
-        return `
+    function generateSignature() {
+      return `
              <div class="signatures">
                         ${config.signatures
-                          .map(
-                            (sig) => `
+          .map(
+            (sig) => `
                             <div>
                                
                                 <p style="vertical-align: bottom">${sig}</p>
                             </div>
                         `
-                          )
-                          .join("")}
+          )
+          .join("")}
                     </div>
             `;
-      }
+    }
 
-      // Generate co-scholastic table
+    // Generate co-scholastic table
 
-      // Set student data
-      const multipleStudents = viewTemplate ? staticData : dataList;
-      const studentHtml = document.getElementById("studentsList");
-      studentHtml.innerHTML = ``;
+    // Set student data
+    const multipleStudents = viewTemplate ? staticData : dataList;
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = ``;
 
-      multipleStudents?.forEach((element) => {
-        const singleStudentHtml = document.createElement("div");
-        singleStudentHtml.style.pageBreakAfter = "always";
+    multipleStudents?.forEach((element) => {
+      const singleStudentHtml = document.createElement("div");
+      singleStudentHtml.style.pageBreakAfter = "always";
 
-        const termConfig =
-          element?.markData?.markSheetTerms?.map((term) => {
-            let temp = {};
-            temp["headerName"] = term?.headerName;
-            temp["subHeaderName"] = term?.subHeaderName;
-            return temp;
-          }) || [];
+      const termConfig =
+        element?.markData?.markSheetTerms?.map((term) => {
+          let temp = {};
+          temp["headerName"] = term?.headerName;
+          temp["subHeaderName"] = term?.subHeaderName;
+          return temp;
+        }) || [];
 
-        singleStudentHtml.innerHTML = `
+      singleStudentHtml.innerHTML = `
             <style type="text/css">${config.styles}</style>
             <page orientation="portrait" format="A4" margin="0">
                 <div class="container">
                    ${generateHeader(element)}
-    <h4 style="background-color : #fff ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${
-      element?.markData?.academicSession || ""
-    }</h4> 
+    <h4 style="background-color : #fff ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
+        }</h4> 
                        ${generateStudentInfo(element?.student)}
 
 
@@ -541,19 +528,19 @@ ${
                     <div class="section">
                         
                         ${generateScholasticTable(
-                          element?.markData
-                            ?.subjectWiseMarkSheetReportResponses,
-                          termConfig,
-                          element?.studentPerfromanceData
-                        )}
+          element?.markData
+            ?.subjectWiseMarkSheetReportResponses,
+          termConfig,
+          element?.studentPerfromanceData
+        )}
 
                     </div>
 
 
                     <div class="section">
                         ${generateCoScholasticTable(
-                          element?.baseTermData?.subject
-                        )}
+          element?.baseTermData?.subject
+        )}
                     </div>
 <div class="section">
                    ${generateRemark(element?.baseTermData?.remarksEntry)}
@@ -561,9 +548,9 @@ ${
 
 <div class="section">
 ${generateSubjectRemark(
-  element?.baseTermData?.remarksEntry,
-  element?.markData?.subjectWiseMarkSheetReportResponses
-)}
+          element?.baseTermData?.remarksEntry,
+          element?.markData?.subjectWiseMarkSheetReportResponses
+        )}
     </div>
     <div class="section">
       
@@ -573,14 +560,12 @@ ${generateSubjectRemark(
 
                    
                    <div style="font-size: 12px; display:flex; justify-content: space-between">
-                    <span style="font-weight: bold">ISSUED DATE: ${
-                      element?.printDate || new Date().toLocaleDateString()
-                    } </span>
-                    <span style="font-weight: bold">Attendance: ${
-                      element?.baseTermData?.remarksEntry?.fields?.find(
-                        (field) => field?.title === "Attendance"
-                      )?.value || element?.student?.attendance
-                    } </span>
+                    <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()
+        } </span>
+                    <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
+          (field) => field?.title === "Attendance"
+        )?.value || element?.student?.attendance
+        } </span>
                     </div>
 </div>
                    
@@ -592,9 +577,9 @@ ${generateSignature()}
             </page>
         `;
 
-        studentHtml.appendChild(singleStudentHtml);
-      });
-    };
+      studentHtml.appendChild(singleStudentHtml);
+    });
+  };
 </script>
 
 <script>
@@ -3152,93 +3137,93 @@ ${generateSignature()}
       "footer": null,
       "printDate": "29-10-2024",
       "studentPerfromanceData": {
-    "classWiseMarkResponse": [
-        {
+        "classWiseMarkResponse": [
+          {
             "subjectName": "ENGLISH",
             "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
             "maxMark": 20,
             "maxObtainedMark": 19.83,
             "averageObtainedMark": 14.504742857142869,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "HINDI",
             "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
             "maxMark": 20,
             "maxObtainedMark": 19.53,
             "averageObtainedMark": 12.698750000000002,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "SOCIAL SCIENCE",
             "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
             "maxMark": 20,
             "maxObtainedMark": 19.71,
             "averageObtainedMark": 13.194171428571439,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "SCIENCE",
             "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
             "maxMark": 20,
             "maxObtainedMark": 18.5,
             "averageObtainedMark": 11.754285714285716,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "MATHS",
             "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
             "maxMark": 20,
             "maxObtainedMark": 19.54,
             "averageObtainedMark": 12.863542857142864,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "ARTIFICIAL INTELLIGENCE",
             "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
             "maxMark": 5,
             "maxObtainedMark": 4.83,
             "averageObtainedMark": 3.113314285714282,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "HEALTH AND PHYSICAL EDUCATION",
             "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
             "maxMark": 5,
             "maxObtainedMark": 5,
             "averageObtainedMark": 4.182857142857143,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "FRENCH",
             "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
             "maxMark": 20,
             "maxObtainedMark": 19.92,
             "averageObtainedMark": 18.18259259259259,
             "attachmentName": null
-        },
-        {
+          },
+          {
             "subjectName": "SANSKRIT",
             "subjectUid": "f81600d4-a295-478d-b814-73d53e9430ee",
             "maxMark": 20,
             "maxObtainedMark": 18.17,
             "averageObtainedMark": 17.2525,
             "attachmentName": null
-        }
-    ],
-    "groupedClassAttachmentResponse": [
-        {
+          }
+        ],
+        "groupedClassAttachmentResponse": [
+          {
             "attachmentName": "MATHS",
             "totalMaxMark": 20,
             "highestObtainedMark": 19.54
-        },
-        {
+          },
+          {
             "attachmentName": "ENGLISH",
             "totalMaxMark": 20,
             "highestObtainedMark": 19.83
-        }
-    ]
-}
+          }
+        ]
+      }
     }
 
   ]);
