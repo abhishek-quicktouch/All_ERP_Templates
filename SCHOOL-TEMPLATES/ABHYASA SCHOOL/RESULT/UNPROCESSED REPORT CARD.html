@@ -13,18 +13,22 @@
 
     window.SetTemplateData = function (dataarr) {
 
+      const gradingFormat = [
+        { minPercentage: 91, grade: "A1" },
+        { minPercentage: 81, grade: "A2" },
+        { minPercentage: 71, grade: "B1" },
+        { minPercentage: 61, grade: "B2" },
+        { minPercentage: 51, grade: "C1" },
+        { minPercentage: 41, grade: "C2" },
+        { minPercentage: 33, grade: "D1" },
+        { minPercentage: 0, grade: "D2" },
+      ];
+
       const perToGrade = (per) => {
-        if (per >= 85 && per <= 100) {
-          return "A";
-        } else if (per >= 65 && per <= 84.99) {
-          return "B";
-        } else if (per >= 50 && per <= 64.99) {
-          return "C";
-        } else if (per >= 33 && per <= 49.99) {
-          return "D";
-        } else if (per >= 0 && per <= 32.99) {
-          return "E";
-        }
+        const gradeObj = gradingFormat.find(
+          (el) => per >= el.minPercentage
+        );
+        return gradeObj ? gradeObj.grade : "";
       };
 
       // const InstructionsMarks = [
@@ -290,6 +294,8 @@
         const obtainTotal = [...res1, ...res2]
           ?.filter((elem) => elem.value[1] !== "-")
           ?.reduce((acc, el) => acc + el.value[1], 0);
+
+        console.log(obtainTotal, grandTotal, ((obtainTotal / grandTotal) * 100), "ffffffff perToGrade((obtainTotal / grandTotal) * 100),")
 
         return [
           ...res1,
