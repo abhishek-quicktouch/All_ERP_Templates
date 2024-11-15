@@ -44,19 +44,17 @@
     };
 
     function ConvertData(data) {
-      console.log(data, "fffffffffff data ")
+      console.log(data)
       let allSubjects = [];
       let subjectData = {};
       let allTotal = {};
       let rowSpan = {};
       let overallTotal = 0;
       let overallTotalMax = 0;
-      let overAllGrade = data.overAllGrade;
       let terms = data?.markSheetTerms?.map((el) => {
         return {
           headerName: el?.headerName,
           subHeaderName: el?.subHeaderName,
-
         };
       });
       data?.subjectWiseMarkSheetReportResponses?.map((el, ind) => {
@@ -105,7 +103,6 @@
 
       for (let k in subjectData) {
         overallTotal += subjectData[k]["AVG"] || subjectData[k]["TOTAL"] || 0;
-
         if (subjectData[k]["AVG"] || subjectData[k]["TOTAL"]) {
           overallTotalMax += 100;
         }
@@ -118,7 +115,6 @@
         rowSpan,
         overallTotal,
         overallTotalMax,
-        overAllGrade
       };
     }
 
@@ -183,7 +179,6 @@
         rowSpan,
         overallTotal,
         overallTotalMax,
-        overAllGrade
       } = ConvertData(st?.markData);
       const baseTermData = (st?.baseTermData?.subject || [])?.filter(
         (t) => !t?.scholastic
@@ -268,7 +263,7 @@
                             </th>`
           )
           .join("")}
-                      <th style="text-align:center; font-size:12px;">Grade</th>
+                      <th style="text-align:center; font-size:12px;">TOTAL</br>100</th>
                     </tr>
                     ${allSubjects
           ?.map((el) => {
@@ -335,13 +330,6 @@
                           </tr>`;
           })
           .join("")}
-                              <tr>
-                         <td style="font-size:12px; font-weight:bold;">OVERALL GRADE</td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                      
-                        <td style="font-size:12px; font-weight:bold; text-align:center;">${overAllGrade}</td>
-                    </tr>
                     <tr>
                          <td style="font-size:12px; font-weight:bold;">TOTAL</td>
                          <td style="font-size:12px; font-weight:bold;"></td>
@@ -458,14 +446,16 @@
                       <p style="font-weight:bold;text-align:center; font-size:14px;">PRINCIPAL'S SIGNATURE</p>  
                   </div>
                 </div>
-               
+                <div style="width:fit-content; margin-top:70px;">
+                      <p style="text-align:center;">_________________________</p>  
+                      <p style="font-weight:bold; text-align:center; font-size:14px;">PARENT'S SIGNATURE</p>  
+                </div>
             </div>
         </div>
         </div>
     </page>`;
     });
   };
-
 </script>
 <script>
   window.SetTemplateData([
