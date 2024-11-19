@@ -113,7 +113,7 @@
             multipleStudents?.forEach((element, ind) => {
                 const singleStudentHtml = document.createElement("div");
                 singleStudentHtml.style.pageBreakAfter = ind % 4 == 3 ? "always" : "";
-                singleStudentHtml.style.maxWidth = "49%"
+                singleStudentHtml.style.maxWidth = "50%"
                 Object.assign(singleStudentHtml.style, {
                     flex: "1 1 50%",
                     minHeight: "50%"
@@ -177,6 +177,7 @@
               <style type="text/css">
   @page {
   size: A4
+
   }
   * {
   margin: 0px;
@@ -205,15 +206,16 @@
   
   @media print {
   @page {
-  margin:5mm;
-  size: A4 landscape;
+  margin:2mm;
+  size: A4;
   }
   
   }
   </style>
   
-  <page orientation="landscape" format="A4" margin="0">
-  
+  <page orientation="landscape" format="A4" margin="0" >
+    <div style="border:1px solid black;margin:1mm 1mm 10mm 1mm; padding:1mm; ">
+
   <!-- Record-1 -->
   <table cellspacing="0" style="width:100%; padding-top:3mm;">
   <tr>
@@ -222,38 +224,45 @@
   <table cellspacing="0" style="width:100%;">
   
   <tr>
-  <td align="center" style="width:100%; font-size:17pt; text-transform:uppercase; padding-top:3mm;">N.R.K PUBLIC SCHOOL
-       <br/>
-  <span style="font-weight:bold; font-size:9pt;">At. Barkurwa, PO-Sonwal,PS-Paharpur, Distt.-East Champaran, Bihar Pin 845425
-                          </span>
+  <td align="center" style="width:100%; font-size:17pt;font-weight:bold; text-transform:uppercase; padding-top:3mm; padding-bottom:0px">N.R.K PUBLIC SCHOOL
+       
   </td>
   </tr>
+  <tr>
+    <td align="center" style="width:100%; font-size:9pt; padding-top:0px; text-transform:uppercase">
+        At. Barkurwa, PO-Sonwal,PS-Paharpur, Distt.-East <br> Champaran, Bihar Pin 845425
+    </td>
+</tr>
   </table>
   <!--// end header section -->
   
   <!-- title -->
   <table cellspacing="0" style="width:100%;">
   <tr>
-  <td align="center" style="width:100%; padding-top:0mm; padding-bottom:3mm; font-size:11pt; font-weight:bold;">ACADEMIC SESSION : ${basicDetails.academicSession
-                    } <br>FEE REMINDER SLIP
+  <td align="center" style="width:100%; padding-top:0mm; padding-bottom:0mm; font-size:9pt; ">ACADEMIC SESSION : ${basicDetails.academicSession
+                    } 
   </td>
   </tr>	
+  <tr>
+    <td align="center" style="width:100%;font-weight:bold; padding-top:0mm; font-size:10pt; ">FEE REMINDER SLIP</td>
+    </tr>
+
   </table>
   <!--// title -->
   <hr style="width:100%; border:1px solid #000000; margin-bottom:3mm;"/>
   <!-- Affiliation -->
   <table cellspacing="0" style="width:100%;">
   <tr>
-  <td align="left" style="width:15%; font-weight:bold;">Adm No.</td>
-  <td align="left" style="width:40%;">: ${basicDetails.admissionNo}</td>
-  <td align="left" style="width:10%; font-weight:bold;">Class</td>
-  <td align="left" style="width:40%;">: ${basicDetails.classSection}</td>
+  <td align="left" style="width:17%; font-weight:bold;">Adm No.</td>
+  <td align="left" style="width:33%;">: ${basicDetails.admissionNo}</td>
+  <td align="left" style="width:17%; font-weight:bold;">Class</td>
+  <td align="left" style="width:33%;">: ${basicDetails.classSection}</td>
   </tr>
   <tr>
-  <td align="left" style="width:10%; font-weight:bold;">S Name</td>
-  <td align="left" style="width:40%;">: ${basicDetails.studentName}</td>
-  <td align="left" style="width:10%; font-weight:bold;">F Name</td>
-  <td align="left" style="width:40%;">: ${basicDetails.fatherName}</td>
+  <td align="left" style="width:17%; font-weight:bold;">S Name</td>
+  <td align="left" style="width:33%;">: ${basicDetails.studentName}</td>
+  <td align="left" style="width:17%; font-weight:bold;">F Name</td>
+  <td align="left" style="width:33%;">: ${basicDetails.fatherName}</td>
   </tr>
  
   </table>	
@@ -329,9 +338,7 @@
   </table>
   
   <table cellspacing="0" style="width:100%;">
-  <tr align="center">
-  <td align="center" style="width:100%; padding-left:0mm; padding-right:0mm; border-bottom:dashed 0.25mm #000000;"></td>
-  </tr>
+  
   </table>
   
   
@@ -339,6 +346,7 @@
   </tr>
   
   </table>
+  </div>
   <!--// Record-1 -->
   </page>
   

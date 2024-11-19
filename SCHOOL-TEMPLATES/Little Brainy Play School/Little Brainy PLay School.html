@@ -349,28 +349,7 @@ Little Brainy Play School
                       
                         <td style="font-size:12px; font-weight:bold; text-align:center;">${overAllGrade}</td>
                     </tr>
-                    <tr>
-                         <td style="font-size:12px; font-weight:bold;">TOTAL</td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                         ${terms
-                    ?.map((el) => {
-                        total += allTotal[el?.headerName]?.obt;
-                        termTotal += allTotal[el?.headerName]?.max;
-                        return ``;
-                    })
-                    .join("")}
-                        <td style="font-size:12px; font-weight:bold; text-align:center;">${total}</td>
-                    </tr>
-                    <tr>
-                        <td style="font-size:12px; font-weight:bold;">PERCENTAGE</td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                         <td style="font-size:12px; font-weight:bold;"></td>
-                        <td style="font-size:12px; font-weight:bold; text-align:center;">${(
-                    (total / termTotal) *
-                    100
-                ).toFixed(2)}%</td>    
-                    </tr>
+
                 </table>
             </div>
             <div style="width: 25%; border:1.5px solid black; flex-grow: 1; min-height:100%; font-size:12px; font-weight:bold;">

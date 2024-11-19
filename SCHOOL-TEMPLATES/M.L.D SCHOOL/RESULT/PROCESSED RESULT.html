@@ -201,16 +201,16 @@
           console.log(markSheetReport)
           return `<tr>
                     <td>${el?.subjectName || "-"}</td>
-                    <td>${50}</td>
+                    <td style="text-align: center">${50}</td>
                     ${markSheetReport
               ?.map((m) => {
-                return `<td style=font-weight:${m?.status ? "bold" : ""
-                  }>${m?.status?.toUpperCase() || m?.obtained || "-"
+                return `<td style="font-weight:${m?.status ? "bold" : ""
+                  } ; text-align: center" >${m?.status?.toUpperCase() || m?.obtained || "-"
                   }</td>`;
               })
               .join("")}
-                    <td>${((el?.marksObtained / 50) * 100) || "-"}</td>
-                    <td>${el?.grade || "-"}</td>
+                    <td style="text-align: center">${((el?.marksObtained / 50) * 100) || "-"}</td>
+                    <td style="text-align: center">${el?.grade || "-"}</td>
                     </tr>`;
         })
         .join("");
@@ -365,7 +365,7 @@
                         <td style="width:100%; text-align:center; padding-top:0mm; padding-bottom:0mm; border:none;">
                           <div style="width:90%;  margin:auto;">
                                  <img align="left" style="width: 100%;" src="
-https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-12T11_08_58_051870424.png">
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/NRKPS895/web-content/event/images/UploadFile2024-11-19T10_42_56_725479052.png">
                         </div>
                         </td>
                      </tr>
@@ -377,9 +377,7 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
                     <tr>
                         <th colspan="4" style="text-align: center;">STUDENT PROGRESS REPORT  <p style="font-size: 10pt ; margin: 0;padding: 0">${studentData?.markData?.academicSession
         }</p></th>
-                        <th rowspan="5" style="width: 15%; text-align: center;">
-                          <img src="${studentData?.baseTermData?.perSignedUrlResponse?.url}" alt="Student Image" style="width: 100%;">
-                          </th>
+                        
                     </tr>
                     <tr>
                         <td><strong>ADMISSION NO.:</strong></td>
@@ -552,19 +550,19 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
                             <th style="border: 1px solid black; padding: 9px; text-align:center;">Grade</th>
                         </tr>
                         <tr>
-                            <td style="border: 1px solid black; padding: 9px; text-align:center;">56-70</td>
+                            <td style="border: 1px solid black; padding: 9px; text-align:center;">90-100</td>
                             <td style="border: 1px solid black; padding: 9px; text-align:center;">A+</td>
-                            <td style="border: 1px solid black; padding: 9px; text-align:center;">35-45.49</td>
+                            <td style="border: 1px solid black; padding: 9px; text-align:center;">50-69.99</td>
                             <td style="border: 1px solid black; padding: 9px; text-align:center;">B+</td>
                         </tr>
                         <tr>
-                            <td style="border: 1px solid black; padding: 9px; text-align:center;">45.5-55.99</td>
+                            <td style="border: 1px solid black; padding: 9px; text-align:center;">70-89.99</td>
                             <td style="border: 1px solid black; padding: 9px; text-align:center;">A</td>
-                            <td style="border: 1px solid black; padding: 9px; text-align:center;">24.5-34.99</td>
+                            <td style="border: 1px solid black; padding: 9px; text-align:center;">40-49.99</td>
                             <td style="border: 1px solid black; padding: 9px; text-align:center;">B</td>
                         </tr>
                         <tr>
-                            <td colspan="4" style="border: 1px solid black; padding: 9px; text-align:center">24.49 AND BELOW: C</td>
+                            <td colspan="4" style="border: 1px solid black; padding: 9px; text-align:center">39.99 AND BELOW: C</td>
                         </tr>
                     </table>
                 </td>
