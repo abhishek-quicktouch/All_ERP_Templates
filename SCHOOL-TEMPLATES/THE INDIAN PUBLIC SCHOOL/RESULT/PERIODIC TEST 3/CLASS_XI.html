@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+  <div id="studentsList">
+    Processed Dynamic School Report Generator Script
+  </div>
+</body>
+<script>
+  window.SetTemplateData = function (data) {
+    const config = {
+      schoolLogo:
+        "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+      schoolLogo2:
+        "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+      schoolName: "THE INDIAN SCHOOL",
+      schoolAddress: `<h5 >J.B. TITO Marg, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 FAX : 011-26253185</h5>
+                <h5 >EmailID : contactus@theindianschool.in Website : www.theindianschool.in</h5>`,
+      studentInfoFields: [
+        { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
+        {
+          label: "FATHER'S NAME",
+          key: "fatherName",
+          additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
+        },
+        {
+          label: "MOTHER'S NAME",
+          key: "motherName",
+          additionalInfo: { label: "D.O.B", key: "dob" },
+        },
+        {
+          label: "ADDRESS",
+          key: "address",
+        },
+      ],
+      gradingScale: "on 8-point (A1-E) Grading Scale",
+      gradeScale: [
+        { minPercentage: 91, grade: "A1" },
+        { minPercentage: 81, grade: "A2" },
+        { minPercentage: 71, grade: "B1" },
+        { minPercentage: 61, grade: "B2" },
+        { minPercentage: 51, grade: "C1" },
+        { minPercentage: 41, grade: "C2" },
+        { minPercentage: 33, grade: "D" },
+        { minPercentage: 0, grade: "E" },
+      ],
+      scholasticConfig: {
+        nature: "THEORY",
+      },
+      coScholasticConfig: {
+        nature: "1B Scholastic",
+      },
+      coScholasticGradingScale: "on a 5-point (A-E) Grading Scale",
+      signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+      footnotes: [
+        "*S.E.A - Subject Enrichment Activity",
+        "*M.A - Multiple Assessment",
+      ],
+      styles: `
+            @page { size: A4; margin: 10mm; }
+            @media print { @page { margin: auto; size: A4; } }
+            body { font-family: Arial, sans-serif; }
+            .container { width: 100%; max-width: 800px;  margin: 0 auto; padding: 20px; box-sizing: border-box; }
+            .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+            .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; } 
+            .header img { max-width: 100px; }
+            .section { margin: 1mm; }
+            .section table { width: 100%; border-collapse: collapse; }
+            .section table, .section th, .section td { border: 1px solid #000; }
+            .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
+            .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+            .remarks { margin :0px; }
+            .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+            .signatures div { font-size: 13px; margin: 0px; padding: 0px;  text-align: center;  }
+            .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+        `,
+    };
+
+    const dataList = Array.isArray(data) ? data : [data];
+    const viewTemplate = dataList[0]?.viewTemplate;
+    const staticData = []; // Function to return attendance/mark based on status
+    function getAttendanceOrMark(status, mark) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+        "Not Submitted": "NS",
+      };
+      return attendanceValue[status] || mark || "-";
+    }
+
+    // Calculate grade based on percentage
+    function calculateGrade(percentage) {
+      for (const grade of config.gradeScale) {
+        if (percentage >= grade.minPercentage) {
+          return grade.grade;
+        }
+      }
+      return "F";
+    }
+
+    function generateStudentInfo(student) {
+      // Generate full address
+      let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
+        ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
+        ", "
+        : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
+          ? student?.studentInfoResponse[0]?.studentAddressResponse
+            ?.landmark + ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          : ""
+        }`;
+
+      // Generate table with student info
+      return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+        ${config.studentInfoFields
+          .map(
+            (field) => `
+                    <tr>
+                        <th style="width: 25%; text-align: left">${field?.label
+              }</th>
+                        ${field?.label?.toLowerCase() === "address"
+                ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
+                : `  <td style="width: 25%;"> : ${student?.[field?.key] || ""
+                } </td> `
+              }   
+                        ${field?.additionalInfo
+                ? field?.additionalInfo?.label === "CLASS & SECTION"
+                  ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.["className"] || ""
+                  }-${student?.["sectionName"] || ""}</td>
+                            `
+                  : `
+                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.[field?.additionalInfo?.key] || ""
+                  }</td>
+                            `
+                : ""
+              }
+                    </tr>
+                `
+          )
+          .join("")}
+    </table>`;
+    }
+
+    // Generate scholastic table
+    function generateScholasticTable(
+      subjects,
+      config,
+      studentPerfromanceData
+    ) {
+      let totalMarksObtained = 0;
+      let grandTotalMarks = 0;
+      let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
+      let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
+      // Group subjects by attachmentName and their parts (Theory or Practical)
+      let totalUnitTestMarks = 0;
+      const groupedSubjects = subjects.reduce((acc, subject) => {
+        const attachmentName =
+          subject?.markSheetReport[0]?.attachmentName || "";
+        const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
+
+        if (attachmentName) {
+          if (!acc[attachmentName]) {
+            acc[attachmentName] = { theory: null, practical: null };
+          }
+          if (subject?.subjectNature?.toLowerCase() == "theory") {
+            acc[attachmentName].theory = subject;
+          } else if (subject?.subjectNature?.toLowerCase() == "practical") {
+            acc[attachmentName].practical = subject;
+          }
+        }
+        return acc;
+      }, {});
+
+      let allsubjects = subjects
+        ?.filter((el) => el?.subjectNature == "THEORY")
+        ?.map((el) => el?.subjectName);
+      let filteredPerformanceData = (
+        studentPerfromanceData?.groupedClassAttachmentResponse || []
+      )?.filter((t) => allsubjects?.some((el) => el == t?.attachmentName));
+      const rows = Object.entries(groupedSubjects)
+        .map(([attachmentName, parts]) => {
+          let unitTestMarks = 0;
+          let halfYearlyTheory = 0;
+          let halfYearlyPractical = 0;
+          let subjectTotal = 0;
+
+          if (parts.theory) {
+            const theoryReports = parts.theory.markSheetReport;
+            theoryReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
+
+              // Match term names in a case-insensitive manner
+              if (termName === "u.t -1") {
+
+                unitTestMarks = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalUnitTestMarks += marksObtained;
+              } else if (termName === "half yearly") {
+                halfYearlyTheory = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
+
+          if (parts.practical) {
+            const practicalReports = parts.practical.markSheetReport;
+            practicalReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
+
+              if (termName === "half yearly") {
+                halfYearlyPractical = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
+
+          totalMarksObtained += subjectTotal;
+          grandTotalMarks += 25; // Assuming the total is always out of 100 for the grand total
+
+          // Render table row for each subject
+          return `
+            <tr>
+                <td style="text-transform:uppercase; font-weight:bold;text-align:center">${attachmentName}</td>
+                <td style="text-align:center; font-weight:${isNaN(unitTestMarks) ? "bold" : ""
+            }">${unitTestMarks}</td>
+                
+               
+                <td style="text-align:center">${filteredPerformanceData?.find(
+              (el) => el?.attachmentName == attachmentName
+            )?.totalObtainedMark || "-"
+            }</td>
+            </tr>
+            `;
+        })
+        .join("");
+
+      console.log(totalMarksObtained, grandTotalMarks, "ffffffffff grandTotalMarks")
+      const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
+      const overallGrade = calculateGrade(overallPercentage);
+
+      // Render the final table
+      return `
+    <table>
+        <tr  > <td colspan="3" style="background-color: #fff ; font-weight:bold; font-size: 13px ;text-align: center"> ACADEMIC PERFORMANCE </td> </tr>
+        <tr style="background-color: #fff">
+            <th  style="text-align: center; width: 30%;">SUBJECTS</th>
+            <th style="text-align: center;width: 14%;">Unit Test-1<br/> (25)</th>
+            
+        
+          
+            <th style="text-align: center; width: 14%;">HIGHEST MARKS IN CLASS (100)</th>
+        </tr>
+        ${rows}
+        <tr style="font-weight:bold">
+            <td style="text-align:center">GRAND TOTAL</td>
+            
+            
+            <td  style="text-align:center">${(totalUnitTestMarks).toFixed(2)} </td>
+        <td></td>
+           
+        </tr>
+        <tr style="font-weight:bold">
+            <td style="text-align:center">PERCENTAGE</td>
+            
+            
+            <td  style="text-align:center">${(
+          (totalUnitTestMarks /
+            grandTotalMarks) *
+          100
+        ).toFixed(2)} </td>
+        <td></td>
+           
+        </tr>
+    </table>
+    `;
+    }
+
+    // Helper function to calculate grade based on percentage
+
+
+    function generateRemark(remark) {
+      return `
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">REMARKS</th>
+        <tr>
+            <td style="text-align: left">${remark?.description || "-"}</td>
+            
+        </tr>
+    </table>
+    `;
+    }
+
+
+
+
+    function generateHeader(element) {
+      return ` <div class="header">
+            
+${element.header
+          ? element.header
+          : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+              <div style="text-align:center">
+                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <div style="color: #2b595e" >${config.schoolAddress}</div>
+                   </div>
+              <img src="${config.schoolLogo2}" alt="School Logo"/> 
+            `
+        }
+
+             
+</div>`;
+    }
+
+    function generateSignature() {
+      return `
+             <div class="signatures">
+                        ${config.signatures
+          .map(
+            (sig) => `
+                            <div>
+                               
+                                <p style="vertical-align: bottom">${sig}</p>
+                            </div>
+                        `
+          )
+          .join("")}
+                    </div>
+            `;
+    }
+
+    function generateGraph(
+      subjects,
+      studentPerformanceData,
+      uniqueGraphId
+    ) {
+      if (!subjects || !studentPerformanceData) {
+        console.error("Invalid inputs provided");
+        return;
+      }
+
+      const filteredSubjects = subjects
+        .filter((subject) =>
+          studentPerformanceData.some(
+            (data) => data.subjectName === subject.subject
+          )
+        )
+        .map((subject) => {
+          const performanceData = studentPerformanceData.find(
+            (data) => data.subjectName === subject.subject
+          );
+          return {
+            subjectName: subject?.subject,
+            maxMark: performanceData.maxMark,
+            maxObtainedMark: performanceData.maxObtainedMark,
+            averageObtainedMark: performanceData.averageObtainedMark,
+            actualObtained: subject?.marks
+          };
+        });
+
+      const chartContainer = document.getElementById(uniqueGraphId);
+      chartContainer.innerHTML = "";
+
+      // Set container styles
+      chartContainer.style.display = "flex";
+      chartContainer.style.flexDirection = "column";
+      chartContainer.style.alignItems = "center";
+      chartContainer.style.width = "100%";
+      chartContainer.style.height = "250px";
+      chartContainer.style.backgroundColor = "#f0f0f0";
+      chartContainer.style.padding = "0px";
+
+      // Y-axis container
+      const yAxisContainer = document.createElement("div");
+      Object.assign(yAxisContainer.style, {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "170px",
+        marginRight: "10px",
+        padding: "0px"
+      });
+
+      // Adding y-axis labels (100 to 0)
+      [100, 80, 60, 40, 20, 0].forEach((value) => {
+        const yLabel = document.createElement("div");
+        yLabel.textContent = value
+        Object.assign(yLabel.style, {
+          fontSize: "10px",
+          color: "#333",
+          textAlign: "right",
+        });
+        yAxisContainer.appendChild(yLabel);
+      });
+
+      // Main container to hold y-axis and bar graph
+      const mainContainer = document.createElement("div");
+      mainContainer.style.display = "flex";
+      mainContainer.style.alignItems = "flex-end";
+      chartContainer.appendChild(mainContainer);
+      mainContainer.appendChild(yAxisContainer);
+
+      // Bar graph container
+      const barGraph = document.createElement("div");
+      Object.assign(barGraph.style, {
+        display: "flex",
+        alignItems: "flex-end",
+        gap: "5px",
+        height: "100%",
+        width: "100%",
+        backgroundColor: "#ffffff",
+        padding: "0px",
+        boxSizing: "border-box",
+        overflow: "hidden",
+      });
+      mainContainer.appendChild(barGraph);
+
+      const barLabels = document.createElement("div");
+      Object.assign(barLabels.style, {
+        display: "flex",
+        justifyContent: "space-around",
+        width: "90%",
+        marginTop: "10px",
+      });
+      chartContainer.appendChild(barLabels);
+
+      filteredSubjects.forEach((subject) => {
+        const subjectGroup = document.createElement("div");
+        Object.assign(subjectGroup.style, {
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-end",
+          gap: "2px",
+          width: "50px",
+          height: "100%",
+        });
+
+        const averageBar = document.createElement("div");
+        Object.assign(averageBar.style, {
+          width: "10px",
+          backgroundColor: "#4CAF50",
+          height: `${(subject.averageObtainedMark / subject.maxMark) * 100
+            }%`,
+        });
+
+        const maxObtainedBar = document.createElement("div");
+        Object.assign(maxObtainedBar.style, {
+          width: "10px",
+          backgroundColor: "#FFA726",
+          height: `${(subject.actualObtained / subject.maxMark) * 100}%`,
+        });
+
+        const maxMarkBar = document.createElement("div");
+        Object.assign(maxMarkBar.style, {
+          width: "10px",
+          backgroundColor: "#2196F3",
+          height: `${(subject.maxObtainedMark / subject.maxMark) * 100}%`,
+        });
+
+        subjectGroup.appendChild(averageBar);
+        subjectGroup.appendChild(maxObtainedBar);
+        subjectGroup.appendChild(maxMarkBar);
+        barGraph.appendChild(subjectGroup);
+
+        const label = document.createElement("div");
+        label.innerText = subject.subjectName;
+        Object.assign(label.style, {
+          fontSize: "9px",
+          textAlign: "center",
+          marginTop: "5px",
+          transform: "rotate(-30deg)",
+          wordBreak: "break-word",
+          width: "50px",
+        });
+        barLabels.appendChild(label);
+      });
+
+      const legend = document.createElement("div");
+      Object.assign(legend.style, {
+        display: "flex",
+        gap: "15px",
+        marginTop: "20px",
+        alignItems: "center",
+      });
+      chartContainer.appendChild(legend);
+
+      const legendData = [
+        { color: "#4CAF50", label: "Average Obtained" },
+        { color: "#FFA726", label: "Marks Obtained" },
+        { color: "#2196F3", label: "Highest Obtained" },
+      ];
+
+      legendData.forEach((item) => {
+        const legendItem = document.createElement("div");
+        Object.assign(legendItem.style, {
+          display: "flex",
+          alignItems: "center",
+          gap: "5px",
+        });
+
+        const legendColor = document.createElement("div");
+        Object.assign(legendColor.style, {
+          width: "10px",
+          height: "10px",
+          backgroundColor: item.color,
+          display: "inline-block",
+        });
+
+        const legendTextContainer = document.createElement("span");
+        legendTextContainer.textContent = item.label;
+        Object.assign(legendTextContainer.style, {
+          fontSize: "10px",
+          color: "#333",
+          fontWeight: "bold",
+          marginLeft: "5px",
+        });
+
+        legendItem.appendChild(legendColor);
+        legendItem.appendChild(legendTextContainer);
+        legend.appendChild(legendItem);
+      });
+    }
+
+
+    // Set student data
+    const multipleStudents = viewTemplate ? staticData : dataList;
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = ``;
+
+    multipleStudents?.forEach((element) => {
+      const singleStudentHtml = document.createElement("div");
+      singleStudentHtml.style.pageBreakAfter = "always";
+      const graphId = `graph-${element?.student?.studentId || Math.random()}`;
+
+      const termConfig =
+        element?.markData?.markSheetTerms?.map((term) => {
+          let temp = {};
+          temp["headerName"] = term?.headerName;
+          temp["subHeaderName"] = term?.subHeaderName;
+          return temp;
+        }) || [];
+
+      singleStudentHtml.innerHTML = `
+            <style type="text/css">${config.styles}</style>
+            <page orientation="portrait" format="A4" margin="0">
+                <div class="container">
+                   ${generateHeader(element)}
+    <h4 style="background-color : #fff ; border: 1px solid black; text-align: center ; font-size: 14px" >PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""
+        }</h4> 
+                       ${generateStudentInfo(element?.student)}
+
+
+                
+
+                    <div class="section">
+                        
+                        ${generateScholasticTable(
+          element?.markData
+            ?.subjectWiseMarkSheetReportResponses,
+          termConfig,
+          element?.studentPerfromanceData
+        )}
+
+                    </div>
+
+
+                  
+<div class="section">
+                   ${generateRemark(element?.baseTermData?.remarksEntry)}
+                   </div>
+
+
+     <div class="section" style="width: 99%">
+              <h3 style="text-align: center; font-size: 12px; border: 1px solid black; padding: 2px; text-transform: uppercase">
+                ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+              </h3>
+              <div id="${graphId}" style="border: 1px solid black"></div>
+            </div>
+
+                   <div class="section">
+
+                   
+                   <div style="font-size: 12px; display:flex; justify-content: space-between">
+                    <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()
+        } </span>
+                    <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
+          (field) => field?.title === "Attendance"
+        )?.value || element?.student?.attendance
+        } </span>
+                    </div>
+</div>
+                   
+${generateSignature()}
+
+
+                  
+                </div>
+            </page>
+        `;
+
+      studentHtml.appendChild(singleStudentHtml);
+      // Generate graph after the container is added to the DOM
+      const graphContainer = document.getElementById(graphId);
+      if (graphContainer && element?.markData?.subjectWiseMarkSheetReportResponses) {
+        // Prepare data for graph
+        const subjects = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+          subject: subject.markSheetReport[0]?.attachmentName,
+          marks: subject.markSheetReport[0]?.obtained || 0,
+          maxPossible: subject.markSheetReport[0]?.maxMark || 100,
+          percentage: (subject.markSheetReport[0]?.obtained / subject.markSheetReport[0]?.maxMark) * 100 || 0
+        }));
+
+        // const performanceData = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+        //   subjectName: subject.attachmentName,
+        //   maxObtainedMark: subject.markSheetReport[0]?.maxMark || 100,
+        //   averageObtainedMark: subject.markSheetReport[0]?.obtained || 0,
+        //   maxMark: subject.markSheetReport[0]?.maxMark || 100
+        // }));
+
+        generateGraph(graphContainer, subjects, element?.studentPerfromanceData);
+      }
+    });
+  };
+</script>
+
+<script>
+  window.SetTemplateData([
+    {
+      studentPerfromanceData: {
+        classWiseMarkResponse: [
+          {
+            subjectName: "ENGLISH",
+            subjectUid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            maxMark: 105,
+            maxObtainedMark: 96,
+            averageObtainedMark: 65.30851063829788,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PHYSICS",
+            subjectUid: "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+            maxMark: 95,
+            maxObtainedMark: 77.5,
+            averageObtainedMark: 42.057377049180324,
+            attachmentName: null,
+          },
+          {
+            subjectName: "CHEMISTRY",
+            subjectUid: "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+            maxMark: 95,
+            maxObtainedMark: 83,
+            averageObtainedMark: 43.86666666666667,
+            attachmentName: null,
+          },
+          {
+            subjectName: "MATHS",
+            subjectUid: "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+            maxMark: 105,
+            maxObtainedMark: 98,
+            averageObtainedMark: 51.592592592592595,
+            attachmentName: null,
+          },
+          {
+            subjectName: "COMPUTER SCIENCE",
+            subjectUid: "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+            maxMark: 95,
+            maxObtainedMark: 76,
+            averageObtainedMark: 44.333333333333336,
+            attachmentName: null,
+          },
+          {
+            subjectName: "SOCIAL AND EMOTIONAL SKILLS",
+            subjectUid: "34ce772c-70ff-4be0-995f-c5c8c31c6302",
+            maxMark: 80,
+            maxObtainedMark: 80,
+            averageObtainedMark: 68.97721311475402,
+            attachmentName: null,
+          },
+          {
+            subjectName: "GENERAL STUDIES",
+            subjectUid: "e5556989-dfa8-4315-8ae6-b631d41f4807",
+            maxMark: 100,
+            maxObtainedMark: 100,
+            averageObtainedMark: 86.65999999999991,
+            attachmentName: null,
+          },
+          {
+            subjectName: "SEWA  AND WORK EDUCATION",
+            subjectUid: "e07f3c70-d36d-4d92-8cb5-cf3f2fa345ec",
+            maxMark: 80,
+            maxObtainedMark: 80,
+            averageObtainedMark: 68.79299999999994,
+            attachmentName: null,
+          },
+          {
+            subjectName: "HEALTH AND PHYSICAL EDUCATION",
+            subjectUid: "731107ab-00ea-4df6-b8b3-8ce8b7917161",
+            maxMark: 100,
+            maxObtainedMark: 100,
+            averageObtainedMark: 85.99299999999991,
+            attachmentName: null,
+          },
+          {
+            subjectName: "DISCIPLINE",
+            subjectUid: "2ff038e1-c337-476b-a203-0ceb1b34f896",
+            maxMark: 100,
+            maxObtainedMark: 100,
+            averageObtainedMark: 92.91984615384611,
+            attachmentName: null,
+          },
+          {
+            subjectName: "ENGLISH PR.",
+            subjectUid: "d63d7fda-0c47-497b-8555-3248c7082013",
+            maxMark: 20,
+            maxObtainedMark: 20,
+            averageObtainedMark: 16.081560283687942,
+            attachmentName: null,
+          },
+          {
+            subjectName: "MATHS PR.",
+            subjectUid: "92de4f9c-738f-4bdc-a195-024f4f15f702",
+            maxMark: 20,
+            maxObtainedMark: 18,
+            averageObtainedMark: 14.3,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PHYSICS PR.",
+            subjectUid: "223ebfc3-cfb4-4742-b16b-0c7f8dc9eab7",
+            maxMark: 30,
+            maxObtainedMark: 26.5,
+            averageObtainedMark: 19.540983606557376,
+            attachmentName: null,
+          },
+          {
+            subjectName: "CHEMISTRY PR.",
+            subjectUid: "5724fada-656b-4776-bcbc-f5ef5b8d8397",
+            maxMark: 30,
+            maxObtainedMark: 26,
+            averageObtainedMark: 18.591666666666665,
+            attachmentName: null,
+          },
+          {
+            subjectName: "COMPUTER SCIENCE PR.",
+            subjectUid: "1977b4a3-cfc9-4cf6-89cb-0900bc662442",
+            maxMark: 30,
+            maxObtainedMark: 27,
+            averageObtainedMark: 14.212121212121213,
+            attachmentName: null,
+          },
+          {
+            subjectName: "Art education - performing and visual arts",
+            subjectUid: "5ca07149-6876-49c5-9ad5-cbb2c7770b15",
+            maxMark: 80,
+            maxObtainedMark: 80,
+            averageObtainedMark: 67.19216666666658,
+            attachmentName: null,
+          },
+          {
+            subjectName: "Participation in school events",
+            subjectUid: "df28415f-15f8-49eb-8e60-63e60dc4faa0",
+            maxMark: 80,
+            maxObtainedMark: 80,
+            averageObtainedMark: 70.12833333333327,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PHYSICAL EDUCATION",
+            subjectUid: "ce9798fe-053a-41c4-823d-563db70aae33",
+            maxMark: 95,
+            maxObtainedMark: 85.5,
+            averageObtainedMark: 52.46296296296296,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PHYSICAL EDUCATION PR.",
+            subjectUid: "075ee4fc-1da7-44c7-aec4-96d8e13eced1",
+            maxMark: 30,
+            maxObtainedMark: 24,
+            averageObtainedMark: 17.79310344827586,
+            attachmentName: null,
+          },
+          {
+            subjectName: "ECONOMICS",
+            subjectUid: "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+            maxMark: 105,
+            maxObtainedMark: 92,
+            averageObtainedMark: 55.92727272727273,
+            attachmentName: null,
+          },
+          {
+            subjectName: "ECONOMICS PR.",
+            subjectUid: "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
+            maxMark: 20,
+            maxObtainedMark: 19,
+            averageObtainedMark: 11.309090909090909,
+            attachmentName: null,
+          },
+          {
+            subjectName: "POLITICAL SCIENCE",
+            subjectUid: "59d10a97-413b-4842-86aa-18639407403d",
+            maxMark: 105,
+            maxObtainedMark: 101,
+            averageObtainedMark: 64.31372549019608,
+            attachmentName: null,
+          },
+          {
+            subjectName: "HISTORY",
+            subjectUid: "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+            maxMark: 105,
+            maxObtainedMark: 88.5,
+            averageObtainedMark: 42.21568627450981,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PSYCHOLOGY",
+            subjectUid: "d5363c2f-fcb2-4742-bcb7-5ba62755e7ef",
+            maxMark: 95,
+            maxObtainedMark: 89.5,
+            averageObtainedMark: 42.59375,
+            attachmentName: null,
+          },
+          {
+            subjectName: "SOCIOLOGY",
+            subjectUid: "fc5e9071-d85a-4ed0-8d11-a8ae2cd79256",
+            maxMark: 95,
+            maxObtainedMark: 82.44,
+            averageObtainedMark: 58.33529411764705,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PSYCHOLOGY PR.",
+            subjectUid: "32547535-8a53-4d46-9e86-02adfadec2b9",
+            maxMark: 30,
+            maxObtainedMark: 27,
+            averageObtainedMark: 12.09375,
+            attachmentName: null,
+          },
+          {
+            subjectName: "POLITICAL SCIENCE PR.",
+            subjectUid: "e932a402-b53d-454c-899b-5e23d6865288",
+            maxMark: 20,
+            maxObtainedMark: 16,
+            averageObtainedMark: 11.92156862745098,
+            attachmentName: null,
+          },
+          {
+            subjectName: "HISTORY PR.",
+            subjectUid: "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
+            maxMark: 20,
+            maxObtainedMark: 19,
+            averageObtainedMark: 11.745098039215685,
+            attachmentName: null,
+          },
+          {
+            subjectName: "SOCIOLOGY PR.",
+            subjectUid: "ff4755fa-9266-4d24-b11f-2de2754b46a2",
+            maxMark: 30,
+            maxObtainedMark: 30,
+            averageObtainedMark: 23.029411764705884,
+            attachmentName: null,
+          },
+          {
+            subjectName: "FASHION STUDIES",
+            subjectUid: "0fd23402-8aab-4a19-861e-725483aeee06",
+            maxMark: 125,
+            maxObtainedMark: 94.17,
+            averageObtainedMark: 53.69583333333333,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PAINTING",
+            subjectUid: "32d5c07b-95ab-4e27-9e5d-e114c7e4d99a",
+            maxMark: 55,
+            maxObtainedMark: 45,
+            averageObtainedMark: 36.166666666666664,
+            attachmentName: null,
+          },
+          {
+            subjectName: "PAINTING PR.",
+            subjectUid: "ff829378-199f-4b28-bc0c-ecc940034282",
+            maxMark: 70,
+            maxObtainedMark: 57,
+            averageObtainedMark: 49.666666666666664,
+            attachmentName: null,
+          },
+          {
+            subjectName: "INFORMATICS PRACTICES",
+            subjectUid: "bbdf0c7b-bf8d-4313-9b00-dd047e947031",
+            maxMark: 95,
+            maxObtainedMark: 73.5,
+            averageObtainedMark: 35.785714285714285,
+            attachmentName: null,
+          },
+          {
+            subjectName: "INFORMATION PRACTICES PR.",
+            subjectUid: "156c3ceb-9ae3-49c0-a8f6-743765be0ba1",
+            maxMark: 30,
+            maxObtainedMark: 16.5,
+            averageObtainedMark: 7.642857142857143,
+            attachmentName: null,
+          },
+          {
+            subjectName: "BIOLOGY",
+            subjectUid: "781260ae-32a1-4ab3-a83d-f71b791cd079",
+            maxMark: 70,
+            maxObtainedMark: 76.5,
+            averageObtainedMark: 42.875,
+            attachmentName: null,
+          },
+          {
+            subjectName: "BIOLOGY PR.",
+            subjectUid: "187ce5ee-44aa-460b-a900-9b65499146a0",
+            maxMark: 30,
+            maxObtainedMark: 24,
+            averageObtainedMark: 19.75,
+            attachmentName: null,
+          },
+          {
+            subjectName: "BUSINESS STUDIES",
+            subjectUid: "c747db84-8d36-4dc8-8d7c-1b32354eead7",
+            maxMark: 105,
+            maxObtainedMark: 94.5,
+            averageObtainedMark: 62.51923076923077,
+            attachmentName: null,
+          },
+          {
+            subjectName: "ACCOUNTANCY",
+            subjectUid: "ef6629f6-b9c6-413d-9cfb-ee4e3de77353",
+            maxMark: 105,
+            maxObtainedMark: 101,
+            averageObtainedMark: 46.26923076923077,
+            attachmentName: null,
+          },
+          {
+            subjectName: "ACCOUNTANCY PR.",
+            subjectUid: "819ed474-c497-487c-80bb-cd640750bb3e",
+            maxMark: 20,
+            maxObtainedMark: 20,
+            averageObtainedMark: 13.038461538461538,
+            attachmentName: null,
+          },
+          {
+            subjectName: "BUSINESS STUDIES PR.",
+            subjectUid: "9b570028-bf69-49ff-abfd-6ec0ed8660d0",
+            maxMark: 20,
+            maxObtainedMark: 20,
+            averageObtainedMark: 14.423076923076923,
+            attachmentName: null,
+          },
+          {
+            subjectName: "APPLIED MATHS",
+            subjectUid: "9a6140a5-b847-4f19-86f8-6e6c8b104014",
+            maxMark: 105,
+            maxObtainedMark: 65.5,
+            averageObtainedMark: 38.611111111111114,
+            attachmentName: null,
+          },
+          {
+            subjectName: "APPLIED MATHS Pr.",
+            subjectUid: "81f94b84-5b5f-45b6-9e0b-aaf8a5489d6d",
+            maxMark: 20,
+            maxObtainedMark: 18,
+            averageObtainedMark: 14.166666666666666,
+            attachmentName: null,
+          },
+        ],
+        groupedClassAttachmentResponse: [
+          {
+            attachmentName: "ENGLISH",
+            totalMaxMark: 100,
+            totalObtainedMark: 95.5,
+          },
+          {
+            attachmentName: "BUSINESS STUDIES",
+            totalMaxMark: 100,
+            totalObtainedMark: 92.5,
+          },
+          {
+            attachmentName: "APPLIED MATHS",
+            totalMaxMark: 100,
+            totalObtainedMark: 61.5,
+          },
+          {
+            attachmentName: "ACCOUNTANCY",
+            totalMaxMark: 100,
+            totalObtainedMark: 96,
+          },
+          {
+            attachmentName: "PHYSICAL EDUCATION",
+            totalMaxMark: 100,
+            totalObtainedMark: 85.5,
+          },
+          {
+            attachmentName: "PSYCHOLOGY",
+            totalMaxMark: 100,
+            totalObtainedMark: 93,
+          },
+          {
+            attachmentName: "MATHS",
+            totalMaxMark: 100,
+            totalObtainedMark: 93,
+          },
+          {
+            attachmentName: "COMPUTER SCIENCE",
+            totalMaxMark: 100,
+            totalObtainedMark: 82,
+          },
+          {
+            attachmentName: "PAINTING",
+            totalMaxMark: 100,
+            totalObtainedMark: 79.5,
+          },
+          {
+            attachmentName: "FASHION STUDIES",
+            totalMaxMark: 100,
+            totalObtainedMark: 79.17,
+          },
+          {
+            attachmentName: "POLITICAL SCIENCE",
+            totalMaxMark: 100,
+            totalObtainedMark: 93,
+          },
+          {
+            attachmentName: "BIOLOGY",
+            totalMaxMark: 100,
+            totalObtainedMark: 78.5,
+          },
+          {
+            attachmentName: "CHEMISTRY",
+            totalMaxMark: 100,
+            totalObtainedMark: 90,
+          },
+          {
+            attachmentName: "ECONOMICS",
+            totalMaxMark: 100,
+            totalObtainedMark: 90,
+          },
+          {
+            attachmentName: "PHYSICS",
+            totalMaxMark: 100,
+            totalObtainedMark: 85.5,
+          },
+          {
+            attachmentName: "INFORMATICS PRACTICES",
+            totalMaxMark: 100,
+            totalObtainedMark: 71,
+          },
+          {
+            attachmentName: "HISTORY",
+            totalMaxMark: 100,
+            totalObtainedMark: 95,
+          },
+          {
+            attachmentName: "SOCIOLOGY",
+            totalMaxMark: 100,
+            totalObtainedMark: 93.44,
+          },
+        ],
+      },
+      header: ``,
+      footer: ``,
+      student: {
+        dob: "06-01-2016",
+        admissionNo: "20220146",
+        studentName: "Aaradhya Singh",
+        className: "PLP 1",
+        sectionName: "A",
+        rollNo: 1,
+        fatherName: "Mr. Bhupender Singh",
+        motherName: "Mrs. Sadhna Singh",
+        attendance: "0.0/0",
+        boardRollNumber: "",
+        studentInfoResponse: [
+          {
+            id: 262207,
+            userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
+            userName: null,
+            fatherUserName: null,
+            motherUserName: null,
+            guardianUserName: null,
+            uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
+            studentId: "20220146",
+            exAdmissionNo: null,
+            studentName: "Aaradhya Singh",
+            fatherName: "Mr. Bhupender Singh",
+            motherName: "Mrs. Sadhna Singh",
+            dob: "06-01-2016",
+            gender: "Female",
+            studentAdhaarcard: "",
+            joiningClass: "FLP 4",
+            joiningSections: "A",
+            joiningDate: "31-03-2022",
+            plotNumber: "",
+            area: "Budh Vihar",
+            city: "Delhi",
+            state: "NA",
+            pincode: "110085",
+            phone1: null,
+            rollNo: 1,
+            emergencyNumber: "8920098444",
+            mobileNumber: "9811230274",
+            studentEmail: "bhpendersingh198383@gmail.com",
+            religion: "",
+            category: "General",
+            minority: "",
+            motherTongue: "",
+            idMark: "",
+            height: "",
+            weight: "",
+            physicalDisability: "",
+            bloodGroup: "",
+            healthRemark: "",
+            siblingDetails: "",
+            alumni: "",
+            siblingResponse: [],
+            fatherOccupation: "",
+            fatherQualification: "",
+            fatherOrganization: "",
+            fatherDesignation: "",
+            fatherIncome: "",
+            fatherArea: "NA",
+            fatherCity: "NA",
+            fatherState: "NA",
+            fatherPincode: "",
+            fatherPhone: null,
+            fatherMobile: "",
+            fatherEmail: null,
+            fatherAdhaarNumber: "",
+            schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            motherQualification: "",
+            motherOccupation: "",
+            motherOrganization: "",
+            motherDesignation: "",
+            motherIncome: "",
+            motherArea: "NA",
+            motherCity: "NA",
+            motherState: "NA",
+            motherPincode: "",
+            motherPhone: null,
+            motherMobile: "",
+            motherEmail: null,
+            motherAdhaarNumber: "",
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: null,
+            otp: null,
+            schoolName: "Demo Public School",
+            remark: null,
+            classTeacher: "",
+            classTeacherUserName: "",
+            classes: "PLP 1",
+            classUid: null,
+            sections: "A",
+            group: "IST 2019-20",
+            wing: "NA",
+            status: "Studying",
+            academicSession: "2024-25",
+            joiningStatus: "Old",
+            houses: "INTELLIGENCE BLUE",
+            certificates: "",
+            certificatesList: [],
+            caste: "",
+            listOfDocuments: null,
+            attached: false,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [],
+            studentTransport: [],
+            studentAadharCard: null,
+            fatherAadharCard: null,
+            motherAadharCard: null,
+            studentImage: null,
+            fatherImage: null,
+            motherImage: null,
+            guardianImage: null,
+            birthCertificate: null,
+            classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+            aluminiProof: null,
+            siblingProof: null,
+            residenceProof: null,
+            firstBornChildProof: null,
+            medicalFitnessCertificate: null,
+            fatherQualificationProof: null,
+            motherQualificationProof: null,
+            casteCertificate: null,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createddate: "2024-02-15 16:01:44.372632",
+            editeddate: "2024-02-15 16:01:44.372632",
+            permanentEducationNumber: null,
+            studentAddressResponse: {
+              uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
+              houseNo: null,
+              area: "Budh Vihar",
+              landmark: null,
+              city: "Delhi",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 110085,
+              street: "A-28, Veer Singh Clny",
+              userName: "DIPS653_20220146",
+              createdDate: "15-02-2024 09:31 PM",
+              editedDate: "15-02-2024 09:31 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            fatherAddressResponse: {
+              uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "15-02-2024 09:31 PM",
+              editedDate: "15-02-2024 09:31 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            motherAddressResponse: {
+              uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "15-02-2024 09:31 PM",
+              editedDate: "15-02-2024 09:31 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            guardianAddressResponse: null,
+            correspondenceAddressResponse: null,
+          },
+        ],
+        classTeacher: "",
+        classTeacherUserName: "",
+        permanentEducationNumber: null,
+        school: {
+          uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+          apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+          schoolName: "DE INDIAN PUBLIC SCHOOL",
+          schoolAbb: "DIPS",
+          educationBoard: "Central Board of Secondary Education (CBSE)",
+          registrationNo: "1412743",
+          plotNumber: "POCKET-11",
+          area: "SECTOR-24,ROHINI",
+          city: "DELHI",
+          pincode: "110085",
+          state: "Delhi",
+          phoneNo1: "1127050252",
+          phoneNo2: "1127050253",
+          contactName: "DIPS",
+          contactMobile: null,
+          contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "dips",
+          website: "WWW.DIPSROHINI.IN",
+          schemaPrefix: null,
+          editedDate: "20-07-2024 04:14 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+          smsenabled: false,
+        },
+      },
+      markData: {
+        academicSession: "2024-2025",
+        admissionNo: "V-5920",
+        studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+        studentName: "Ashmit Chakraborty",
+        rollNo: 0,
+        fatherName: "Arunav Chakra",
+        className: "XII",
+        sectionName: "E",
+        terms: "HALF YEARLY",
+        markSheetName: "TERM-I",
+        overAllRank: "1",
+        markSheetTerms: [
+          {
+            id: 1023,
+            headerName: "U.T -1",
+            subHeaderName: "(25)",
+            priority: 1,
+            bestOf: 0,
+            decimalPlaces: 2,
+            weightage: 25,
+            terms: ["UNIT TEST-1"],
+          },
+          {
+            id: 1024,
+            headerName: "HALF YEARLY",
+            subHeaderName: "(80)",
+            priority: 2,
+            bestOf: 0,
+            decimalPlaces: 2,
+            weightage: 80,
+            terms: ["HALF YEARLY"],
+          },
+        ],
+        subjectWiseMarkSheetReportResponses: [
+          {
+            subjectUid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            subjectName: "ENGLISH",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                subjectName: "ENGLISH",
+                subjectNature: "THEORY",
+                max: 25,
+                obtained: 9.5,
+                grade: "D",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ENGLISH",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1023,
+                  headerName: "U.T -1",
+                  subHeaderName: "(25)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 25,
+                  terms: ["UNIT TEST-1"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                subjectName: "ENGLISH",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 56,
+                grade: "B1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ENGLISH",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 65.5,
+            total: 105,
+            percentage: 62.38,
+            grade: "B1",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 1,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "d63d7fda-0c47-497b-8555-3248c7082013",
+            subjectName: "ENGLISH PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "d63d7fda-0c47-497b-8555-3248c7082013",
+                subjectName: "ENGLISH PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 19,
+                grade: "A",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ENGLISH",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 19,
+            total: 20,
+            percentage: 95,
+            grade: "A",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 2,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "59d10a97-413b-4842-86aa-18639407403d",
+            subjectName: "POLITICAL SCIENCE",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "59d10a97-413b-4842-86aa-18639407403d",
+                subjectName: "POLITICAL SCIENCE",
+                subjectNature: "THEORY",
+                max: 25,
+                obtained: 24.5,
+                grade: "A",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "POLITICAL SCIENCE",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1023,
+                  headerName: "U.T -1",
+                  subHeaderName: "(25)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 25,
+                  terms: ["UNIT TEST-1"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "59d10a97-413b-4842-86aa-18639407403d",
+                subjectName: "POLITICAL SCIENCE",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 61.5,
+                grade: "B",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "POLITICAL SCIENCE",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 86,
+            total: 105,
+            percentage: 81.9,
+            grade: "A1",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 3,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "e932a402-b53d-454c-899b-5e23d6865288",
+            subjectName: "POLITICAL SCIENCE PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "e932a402-b53d-454c-899b-5e23d6865288",
+                subjectName: "POLITICAL SCIENCE PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 15,
+                grade: "B",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "POLITICAL SCIENCE",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 15,
+            total: 20,
+            percentage: 75,
+            grade: "B",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 4,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+            subjectName: "HISTORY",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+                subjectName: "HISTORY",
+                subjectNature: "THEORY",
+                max: 25,
+                obtained: 1,
+                grade: "E",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "HISTORY",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1023,
+                  headerName: "U.T -1",
+                  subHeaderName: "(25)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 25,
+                  terms: ["UNIT TEST-1"],
+                },
+                visible: false,
+                pass: false,
+                graded: false,
+              },
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+                subjectName: "HISTORY",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 59.5,
+                grade: "B",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "HISTORY",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 60.5,
+            total: 105,
+            percentage: 57.62,
+            grade: "C",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 5,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
+            subjectName: "HISTORY PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
+                subjectName: "HISTORY PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 18,
+                grade: "A1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "HISTORY",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 18,
+            total: 20,
+            percentage: 90,
+            grade: "A1",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 6,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+            subjectName: "ECONOMICS",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+                subjectName: "ECONOMICS",
+                subjectNature: "THEORY",
+                max: 25,
+                obtained: 11.5,
+                grade: "C1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ECONOMICS",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1023,
+                  headerName: "U.T -1",
+                  subHeaderName: "(25)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 25,
+                  terms: ["UNIT TEST-1"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+                subjectName: "ECONOMICS",
+                subjectNature: "THEORY",
+                max: 80,
+                obtained: 43,
+                grade: "C",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ECONOMICS",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 54.5,
+            total: 105,
+            percentage: 51.9,
+            grade: "C",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 11,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
+            subjectName: "ECONOMICS PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
+                subjectName: "ECONOMICS PR.",
+                subjectNature: "PRACTICAL",
+                max: 20,
+                obtained: 8,
+                grade: "D",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "ECONOMICS",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 8,
+            total: 20,
+            percentage: 40,
+            grade: "D",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 12,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "bbdf0c7b-bf8d-4313-9b00-dd047e947031",
+            subjectName: "INFORMATICS PRACTICES",
+            subjectNature: "THEORY",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "bbdf0c7b-bf8d-4313-9b00-dd047e947031",
+                subjectName: "INFORMATICS PRACTICES",
+                subjectNature: "THEORY",
+                max: 25,
+                obtained: 8.5,
+                grade: "D",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "INFORMATICS PRACTICES",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1023,
+                  headerName: "U.T -1",
+                  subHeaderName: "(25)",
+                  priority: 1,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 25,
+                  terms: ["UNIT TEST-1"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "bbdf0c7b-bf8d-4313-9b00-dd047e947031",
+                subjectName: "INFORMATICS PRACTICES",
+                subjectNature: "THEORY",
+                max: 70,
+                obtained: 31.5,
+                grade: "C1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "INFORMATICS PRACTICES",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 40,
+            total: 95,
+            percentage: 42.11,
+            grade: "C1",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 32,
+            decimalPlaces: 2,
+            visible: false,
+          },
+          {
+            subjectUid: "156c3ceb-9ae3-49c0-a8f6-743765be0ba1",
+            subjectName: "INFORMATION PRACTICES PR.",
+            subjectNature: "PRACTICAL",
+            markSheetReport: [
+              {
+                studentInfoUid: "70ba958e-0150-435e-b058-d346dc1232aa",
+                admissionNo: "V-5920",
+                studentName: "Ashmit Chakraborty",
+                rollNo: 0,
+                fatherName: "Arunav Chakra",
+                className: "XII",
+                sectionName: "E",
+                classSectionUid: "5870c831-bc2a-4c5d-bb34-1622241803c5",
+                terms: "HALF YEARLY",
+                subjectUid: "156c3ceb-9ae3-49c0-a8f6-743765be0ba1",
+                subjectName: "INFORMATION PRACTICES PR.",
+                subjectNature: "PRACTICAL",
+                max: 30,
+                obtained: 14,
+                grade: "C1",
+                status: "",
+                markSheetName: "TERM-I",
+                attachmentName: "INFORMATICS PRACTICES",
+                session: "2024-2025",
+                decimalPlaces: 2,
+                markSheetTermResponse: {
+                  id: 1024,
+                  headerName: "HALF YEARLY",
+                  subHeaderName: "(80)",
+                  priority: 2,
+                  bestOf: 0,
+                  decimalPlaces: 2,
+                  weightage: 80,
+                  terms: ["HALF YEARLY"],
+                },
+                visible: false,
+                pass: true,
+                graded: false,
+              },
+            ],
+            marksObtained: 14,
+            total: 30,
+            percentage: 46.67,
+            grade: "C1",
+            className: "XII",
+            sectionName: "E",
+            terms: "HALF YEARLY",
+            markSheetName: "TERM-I",
+            subjectPrt: 33,
+            decimalPlaces: 2,
+            visible: false,
+          },
+        ],
+        marksObtained: 380.5,
+        total: 625,
+        percentage: 60.88,
+        overAllGrade: "C",
+        visible: false,
+      },
+      remarks: {
+        uid: "0dec065e-e053-4858-8871-e3e0788fbb30",
+        terms: ["HALF YEARLY"],
+        studentId: "4266",
+        studentName: "Roshie Kumar",
+        rollNumber: 0,
+        classSectionUid: "0e5d28b4-3ddf-4df4-9453-c63ead38515f",
+        classSection: "XI-C",
+        description:
+          "Roshie is a cooperative polite member of the class who volunteers to help others",
+        fields: [
+          {
+            uid: "203ac76a-e77f-4ac8-ab1c-6a0924502904",
+            title: "Accountancy",
+            type: "OPEN",
+            value:
+              "Roshie needs to understand the importance of consistent hard work. She is expected to show greater level of commitment towards the subject in order to perform.",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "b20e3dc7-b539-4085-805b-b20fbf93f429",
+            title: "Applied Maths",
+            type: "OPEN",
+            value:
+              "Roshie shows excellent motivation and commitment to solving math problems. She is encouraged to become familiar with the variety of strategies and apply them to solve mathematical problems. ",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "a97deab6-513c-4fd8-aa08-629706aed8aa",
+            title: "Attendance",
+            type: "OPEN",
+            value: "109/115",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "837e6762-34eb-46dd-9f85-46e92674a707",
+            title: "Biology",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "74be6e7d-4872-4349-b1bc-681ed5498feb",
+            title: "Business Studies",
+            type: "OPEN",
+            value:
+              "Roshie is a quiet and well-mannered student with the potential to achieve higher marks through sustained practice and hard work. She is encouraged to build on her strengths and aim for excellence in the subject.",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "78a0ce0d-569e-4119-b8e1-6ce7a12a255e",
+            title: "Chemistry",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "4c6ab83a-cee9-4130-abb0-ebf430dcf9a8",
+            title: "Computer Science",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "16ea3e4c-c9ea-4936-b269-838dcd8875cb",
+            title: "Economics",
+            type: "OPEN",
+            value:
+              "Roshie has shown steady improvement! With a bit more practice, you can reach new academic heights.",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "04a493e4-4e2e-4fe2-8391-8b827d9bbb7b",
+            title: "English",
+            type: "OPEN",
+            value:
+              "Roshie is encouraged to build on her strengths and avoid spelling errors with practice.",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "61a35fd4-19fd-4fe8-845d-411e9604547b",
+            title: "Fashion Studies",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "9b0b60b1-5550-4822-b3d4-89967a471fcc",
+            title: "History",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "5bf03bc8-5002-48e7-b84d-15f778886fa4",
+            title: "Informatics Practices",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "717e1ba1-c28c-4427-b2e0-292d6a96e8db",
+            title: "Maths",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "35133555-d727-48d8-9f1e-69bfe980caf0",
+            title: "Painting",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "fb66041b-a89c-4f36-a9ee-47b5d025e465",
+            title: "Physical Education",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "ee0e37df-2930-41f5-9df0-c8894bca3aad",
+            title: "Physics",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "ab3b4544-0c08-4985-b87c-117209918c70",
+            title: "Political Science",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "c7514c27-85a3-437b-bed6-338f68e81ed2",
+            title: "Psychology",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+          {
+            uid: "041dba83-3062-4aeb-887e-6c174ab67892",
+            title: "Sociology",
+            type: "OPEN",
+            value: "",
+            masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+            masterName: "Remarks",
+          },
+        ],
+        status: true,
+        createdUser: "POOJAMENDIRATTA_526111",
+        editedUser: "POOJAMENDIRATTA_526111",
+        createdDate: "20-10-2024 09:50 AM",
+        editedDate: "29-10-2024 07:41 AM",
+      },
+      baseTermData: {
+        student: {
+          dob: "06-01-2016",
+          admissionNo: "20220146",
+          studentName: "Aaradhya Singh",
+          className: "PLP 1",
+          sectionName: "A",
+          rollNo: 1,
+          fatherName: "Mr. Bhupender Singh",
+          motherName: "Mrs. Sadhna Singh",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 262207,
+              userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
+              studentId: "20220146",
+              exAdmissionNo: null,
+              studentName: "Aaradhya Singh",
+              fatherName: "Mr. Bhupender Singh",
+              motherName: "Mrs. Sadhna Singh",
+              dob: "06-01-2016",
+              gender: "Female",
+              studentAdhaarcard: "",
+              joiningClass: "FLP 4",
+              joiningSections: "A",
+              joiningDate: "31-03-2022",
+              plotNumber: "",
+              area: "Budh Vihar",
+              city: "Delhi",
+              state: "NA",
+              pincode: "110085",
+              phone1: null,
+              rollNo: 1,
+              emergencyNumber: "8920098444",
+              mobileNumber: "9811230274",
+              studentEmail: "bhpendersingh198383@gmail.com",
+              religion: "",
+              category: "General",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "PLP 1",
+              classUid: null,
+              sections: "A",
+              group: "IST 2019-20",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-25",
+              joiningStatus: "Old",
+              houses: "INTELLIGENCE BLUE",
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-02-15 16:01:44.372632",
+              editeddate: "2024-02-15 16:01:44.372632",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
+                houseNo: null,
+                area: "Budh Vihar",
+                landmark: null,
+                city: "Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110085,
+                street: "A-28, Veer Singh Clny",
+                userName: "DIPS653_20220146",
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "15-02-2024 09:31 PM",
+                editedDate: "15-02-2024 09:31 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+            apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+            schoolName: "DE INDIAN PUBLIC SCHOOL",
+            schoolAbb: "DIPS",
+            educationBoard: "Central Board of Secondary Education (CBSE)",
+            registrationNo: "1412743",
+            plotNumber: "POCKET-11",
+            area: "SECTOR-24,ROHINI",
+            city: "DELHI",
+            pincode: "110085",
+            state: "Delhi",
+            phoneNo1: "1127050252",
+            phoneNo2: "1127050253",
+            contactName: "DIPS",
+            contactMobile: null,
+            contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "dips",
+            website: "WWW.DIPSROHINI.IN",
+            schemaPrefix: null,
+            editedDate: "20-07-2024 04:14 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+            smsenabled: false,
+          },
+        },
+        subject: [
+          {
+            subjectAllResponse: {
+              uid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              subjectName: "ENGLISH",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:21:34.044469",
+              editeddate: "2024-09-28 07:21:34.043717",
+            },
+            termName: "HALF YEARLY",
+            max: 80,
+            markObtained: 56,
+            percentage: 70,
+            grade: "B1",
+            remarkStatus: "",
+            attachmentName: "ENGLISH",
+            additional: false,
+            priority: 1,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "d63d7fda-0c47-497b-8555-3248c7082013",
+              subjectName: "ENGLISH PR.",
+              nature: "PRACTICAL",
+              natureUid: "05ca253f-7aaa-44b2-9df0-6b57a7e676ef",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "QuickCampus",
+              createddate: "2024-10-08 09:16:17.238392",
+              editeddate: "2024-10-28 07:16:43.305383",
+            },
+            termName: "HALF YEARLY",
+            max: 20,
+            markObtained: 19,
+            percentage: 95,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "ENGLISH",
+            additional: false,
+            priority: 2,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "59d10a97-413b-4842-86aa-18639407403d",
+              subjectName: "POLITICAL SCIENCE",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:26:09.21597",
+              editeddate: "2024-09-28 07:26:09.215285",
+            },
+            termName: "HALF YEARLY",
+            max: 80,
+            markObtained: 61.5,
+            percentage: 76.875,
+            grade: "B",
+            remarkStatus: "",
+            attachmentName: "POLITICAL SCIENCE",
+            additional: false,
+            priority: 3,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "e932a402-b53d-454c-899b-5e23d6865288",
+              subjectName: "POLITICAL SCIENCE PR.",
+              nature: "PRACTICAL",
+              natureUid: "05ca253f-7aaa-44b2-9df0-6b57a7e676ef",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "QuickCampus",
+              createddate: "2024-10-08 09:21:05.662166",
+              editeddate: "2024-10-28 07:19:10.04017",
+            },
+            termName: "HALF YEARLY",
+            max: 20,
+            markObtained: 15,
+            percentage: 75,
+            grade: "B",
+            remarkStatus: "",
+            attachmentName: "POLITICAL SCIENCE",
+            additional: false,
+            priority: 4,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "e36c592a-72f9-48ba-9928-89cd1dd3bf80",
+              subjectName: "HISTORY",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:26:37.043927",
+              editeddate: "2024-09-28 07:26:37.043506",
+            },
+            termName: "HALF YEARLY",
+            max: 80,
+            markObtained: 59.5,
+            percentage: 74.375,
+            grade: "B",
+            remarkStatus: "",
+            attachmentName: "HISTORY",
+            additional: false,
+            priority: 5,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "1a3a4395-95b8-46ae-9b0b-4c4a42bd2009",
+              subjectName: "HISTORY PR.",
+              nature: "PRACTICAL",
+              natureUid: "05ca253f-7aaa-44b2-9df0-6b57a7e676ef",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "QuickCampus",
+              createddate: "2024-10-08 09:21:15.429448",
+              editeddate: "2024-10-28 07:19:14.907537",
+            },
+            termName: "HALF YEARLY",
+            max: 20,
+            markObtained: 18,
+            percentage: 90,
+            grade: "A1",
+            remarkStatus: "",
+            attachmentName: "HISTORY",
+            additional: false,
+            priority: 6,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "33f3d42f-2474-4c4d-a91e-125487dd67ca",
+              subjectName: "ECONOMICS",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:27:54.917357",
+              editeddate: "2024-09-28 07:27:54.916953",
+            },
+            termName: "HALF YEARLY",
+            max: 80,
+            markObtained: 43,
+            percentage: 53.75,
+            grade: "C",
+            remarkStatus: "",
+            attachmentName: "ECONOMICS",
+            additional: false,
+            priority: 11,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "9d523fa0-ea9c-45b9-bf88-d6d9ce034cb7",
+              subjectName: "ECONOMICS PR.",
+              nature: "PRACTICAL",
+              natureUid: "05ca253f-7aaa-44b2-9df0-6b57a7e676ef",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "QuickCampus",
+              createddate: "2024-10-08 09:19:05.03694",
+              editeddate: "2024-10-28 07:18:08.241084",
+            },
+            termName: "HALF YEARLY",
+            max: 20,
+            markObtained: 8,
+            percentage: 40,
+            grade: "D",
+            remarkStatus: "",
+            attachmentName: "ECONOMICS",
+            additional: false,
+            priority: 12,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "2ff038e1-c337-476b-a203-0ceb1b34f896",
+              subjectName: "DISCIPLINE",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:48:10.234485",
+              editeddate: "2024-09-28 07:48:10.233592",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 24,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "bbdf0c7b-bf8d-4313-9b00-dd047e947031",
+              subjectName: "INFORMATICS PRACTICES",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:37:39.767895",
+              editeddate: "2024-09-28 07:37:39.767561",
+            },
+            termName: "HALF YEARLY",
+            max: 70,
+            markObtained: 31.5,
+            percentage: 45,
+            grade: "C1",
+            remarkStatus: "",
+            attachmentName: "INFORMATICS PRACTICES",
+            additional: false,
+            priority: 32,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "156c3ceb-9ae3-49c0-a8f6-743765be0ba1",
+              subjectName: "INFORMATION PRACTICES PR.",
+              nature: "PRACTICAL",
+              natureUid: "05ca253f-7aaa-44b2-9df0-6b57a7e676ef",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "QuickCampus",
+              createddate: "2024-10-08 09:20:24.759622",
+              editeddate: "2024-10-28 07:18:27.693553",
+            },
+            termName: "HALF YEARLY",
+            max: 30,
+            markObtained: 14,
+            percentage: 46.666666666666664,
+            grade: "C1",
+            remarkStatus: "",
+            attachmentName: "INFORMATICS PRACTICES",
+            additional: false,
+            priority: 33,
+            added: true,
+            scholastic: true,
+          },
+        ],
+        remarksEntry: {
+          uid: "0dec065e-e053-4858-8871-e3e0788fbb30",
+          terms: ["HALF YEARLY"],
+          studentId: "4266",
+          studentName: "Roshie Kumar",
+          rollNumber: 0,
+          classSectionUid: "0e5d28b4-3ddf-4df4-9453-c63ead38515f",
+          classSection: "XI-C",
+          description:
+            "Roshie is a cooperative polite member of the class who volunteers to help others",
+          fields: [
+            {
+              uid: "203ac76a-e77f-4ac8-ab1c-6a0924502904",
+              title: "Accountancy",
+              type: "OPEN",
+              value:
+                "Roshie needs to understand the importance of consistent hard work. She is expected to show greater level of commitment towards the subject in order to perform.",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "b20e3dc7-b539-4085-805b-b20fbf93f429",
+              title: "Applied Maths",
+              type: "OPEN",
+              value:
+                "Roshie shows excellent motivation and commitment to solving math problems. She is encouraged to become familiar with the variety of strategies and apply them to solve mathematical problems. ",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "a97deab6-513c-4fd8-aa08-629706aed8aa",
+              title: "Attendance",
+              type: "OPEN",
+              value: "109/115",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "837e6762-34eb-46dd-9f85-46e92674a707",
+              title: "Biology",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "74be6e7d-4872-4349-b1bc-681ed5498feb",
+              title: "Business Studies",
+              type: "OPEN",
+              value:
+                "Roshie is a quiet and well-mannered student with the potential to achieve higher marks through sustained practice and hard work. She is encouraged to build on her strengths and aim for excellence in the subject.",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "78a0ce0d-569e-4119-b8e1-6ce7a12a255e",
+              title: "Chemistry",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "4c6ab83a-cee9-4130-abb0-ebf430dcf9a8",
+              title: "Computer Science",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "16ea3e4c-c9ea-4936-b269-838dcd8875cb",
+              title: "Economics",
+              type: "OPEN",
+              value:
+                "Roshie has shown steady improvement! With a bit more practice, you can reach new academic heights.",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "04a493e4-4e2e-4fe2-8391-8b827d9bbb7b",
+              title: "English",
+              type: "OPEN",
+              value:
+                "Roshie is encouraged to build on her strengths and avoid spelling errors with practice.",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "61a35fd4-19fd-4fe8-845d-411e9604547b",
+              title: "Fashion Studies",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "9b0b60b1-5550-4822-b3d4-89967a471fcc",
+              title: "History",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "5bf03bc8-5002-48e7-b84d-15f778886fa4",
+              title: "Informatics Practices",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "717e1ba1-c28c-4427-b2e0-292d6a96e8db",
+              title: "Maths",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "35133555-d727-48d8-9f1e-69bfe980caf0",
+              title: "Painting",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "fb66041b-a89c-4f36-a9ee-47b5d025e465",
+              title: "Physical Education",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "ee0e37df-2930-41f5-9df0-c8894bca3aad",
+              title: "Physics",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "ab3b4544-0c08-4985-b87c-117209918c70",
+              title: "Political Science",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "c7514c27-85a3-437b-bed6-338f68e81ed2",
+              title: "Psychology",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+            {
+              uid: "041dba83-3062-4aeb-887e-6c174ab67892",
+              title: "Sociology",
+              type: "OPEN",
+              value: "",
+              masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+              masterName: "Remarks",
+            },
+          ],
+          status: true,
+          createdUser: "POOJAMENDIRATTA_526111",
+          editedUser: "POOJAMENDIRATTA_526111",
+          createdDate: "20-10-2024 09:50 AM",
+          editedDate: "29-10-2024 07:41 AM",
+        },
+        school: {
+          uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+          apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+          schoolName: "DE INDIAN PUBLIC SCHOOL",
+          schoolAbb: "DIPS",
+          educationBoard: "Central Board of Secondary Education (CBSE)",
+          registrationNo: "1412743",
+          plotNumber: "POCKET-11",
+          area: "SECTOR-24,ROHINI",
+          city: "DELHI",
+          pincode: "110085",
+          state: "Delhi",
+          phoneNo1: "1127050252",
+          phoneNo2: "1127050253",
+          contactName: "DIPS",
+          contactMobile: null,
+          contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "dips",
+          website: "WWW.DIPSROHINI.IN",
+          schemaPrefix: null,
+          editedDate: "20-07-2024 04:14 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+          smsenabled: false,
+        },
+        promotedClass: null,
+        promotedSection: null,
+        perSignedUrlResponse: {
+          url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIPS/student-info/20220146/student/images/20220146.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240729T100532Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240729%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=cb707469666efe4ff9dd0c9c166555b096d93608eb0b7f3ac1bb5f23a2081f66",
+          fileName: "20220146.png",
+        },
+        pass: false,
+        status_code: 200,
+      },
+    },
+  ]);
+</script>
+
+</html>

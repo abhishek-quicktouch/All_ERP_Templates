@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+  <div id="studentsList">
+    Processed Dynamic School Report Generator Script
+  </div>
+</body>
+<script>
+
+
+
+  window.SetTemplateData = function (data) {
+    const config = {
+      schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+      schoolLogo2: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+      schoolName: "THE INDIAN SCHOOL",
+      schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 </h5>
+                <h5>EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
+      studentInfoFields: [
+        { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
+        { label: "FATHER'S NAME", key: "fatherName", additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" } },
+        { label: "MOTHER'S NAME", key: "motherName", additionalInfo: { label: "D.O.B", key: "dob" } },
+        { label: "ADDRESS", key: "address" }
+      ],
+      gradingScale: "on 8-point (A1-E) Grading Scale",
+      gradeScale: [
+        { minPercentage: 91, grade: "A1" },
+        { minPercentage: 81, grade: "A2" },
+        { minPercentage: 71, grade: "B1" },
+        { minPercentage: 61, grade: "B2" },
+        { minPercentage: 51, grade: "C1" },
+        { minPercentage: 41, grade: "C2" },
+        { minPercentage: 33, grade: "D" },
+        { minPercentage: 0, grade: "E" }
+      ],
+      scholasticConfig: { nature: "THEORY" },
+      coScholasticConfig: { nature: "1B Scholastic" },
+      signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+      styles: `
+      @page { size: A4; margin: 10mm; }
+      @media print { @page { margin: auto; size: A4; } }
+      body { font-family: Arial, sans-serif; }
+      .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+      .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+      .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+      .header img { max-width: 100px; }
+      .section { margin: 1mm; }
+      .section table { width: 100%; border-collapse: collapse; }
+      .section table, .section th, .section td { border: 1px solid #000; }
+      .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
+      .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+      .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+      .signatures div { font-size: 13px; margin: 0px; padding: 0px; text-align: center; }
+      .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+    `
+    };
+
+    // Helper function to generate graph
+    function generateGraph(graphContainer, subjects, studentPerformanceData) {
+      if (!graphContainer || !subjects || !studentPerformanceData) {
+        console.error('Invalid inputs provided');
+        return;
+      }
+
+      // Create and configure canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = 740;
+      canvas.height = 260;
+      canvas.style.paddingTop = "10px";
+      graphContainer.appendChild(canvas);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      console.log(subjects, "ffffffffff subjects")
+      // Filter and map subjects with matching data
+      const filteredSubjects = subjects.filter(subject =>
+        studentPerformanceData?.some(data => data.subjectName === subject.subject)
+      ).map(subject => {
+        const performanceData = studentPerformanceData.find(data => data.subjectName === subject.subject);
+        return {
+          subjectName: subject.subject,
+          marks: subject.marks || 0,
+          maxPossible: subject.maxPossible || 100,
+          percentage: subject.percentage || 0,
+          maxObtainedMark: performanceData.maxObtainedMark || 0,
+          averageObtainedMark: performanceData.averageObtainedMark || 0,
+          maxMark: performanceData.maxMark || 0,
+        };
+      });
+      console.log(filteredSubjects, "ffffffff filteredSubjects")
+      // Scaling configuration
+      const maxValue = Math.max(...filteredSubjects.map(s => Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible)));
+      const scaleFactor = 140 / maxValue; // Scale bars to fit chart height
+
+      const barWidth = 20;
+      const barGap = 80;
+      const chartHeight = 140;
+      const xOffset = 50;
+      const topPadding = 10;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw grid and Y-axis values
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillStyle = 'black';
+      ctx.font = "10px Arial";
+
+      const yStep = maxValue / 5;
+      for (let i = 0; i <= 5; i++) {
+        const y = (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(xOffset, chartHeight - y + topPadding);
+        ctx.lineTo(canvas.width, chartHeight - y + topPadding);
+        ctx.stroke();
+        const yValue = Math.round(yStep * i);
+        ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
+      }
+
+      // Draw bars
+      filteredSubjects.forEach((subject, index) => {
+        const x = xOffset + index * (barWidth + barGap);
+
+        // Calculate scaled heights
+        const markHeight = subject.marks * scaleFactor;
+        const averageHeight = subject.averageObtainedMark * scaleFactor * 5;
+        const highestHeight = subject.maxMark * scaleFactor * 5;
+
+        // Draw average bar (pink)
+        ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+        ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
+
+        // Draw marks bar (black)
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - markHeight, barWidth, markHeight);
+
+        // Draw highest bar (blue-gray)
+        ctx.fillStyle = 'rgb(193, 224, 224)';
+        ctx.fillRect(x + barWidth + 20, chartHeight + topPadding - highestHeight, barWidth, highestHeight);
+
+        // Draw subject label
+        ctx.save();
+        ctx.fillStyle = 'black'; // Ensure label text is black
+        ctx.textAlign = 'right';
+        ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(subject.subjectName, 0, 0);
+        ctx.restore();
+      });
+
+      // Draw legend
+      const legendY = canvas.height - 30;
+
+      // Marks legend
+      ctx.fillStyle = 'black';
+      ctx.fillRect(xOffset, legendY, 10, 10);
+      ctx.fillText("Marks Obtained", xOffset + 15, legendY + 10);
+
+      // Average legend
+      ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+      ctx.fillRect(xOffset + 100, legendY, 10, 10);
+      ctx.fillStyle = 'black';
+      ctx.fillText("Average in Class", xOffset + 115, legendY + 10);
+
+      // Highest legend
+      ctx.fillStyle = 'rgb(193, 224, 224)';
+      ctx.fillRect(xOffset + 250, legendY, 10, 10);
+      ctx.fillStyle = 'black';
+      ctx.fillText("Highest in Class", xOffset + 265, legendY + 10);
+    }
+
+    function getAttendanceOrMark(status, mark) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+        "Not Submitted": "NS"
+      };
+      return attendanceValue[status] || mark || "-";
+    }
+
+    function calculateGrade(percentage) {
+      for (const grade of config.gradeScale) {
+        if (percentage >= grade.minPercentage) {
+          return grade.grade;
+        }
+      }
+      return "F";
+    }
+
+    // Rest of your existing functions (generateStudentInfo, generateScholasticTable, etc.)
+    // ... [Previous functions remain the same]
+
+    function generateStudentInfo(student) {
+      // Generate full address
+      let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
+        ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
+        ", "
+        : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
+          ? student?.studentInfoResponse[0]?.studentAddressResponse
+            ?.landmark + ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          : ""
+        }`;
+
+      // Generate table with student info
+      return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+        ${config.studentInfoFields
+          .map(
+            (field) => `
+                    <tr>
+                        <th style="width: 25%; text-align: left">${field?.label
+              }</th>
+                        ${field?.label?.toLowerCase() === "address"
+                ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
+                : `  <td style="width: 25%;"> : ${student?.[field?.key] || ""
+                } </td> `
+              }   
+                        ${field?.additionalInfo
+                ? field?.additionalInfo?.label === "CLASS & SECTION"
+                  ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.["className"] || ""
+                  }-${student?.["sectionName"] || ""}</td>
+                            `
+                  : `
+                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.[field?.additionalInfo?.key] || ""
+                  }</td>
+                            `
+                : ""
+              }
+                    </tr>
+                `
+          )
+          .join("")}
+    </table>`;
+    }
+
+    // Generate scholastic table
+    function generateScholasticTable(
+      subjects,
+      config,
+      studentPerfromanceData
+    ) {
+      let totalMarksObtained = 0;
+      let grandTotalMarks = 0;
+      let totalHalfYearlyTheory = 0; // To store the sum of all Half Yearly theory marks
+      let totalHalfYearlyPractical = 0; // To store the sum of all Half Yearly practical marks
+      // Group subjects by attachmentName and their parts (Theory or Practical)
+      let totalUnitTestMarks = 0;
+      const groupedSubjects = subjects.reduce((acc, subject) => {
+        const attachmentName =
+          subject?.markSheetReport[0]?.attachmentName || "";
+        const subjectPart = subject.subjectPrt; // 1 for Theory, 2 for Practical
+
+        if (attachmentName) {
+          if (!acc[attachmentName]) {
+            acc[attachmentName] = { theory: null, practical: null };
+          }
+          if (subject?.subjectNature?.toLowerCase() == "theory") {
+            acc[attachmentName].theory = subject;
+          } else if (subject?.subjectNature?.toLowerCase() == "practical") {
+            acc[attachmentName].practical = subject;
+          }
+        }
+        return acc;
+      }, {});
+
+      let allsubjects = subjects
+        ?.filter((el) => el?.subjectNature == "THEORY")
+        ?.map((el) => el?.subjectName);
+      let filteredPerformanceData = (
+        studentPerfromanceData?.groupedClassAttachmentResponse || []
+      )?.filter((t) => allsubjects?.some((el) => el == t?.attachmentName));
+      const rows = Object.entries(groupedSubjects)
+        .map(([attachmentName, parts]) => {
+          let unitTestMarks = 0;
+          let halfYearlyTheory = 0;
+          let halfYearlyPractical = 0;
+          let subjectTotal = 0;
+
+          if (parts.theory) {
+            const theoryReports = parts.theory.markSheetReport;
+            theoryReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
+
+              // Match term names in a case-insensitive manner
+              if (termName === "u.t -1") {
+
+                unitTestMarks = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalUnitTestMarks += marksObtained;
+              } else if (termName === "half yearly") {
+                halfYearlyTheory = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyTheory += marksObtained; // Accumulate the Half Yearly theory marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
+
+          if (parts.practical) {
+            const practicalReports = parts.practical.markSheetReport;
+            practicalReports.forEach((report) => {
+              const termName =
+                report?.markSheetTermResponse?.headerName
+                  ?.trim()
+                  .toLowerCase() || "";
+              const marksObtained = report?.obtained || 0;
+
+              if (termName === "half yearly") {
+                halfYearlyPractical = report?.status
+                  ? getAttendanceOrMark(report?.status, marksObtained)
+                  : marksObtained;
+                totalHalfYearlyPractical += marksObtained; // Accumulate the Half Yearly practical marks
+              }
+              subjectTotal += marksObtained;
+            });
+          }
+
+          totalMarksObtained += subjectTotal;
+          grandTotalMarks += 25; // Assuming the total is always out of 100 for the grand total
+
+          // Render table row for each subject
+          return `
+            <tr>
+                <td style="text-transform:uppercase; font-weight:bold;text-align:center">${attachmentName}</td>
+                <td style="text-align:center; font-weight:${isNaN(unitTestMarks) ? "bold" : ""
+            }">${unitTestMarks}</td>
+                
+               
+                <td style="text-align:center">${filteredPerformanceData?.find(
+              (el) => el?.attachmentName == attachmentName
+            )?.totalObtainedMark || "-"
+            }</td>
+            </tr>
+            `;
+        })
+        .join("");
+
+      console.log(totalMarksObtained, grandTotalMarks, "ffffffffff grandTotalMarks")
+      const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
+      const overallGrade = calculateGrade(overallPercentage);
+
+      // Render the final table
+      return `
+    <table>
+        <tr  > <td colspan="3" style="background-color: #fff ; font-weight:bold; font-size: 13px ;text-align: center"> ACADEMIC PERFORMANCE </td> </tr>
+        <tr style="background-color: #fff">
+            <th  style="text-align: center; width: 30%;">SUBJECTS</th>
+            <th style="text-align: center;width: 14%;">Unit Test-1<br/> (25)</th>
+            
+        
+          
+            <th style="text-align: center; width: 14%;">HIGHEST MARKS IN CLASS (100)</th>
+        </tr>
+        ${rows}
+        <tr style="font-weight:bold">
+            <td style="text-align:center">GRAND TOTAL</td>
+            
+            
+            <td  style="text-align:center">${(totalUnitTestMarks).toFixed(2)} </td>
+        <td></td>
+           
+        </tr>
+        <tr style="font-weight:bold">
+            <td style="text-align:center">PERCENTAGE</td>
+            
+            
+            <td  style="text-align:center">${(
+          (totalUnitTestMarks /
+            grandTotalMarks) *
+          100
+        ).toFixed(2)} </td>
+        <td></td>
+           
+        </tr>
+    </table>
+    `;
+    }
+
+    // Helper function to calculate grade based on percentage
+
+    function generateCoScholasticTable(subjects) {
+      const coScholasticSubjects = subjects?.filter(
+        (subject) =>
+          subject?.subjectAllResponse?.nature ===
+          config.coScholasticConfig.nature
+      );
+
+      let tableContent = "";
+      // console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
+      for (let i = 0; i < coScholasticSubjects.length; i++) {
+        const leftSubject = coScholasticSubjects[i];
+        // console.log(leftSubject, "fffffffffffff leftSubject")
+        tableContent += `
+                <tr>
+                    <td style="width: 70%;">${leftSubject?.subjectAllResponse?.subjectName || ""
+          }</td>
+                    <td style="width: 30%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"
+          }">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
+          }</td>
+                    
+                </tr>
+            `;
+      }
+
+      return `
+            <table>
+                
+                <tr style="background-color: #fff">
+                    <th style="width: 70%;">Grade Subjects</th>
+                    <th style="width: 30%; text-align: center">HALF YEARLY</th>
+                    
+                </tr>
+                ${tableContent}
+            </table>
+        `;
+    }
+
+    function generateRemark(remark) {
+      return `
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">GENERAL REMARKS</th>
+        <tr>
+            <td style="text-align: left">${remark?.description || "-"}</td>
+            
+        </tr>
+    </table>
+    `;
+    }
+
+    function generateSubjectRemark(remark, sub) {
+      let theorySub = sub?.filter(el => el?.subjectNature == "THEORY")?.map(el => el?.subjectName)
+      console.log(
+        remark?.fields,
+        theorySub,
+        "llllllll"
+      );
+      return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th colspan="2" style="text-align: center">STUDENT'S PROFILE</th>
+            </tr>
+            ${theorySub?.map(el => {
+        return remark?.fields?.map((f) =>
+          f?.value && el?.toLowerCase()?.includes(f?.title?.toLowerCase())
+            ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${f?.title || ""
+            }</td><td style="width: 80%">${f?.value || ""}</td></tr>`
+            : ""
+        )?.join("")
+      })?.join("")}
+       
+    </table>
+    `;
+    }
+
+    function generatePrincipalRemark(remark) {
+      return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">PRINCIPAL'S REMARKS</th>
+            </tr>
+            ${remark?.masterName === "PRINCIPAL'S REMARKS"
+          ? remark?.fields
+            ?.map(
+              (f) =>
+                `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""
+                }</td></tr>`
+            )
+            .join("")
+          : ""
+        }
+       
+    </table>
+    `;
+    }
+
+    function generateGradingTable() {
+      return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <tr>
+            <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
+                INSTRUCTIONS
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: center; border: 1px solid black;">
+                Grading scale for Scholastic Areas: Grades are awarded on an 8 point grading scale as follows
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">MARKS RANGE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">GRADE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">MARKS RANGE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">GRADE</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">91 - 100</td>
+            <td style="border: 1px solid black; text-align: center;">A1</td>
+            <td style="border: 1px solid black; text-align: center;">51 - 60</td>
+            <td style="border: 1px solid black; text-align: center;">C1</td>
+            
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">81 - 90</td>
+            <td style="border: 1px solid black; text-align: center;">A2</td>
+            <td style="border: 1px solid black; text-align: center;">41 - 50</td>
+            <td style="border: 1px solid black; text-align: center;">C2</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">71 - 80</td>
+            <td style="border: 1px solid black; text-align: center;">B1</td>
+            <td style="border: 1px solid black; text-align: center;">33 - 40</td>
+            <td style="border: 1px solid black; text-align: center;">D</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">61 - 70</td>
+            <td style="border: 1px solid black; text-align: center;">B2</td>
+           <td style="border: 1px solid black; text-align: center;">33 &amp; Below</td>
+            <td style="border: 1px solid black; text-align: center;">E (Needs Improvement)</td>
+        </tr>
+    </table>
+`;
+    }
+
+    function generateHeader(element) {
+      return ` <div class="header">
+            
+${element.header
+          ? element.header
+          : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+              <div style="text-align:center">
+                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <div style="color: #2b595e" >${config.schoolAddress}</div>
+                   </div>
+              <img src="${config.schoolLogo2}" alt="School Logo"/> 
+            `
+        }
+
+             
+</div>`;
+    }
+
+    function generateSignature() {
+      return `
+             <div class="signatures">
+                        ${config.signatures
+          .map(
+            (sig) => `
+                            <div>
+                               
+                                <p style="vertical-align: bottom">${sig}</p>
+                            </div>
+                        `
+          )
+          .join("")}
+                    </div>
+            `;
+    }
+
+
+    const multipleStudents = data;
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = ``;
+
+    multipleStudents?.forEach((element) => {
+      const singleStudentHtml = document.createElement("div");
+      singleStudentHtml.style.pageBreakAfter = "always";
+
+      const termConfig = element?.markData?.markSheetTerms?.map((term) => ({
+        headerName: term?.headerName,
+        subHeaderName: term?.subHeaderName
+      })) || [];
+
+      const graphId = `graph-${element?.student?.studentId || Math.random()}`;
+
+      singleStudentHtml.innerHTML = `
+      <style type="text/css">${config.styles}</style>
+      <page orientation="portrait" format="A4" margin="0">
+        <div class="container">
+          ${generateHeader(element)}
+          <h4 style="background-color: #fff; border: 1px solid black; text-align: center; font-size: 14px">
+            PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""}
+          </h4>
+          ${generateStudentInfo(element?.student)}
+          <div class="section">
+            ${generateScholasticTable(element?.markData?.subjectWiseMarkSheetReportResponses, termConfig)}
+          </div>
+          
+          <div class="section">
+            ${generateRemark(element?.baseTermData?.remarksEntry)}
+          </div>
+          
+            <div class="section" style="width: 99%">
+              <h3 style="text-align: center; font-size: 12px; border: 1px solid black; padding: 2px; text-transform: uppercase">
+                ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+              </h3>
+              <div id="${graphId}" style="border: 1px solid black"></div>
+            </div>
+         
+         
+          <div class="section">
+            <div style="font-size: 12px; display:flex; justify-content: space-between">
+              <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()}</span>
+              <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
+        field => field?.title === "Attendance"
+      )?.value || element?.student?.attendance}</span>
+            </div>
+          </div>
+          ${generateSignature()}
+        </div>
+      </page>
+    `;
+
+      studentHtml.appendChild(singleStudentHtml);
+
+      // Generate graph after the container is added to the DOM
+      const graphContainer = document.getElementById(graphId);
+      if (graphContainer && element?.markData?.subjectWiseMarkSheetReportResponses) {
+        // Prepare data for graph
+        // const subjects = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+        //   subject: subject.markSheetReport[0]?.attachmentName,
+        //   marks: subject.markSheetReport[0]?.obtained || 0,
+        //   maxPossible: subject.markSheetReport[0]?.maxMark || 100,
+        //   percentage: (subject.markSheetReport[0]?.obtained / subject.markSheetReport[0]?.maxMark) * 100 || 0
+        // }));
+
+        const subjects = element?.baseTermData?.subject.map(subject => ({
+          subject: subject.subjectAllResponse?.subjectName,
+          marks: subject.markObtained || 0,
+          maxPossible: subject.max || 100,
+          percentage: (subject.markObtained / subject.max) * 100 || 0
+        }));
+        // const performanceData = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+        //   subjectName: subject.attachmentName,
+        //   maxObtainedMark: subject.markSheetReport[0]?.maxMark || 100,
+        //   averageObtainedMark: subject.markSheetReport[0]?.obtained || 0,
+        //   maxMark: subject.markSheetReport[0]?.maxMark || 100
+        // }));
+
+        generateGraph(graphContainer, subjects, element?.studentPerfromanceData);
+      }
+    });
+  };
+
+
+</script>
+
+<script>
+  window.SetTemplateData([
+    {
+      "student": {
+        "dob": "19-04-2010",
+        "admissionNo": "I-5148",
+        "studentName": "Aanyaa Kumar",
+        "className": "IX",
+        "sectionName": "A",
+        "rollNo": 2,
+        "fatherName": "PRANEET KUMAR",
+        "motherName": "SANGEETA KUMAR",
+        "attendance": "0.0/0",
+        "boardRollNumber": "",
+        "studentInfoResponse": [
+          {
+            "id": 321671,
+            "userUid": "13c7511d-697a-4430-ae73-b070cc5d3c27",
+            "userName": null,
+            "fatherUserName": null,
+            "motherUserName": null,
+            "guardianUserName": null,
+            "uid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+            "studentId": "I-5148",
+            "exAdmissionNo": null,
+            "studentName": "Aanyaa Kumar",
+            "fatherName": "PRANEET KUMAR",
+            "motherName": "SANGEETA KUMAR",
+            "dob": "19-04-2010",
+            "gender": "NA",
+            "studentAdhaarcard": "",
+            "joiningClass": "IX",
+            "joiningSections": "A",
+            "joiningDate": "",
+            "plotNumber": "FLAT NO. 12A, POCKET A14",
+            "area": "KALKAJI EXTENSION",
+            "city": "NEW DELHI",
+            "state": "NA",
+            "pincode": "110019",
+            "phone1": null,
+            "rollNo": 2,
+            "emergencyNumber": "",
+            "mobileNumber": "9650444956",
+            "studentEmail": null,
+            "religion": "",
+            "category": "",
+            "minority": "",
+            "motherTongue": "",
+            "idMark": "",
+            "height": "",
+            "weight": "",
+            "physicalDisability": "",
+            "bloodGroup": "",
+            "healthRemark": "",
+            "siblingDetails": "",
+            "alumni": "",
+            "siblingResponse": [],
+            "fatherOccupation": "",
+            "fatherQualification": "",
+            "fatherOrganization": "",
+            "fatherDesignation": "",
+            "fatherIncome": "",
+            "fatherArea": "NA",
+            "fatherCity": "NA",
+            "fatherState": "NA",
+            "fatherPincode": null,
+            "fatherPhone": null,
+            "fatherMobile": "9650444956",
+            "fatherEmail": null,
+            "fatherAdhaarNumber": "",
+            "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "motherQualification": "",
+            "motherOccupation": "",
+            "motherOrganization": "",
+            "motherDesignation": "",
+            "motherIncome": "",
+            "motherArea": "NA",
+            "motherCity": "NA",
+            "motherState": "NA",
+            "motherPincode": null,
+            "motherPhone": null,
+            "motherMobile": "9650444956",
+            "motherEmail": null,
+            "motherAdhaarNumber": "",
+            "guardianName": null,
+            "relation": null,
+            "guardianOccupation": null,
+            "guardianPhone": null,
+            "guardianMobile": null,
+            "guardianEmail": null,
+            "guardianAddress": null,
+            "leavingDate": null,
+            "previousSchoolName": "",
+            "otp": null,
+            "schoolName": "Demo Public School",
+            "remark": "",
+            "classTeacher": "",
+            "classTeacherUserName": "",
+            "classes": "IX",
+            "classUid": null,
+            "sections": "A",
+            "group": null,
+            "wing": "NA",
+            "status": "Studying",
+            "academicSession": "2024-2025",
+            "joiningStatus": "New",
+            "houses": null,
+            "certificates": "",
+            "certificatesList": [],
+            "caste": "",
+            "listOfDocuments": null,
+            "attached": false,
+            "required": false,
+            "submitted": false,
+            "studentHostel": [],
+            "studentConcession": [],
+            "studentTransport": [],
+            "studentAadharCard": null,
+            "fatherAadharCard": null,
+            "motherAadharCard": null,
+            "studentImage": null,
+            "fatherImage": null,
+            "motherImage": null,
+            "guardianImage": null,
+            "birthCertificate": null,
+            "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+            "aluminiProof": null,
+            "siblingProof": null,
+            "residenceProof": null,
+            "firstBornChildProof": null,
+            "medicalFitnessCertificate": null,
+            "fatherQualificationProof": null,
+            "motherQualificationProof": null,
+            "casteCertificate": null,
+            "createdUser": "SimranjeetKaur_522590",
+            "editedUser": "SimranjeetKaur_522590",
+            "createddate": "2024-09-18 12:09:06.864839",
+            "editeddate": "2024-10-29 10:45:09.060794",
+            "permanentEducationNumber": "",
+            "studentAddressResponse": {
+              "uid": "2550f38b-9149-401d-a5ad-169538bf6641",
+              "houseNo": null,
+              "area": "KALKAJI EXTENSION",
+              "landmark": null,
+              "city": "NEW DELHI",
+              "district": null,
+              "state": "NA",
+              "poPs": null,
+              "pincode": 110019,
+              "street": "FLAT NO. 12A, POCKET A14",
+              "userName": "DIS896_I-5148",
+              "createdDate": "18-09-2024 05:39 PM",
+              "editedDate": "29-10-2024 04:15 PM",
+              "createdBy": "SimranjeetKaur_522590",
+              "editedBy": "SimranjeetKaur_522590"
+            },
+            "fatherAddressResponse": {
+              "uid": "b88e9bb4-be80-4100-b52c-eb6960aa23e9",
+              "houseNo": null,
+              "area": "NA",
+              "landmark": null,
+              "city": "NA",
+              "district": null,
+              "state": "NA",
+              "poPs": null,
+              "pincode": null,
+              "street": null,
+              "userName": null,
+              "createdDate": "18-09-2024 05:39 PM",
+              "editedDate": "29-10-2024 04:15 PM",
+              "createdBy": "SimranjeetKaur_522590",
+              "editedBy": "SimranjeetKaur_522590"
+            },
+            "motherAddressResponse": {
+              "uid": "7bace436-cc49-45ce-bba6-5a2b10858a75",
+              "houseNo": null,
+              "area": "NA",
+              "landmark": null,
+              "city": "NA",
+              "district": null,
+              "state": "NA",
+              "poPs": null,
+              "pincode": null,
+              "street": null,
+              "userName": null,
+              "createdDate": "18-09-2024 05:39 PM",
+              "editedDate": "29-10-2024 04:15 PM",
+              "createdBy": "SimranjeetKaur_522590",
+              "editedBy": "SimranjeetKaur_522590"
+            },
+            "guardianAddressResponse": null,
+            "correspondenceAddressResponse": {
+              "uid": "f3e2c79b-9b0b-4ab1-8010-e67c536600c6",
+              "houseNo": null,
+              "area": "",
+              "landmark": null,
+              "city": "",
+              "district": null,
+              "state": "",
+              "poPs": null,
+              "pincode": null,
+              "street": "",
+              "userName": "DIS896_I-5148",
+              "createdDate": "29-10-2024 04:15 PM",
+              "editedDate": "29-10-2024 04:15 PM",
+              "createdBy": "SimranjeetKaur_522590",
+              "editedBy": "SimranjeetKaur_522590"
+            }
+          }
+        ],
+        "classTeacher": "",
+        "classTeacherUserName": "",
+        "permanentEducationNumber": "",
+        "school": {
+          "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+          "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+          "schoolName": "The Indian School",
+          "schoolAbb": "DIS",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "NA",
+          "area": "Josip Broz Tito Marg",
+          "city": "New Delhi",
+          "pincode": "110049",
+          "state": "Delhi",
+          "phoneNo1": "1126265956",
+          "phoneNo2": "1126265957",
+          "contactName": "Simranjeet",
+          "contactMobile": "9711140936",
+          "contactEmail": "simranjeet@theindianschool.in",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": "www.theindianschool.in",
+          "schemaPrefix": null,
+          "editedDate": "11-11-2024 05:32 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": "",
+          "phoneNumberId": "",
+          "whatsappApiKey": "",
+          "isQuickCampusWhatsapp": false,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        }
+      },
+      "markData": {
+        "academicSession": "2024-2025",
+        "admissionNo": "I-5148",
+        "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+        "studentName": "Aanyaa Kumar",
+        "rollNo": 2,
+        "fatherName": "PRANEET KUMAR",
+        "className": "IX",
+        "sectionName": "A",
+        "terms": "PERIODIC TEST 3",
+        "markSheetName": "PERIODIC TEST 3",
+        "overAllRank": "2",
+        "markSheetTerms": [
+          {
+            "id": 1317,
+            "headerName": "WEIGHTAGE",
+            "subHeaderName": "(5)",
+            "priority": 1,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "PERIODIC TEST 3"
+            ]
+          }
+        ],
+        "subjectWiseMarkSheetReportResponses": [
+          {
+            "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            "subjectName": "ENGLISH",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0.2,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 0.2,
+            "total": 5,
+            "percentage": 4,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 1,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+            "subjectName": "HINDI",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0.4,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 0.4,
+            "total": 5,
+            "percentage": 8,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 2,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+            "subjectName": "MATHS",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                "subjectName": "MATHS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0.8,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 0.8,
+            "total": 5,
+            "percentage": 16,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 6,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+            "subjectName": "SCIENCE",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+                "subjectName": "SCIENCE",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 1,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 1,
+            "total": 5,
+            "percentage": 20,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 8,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+            "subjectName": "SOCIAL SCIENCE",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+                "subjectName": "SOCIAL SCIENCE",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0,
+                "grade": "E",
+                "status": "Absent",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 0,
+            "total": 5,
+            "percentage": 0,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 9,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
+            "subjectName": "ARTIFICIAL INTELLIGENCE",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+                "admissionNo": "I-5148",
+                "studentName": "Aanyaa Kumar",
+                "rollNo": 2,
+                "fatherName": "PRANEET KUMAR",
+                "className": "IX",
+                "sectionName": "A",
+                "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+                "terms": "PERIODIC TEST 3",
+                "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
+                "subjectName": "ARTIFICIAL INTELLIGENCE",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0,
+                "grade": "E",
+                "status": "Medical",
+                "markSheetName": "PERIODIC TEST 3",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1317,
+                  "headerName": "WEIGHTAGE",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 3"
+                  ]
+                },
+                "visible": false,
+                "pass": false,
+                "graded": false
+              }
+            ],
+            "marksObtained": 0,
+            "total": 5,
+            "percentage": 0,
+            "grade": "E",
+            "className": "IX",
+            "sectionName": "A",
+            "terms": "PERIODIC TEST 3",
+            "markSheetName": "PERIODIC TEST 3",
+            "subjectPrt": 10,
+            "decimalPlaces": 2,
+            "visible": false
+          }
+        ],
+        "marksObtained": 2.4000000000000004,
+        "total": 30,
+        "percentage": 8,
+        "overAllGrade": "E",
+        "visible": false
+      },
+      "remarks": {
+        "uid": null,
+        "terms": null,
+        "studentId": null,
+        "studentName": null,
+        "rollNumber": 0,
+        "classSectionUid": null,
+        "classSection": null,
+        "description": null,
+        "fields": null,
+        "status": false,
+        "createdUser": null,
+        "editedUser": null,
+        "createdDate": null,
+        "editedDate": null
+      },
+      "baseTermData": {
+        "studentAcademic": {
+          "dob": "19-04-2010",
+          "admissionNo": "I-5148",
+          "studentName": "Aanyaa Kumar",
+          "className": "IX",
+          "sectionName": "A",
+          "rollNo": 2,
+          "fatherName": "PRANEET KUMAR",
+          "motherName": "SANGEETA KUMAR",
+          "attendance": "0.0/0",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 321671,
+              "userUid": "13c7511d-697a-4430-ae73-b070cc5d3c27",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "e95cac88-e344-41e7-9dd6-3ade278ec950",
+              "studentId": "I-5148",
+              "exAdmissionNo": null,
+              "studentName": "Aanyaa Kumar",
+              "fatherName": "PRANEET KUMAR",
+              "motherName": "SANGEETA KUMAR",
+              "dob": "19-04-2010",
+              "gender": "NA",
+              "studentAdhaarcard": "",
+              "joiningClass": "IX",
+              "joiningSections": "A",
+              "joiningDate": "",
+              "plotNumber": "FLAT NO. 12A, POCKET A14",
+              "area": "KALKAJI EXTENSION",
+              "city": "NEW DELHI",
+              "state": "NA",
+              "pincode": "110019",
+              "phone1": null,
+              "rollNo": 2,
+              "emergencyNumber": "",
+              "mobileNumber": "9650444956",
+              "studentEmail": null,
+              "religion": "",
+              "category": "",
+              "minority": "",
+              "motherTongue": "",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "NA",
+              "fatherState": "NA",
+              "fatherPincode": null,
+              "fatherPhone": null,
+              "fatherMobile": "9650444956",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "NA",
+              "motherState": "NA",
+              "motherPincode": null,
+              "motherPhone": null,
+              "motherMobile": "9650444956",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": "",
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": "",
+              "classTeacher": "",
+              "classTeacherUserName": "",
+              "classes": "IX",
+              "classUid": null,
+              "sections": "A",
+              "group": null,
+              "wing": "NA",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "New",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-18 12:09:06.864839",
+              "editeddate": "2024-10-29 10:45:09.060794",
+              "permanentEducationNumber": "",
+              "studentAddressResponse": {
+                "uid": "2550f38b-9149-401d-a5ad-169538bf6641",
+                "houseNo": null,
+                "area": "KALKAJI EXTENSION",
+                "landmark": null,
+                "city": "NEW DELHI",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 110019,
+                "street": "FLAT NO. 12A, POCKET A14",
+                "userName": "DIS896_I-5148",
+                "createdDate": "18-09-2024 05:39 PM",
+                "editedDate": "29-10-2024 04:15 PM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "fatherAddressResponse": {
+                "uid": "b88e9bb4-be80-4100-b52c-eb6960aa23e9",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": null,
+                "street": null,
+                "userName": null,
+                "createdDate": "18-09-2024 05:39 PM",
+                "editedDate": "29-10-2024 04:15 PM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "motherAddressResponse": {
+                "uid": "7bace436-cc49-45ce-bba6-5a2b10858a75",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": null,
+                "street": null,
+                "userName": null,
+                "createdDate": "18-09-2024 05:39 PM",
+                "editedDate": "29-10-2024 04:15 PM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": {
+                "uid": "f3e2c79b-9b0b-4ab1-8010-e67c536600c6",
+                "houseNo": null,
+                "area": "",
+                "landmark": null,
+                "city": "",
+                "district": null,
+                "state": "",
+                "poPs": null,
+                "pincode": null,
+                "street": "",
+                "userName": "DIS896_I-5148",
+                "createdDate": "29-10-2024 04:15 PM",
+                "editedDate": "29-10-2024 04:15 PM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              }
+            }
+          ],
+          "classTeacher": "",
+          "classTeacherUserName": "",
+          "permanentEducationNumber": "",
+          "school": {
+            "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            "schoolName": "The Indian School",
+            "schoolAbb": "DIS",
+            "educationBoard": null,
+            "registrationNo": null,
+            "plotNumber": "NA",
+            "area": "Josip Broz Tito Marg",
+            "city": "New Delhi",
+            "pincode": "110049",
+            "state": "Delhi",
+            "phoneNo1": "1126265956",
+            "phoneNo2": "1126265957",
+            "contactName": "Simranjeet",
+            "contactMobile": "9711140936",
+            "contactEmail": "simranjeet@theindianschool.in",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": null,
+            "website": "www.theindianschool.in",
+            "schemaPrefix": null,
+            "editedDate": "11-11-2024 05:32 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          }
+        },
+        "subject": [
+          {
+            "subjectAllResponse": {
+              "uid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              "subjectName": "ENGLISH",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:21:34.044469",
+              "editeddate": "2024-09-28 07:21:34.043717"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 1,
+            "percentage": 4,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 1,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "b6c5404e-c32b-4115-b523-73a055a95318",
+              "subjectName": "HINDI",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:21:40.540336",
+              "editeddate": "2024-09-28 07:21:40.539652"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 2,
+            "percentage": 8,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 2,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+              "subjectName": "MATHS",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:26:54.518315",
+              "editeddate": "2024-09-28 07:26:54.517434"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 4,
+            "percentage": 16,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 6,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+              "subjectName": "SCIENCE",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:22:56.442158",
+              "editeddate": "2024-09-28 07:22:56.440594"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 5,
+            "percentage": 20,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 8,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+              "subjectName": "SOCIAL SCIENCE",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:22:49.258754",
+              "editeddate": "2024-09-28 07:22:49.25807"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 0,
+            "percentage": 0,
+            "grade": "E",
+            "remarkStatus": "Absent",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 9,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "680f221d-c435-4736-a764-3e26aeda7dbf",
+              "subjectName": "ARTIFICIAL INTELLIGENCE",
+              "nature": "THEORY",
+              "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-28 07:43:06.126027",
+              "editeddate": "2024-09-28 07:43:06.125261"
+            },
+            "termName": "PERIODIC TEST 3",
+            "max": 25,
+            "markObtained": 0,
+            "percentage": 0,
+            "grade": "E",
+            "remarkStatus": "Medical",
+            "attachmentName": "",
+            "additional": true,
+            "priority": 10,
+            "added": false,
+            "scholastic": true
+          }
+        ],
+        "remarksEntry": {
+          "uid": null,
+          "terms": null,
+          "studentId": null,
+          "studentName": null,
+          "rollNumber": 0,
+          "classSectionUid": null,
+          "classSection": null,
+          "description": null,
+          "fields": null,
+          "status": false,
+          "createdUser": null,
+          "editedUser": null,
+          "createdDate": null,
+          "editedDate": null
+        },
+        "school": {
+          "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+          "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+          "schoolName": "The Indian School",
+          "schoolAbb": "DIS",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "NA",
+          "area": "Josip Broz Tito Marg",
+          "city": "New Delhi",
+          "pincode": "110049",
+          "state": "Delhi",
+          "phoneNo1": "1126265956",
+          "phoneNo2": "1126265957",
+          "contactName": "Simranjeet",
+          "contactMobile": "9711140936",
+          "contactEmail": "simranjeet@theindianschool.in",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": "www.theindianschool.in",
+          "schemaPrefix": null,
+          "editedDate": "11-11-2024 05:32 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": "",
+          "phoneNumberId": "",
+          "whatsappApiKey": "",
+          "isQuickCampusWhatsapp": false,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "promotedClass": null,
+        "promotedSection": null,
+        "perSignedUrlResponse": {
+          "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIS896/student-info/I-5148/student/images/I-5148.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241119T123526Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241119%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=31c0e8f83208f63a97d373ae89a23a5f3f60c648cd84306c16df02a599e80a0b",
+          "fileName": "I-5148.png"
+        },
+        "pass": false,
+        "status_code": 200
+      },
+      "header": null,
+      "footer": null,
+      "printDate": "19-11-2024",
+      "studentPerfromanceData": {
+        "classWiseMarkResponse": [
+          {
+            "subjectName": "ENGLISH",
+            "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            "maxMark": 5,
+            "maxObtainedMark": 4,
+            "averageObtainedMark": 2.1,
+            "attachmentName": null
+          },
+          {
+            "subjectName": "HINDI",
+            "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+            "maxMark": 5,
+            "maxObtainedMark": 4.2,
+            "averageObtainedMark": 2.3000000000000003,
+            "attachmentName": null
+          },
+          {
+            "subjectName": "SOCIAL SCIENCE",
+            "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+            "maxMark": 5,
+            "maxObtainedMark": 4.8,
+            "averageObtainedMark": 2.4,
+            "attachmentName": null
+          },
+          {
+            "subjectName": "SCIENCE",
+            "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+            "maxMark": 5,
+            "maxObtainedMark": 4.6,
+            "averageObtainedMark": 2.8,
+            "attachmentName": null
+          },
+          {
+            "subjectName": "MATHS",
+            "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+            "maxMark": 5,
+            "maxObtainedMark": 4.4,
+            "averageObtainedMark": 2.6,
+            "attachmentName": null
+          },
+          {
+            "subjectName": "ARTIFICIAL INTELLIGENCE",
+            "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
+            "maxMark": 5,
+            "maxObtainedMark": 5,
+            "averageObtainedMark": 2.5,
+            "attachmentName": null
+          }
+        ],
+        "groupedClassAttachmentResponse": [
+          {
+            "attachmentName": "MATHS",
+            "totalMaxMark": 5,
+            "highestObtainedMark": 4.4
+          },
+          {
+            "attachmentName": "ENGLISH",
+            "totalMaxMark": 5,
+            "highestObtainedMark": 4
+          }
+        ],
+        "status_code": 200
+      }
+    }
+  ])
+
+
+
+</script>
+
+</html>
