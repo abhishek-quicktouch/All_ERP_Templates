@@ -209,7 +209,7 @@
                   }</td>`;
               })
               .join("")}
-                    <td style="text-align: center">${((el?.marksObtained / 50) * 100) || "-"}</td>
+                    <td style="text-align: center">${((el?.marksObtained / 50) * 100).toFixed(0) || "-"}</td>
                     <td style="text-align: center">${el?.grade || "-"}</td>
                     </tr>`;
         })
@@ -365,7 +365,7 @@
                         <td style="width:100%; text-align:center; padding-top:0mm; padding-bottom:0mm; border:none;">
                           <div style="width:90%;  margin:auto;">
                                  <img align="left" style="width: 100%;" src="
-https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/NRKPS895/web-content/event/images/UploadFile2024-11-19T10_42_56_725479052.png">
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-21T05_45_04_922601011.jpeg">
                         </div>
                         </td>
                      </tr>
