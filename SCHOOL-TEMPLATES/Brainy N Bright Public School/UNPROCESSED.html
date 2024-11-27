@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unprocessed report card</title>
+</head>
+
+<body>
+  <div id="studentarr">Student Result</div>
+  <script>
+    window.SetTemplateData = function (dataarr) {
+      const perToGrade = (per) => {
+        if (per >= 85 && per <= 100) {
+          return "A";
+        } else if (per >= 65 && per <= 84.99) {
+          return "B";
+        } else if (per >= 50 && per <= 64.99) {
+          return "C";
+        } else if (per >= 33 && per <= 49.99) {
+          return "D";
+        } else if (per >= 0 && per <= 32.99) {
+          return "E";
+        }
+      };
+
+      const InstructionsMarks = [
+        {
+          key: "Marks Range",
+          value: "Grade",
+        },
+        {
+          key: "85-100",
+          value: "A",
+        },
+        {
+          key: "65-84.99",
+          value: "B",
+        },
+        {
+          key: "50-64.99",
+          value: "C",
+        },
+        {
+          key: "33-49.99",
+          value: "D",
+        },
+        {
+          key: "0-32.99",
+          value: "E",
+        },
+      ];
+
+      let monthsList = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+      };
+
+      const convertData = (dataarr) => {
+        const res = dataarr?.map((data) => {
+          const address = `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+            ?.houseNo
+            ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.houseNo}, `
+            : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.street
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.street}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.landmark
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.landmark}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.area
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.area}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.district
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.district}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.city
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.city}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.state
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.state}, `
+              : ""
+            }${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.pincode
+              ? `${data?.student?.studentInfoResponse?.[0]?.studentAddressResponse?.pincode}`
+              : ""
+            }`;
+          return {
+            academicSession: {
+              year: data?.markData?.academicSession || "",
+              reportName:
+                data?.markData?.termWiseSubjectResponse[0]?.termName || "",
+              class: data?.markData?.className || "",
+              classTeacher: "",
+            },
+            studentInfo: [
+              {
+                key: "STUDENT'S NAME",
+                value: data?.markData?.studentName || "",
+              },
+              {
+                key: "ADMISSION NO.",
+                value: data?.markData?.admissionNo || "",
+              },
+              {
+                key: "FATHER'S NAME",
+                value: data?.student?.fatherName || "",
+              },
+              {
+                key: "CLASS / SECTION",
+                value: `${data?.markData?.className || ""}-${data?.markData?.sectionName || ""
+                  }`,
+              },
+              {
+                key: "MOTHER'S NAME",
+                value: data?.student?.motherName || "",
+              },
+              { key: "ROLL NO.", value: data?.markData?.rollNo || 0 },
+              {
+                key: "DATE OF BIRTH",
+                value: data?.student?.dob || "",
+              },
+              { key: "ATTENDANCE", value: data?.student?.attendance || "" },
+            ],
+
+            studentResult: attachments(data),
+
+            remarks: data?.remarks?.details?.[0]?.description || "",
+            header: data?.header || "",
+            footer: data?.footer || "",
+          };
+        });
+        return res;
+      };
+      const attachments = (data) => {
+        let attachment = [];
+        let subjects = [];
+
+        // Collect unique attachment names
+        data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+          v.subjectMarksEntryRequests.forEach((val) => {
+            if (!attachment?.find((v) => v == val.attachmentName))
+              attachment.push(val.attachmentName);
+          })
+        );
+
+        // Process attachment-based results
+        const res1 = attachment
+          ?.filter((v) => v)
+          ?.map((val) => {
+            let value = [];
+
+            data?.markData?.termWiseSubjectResponse?.forEach((element) => {
+              let termValue = {
+                termName: element?.termName, // Term name
+                obtain: 0,
+                grade: "",
+              };
+
+              element.subjectMarksEntryRequests.forEach((el) => {
+                if (val === el.attachmentName) {
+                  if (el.subjectNature === "CORE SUBJECT") {
+                    termValue.obtain = el.marks; // Theory marks
+                    termValue.grade = el?.grade || perToGrade((el.marks / el.max) * 100);
+                  } else if (el.subjectNature === "PRACTICAL") {
+                    termValue.obtain += el.marks; // Practical marks
+                    termValue.grade = el?.grade || perToGrade((el.marks / el.max) * 100);
+                  }
+                }
+              });
+
+              if (termValue.obtain || termValue.grade) value.push(termValue);
+            });
+
+            return {
+              key: val,
+              value,
+            };
+          });
+
+        // Collect unique subject names without attachment
+        data?.markData?.termWiseSubjectResponse?.forEach((v) =>
+          v.subjectMarksEntryRequests.forEach((val) => {
+            if (!subjects?.find((v) => v == val.subjectName))
+              if (val?.subjectNature === "CORE SUBJECT") {
+                subjects.push(val.subjectName);
+              }
+          })
+        );
+
+        // Process non-attachment-based results (subjects)
+        const res2 = subjects
+          ?.filter((v) => v)
+          ?.map((val) => {
+            let value = [];
+
+            data?.markData?.termWiseSubjectResponse?.forEach((element) => {
+              let termValue = {
+                termName: element?.termName, // Term name
+                obtain: 0,
+                grade: "",
+              };
+
+              element.subjectMarksEntryRequests.forEach((el) => {
+                if (val === el?.subjectName) {
+                  if (el.graded) {
+                    termValue.obtain = "-";
+                    termValue.grade = el?.grade;
+                  } else {
+                    if (el.subjectNature === "CORE SUBJECT") {
+                      termValue.obtain = el.marks; // Theory marks
+                      termValue.grade = el?.grade || perToGrade((el.marks / el.max) * 100);
+                    } else if (el.subjectNature === "PRACTICAL") {
+                      termValue.obtain += el.marks; // Practical marks
+                      termValue.grade = el?.grade || perToGrade((el.marks / el.max) * 100);
+                    }
+                  }
+                }
+              });
+
+              if (termValue.obtain || termValue.grade) value.push(termValue);
+            });
+
+            return {
+              key: val,
+              value,
+            };
+          });
+
+        return [...res1, ...res2];
+      };
+
+      const termSubHeading = (header, data) => {
+        let value = [];
+        let marks = {
+          theory: 0,
+          practical: 0,
+        };
+        data?.markData?.subjectWiseMarkSheetReportResponses?.forEach((v) => {
+          v.markSheetReport.forEach((val) => {
+            if (
+              val.markSheetTermResponse.headerName == header &&
+              !marks.theory &&
+              val.subjectNature == "CORE SUBJECT"
+            ) {
+              marks.theory = val.max;
+            }
+            if (
+              val.markSheetTermResponse.headerName == header &&
+              !marks.practical &&
+              val.subjectNature == "PRACTICAL"
+            ) {
+              marks.practical = val.max;
+            }
+          });
+        });
+        value.push(
+          marks.theory,
+          marks.practical,
+          marks.theory + marks.practical
+        );
+        return value;
+      };
+
+      const varr = convertData(dataarr);
+
+      const studallhtml = document.getElementById("studentarr");
+      studallhtml.innerHTML = "";
+      varr?.forEach((v) => {
+        const studhtml = document.createElement("div");
+        studhtml.style.pageBreakAfter = "always";
+        studhtml.innerHTML =
+          `<div style="margin-top: 20px">${v?.header || `<div>
+      <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div style="width:12%;">
+        <img src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-15T11_40_29_805877956.png" alt="" style="width:100%;"/>
+      </div>
+      <div style="width:76%; text-align:center;">
+       <p style="font-size:35px; font-weight:bold;">Brainy N Bright Public School
+
+</p>
+       <p style="font-size:14px;">Near Ashapurna Temple, Ashapurna Colony, Jalore, Rajasthan, 343001</p>
+      </div>
+      <div style="width:12%; ">
+      </div>
+    </div>`}</div>` +
+          `<page orientation="portrait" format="A4" margin="0">
+              <style type="text/css">
+                @page {
+                  size: A4;
+                }
+
+                * {
+                  margin: 0px;
+                  padding: 0px;
+                  font-family: Arial, Helvetica, sans-serif;
+                }
+
+                td {
+                  padding-left: 1mm;
+                  padding-right: 1mm;
+                  padding-top: 1mm;
+                  padding-bottom: 1mm;
+                  font-size: 9pt;
+                  color: #000000;
+                  font-family: Arial, Helvetica, sans-serif;
+                }
+
+                th {
+                  padding-left: 1mm;
+                  padding-right: 1mm;
+                  padding-top: 1mm;
+                  padding-bottom: 1mm;
+                  background: #e7e7e7;
+                  font-family: Arial, Helvetica, sans-serif;
+                }
+
+                .signImg {
+                  width: 150px;
+                  height: auto;
+                }
+
+                @media print {
+                  @page {
+                    margin: 5mm;
+                    size: A4;
+                  }
+
+                  .signImg {
+                    width: 150px;
+                    height: auto;
+                  }
+                }
+              </style>
+              <table style="width: 100%">
+                <tr>
+                  <td
+                    style="width: 100%;"
+                    valign="top"
+                    align="center"
+                  >
+                    <div
+                      style="
+                        width: 100%;
+                        line-height: 130%;
+                        padding-bottom: 0mm;
+                        text-align: center;
+                        font-size: 11pt;
+                        color: #000;
+                        font-weight: bold;
+                      "
+                      id=${v.studentInfo[1].value}-AcademicSession
+                    ></div>
+                  </td>
+                </tr>
+              </table>
+
+              <table
+                cellspacing="0"
+                style="
+                  width: 100%;
+                  padding-top: 8px;
+                "
+                id=${v.studentInfo[1].value}-studentInfo
+              ></table>
+              
+              <div style="height: 750px">
+                <table
+                  cellspacing="0"
+                  style="
+                    width: 100%;
+                    border: solid 0.264583333mm #000000;
+                    margin-top: 16px;
+                  "
+                  id=${v.studentInfo[1].value}-studentResult
+                ></table>
+                <table cellspacing="0" style="width: 100%">
+                  <tr>
+                    <td
+                      style="
+                        padding-left: 0mm;
+                        padding-right: 0mm;
+                        padding-top: 0mm;
+                        padding-bottom: 0mm;
+                      "
+                    >
+                      <div style="height: 5mm">&nbsp;</div>
+                    </td>
+                  </tr>
+                </table>
+                <table cellspacing="0" style="width: 100%" id=${v.studentInfo[1].value}-remarks></table>
+              </div>
+              <table cellspacing="0" style="width: 100%" id=${v.studentInfo[1].value}-footer></table>
+            </page>`;
+
+        studallhtml.appendChild(studhtml);
+        if (v) {
+          // Academic session Part
+          const academicSessionEle = document.getElementById(
+            `${v.studentInfo[1].value}-AcademicSession`
+          );
+          if (academicSessionEle) {
+            if (v.academicSession) {
+              academicSessionEle.innerHTML = `Academic Session : ${v.academicSession.year} <br />${v.academicSession.reportName}<br />`;
+            } else {
+              academicSessionEle.innerHTML =
+                "Academic Session : 2023-2024<br />Annual Report Card<br />";
+            }
+          }
+
+          // student details part
+          const studentInfoEle = document.getElementById(
+            `${v.studentInfo[1].value}-studentInfo`
+          );
+          if (studentInfoEle) {
+            let studentArr = v.studentInfo;
+            // console.log(studentArr, "fffffffffffff studentArr")
+            if (!studentArr) studentArr = v?.studentInfo;
+
+            let studentInfoHtml = "";
+
+            studentArr.forEach((v, i) => {
+              let style = false;
+              if (i % 2 === 0) {
+                style = true;
+              }
+              studentInfoHtml =
+                studentInfoHtml +
+                `${style ? "<tr>" : ""}<td style="width: ${style ? 60 : 40
+                }%; border:1px solid; border-bottom:${i == 6 || i == 7 ? "1px solid" : "none"
+                }; border-right:${i % 2 == 0 ? "none" : "1px solid"}">
+                <table width="100%" border="0" cellspacing="0" ">
+                  <tr>
+                    <td
+                      style="
+                        width: ${style ? 34 : 40}%;
+                        text-transform: uppercase;
+                        padding-left: 0mm;
+                        padding-right: 0mm;
+                        padding-top: 0mm;
+                        padding-bottom: 0mm;
+                      "
+                    >
+                      <strong>${v.key}</strong>
+                    </td>
+                    <td
+                      style="
+                        width: ${style ? 66 : 58}%;
+                        padding-left: 0mm;
+                        padding-right: 0mm;
+                        padding-top: 0mm;
+                        padding-bottom: 0mm;
+                      "
+                    >
+                      : ${v.value}
+                    </td>
+                  </tr>
+                </table>
+              </td>${style ? "" : "</tr>"}`;
+              studentInfoEle.innerHTML = studentInfoHtml;
+            });
+          }
+
+          // student result part with subject
+
+          const StudentResultEle = document.getElementById(
+            `${v.studentInfo[1].value}-studentResult`
+          );
+          if (StudentResultEle) {
+            let StudentResultInnerHtml = ``;
+            let StudentAttandenceHtml = `
+              <div style="display:flex;
+              border: solid 0.264583333mm #000000;
+              text-align:center;
+              ">
+                <div style="border-right:solid 0.264583333mm #000000;width:33.33%; display:flex; justify-content:center;align-items:center;">
+                  <p>${v?.remarks?.remarks || "-"}</p>
+                </div>
+
+                <div style="border-right:solid 0.264583333mm #000000;width:33.33%">
+                  <div style="border-bottom:solid 0.264583333mm #000000; font-family: Arial, Helvetica, sans-serif; font-weight:550; font-size:11pt; padding:5px;">
+                    <p>Total Working Days</p>
+                  </div>
+                  <div style="border-bottom:solid 0.264583333mm #000000; padding:3px;font-size:10pt;">
+                    ${v?.remarks?.totalDays || "-"}
+                  </div>
+                  <div style="padding:3px;font-size:10pt;font-weight:550">
+                    <p>Percentage</p>
+                  </div>
+                </div>
+
+                <div style=" width:33.33%;">
+                  <div style="border-bottom:solid 0.264583333mm #000000;font-family: Arial, Helvetica, sans-serif;font-weight:550; font-size:11pt; padding:5px;">
+                    <p>Attendance</p>
+                  </div>
+
+                  <div style="border-bottom:solid 0.264583333mm #000000; padding:3px;font-size:10pt;">
+                    ${v?.remarks?.present || "-"}
+                  </div>
+
+                  <div style="padding:3px; font-size:10pt;">
+                    ${v?.remarks?.percentage || "-"}
+                  </div>
+                </div>
+              </div>`;
+
+            let StudentResultArr = v.studentResult;
+            if (!StudentResultArr) StudentResultArr = v.studentResult;
+            console.log(StudentResultArr, "fffffffffffff StudentResultArr")
+            let termArray = v.termArray;
+            if (!termArray) {
+              termArray = v.termArray;
+            }
+
+            StudentResultInnerHtml =
+              StudentResultInnerHtml +
+              `<tr>
+              <th
+                align="left"
+                style="
+                  width: 18.8%;
+                  font-size: 9pt;
+                  font-weight: bold;
+                  border-bottom: solid 0.264583333mm #000000;
+                  
+                "
+              >
+                SUBJECT
+              </th>
+              ${StudentResultArr[0].value?.flat().map(val => {
+                console.log(val, "fffffffffff val")
+                return `<th
+                align="center"
+                style="
+                  width: 13.7%;
+                  font-size: 9pt;
+                  font-weight: bold;
+                  border-left: solid 0.264583333mm #000000;
+                "
+              >${val?.termName || ""}
+              </th>`;
+              }).join("")}
+            </tr>`;
+
+            StudentResultInnerHtml =
+              StudentResultInnerHtml +
+              `<tr>
+              `;
+
+            StudentResultArr.forEach((v, i) => {
+              console.log(v, "fffffffffff v")
+              StudentResultInnerHtml =
+                StudentResultInnerHtml +
+                `<tr>
+                <td
+                align="left"
+                valign="middle"
+                style="width: 26%; color:${v?.color || ""}; text-transform:uppercase; border-top: ${i === 0 ? "none" : "solid 0.264583333mm #000000"
+                }; font-weight:${v?.style ?? ""};"
+              >
+                ${v.key}
+              </td>
+              ${v.value
+                  ?.map(
+                    (el, index) =>
+                      ` <td
+                valign="top"
+                align="center"
+                style="
+                text-align: center;
+                row-span: ${v?.rowSpan ?? ""};
+                font-weight:${v?.style ?? ""};
+                  width: 8%;
+                  color:${v?.key == "Grand total" && (index == 0 || index == 1) ? "blue" : v?.key == "Percentage" && index == 1 ? "green" : v?.key == "Grand total" && (index == 2) ? "red" : ""};
+                  border-left: ${i === StudentResultArr?.length && index !== 0
+                        ? ""
+                        : "solid 0.264583333mm #000000"
+                      };
+                  border-top: solid 0.264583333mm #000000;
+                "
+              >
+               ${el.grade}
+              </td>`
+                  )
+                  .join("")}
+            </tr>`;
+            });
+
+            let StudentInstructionTable = `
+              <div style="text-align:center">
+               <div>
+                <h3 style="margin-top: 20px">Instructions</h3>
+                <div style="display: flex; margin-top:10px;margin-bottom:10px">
+                  ${InstructionsMarks?.map((el, i) => {
+              return `<div
+                    style="width:${i === 0 ? "15%" : i === 8 ? "25%" : "10%"};
+                    font-size:10pt;
+                    font-weight:${i === 0 ? "550" : "500"};
+                    ">
+
+                    <div
+                    style="border-top:1px solid;
+                    padding:5px;
+                    border-left: 1px solid;
+                    border-bottom: 1px solid;
+                    border-right:1px solid
+                    " >${el.key}</div>
+
+                    <div style="padding:5px;
+                    border-left: 1px solid;
+                    border-bottom: 1px solid;
+                    border-right: 1px solid
+                    ">${el.value}</div>
+                    </div>`;
+            }).join("")}
+                </div>
+              </div>
+              </div>
+              `;
+
+            let StudentResultTotal = v.StudentResultTotal;
+            if (!StudentResultTotal)
+              StudentResultTotal = { number: "385.2", percentage: "77.1" };
+
+            StudentResultEle.innerHTML = StudentResultInnerHtml;
+
+            const StudentRemarks = document.getElementById(
+              `${v.studentInfo[1].value}-remarks`
+            );
+            let currentDate = new Date();
+            let day = currentDate.getDate();
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
+            let remarks = v?.remarks;
+            if (!remarks) {
+              remarks = v.remarks;
+            }
+            StudentRemarks.innerHTML = `<tr>
+                            <td
+                              style="
+                                padding-left: 0mm;
+                                padding-right: 0mm;
+                                padding-top: 0mm;
+                                padding-bottom: 0mm;
+                                padding-right: 1pt;
+                              "
+                            >
+                              <strong>DATE </strong>
+                            </td>
+                            <td
+                              style="
+                                padding-left: 0mm;
+                                padding-right: 0mm;
+                                padding-top: 0mm;
+                                padding-bottom: 0mm;
+                                width:65%;
+                              "
+                            >
+                              : ${day + "-" + month + "-" + year}
+                            </td>
+
+                            <td
+                              style="
+                                padding-left: 0mm;
+                                padding-right: 0mm;
+                                padding-top: 0mm;
+                                padding-bottom: 0mm;
+                                padding-right: 1pt;
+
+                              "
+                            >
+                              <strong>PLACE </strong>
+                            </td>
+                            <td
+                              style="
+                                padding-left: 0mm;
+                                padding-right: 0mm;
+                                padding-top: 0mm;
+                                padding-bottom: 0mm;
+
+                              "
+                            >
+                              : ${"Rajasthan"}
+                            </td>
+                          </tr>`;
+
+            const footer = document.getElementById(
+              `${v.studentInfo[1].value}-footer`
+            );
+
+            footer.innerHTML = v.footer || "";
+          }
+        }
+      });
+    };
+  </script>
+  <script>
+    window.SetTemplateData([
+      {
+        student: {
+          dob: "11-02-2019",
+          admissionNo: "7378",
+          studentName: "Eklavya Jadwani",
+          className: "PRE SCHOOL",
+          sectionName: "A",
+          rollNo: 1,
+          fatherName: "Mohit Jadwani",
+          motherName: "Sonal Jadwani",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              "id": 273859,
+              "userUid": "d7024a57-1adb-4a49-97d5-e9781f12362c",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "b1df112b-a2dc-4141-ad48-f389184fe54c",
+              "studentId": "2425/014",
+              "exAdmissionNo": null,
+              "studentName": "REYANSH GARG",
+              "fatherName": "SUSHIL KUMAR",
+              "motherName": "SANGEETA GARG",
+              "dob": "10-05-2017",
+              "gender": "Male",
+              "studentAdhaarcard": "",
+              "joiningClass": "I",
+              "joiningSections": "A",
+              "joiningDate": "01-04-2024",
+              "plotNumber": "",
+              "area": "RAMDEV COLONY NEAR GOVT. SCHOOL",
+              "city": "jalore",
+              "state": "Rajasthan",
+              "pincode": "343001",
+              "phone1": "8278615210",
+              "rollNo": 0,
+              "emergencyNumber": "",
+              "mobileNumber": "8278615210",
+              "studentEmail": null,
+              "religion": "HINDU",
+              "category": "SC",
+              "minority": "",
+              "motherTongue": "Hindi",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "RAMDEV COLONY NR. GOVT. SCHOOL ",
+              "fatherCity": "Jalor",
+              "fatherState": "Rajasthan",
+              "fatherPincode": "343001",
+              "fatherPhone": "8278615210",
+              "fatherMobile": "8278615210",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "7bb31578-5264-4aca-9ecc-726f25518432",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "RAMDEV COLONY NR. GOVT. SCHOOL ",
+              "motherCity": "Jalor",
+              "motherState": "Rajasthan",
+              "motherPincode": "343001",
+              "motherPhone": "",
+              "motherMobile": "8278615210",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": "",
+              "relation": "",
+              "guardianOccupation": "",
+              "guardianPhone": "",
+              "guardianMobile": "",
+              "guardianEmail": null,
+              "guardianAddress": "",
+              "leavingDate": null,
+              "previousSchoolName": "",
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": "",
+              "classTeacher": "",
+              "classTeacherUserName": "",
+              "classes": "I",
+              "classUid": null,
+              "sections": "A",
+              "group": null,
+              "wing": "NA",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "New",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "APR"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "MAY"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "JUL"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "AUG"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "SEP"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "OCT"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "NOV"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "DEC"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "JAN"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "FEB"
+                },
+                {
+                  "concessionName": "NO CONCESSION",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "MAR"
+                }
+              ],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "aa81fb4b-5ced-4e06-a7d2-6119a68911e1",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "UpendraSingh_463415",
+              "editedUser": "Raghav436925",
+              "createddate": "2024-04-08 07:29:24.802911",
+              "editeddate": "2024-08-08 04:15:49.91038",
+              "permanentEducationNumber": "",
+              "studentAddressResponse": {
+                "uid": "3f525f9a-ba63-4136-b35e-4b2307fe29ff",
+                "houseNo": null,
+                "area": "RAMDEV COLONY NEAR GOVT. SCHOOL",
+                "landmark": null,
+                "city": "jalore",
+                "district": null,
+                "state": "Rajasthan",
+                "poPs": null,
+                "pincode": 343001,
+                "street": "",
+                "userName": "BNBPS663_2425/014",
+                "createdDate": "08-04-2024 12:59 PM",
+                "editedDate": "08-08-2024 09:45 AM",
+                "createdBy": "UpendraSingh_463415",
+                "editedBy": "Raghav436925"
+              },
+              "fatherAddressResponse": {
+                "uid": "f2d57adf-7bb3-4454-a343-9887e5e343a3",
+                "houseNo": null,
+                "area": "RAMDEV COLONY NR. GOVT. SCHOOL ",
+                "landmark": null,
+                "city": "Jalor",
+                "district": null,
+                "state": "Rajasthan",
+                "poPs": null,
+                "pincode": 343001,
+                "street": null,
+                "userName": null,
+                "createdDate": "08-04-2024 12:59 PM",
+                "editedDate": "08-08-2024 09:45 AM",
+                "createdBy": "UpendraSingh_463415",
+                "editedBy": "Raghav436925"
+              },
+              "motherAddressResponse": {
+                "uid": "8d371586-7e41-4786-b3de-eefb4aa5ce42",
+                "houseNo": null,
+                "area": "RAMDEV COLONY NR. GOVT. SCHOOL ",
+                "landmark": null,
+                "city": "Jalor",
+                "district": null,
+                "state": "Rajasthan",
+                "poPs": null,
+                "pincode": 343001,
+                "street": null,
+                "userName": null,
+                "createdDate": "08-04-2024 12:59 PM",
+                "editedDate": "08-08-2024 09:45 AM",
+                "createdBy": "UpendraSingh_463415",
+                "editedBy": "Raghav436925"
+              },
+              "guardianAddressResponse": {
+                "uid": "55ed1eb8-4569-4ce0-a0d4-5b42818b48ac",
+                "houseNo": null,
+                "area": "",
+                "landmark": null,
+                "city": null,
+                "district": null,
+                "state": null,
+                "poPs": null,
+                "pincode": null,
+                "street": null,
+                "userName": null,
+                "createdDate": "08-04-2024 12:59 PM",
+                "editedDate": "08-08-2024 09:45 AM",
+                "createdBy": "UpendraSingh_463415",
+                "editedBy": "Raghav436925"
+              },
+              "correspondenceAddressResponse": {
+                "uid": "284c0954-0902-49f7-908b-86c8ebf37a75",
+                "houseNo": null,
+                "area": "RAMDEV COLONY NEAR GOVT. SCHOOL",
+                "landmark": null,
+                "city": "jalore",
+                "district": null,
+                "state": "Rajasthan",
+                "poPs": null,
+                "pincode": 343001,
+                "street": "",
+                "userName": "BNBPS663_2425/014",
+                "createdDate": "08-04-2024 12:59 PM",
+                "editedDate": "08-08-2024 09:45 AM",
+                "createdBy": "UpendraSingh_463415",
+                "editedBy": "Raghav436925"
+              }
+            }
+          ]
+        },
+        markData: {
+          "admissionNo": "2425/014",
+          "permanentEducationNumber": "",
+          "studentName": "REYANSH GARG",
+          "className": "I",
+          "sectionName": "A",
+          "classSectionUid": "aa81fb4b-5ced-4e06-a7d2-6119a68911e1",
+          "academicSession": "2024-2025",
+          "fatherName": "SUSHIL KUMAR",
+          "uid": "b1df112b-a2dc-4141-ad48-f389184fe54c",
+          "attendanceResponse": null,
+          "pass": false,
+          "rollNo": 0,
+          "termWiseSubjectResponse": [
+            {
+              "totalMarks": 150,
+              "totalObtained": 122,
+              "overAllGrade": "A+",
+              "totalPercentage": 81.33333333333333,
+              "termName": "ORAL-I1",
+              "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+              "pass": true,
+              "subjectMarksEntryRequests": [
+                {
+                  "marks": 22,
+                  "description": "",
+                  "status": "",
+                  "subject": "738201da-4287-4a6b-807a-1ed9a85c04d5",
+                  "subjectName": "English",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 1,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 88,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 21,
+                  "description": "",
+                  "status": "",
+                  "subject": "d8379a09-8122-455b-94b4-c6b7957ec55b",
+                  "subjectName": "Hindi",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 2,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 84,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 22,
+                  "description": "",
+                  "status": "",
+                  "subject": "766bc4c6-e82f-4d22-9e0b-0df5020b268d",
+                  "subjectName": "Maths & Logical Reasoning",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 3,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 88,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 20,
+                  "description": "",
+                  "status": "",
+                  "subject": "2a9bd2db-0e9d-4567-9e5e-44908a85f8c2",
+                  "subjectName": "Science & General Knowledge",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 4,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A",
+                  "percentage": 80,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 18,
+                  "description": "",
+                  "status": "",
+                  "subject": "7253a82a-63c4-44d6-96db-ed48dfe99a98",
+                  "subjectName": "computer",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 5,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "A",
+                  "percentage": 72,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 19,
+                  "description": "",
+                  "status": "",
+                  "subject": "2d70d987-0bba-4784-81ab-f1542d22a895",
+                  "subjectName": "value education",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 6,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "A",
+                  "percentage": 76,
+                  "term": "ORAL-I1",
+                  "termUid": "3395db63-383c-4b71-a402-8a6708786db8",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                }
+              ]
+            },
+            {
+              "totalMarks": 450,
+              "totalObtained": 139,
+              "overAllGrade": "B",
+              "totalPercentage": 30.88888888888889,
+              "termName": "WRITTEN-II",
+              "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+              "pass": false,
+              "subjectMarksEntryRequests": [
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "738201da-4287-4a6b-807a-1ed9a85c04d5",
+                  "subjectName": "English",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 1,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 30.666666666666664,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "d8379a09-8122-455b-94b4-c6b7957ec55b",
+                  "subjectName": "Hindi",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 2,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 30.666666666666664,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "766bc4c6-e82f-4d22-9e0b-0df5020b268d",
+                  "subjectName": "Maths & Logical Reasoning",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 3,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 30.666666666666664,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "2a9bd2db-0e9d-4567-9e5e-44908a85f8c2",
+                  "subjectName": "Science & General Knowledge",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 4,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 30.666666666666664,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 24,
+                  "description": "",
+                  "status": "",
+                  "subject": "7253a82a-63c4-44d6-96db-ed48dfe99a98",
+                  "subjectName": "computer",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 5,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 32,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "2d70d987-0bba-4784-81ab-f1542d22a895",
+                  "subjectName": "value education",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 6,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "B",
+                  "percentage": 30.666666666666664,
+                  "term": "WRITTEN-II",
+                  "termUid": "63b05824-cd88-4ca2-9e29-e5247ece3622",
+                  "pass": false,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                }
+              ]
+            },
+            {
+              "totalMarks": 150,
+              "totalObtained": 143,
+              "overAllGrade": "A+",
+              "totalPercentage": 95.33333333333334,
+              "termName": "ORAL-I",
+              "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+              "pass": true,
+              "subjectMarksEntryRequests": [
+                {
+                  "marks": 22,
+                  "description": "",
+                  "status": "",
+                  "subject": "738201da-4287-4a6b-807a-1ed9a85c04d5",
+                  "subjectName": "English",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 1,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 88,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 24,
+                  "description": "",
+                  "status": "",
+                  "subject": "d8379a09-8122-455b-94b4-c6b7957ec55b",
+                  "subjectName": "Hindi",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 2,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 96,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 25,
+                  "description": "",
+                  "status": "",
+                  "subject": "766bc4c6-e82f-4d22-9e0b-0df5020b268d",
+                  "subjectName": "Maths & Logical Reasoning",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 3,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 100,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 24,
+                  "description": "",
+                  "status": "",
+                  "subject": "2a9bd2db-0e9d-4567-9e5e-44908a85f8c2",
+                  "subjectName": "Science & General Knowledge",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 4,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 96,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 25,
+                  "description": "",
+                  "status": "",
+                  "subject": "7253a82a-63c4-44d6-96db-ed48dfe99a98",
+                  "subjectName": "computer",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 5,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 100,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 23,
+                  "description": "",
+                  "status": "",
+                  "subject": "2d70d987-0bba-4784-81ab-f1542d22a895",
+                  "subjectName": "value education",
+                  "scholastic": true,
+                  "max": 25,
+                  "priority": 6,
+                  "min": 8,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 92,
+                  "term": "ORAL-I",
+                  "termUid": "756065e1-e4d6-4b30-bed0-9c95531b0f50",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                }
+              ]
+            },
+            {
+              "totalMarks": 450,
+              "totalObtained": 340,
+              "overAllGrade": "A",
+              "totalPercentage": 75.55555555555556,
+              "termName": "WRITTEN-I",
+              "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+              "pass": true,
+              "subjectMarksEntryRequests": [
+                {
+                  "marks": 71,
+                  "description": "",
+                  "status": "",
+                  "subject": "738201da-4287-4a6b-807a-1ed9a85c04d5",
+                  "subjectName": "English",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 1,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 94.66666666666667,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 62,
+                  "description": "",
+                  "status": "",
+                  "subject": "d8379a09-8122-455b-94b4-c6b7957ec55b",
+                  "subjectName": "Hindi",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 2,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 82.66666666666667,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 53,
+                  "description": "",
+                  "status": "",
+                  "subject": "766bc4c6-e82f-4d22-9e0b-0df5020b268d",
+                  "subjectName": "Maths & Logical Reasoning",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 3,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A",
+                  "percentage": 70.66666666666667,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 69,
+                  "description": "",
+                  "status": "",
+                  "subject": "2a9bd2db-0e9d-4567-9e5e-44908a85f8c2",
+                  "subjectName": "Science & General Knowledge",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 4,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "CORE SUBJECT",
+                  "parent": [],
+                  "grade": "A+",
+                  "percentage": 92,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 45,
+                  "description": "",
+                  "status": "",
+                  "subject": "7253a82a-63c4-44d6-96db-ed48dfe99a98",
+                  "subjectName": "computer",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 5,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "B+",
+                  "percentage": 60,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                },
+                {
+                  "marks": 40,
+                  "description": "",
+                  "status": "",
+                  "subject": "2d70d987-0bba-4784-81ab-f1542d22a895",
+                  "subjectName": "value education",
+                  "scholastic": true,
+                  "max": 75,
+                  "priority": 6,
+                  "min": 25,
+                  "attachmentName": null,
+                  "subjectNature": "Additional subject",
+                  "parent": [],
+                  "grade": "B+",
+                  "percentage": 53.333333333333336,
+                  "term": "WRITTEN-I",
+                  "termUid": "b5c2ad42-1de9-43d3-8305-6cd32c7d1b6b",
+                  "pass": true,
+                  "gradePattern": "5 POINT SCALE",
+                  "graded": false
+                }
+              ]
+            }
+          ]
+        },
+
+        remarks: {
+          uid: "69431c26-f12d-4927-b4d2-b076a36e30ce",
+          terms: ["TERM-I"],
+          studentId: "15516",
+          studentName: "Niya Massey",
+          rollNumber: 20,
+          classSectionUid: "02cc86c8-335f-4a9d-9f1c-ee583898cb14",
+          classSection: "LKG-A",
+          description: "GENERAL REMARKS",
+          fields: [
+            {
+              uid: "87abd191-f913-421e-8606-1619006ae3ce",
+              title: "Session Date",
+              type: "ALPHA_NUMERIC",
+              value: "1st Of April 2024",
+              masterUid: "d6bdde3b-5399-4edb-88c3-f4bbb1bfa6ec",
+              masterName: "NEW SESSION BEGINS ON",
+            },
+            {
+              uid: "0b5777e4-291c-4bcf-a503-d5a4560f5343",
+              title: "TEACHER REMARK",
+              type: "ALPHABETS_WITH_SPECIAL",
+              value: "HI HELLO",
+              masterUid: "59de457f-192d-43ae-96b4-23d323467b74",
+              masterName: "REMARKS",
+            },
+            {
+              uid: "34cc79e5-9cc1-4e98-a0a9-ff6309e6b95a",
+              title: "TOTAL ATTENDANCE",
+              type: "NUMERIC",
+              value: "",
+              masterUid: "46a05041-392f-4825-aa64-bd5b6dd4ca05",
+              masterName: "ATTENDANCE",
+            },
+          ],
+          status: true,
+          createdUser: "PremSir_453226",
+          editedUser: "PremSir_453226",
+          createdDate: "31-01-2024 11:14 AM",
+          editedDate: "31-01-2024 11:14 AM",
+        },
+        header: ``,
+        footer: '',
+      },
+
+    ]);
+
+
+  </script>
+</body>
+
+</html>
