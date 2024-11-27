@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admit Card</title>
+</head>
+
+<body>
+  <div id="studentsList">Admit Card</div>
+
+  <script>
+    window.SetTemplateData = function (data) {
+      const dataList = Array.isArray(data) ? data : [data];
+      const container = document.getElementById("studentsList");
+      container.innerHTML = "";
+
+      dataList.forEach((element) => {
+        let student = element?.contentRequest;
+        let school = element?.school;
+
+        const admitCardHtml = document.createElement("div");
+        admitCardHtml.classList.add("admit-card");
+
+        admitCardHtml.innerHTML = `
+         <style type="text/css">
+          
+ body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    #studentsList {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Two cards per row */
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .admit-card {
+      width: 100%;
+      height: auto;
+      border: 2px solid black;
+      background-color: white;
+      page-break-inside: avoid;
+    }
+
+    .admit-card img {
+      max-width: 100%;
+      height: auto;
+    }
+      @media print {
+@page {
+margin:1mm;
+size: A4 ;
+}
+         }
+          </style>
+          <div  >
+            <!-- Header -->
+            <div style="text-align: center;  background-color: #ffa07a; color: black;">
+              <div style="display: flex; align-items: center; padding: 10px; width: 100%;">
+                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-17T09_39_57_281599227.png" alt="School Logo" style="width: 15%; height: 80px;">
+                <div style="width: 70%;">
+                  <h1 style="margin: 0; font-size: 16px;">${school?.schoolName}</h1>
+                  <p style="margin: 0; font-size: 12px;">${school?.area + "," + school?.city + "," + school?.state + "-" + school?.pincode}</p>
+                  <p style="margin: 0; font-size: 12px;">${school?.contactEmail + ", " + school?.contactMobile}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admit Card Title -->
+            <div style="text-align: center; padding: 5px;">
+              <h2 style="margin: 0; font-size: 16px;">ADMIT CARD ${student?.session}</h2>
+              <p style="margin: 0; font-weight: bold; font-size: 14px;">Admit Card For Examination: Term - 1 Examination</p>
+            </div>
+
+            <!-- Student Info -->
+            <div style="display: flex; justify-content: space-between; padding: 10px;">
+              <table style="width: 70%; border-collapse: collapse;">
+                <tr>
+                  <td style="width: 40%; padding: 5px;"><b>Admission No.</b></td>
+                  <td style="width: 60%; padding: 5px;">: ${student?.admissionNo}</td>
+                </tr>
+                <tr>
+                  <td style="width: 40%; padding: 5px;"><b>Name</b></td>
+                  <td style="width: 60%; padding: 5px;">: ${student?.studentName}</td>
+                </tr>
+                <tr>
+                  <td style="width: 40%; padding: 5px;"><b>Father’s Name</b></td>
+                  <td style="width: 60%; padding: 5px;">: ${student?.fatherInformation?.name}</td>
+                </tr>
+                <tr>
+                  <td style="width: 40%; padding: 5px;"><b>DOB</b></td>
+                  <td style="width: 60%; padding: 5px;">: ${student?.dob}</td>
+                </tr>
+                <tr>
+                  <td style="width: 40%; padding: 5px;"><b>Class-Section</b></td>
+                  <td style="width: 60%; padding: 5px;">: ${student?.className + "-" + student?.sectionName}</td>
+                </tr>
+              </table>
+              <div>
+                <img src="${student?.preSignedUrlResponse?.url}" alt="Student Photo" style="width: 100px; height: 110px; border: 1px solid #ddd;">
+              </div>
+            </div>
+
+            <!-- Signatures -->
+            <div style="display: flex; justify-content: space-between; padding: 40px 10px 5px 10px; background-color: #f4e4c1; border-top: 2px solid green;">
+              <div style="text-align: center;">
+                <p style="margin: 0; color: green; font-size: 12px; border-top: 1px solid green;">Manager Signature</p>
+              </div>
+              <div style="text-align: center;">
+                <p style="margin: 0; color: green; font-size: 12px; border-top: 1px solid green;">Principal Signature</p>
+              </div>
+            </div>
+          </div>
+        `;
+
+        container.append(admitCardHtml);
+      });
+    };
+
+
+  </script>
+
+  <script>
+    window.SetTemplateData([
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      },
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      ,
+      {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+      , {
+        "school": {
+          "uid": "a0014377-6eed-49eb-8a07-c479dd6175a8",
+          "apikey": "77723fd4-7f2d-4706-9aa8-f0aec75e6f5e",
+          "schoolName": "DEVI SARASWATI VIDYAMANDIR",
+          "schoolAbb": "DSV",
+          "educationBoard": null,
+          "registrationNo": null,
+          "plotNumber": "KALISEN",
+          "area": "MURAKATA",
+          "city": "ONDA BANKURA",
+          "pincode": "722144",
+          "state": "West Bengal",
+          "phoneNo1": "9933534413",
+          "phoneNo2": null,
+          "contactName": "PRAPTI BANERJEE",
+          "contactMobile": "9933534413",
+          "contactEmail": "kalisencscbalvidyalaya@gmail.com",
+          "schoolCode": null,
+          "pfCode": null,
+          "societyManagement": null,
+          "language": null,
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": null,
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "07-08-2024 02:48 PM",
+          "editedUser": "QuickCampus",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": false,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": null,
+          "phoneNumberId": null,
+          "whatsappApiKey": null,
+          "isQuickCampusWhatsapp": null,
+          "whatsAppEnabled": false,
+          "smsenabled": false,
+          "notificationEnabled": true,
+          "loanEnabled": false
+        },
+        "contentRequest": {
+          "id": 300951,
+          "uid": "b740468a-b10f-4b47-a456-18597edabb0b",
+          "admissionNo": "120",
+          "studentName": "Akriti Das",
+          "className": "NURSERY",
+          "sectionName": "A",
+          "joiningStatus": "New",
+          "joiningDate": "2024-06-13",
+          "gender": "Female",
+          "certificate": null,
+          "joiningClassName": "NURSERY",
+          "joiningSectionName": "A",
+          "group": "DSVM",
+          "status": "Studying",
+          "caste": null,
+          "wing": "NA",
+          "house": null,
+          "dob": "2020-07-30",
+          "rollNo": 9,
+          "session": "2024-25",
+          "permanentEducationNumber": null,
+          "preSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DSV862/student-info/120/student/images/120.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241120T100552Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241120%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5b46f553b7f54848b754863b2747adda14585d35070b3748f7f13dab994984d2",
+            "fileName": "120.png"
+          },
+          "fatherInformation": {
+            "name": "Prasad Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "motherInformation": {
+            "name": "Laxmi Das",
+            "qualification": null,
+            "occupation": null,
+            "yearlyIncome": null,
+            "email": null
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "NA",
+            "street": "Bikrampur",
+            "city": "Bankura",
+            "pincode": "722174",
+            "state": "West Bengal",
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": "8918776442"
+          },
+          "officialAddress": {
+            "houseNo": "NA",
+            "area": null,
+            "street": null,
+            "city": null,
+            "pincode": null,
+            "state": null,
+            "emergencyNo": "",
+            "phoneNo": null,
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": null,
+            "guradianRelation": null,
+            "guradianOccupation": null,
+            "guradianEmail": null,
+            "guradianMobileNo": null
+          },
+          "characterCertificateDetail": null,
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": "NA"
+        },
+        "header": null,
+        "footer": null,
+        "student": {},
+        "selectedDatesheet": [
+          {
+            "uid": "f8c9d80a-6c03-427f-8d13-112b2c0b82d5",
+            "datesheetName": "SA-I",
+            "termUid": "5e8c30cd-7bbe-4974-b1d0-46e4cb40ee2b",
+            "termName": "HALF YEARLY",
+            "classes": "III",
+            "sections": [
+              "A"
+            ],
+            "classSectionUids": [
+              "f4790847-25e9-4a34-a7b2-4f3fb096472f"
+            ],
+            "startDate": "11-09-2024",
+            "endDate": "25-09-2024",
+            "academicSession": "2024-2025",
+            "dateSheetSettingResponseList": [
+              {
+                "subject": "ART EDUCATION",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd"
+              },
+              {
+                "subject": "G.K.",
+                "examDate": "11-09-2024",
+                "maxMarks": 0,
+                "startTime": "2024-09-11T08:00",
+                "endTime": "2024-09-11T11:30",
+                "description": null,
+                "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
+              },
+              {
+                "subject": "COMPUTER",
+                "examDate": "13-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-13T08:00",
+                "endTime": "2024-09-13T11:30",
+                "description": null,
+                "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
+              },
+              {
+                "subject": "SCIENCE",
+                "examDate": "16-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-16T08:00",
+                "endTime": "2024-09-16T11:30",
+                "description": null,
+                "subjectUid": "8530c727-f258-4f49-b3c2-3025c690fb14"
+              },
+              {
+                "subject": "Hindi",
+                "examDate": "18-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-18T08:00",
+                "endTime": "2024-09-18T11:30",
+                "description": null,
+                "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90"
+              },
+              {
+                "subject": "ENGLISH",
+                "examDate": "20-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-20T08:00",
+                "endTime": "2024-09-20T11:30",
+                "description": null,
+                "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564"
+              },
+              {
+                "subject": "MATHEMATICS",
+                "examDate": "23-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-23T08:00",
+                "endTime": "2024-09-23T11:30",
+                "description": null,
+                "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
+              },
+              {
+                "subject": "SOCIAL SCIENCE",
+                "examDate": "25-09-2024",
+                "maxMarks": 80,
+                "startTime": "2024-09-25T08:00",
+                "endTime": "2024-09-25T11:30",
+                "description": null,
+                "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
+              }
+            ],
+            "enabled": false
+          }
+        ]
+
+      }
+
+
+    ])
+  </script>
+
+
+  <!-- <script>
+
+    window.SetTemplateData({ viewTemplate: true, header: "", footer: "" });
+  </script> -->
+
+
+</html>
