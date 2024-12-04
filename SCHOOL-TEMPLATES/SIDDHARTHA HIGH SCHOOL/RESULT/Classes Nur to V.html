@@ -108,7 +108,7 @@
                             <td style="font-weight:${isNaN(assessment) ? "bold" : "normal"
                             }; text-align:center">${assessment}</td>
                           
-                            <td style="text-align:center" >${subject?.marksObtained
+                            <td style="text-align:center" >${subject?.marksObtained * 2
                             }</td>
                           <td style="text-align:center" >${subject?.percentage
                             }</td>
@@ -483,7 +483,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                             <tr>
                                 <th>Grand Total / Grade</th>
                                 <td colspan="3"></td>
-                                <th >${scholasticResult.totalMarksObtained}</th>
+                                <th >${scholasticResult.totalMarksObtained * 2}</th>
                                 <td> ${element?.markData?.percentage}</td>
                                 <th>${element?.markData?.overAllGrade}</th>
                                 </tr>
