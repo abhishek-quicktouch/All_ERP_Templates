@@ -11,7 +11,7 @@
     <div id="studentsList">Loading...</div>
 
     <script>
-        // Function to render gate passes dynamically for multiple students
+
         window.SetTemplateData = function (data) {
             console.log(data, "ffffffff data in Gate Pass");
             const studentsListElement = document.getElementById("studentsList");
@@ -36,8 +36,7 @@
                 <!-- Header Section -->
                 <div style="text-align: center; background-color: #d9f9d9; padding: 10px;display: flex; align-items: center; ">
 
-                                    <img src="
-https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/schoolLogo.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241121T053233Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241121%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=b570a3f194a315717c442a28c7825bc3feb91f6824589c6e45f7c9d0ce4911fc" alt="School Logo" style="max-width: 100px; height: auto; display: block; margin: 0;">
+                                    <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-11T07_16_33_701959259.png" alt="School Logo" style="max-width: 100px; height: auto; display: block; margin: 0;">
 
 <div style="width: 80%;align-items: center; " >
                   <h2 style="margin: 0; font-size: 24px;">${school.schoolName}</h2>
@@ -50,18 +49,40 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
     
                 <!-- Title -->
                 <div style="padding: 10px">
-                <h3 style="text-align: center; margin: 10px 0 10px; font-size: 22px;">GATE PASS</h3>
+                <h3 style="text-align: center; margin: 0px 100px 5px 0px; font-size: 22px;">GATE PASS 
+                    <span style="text-align: center; margin: 0px -300px 0px 100px; font-size: 16px;"><strong>Time:</strong> ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </h3> 
+                
+
     
                 <!-- Details Section -->
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                  <div>
-                    <p style="margin: 5px 0;"><strong>Student Name:</strong> ${studentName}</p>
-                    <p style="margin: 5px 0;"><strong>Class:</strong> ${className}-${sectionName}</p>
-                    <p style="margin: 5px 0;"><strong>Bus No:</strong> ______________________</p>
-                    <p style="margin: 5px 0;"><strong>Contact:</strong> ${permanentAddress.mobileNo}</p>
-                    <p style="margin: 5px 0;"><strong>Reason:</strong> __________________________</p>
-                    <p style="margin: 5px 0;"><strong>Taken By:</strong> ______________________</p>
-                  </div>
+                  <table style="width: 80%; border-collapse: collapse;">
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Student Name</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${studentName}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Class</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${className}-${sectionName}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Bus No</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ____________________</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Contact</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${permanentAddress.mobileNo}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Reason</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ________________________</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Taken By</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ____________________</td>
+                    </tr>
+                  </table>
                   <div style="border: 1px solid #000; width: 120px; height: 150px; text-align: center; display: flex; align-items: center; justify-content: center;">
                     <img src="${preSignedUrlResponse.url}" alt="Student Photo" style="max-width: 100%; max-height: 100%;" />
                   </div>
@@ -70,7 +91,7 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
                 <!-- Footer Section -->
                 <div style="display: flex; justify-content: space-between;">
                   <p style="margin: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                  <p style="margin: 0; text-align: right;"><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                  <p style="margin: 0; text-align: right;"><strong>Time:</strong> ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
                 <div style="text-align: right; margin-top: 30px;">
                   <p style="margin: 0;"><strong>Principal</strong></p>
@@ -81,8 +102,11 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
 
                 // Append each gate pass to the DOM
                 studentsListElement.innerHTML += gatePassHtml;
-            });
+            }
+            );
         };
+
+
     </script>
 
 

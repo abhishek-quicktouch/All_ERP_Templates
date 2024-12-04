@@ -201,22 +201,19 @@
             };
 
             switch (report?.markSheetTermResponse?.headerName) {
-              case "P.T.1":
+              case "PERIODIC TEST 1":
                 pt1 = getAttendanceOrMark(report?.status, report?.obtained);
                 pt1Total = report?.max;
                 break;
-              case "SEA":
+              case "HALF YEARLY":
                 sa1 = getAttendanceOrMark(report?.status, report?.obtained);
                 sa1Total = report?.max;
                 break;
-              case "NOTE BOOK":
+              case "PERIODIC TEST 2":
                 pt2 = getAttendanceOrMark(report?.status, report?.obtained);
                 pt2Total = report?.max;
                 break;
-              case "HALF YEARLY":
-                assessment = getAttendanceOrMark(report?.status, report?.obtained);
-                assessmentTotal = report?.max;
-                break;
+
             }
 
             // Add the term data to subjectGraphData
@@ -244,9 +241,7 @@
             <td style="font-weight:${isNaN(pt1) ? "bold" : "normal"}; text-align:center">${pt1}</td>
             <td style="font-weight:${isNaN(sa1) ? "bold" : "normal"}; text-align:center">${sa1}</td>
             <td style="font-weight:${isNaN(pt2) ? "bold" : "normal"}; text-align:center">${pt2}</td>
-            <td style="font-weight:${isNaN(assessment) ? "bold" : "normal"}; text-align:center">${assessment}</td>
-            <td style="text-align:center">${subject?.marksObtained.toFixed(1)}</td>
-            <td style="text-align:center">${subject?.grade}</td>
+            
           </tr>
         `;
           } else {
@@ -472,15 +467,10 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                         <h3 style="text-align: left; margin: 0px; margin-top: -15px ; font-size: 14px;">SCHOLASTIC AREAS (8 POINT GRADING SCALE )</h3>
                         <table >
                             
-                          <tr>
-                           <th rowspan="2">SR.NO.</th>
-                           <th rowspan="2" style="text-align: center; width: 16%;">SUBJECT</th> 
-                            <th colspan="7"  style="text-align: center; width: 12%;">TERM -1</th>
-                            </tr>
-
-                            <tr >  
+                         
                               
-                                 
+                                 <tr> <th rowspan="2">SR.NO.</th>
+                           <th rowspan="2" style="text-align: center; ">SUBJECT</th>  </tr>
                                 
                                 ${element?.markData?.markSheetTerms
           ?.map((term) => {
@@ -489,29 +479,18 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 term?.headerName?.replace(/[()]/g, "")
               ) || 0;
             totalHeaderName += headerValue;
-            return `<th style="text-align: center; width: 12%;">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
+            return `
+            
+            <th style="text-align: center; ">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
           })
           .join("")}
-                                <th style="text-align: center;width: 12%;"><h4>TOTAL</h4></th>
-                             
-                                <th style="text-align: center; width: 12%;">GRADE</th>
+                                
                             </tr>
                             <tr>
+                              
 </tr>
                             ${scholasticResult.rows}
-                            <tr>
-                                <td></td>
-                                <th>TOTAL</th>
-                                <td colspan="4"></td>
-                                <th colspan="2">${scholasticResult.totalMarksObtained.toFixed(1)}</th>
-                                </tr>
-                                 
-                                <tr>
-                                <td></td> 
-                                <th>%AGE</th>
-                                <td colspan="4"></td>
-                                <th colspan="2">${((scholasticResult.totalMarksObtained / scholasticResult.totalPossibleMarks) * 100).toFixed(2)}%</th>
-                                </tr>
+                            
                         </table>
                     </div>
                   <div class="graphContainer">
@@ -525,7 +504,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                      
                          <td style="white-space: nowrap;" >
                             
-                                <strong>ATTENDANCE:</strong> ${element?.remarks?.fields.find(e => e.title.toLowerCase() === "sa1")?.value || ""
+                                <strong>ATTENDANCE:</strong> ${element?.remarks?.fields?.find(e => e.title.toLowerCase() === "sa1")?.value || ""
         }    
                             </td >
                         </tr >
@@ -623,10 +602,10 @@ ${element.student.studentInfoResponse[0]?.state}</td>
           "studentName": "Shivaan Ahuja",
           "className": "I",
           "sectionName": "A",
-          "rollNo": 23,
+          "rollNo": 26,
           "fatherName": "Mr. Sanjeev Ahuja",
           "motherName": "Mrs. Garima Ahuja",
-          "sa1": "26.0/33",
+          "attendance": "64.0/77",
           "boardRollNumber": "",
           "studentInfoResponse": [
             {
@@ -648,26 +627,26 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "joiningClass": "I",
               "joiningSections": "A",
               "joiningDate": "10-03-2022",
-              "plotNumber": "",
+              "plotNumber": "AAGMAN SOCIETY ,TOWER -3",
               "area": "Sector-70",
               "city": "Faridabad",
               "state": "Haryana",
-              "pincode": "121006",
-              "phone1": "",
-              "rollNo": 23,
-              "emergencyNumber": "",
+              "pincode": "121004",
+              "phone1": "9711911528",
+              "rollNo": 26,
+              "emergencyNumber": "7678419759",
               "mobileNumber": "9711911528",
               "studentEmail": null,
               "religion": "HINDU",
               "category": "GENERAL",
-              "minority": "",
-              "motherTongue": "",
+              "minority": "No",
+              "motherTongue": "Hindi",
               "idMark": "",
-              "height": "",
-              "weight": "",
+              "height": "111",
+              "weight": "20",
               "physicalDisability": "",
               "bloodGroup": "",
-              "healthRemark": "",
+              "healthRemark": "GOOD",
               "siblingDetails": "",
               "alumni": "",
               "siblingResponse": [],
@@ -677,27 +656,27 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "fatherDesignation": "",
               "fatherIncome": "",
               "fatherArea": "NA",
-              "fatherCity": "NA",
-              "fatherState": "NA",
-              "fatherPincode": "",
+              "fatherCity": "FBD",
+              "fatherState": "Haryana",
+              "fatherPincode": "121004",
               "fatherPhone": "",
-              "fatherMobile": "",
+              "fatherMobile": "9711911528",
               "fatherEmail": null,
-              "fatherAdhaarNumber": "",
+              "fatherAdhaarNumber": "299346710861",
               "schoolUid": "55e97712-7e3a-4962-9929-d63cee64c452",
               "motherQualification": "",
-              "motherOccupation": "",
+              "motherOccupation": "HOME MAKER",
               "motherOrganization": "",
               "motherDesignation": "",
               "motherIncome": "",
               "motherArea": "NA",
-              "motherCity": "NA",
-              "motherState": "NA",
-              "motherPincode": "",
+              "motherCity": "FBD",
+              "motherState": "Haryana",
+              "motherPincode": "121004",
               "motherPhone": "",
-              "motherMobile": "",
+              "motherMobile": "7678419759",
               "motherEmail": null,
-              "motherAdhaarNumber": "",
+              "motherAdhaarNumber": "297145978302",
               "guardianName": null,
               "relation": null,
               "guardianOccupation": null,
@@ -706,17 +685,17 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "guardianEmail": null,
               "guardianAddress": null,
               "leavingDate": null,
-              "previousSchoolName": "",
+              "previousSchoolName": "SMART KIT ,SEC 8",
               "otp": null,
               "schoolName": "Demo Public School",
-              "remark": "",
+              "remark": "PASS",
               "classTeacher": "",
               "classTeacherUserName": "",
               "classes": "I",
               "classUid": null,
               "sections": "A",
               "group": "I",
-              "wing": "NA",
+              "wing": "Junior",
               "status": "Studying",
               "academicSession": "2024-2025",
               "joiningStatus": "Old",
@@ -900,9 +879,9 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "motherQualificationProof": null,
               "casteCertificate": null,
               "createdUser": "QuickCampus",
-              "editedUser": "SHRUTIDUBE_507408",
+              "editedUser": "varuniBhatia_507415",
               "createddate": "2024-05-16 04:57:19.991299",
-              "editeddate": "2024-08-20 02:26:47.795547",
+              "editeddate": "2024-09-21 04:54:01.914258",
               "permanentEducationNumber": "",
               "studentAddressResponse": {
                 "uid": "849c3235-f467-46c3-9ea0-8e39aedeb979",
@@ -913,65 +892,65 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 "district": null,
                 "state": "Haryana",
                 "poPs": null,
-                "pincode": 121006,
-                "street": "NA",
+                "pincode": 121004,
+                "street": "AAGMAN SOCIETY ,TOWER -3 ",
                 "userName": "dcms832_20220001",
                 "createdDate": "16-05-2024 10:27 AM",
-                "editedDate": "20-08-2024 07:56 AM",
+                "editedDate": "21-09-2024 10:24 AM",
                 "createdBy": "QuickCampus",
-                "editedBy": "SHRUTIDUBE_507408"
+                "editedBy": "varuniBhatia_507415"
               },
               "fatherAddressResponse": {
                 "uid": "35477170-957a-4501-a406-c9f5e5b0cacd",
                 "houseNo": null,
                 "area": "NA",
                 "landmark": null,
-                "city": "NA",
+                "city": "FBD",
                 "district": null,
-                "state": "NA",
+                "state": "Haryana",
                 "poPs": null,
-                "pincode": 0,
+                "pincode": 121004,
                 "street": null,
                 "userName": null,
                 "createdDate": "16-05-2024 10:27 AM",
-                "editedDate": "20-08-2024 07:56 AM",
+                "editedDate": "21-09-2024 10:24 AM",
                 "createdBy": "QuickCampus",
-                "editedBy": "SHRUTIDUBE_507408"
+                "editedBy": "varuniBhatia_507415"
               },
               "motherAddressResponse": {
                 "uid": "5f68b3c1-72cc-48d3-8c40-83e26dcc4563",
                 "houseNo": null,
                 "area": "NA",
                 "landmark": null,
-                "city": "NA",
+                "city": "FBD",
                 "district": null,
-                "state": "NA",
+                "state": "Haryana",
                 "poPs": null,
-                "pincode": 0,
+                "pincode": 121004,
                 "street": null,
                 "userName": null,
                 "createdDate": "16-05-2024 10:27 AM",
-                "editedDate": "20-08-2024 07:56 AM",
+                "editedDate": "21-09-2024 10:24 AM",
                 "createdBy": "QuickCampus",
-                "editedBy": "SHRUTIDUBE_507408"
+                "editedBy": "varuniBhatia_507415"
               },
               "guardianAddressResponse": null,
               "correspondenceAddressResponse": {
                 "uid": "fa3d4f2f-35b5-4533-b1e2-cbae32dab536",
                 "houseNo": null,
-                "area": "",
+                "area": "Sector-70",
                 "landmark": null,
-                "city": "",
+                "city": "Faridabad",
                 "district": null,
-                "state": "",
+                "state": "Haryana",
                 "poPs": null,
-                "pincode": null,
-                "street": "",
+                "pincode": 121004,
+                "street": "AAGMAN SOCIETY ,TOWER -3 ",
                 "userName": "dcms832_20220001",
                 "createdDate": "20-07-2024 07:47 AM",
-                "editedDate": "20-08-2024 07:56 AM",
+                "editedDate": "21-09-2024 10:24 AM",
                 "createdBy": "Ms. Astha_491569",
-                "editedBy": "SHRUTIDUBE_507408"
+                "editedBy": "varuniBhatia_507415"
               }
             }
           ],
@@ -1005,7 +984,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             "subDomain": "dcms",
             "website": null,
             "schemaPrefix": null,
-            "editedDate": "29-08-2024 11:56 AM",
+            "editedDate": "07-10-2024 11:07 AM",
             "editedUser": "QuickCampus",
             "visitorSchool": false,
             "clientSchoolId": null,
@@ -1017,71 +996,63 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             "sessionResponse": null,
             "schoolLogoUrl": null,
             "printAcknowledge": false,
-            "whatsAppEnabled": false,
-            "smsenabled": false,
+            "wabaId": null,
+            "phoneNumberId": null,
+            "whatsappApiKey": null,
+            "isQuickCampusWhatsapp": false,
             "notificationEnabled": true,
-            "loanEnabled": false
+            "loanEnabled": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false
           }
         },
         "markData": {
           "academicSession": "2024-2025",
-          "admissionNo": "20220031",
-          "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-          "studentName": "Pratigya Gangwar",
+          "admissionNo": "20220001",
+          "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+          "studentName": "Shivaan Ahuja",
           "rollNo": 26,
-          "fatherName": "Mr. Jayveer Singh Gangwar",
-          "className": "II",
+          "fatherName": "Mr. Sanjeev Ahuja",
+          "className": "I",
           "sectionName": "A",
-          "terms": "HALF YEARLY",
-          "markSheetName": "TERM-I",
+          "terms": "PERIODIC TEST 2",
+          "markSheetName": "GRAPHICAL REPORT CARD",
           "overAllRank": "1",
           "markSheetTerms": [
             {
-              "id": 785,
-              "headerName": "P.T.1",
-              "subHeaderName": "10",
+              "id": 1380,
+              "headerName": "PERIODIC TEST 1",
+              "subHeaderName": "(40)",
               "priority": 1,
               "bestOf": 0,
               "decimalPlaces": 2,
-              "weightage": 10,
+              "weightage": 40,
               "terms": [
                 "PERIODIC TEST 1"
               ]
             },
             {
-              "id": 786,
-              "headerName": "SEA",
-              "subHeaderName": "5",
-              "priority": 2,
-              "bestOf": 0,
-              "decimalPlaces": 2,
-              "weightage": 5,
-              "terms": [
-                "NOTE BOOK-I"
-              ]
-            },
-            {
-              "id": 787,
-              "headerName": "NOTE BOOK",
-              "subHeaderName": "5",
-              "priority": 3,
-              "bestOf": 0,
-              "decimalPlaces": 2,
-              "weightage": 5,
-              "terms": [
-                "SEA-I"
-              ]
-            },
-            {
-              "id": 788,
+              "id": 1381,
               "headerName": "HALF YEARLY",
-              "subHeaderName": "80",
-              "priority": 4,
+              "subHeaderName": "(80)",
+              "priority": 2,
               "bestOf": 0,
               "decimalPlaces": 2,
               "weightage": 80,
               "terms": [
                 "HALF YEARLY"
+              ]
+            },
+            {
+              "id": 1382,
+              "headerName": "PERIODIC TEST 2",
+              "subHeaderName": "(40)",
+              "priority": 3,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 40,
+              "terms": [
+                "PERIODIC TEST 2"
               ]
             }
           ],
@@ -1092,142 +1063,68 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subjectNature": "Theory",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
                   "subjectName": "ENGLISH",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
+                  "max": 40,
+                  "obtained": 37.6,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 785,
-                    "headerName": "P.T.1",
-                    "subHeaderName": "10",
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
                     "priority": 1,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 10,
+                    "weightage": 40,
                     "terms": [
                       "PERIODIC TEST 1"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 },
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
-                  "subjectName": "ENGLISH",
-                  "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 786,
-                    "headerName": "SEA",
-                    "subHeaderName": "5",
-                    "priority": 2,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "NOTE BOOK-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
-                  "subjectName": "ENGLISH",
-                  "subjectNature": "Theory",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 787,
-                    "headerName": "NOTE BOOK",
-                    "subHeaderName": "5",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SEA-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
                   "subjectName": "ENGLISH",
                   "subjectNature": "Theory",
                   "max": 80,
-                  "obtained": 80,
+                  "obtained": 79,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 788,
+                    "id": 1381,
                     "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
+                    "subHeaderName": "(80)",
+                    "priority": 2,
                     "bestOf": 0,
                     "decimalPlaces": 2,
                     "weightage": 80,
@@ -1236,18 +1133,18 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 }
               ],
-              "marksObtained": 105,
-              "total": 105,
-              "percentage": 100,
+              "marksObtained": 116.6,
+              "total": 120,
+              "percentage": 97.17,
               "grade": "A1",
-              "className": "II",
+              "className": "I",
               "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
               "subjectPrt": 1,
               "decimalPlaces": 2,
               "visible": false
@@ -1258,142 +1155,68 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subjectNature": "Theory",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
                   "subjectName": "Hindi",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 9,
-                  "grade": "A2",
+                  "max": 40,
+                  "obtained": 39.2,
+                  "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 785,
-                    "headerName": "P.T.1",
-                    "subHeaderName": "10",
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
                     "priority": 1,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 10,
+                    "weightage": 40,
                     "terms": [
                       "PERIODIC TEST 1"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 },
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
-                  "subjectName": "Hindi",
-                  "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 786,
-                    "headerName": "SEA",
-                    "subHeaderName": "5",
-                    "priority": 2,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "NOTE BOOK-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
-                  "subjectName": "Hindi",
-                  "subjectNature": "Theory",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 787,
-                    "headerName": "NOTE BOOK",
-                    "subHeaderName": "5",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SEA-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
                   "subjectName": "Hindi",
                   "subjectNature": "Theory",
                   "max": 80,
-                  "obtained": 79,
-                  "grade": "A1",
+                  "obtained": 71,
+                  "grade": "A2",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 788,
+                    "id": 1381,
                     "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
+                    "subHeaderName": "(80)",
+                    "priority": 2,
                     "bestOf": 0,
                     "decimalPlaces": 2,
                     "weightage": 80,
@@ -1402,18 +1225,18 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 }
               ],
-              "marksObtained": 103,
-              "total": 105,
-              "percentage": 98.1,
+              "marksObtained": 110.2,
+              "total": 120,
+              "percentage": 91.83,
               "grade": "A1",
-              "className": "II",
+              "className": "I",
               "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
               "subjectPrt": 2,
               "decimalPlaces": 2,
               "visible": false
@@ -1424,126 +1247,52 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subjectNature": "Theory",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
                   "subjectName": "MATHEMATICS",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 9,
-                  "grade": "A2",
+                  "max": 40,
+                  "obtained": 31.2,
+                  "grade": "B1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 785,
-                    "headerName": "P.T.1",
-                    "subHeaderName": "10",
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
                     "priority": 1,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 10,
+                    "weightage": 40,
                     "terms": [
                       "PERIODIC TEST 1"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 },
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
-                  "subjectName": "MATHEMATICS",
-                  "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 786,
-                    "headerName": "SEA",
-                    "subHeaderName": "5",
-                    "priority": 2,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "NOTE BOOK-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
-                  "subjectName": "MATHEMATICS",
-                  "subjectNature": "Theory",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 787,
-                    "headerName": "NOTE BOOK",
-                    "subHeaderName": "5",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SEA-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
                   "subjectName": "MATHEMATICS",
                   "subjectNature": "Theory",
@@ -1551,15 +1300,15 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                   "obtained": 80,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 788,
+                    "id": 1381,
                     "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
+                    "subHeaderName": "(80)",
+                    "priority": 2,
                     "bestOf": 0,
                     "decimalPlaces": 2,
                     "weightage": 80,
@@ -1568,18 +1317,18 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 }
               ],
-              "marksObtained": 104,
-              "total": 105,
-              "percentage": 99.05,
+              "marksObtained": 111.2,
+              "total": 120,
+              "percentage": 92.67,
               "grade": "A1",
-              "className": "II",
+              "className": "I",
               "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
               "subjectPrt": 3,
               "decimalPlaces": 2,
               "visible": false
@@ -1590,142 +1339,68 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subjectNature": "Theory",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
                   "subjectName": "SOCIAL SCIENCE",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 9.8,
+                  "max": 40,
+                  "obtained": 38.4,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 785,
-                    "headerName": "P.T.1",
-                    "subHeaderName": "10",
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
                     "priority": 1,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 10,
+                    "weightage": 40,
                     "terms": [
                       "PERIODIC TEST 1"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 },
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
-                  "subjectName": "SOCIAL SCIENCE",
-                  "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 786,
-                    "headerName": "SEA",
-                    "subHeaderName": "5",
-                    "priority": 2,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "NOTE BOOK-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
-                  "subjectName": "SOCIAL SCIENCE",
-                  "subjectNature": "Theory",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 787,
-                    "headerName": "NOTE BOOK",
-                    "subHeaderName": "5",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SEA-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
                   "subjectName": "SOCIAL SCIENCE",
                   "subjectNature": "Theory",
                   "max": 80,
-                  "obtained": 79,
+                  "obtained": 78,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 788,
+                    "id": 1381,
                     "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
+                    "subHeaderName": "(80)",
+                    "priority": 2,
                     "bestOf": 0,
                     "decimalPlaces": 2,
                     "weightage": 80,
@@ -1734,18 +1409,18 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 }
               ],
-              "marksObtained": 103.8,
-              "total": 105,
-              "percentage": 98.86,
+              "marksObtained": 116.4,
+              "total": 120,
+              "percentage": 97,
               "grade": "A1",
-              "className": "II",
+              "className": "I",
               "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
               "subjectPrt": 4,
               "decimalPlaces": 2,
               "visible": false
@@ -1756,280 +1431,96 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subjectNature": "Theory",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
                   "subjectName": "COMPUTER",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
+                  "max": 40,
+                  "obtained": 40,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 785,
-                    "headerName": "P.T.1",
-                    "subHeaderName": "10",
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
                     "priority": 1,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 10,
+                    "weightage": 40,
                     "terms": [
                       "PERIODIC TEST 1"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 },
                 {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
                   "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
                   "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
                   "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
                   "subjectName": "COMPUTER",
                   "subjectNature": "Theory",
-                  "max": 10,
-                  "obtained": 10,
+                  "max": 80,
+                  "obtained": 77,
                   "grade": "A1",
                   "status": "",
-                  "markSheetName": "TERM-I",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
                   "attachmentName": "",
                   "session": "2024-2025",
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
-                    "id": 786,
-                    "headerName": "SEA",
-                    "subHeaderName": "5",
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
                     "priority": 2,
                     "bestOf": 0,
                     "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "NOTE BOOK-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
-                  "subjectName": "COMPUTER",
-                  "subjectNature": "Theory",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 787,
-                    "headerName": "NOTE BOOK",
-                    "subHeaderName": "5",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SEA-I"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": false
-                },
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
-                  "subjectName": "COMPUTER",
-                  "subjectNature": "Theory",
-                  "max": 80,
-                  "obtained": 79,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 788,
-                    "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
                     "weightage": 80,
                     "terms": [
                       "HALF YEARLY"
                     ]
                   },
                   "visible": false,
-                  "pass": true,
-                  "graded": false
+                  "graded": false,
+                  "pass": true
                 }
               ],
-              "marksObtained": 104,
-              "total": 105,
-              "percentage": 99.05,
+              "marksObtained": 117,
+              "total": 120,
+              "percentage": 97.5,
               "grade": "A1",
-              "className": "II",
+              "className": "I",
               "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
               "subjectPrt": 5,
-              "decimalPlaces": 2,
-              "visible": false
-            },
-            {
-              "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd",
-              "subjectName": "ART EDUCATION",
-              "subjectNature": "1B Scholastic",
-              "markSheetReport": [
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "9d56228f-8144-4597-aa1a-8b97f21832fd",
-                  "subjectName": "ART EDUCATION",
-                  "subjectNature": "1B Scholastic",
-                  "max": 80,
-                  "obtained": 80,
-                  "grade": "A",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 788,
-                    "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 80,
-                    "terms": [
-                      "HALF YEARLY"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": true
-                }
-              ],
-              "marksObtained": 80,
-              "total": 80,
-              "percentage": 100,
-              "grade": "A",
-              "className": "II",
-              "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
-              "subjectPrt": 6,
-              "decimalPlaces": 2,
-              "visible": false
-            },
-            {
-              "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7",
-              "subjectName": "General Knowledge",
-              "subjectNature": "1B Scholastic",
-              "markSheetReport": [
-                {
-                  "studentInfoUid": "5afec005-899b-4e9e-8efd-e2367aa20f15",
-                  "admissionNo": "20220031",
-                  "studentName": "Pratigya Gangwar",
-                  "rollNo": 26,
-                  "fatherName": "Mr. Jayveer Singh Gangwar",
-                  "className": "II",
-                  "sectionName": "A",
-                  "classSectionUid": "45473591-f2bb-4164-a089-ed24f17a1968",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7",
-                  "subjectName": "General Knowledge",
-                  "subjectNature": "1B Scholastic",
-                  "max": 80,
-                  "obtained": 80,
-                  "grade": "A",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 788,
-                    "headerName": "HALF YEARLY",
-                    "subHeaderName": "80",
-                    "priority": 4,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 80,
-                    "terms": [
-                      "HALF YEARLY"
-                    ]
-                  },
-                  "visible": false,
-                  "pass": true,
-                  "graded": true
-                }
-              ],
-              "marksObtained": 80,
-              "total": 80,
-              "percentage": 100,
-              "grade": "A",
-              "className": "II",
-              "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
-              "subjectPrt": 7,
               "decimalPlaces": 2,
               "visible": false
             }
           ],
-          "marksObtained": 679.8,
-          "total": 685,
-          "percentage": 99.24,
+          "marksObtained": 571.4,
+          "total": 600,
+          "percentage": 95.23,
           "overAllGrade": "A1",
           "visible": false
         },
@@ -2042,24 +1533,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
           "classSectionUid": null,
           "classSection": null,
           "description": null,
-          "fields": [
-            {
-              "uid": "2da0f407-7a84-4311-97fa-a8b9645b9dd2",
-              "title": "sa1",
-              "type": "OPEN",
-              "value": "76/85",
-              "masterUid": "0928bcbf-e245-472a-a276-0688b8cb3c2a",
-              "masterName": "Remarks"
-            },
-            {
-              "uid": "1739fda0-eed5-4c1c-b312-bd6fc8e7be22",
-              "title": "Remakrs",
-              "type": "OPEN",
-              "value": "",
-              "masterUid": "0928bcbf-e245-472a-a276-0688b8cb3c2a",
-              "masterName": "Remarks"
-            }
-          ],
+          "fields": null,
           "status": false,
           "createdUser": null,
           "editedUser": null,
@@ -2073,10 +1547,10 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             "studentName": "Shivaan Ahuja",
             "className": "I",
             "sectionName": "A",
-            "rollNo": 23,
+            "rollNo": 26,
             "fatherName": "Mr. Sanjeev Ahuja",
             "motherName": "Mrs. Garima Ahuja",
-            "sa1": "26.0/33",
+            "attendance": "64.0/77",
             "boardRollNumber": "",
             "studentInfoResponse": [
               {
@@ -2098,26 +1572,26 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 "joiningClass": "I",
                 "joiningSections": "A",
                 "joiningDate": "10-03-2022",
-                "plotNumber": "",
+                "plotNumber": "AAGMAN SOCIETY ,TOWER -3",
                 "area": "Sector-70",
                 "city": "Faridabad",
                 "state": "Haryana",
-                "pincode": "121006",
-                "phone1": "",
-                "rollNo": 23,
-                "emergencyNumber": "",
+                "pincode": "121004",
+                "phone1": "9711911528",
+                "rollNo": 26,
+                "emergencyNumber": "7678419759",
                 "mobileNumber": "9711911528",
                 "studentEmail": null,
                 "religion": "HINDU",
                 "category": "GENERAL",
-                "minority": "",
-                "motherTongue": "",
+                "minority": "No",
+                "motherTongue": "Hindi",
                 "idMark": "",
-                "height": "",
-                "weight": "",
+                "height": "111",
+                "weight": "20",
                 "physicalDisability": "",
                 "bloodGroup": "",
-                "healthRemark": "",
+                "healthRemark": "GOOD",
                 "siblingDetails": "",
                 "alumni": "",
                 "siblingResponse": [],
@@ -2127,27 +1601,27 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 "fatherDesignation": "",
                 "fatherIncome": "",
                 "fatherArea": "NA",
-                "fatherCity": "NA",
-                "fatherState": "NA",
-                "fatherPincode": "",
+                "fatherCity": "FBD",
+                "fatherState": "Haryana",
+                "fatherPincode": "121004",
                 "fatherPhone": "",
-                "fatherMobile": "",
+                "fatherMobile": "9711911528",
                 "fatherEmail": null,
-                "fatherAdhaarNumber": "",
+                "fatherAdhaarNumber": "299346710861",
                 "schoolUid": "55e97712-7e3a-4962-9929-d63cee64c452",
                 "motherQualification": "",
-                "motherOccupation": "",
+                "motherOccupation": "HOME MAKER",
                 "motherOrganization": "",
                 "motherDesignation": "",
                 "motherIncome": "",
                 "motherArea": "NA",
-                "motherCity": "NA",
-                "motherState": "NA",
-                "motherPincode": "",
+                "motherCity": "FBD",
+                "motherState": "Haryana",
+                "motherPincode": "121004",
                 "motherPhone": "",
-                "motherMobile": "",
+                "motherMobile": "7678419759",
                 "motherEmail": null,
-                "motherAdhaarNumber": "",
+                "motherAdhaarNumber": "297145978302",
                 "guardianName": null,
                 "relation": null,
                 "guardianOccupation": null,
@@ -2156,17 +1630,17 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 "guardianEmail": null,
                 "guardianAddress": null,
                 "leavingDate": null,
-                "previousSchoolName": "",
+                "previousSchoolName": "SMART KIT ,SEC 8",
                 "otp": null,
                 "schoolName": "Demo Public School",
-                "remark": "",
+                "remark": "PASS",
                 "classTeacher": "",
                 "classTeacherUserName": "",
                 "classes": "I",
                 "classUid": null,
                 "sections": "A",
                 "group": "I",
-                "wing": "NA",
+                "wing": "Junior",
                 "status": "Studying",
                 "academicSession": "2024-2025",
                 "joiningStatus": "Old",
@@ -2350,9 +1824,9 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                 "motherQualificationProof": null,
                 "casteCertificate": null,
                 "createdUser": "QuickCampus",
-                "editedUser": "SHRUTIDUBE_507408",
+                "editedUser": "varuniBhatia_507415",
                 "createddate": "2024-05-16 04:57:19.991299",
-                "editeddate": "2024-08-20 02:26:47.795547",
+                "editeddate": "2024-09-21 04:54:01.914258",
                 "permanentEducationNumber": "",
                 "studentAddressResponse": {
                   "uid": "849c3235-f467-46c3-9ea0-8e39aedeb979",
@@ -2363,65 +1837,65 @@ ${element.student.studentInfoResponse[0]?.state}</td>
                   "district": null,
                   "state": "Haryana",
                   "poPs": null,
-                  "pincode": 121006,
-                  "street": "NA",
+                  "pincode": 121004,
+                  "street": "AAGMAN SOCIETY ,TOWER -3 ",
                   "userName": "dcms832_20220001",
                   "createdDate": "16-05-2024 10:27 AM",
-                  "editedDate": "20-08-2024 07:56 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
                   "createdBy": "QuickCampus",
-                  "editedBy": "SHRUTIDUBE_507408"
+                  "editedBy": "varuniBhatia_507415"
                 },
                 "fatherAddressResponse": {
                   "uid": "35477170-957a-4501-a406-c9f5e5b0cacd",
                   "houseNo": null,
                   "area": "NA",
                   "landmark": null,
-                  "city": "NA",
+                  "city": "FBD",
                   "district": null,
-                  "state": "NA",
+                  "state": "Haryana",
                   "poPs": null,
-                  "pincode": 0,
+                  "pincode": 121004,
                   "street": null,
                   "userName": null,
                   "createdDate": "16-05-2024 10:27 AM",
-                  "editedDate": "20-08-2024 07:56 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
                   "createdBy": "QuickCampus",
-                  "editedBy": "SHRUTIDUBE_507408"
+                  "editedBy": "varuniBhatia_507415"
                 },
                 "motherAddressResponse": {
                   "uid": "5f68b3c1-72cc-48d3-8c40-83e26dcc4563",
                   "houseNo": null,
                   "area": "NA",
                   "landmark": null,
-                  "city": "NA",
+                  "city": "FBD",
                   "district": null,
-                  "state": "NA",
+                  "state": "Haryana",
                   "poPs": null,
-                  "pincode": 0,
+                  "pincode": 121004,
                   "street": null,
                   "userName": null,
                   "createdDate": "16-05-2024 10:27 AM",
-                  "editedDate": "20-08-2024 07:56 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
                   "createdBy": "QuickCampus",
-                  "editedBy": "SHRUTIDUBE_507408"
+                  "editedBy": "varuniBhatia_507415"
                 },
                 "guardianAddressResponse": null,
                 "correspondenceAddressResponse": {
                   "uid": "fa3d4f2f-35b5-4533-b1e2-cbae32dab536",
                   "houseNo": null,
-                  "area": "",
+                  "area": "Sector-70",
                   "landmark": null,
-                  "city": "",
+                  "city": "Faridabad",
                   "district": null,
-                  "state": "",
+                  "state": "Haryana",
                   "poPs": null,
-                  "pincode": null,
-                  "street": "",
+                  "pincode": 121004,
+                  "street": "AAGMAN SOCIETY ,TOWER -3 ",
                   "userName": "dcms832_20220001",
                   "createdDate": "20-07-2024 07:47 AM",
-                  "editedDate": "20-08-2024 07:56 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
                   "createdBy": "Ms. Astha_491569",
-                  "editedBy": "SHRUTIDUBE_507408"
+                  "editedBy": "varuniBhatia_507415"
                 }
               }
             ],
@@ -2455,7 +1929,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "subDomain": "dcms",
               "website": null,
               "schemaPrefix": null,
-              "editedDate": "29-08-2024 11:56 AM",
+              "editedDate": "07-10-2024 11:07 AM",
               "editedUser": "QuickCampus",
               "visitorSchool": false,
               "clientSchoolId": null,
@@ -2467,964 +1941,17 @@ ${element.student.studentInfoResponse[0]?.state}</td>
               "sessionResponse": null,
               "schoolLogoUrl": null,
               "printAcknowledge": false,
-              "whatsAppEnabled": false,
-              "smsenabled": false,
+              "wabaId": null,
+              "phoneNumberId": null,
+              "whatsappApiKey": null,
+              "isQuickCampusWhatsapp": false,
               "notificationEnabled": true,
-              "loanEnabled": false
+              "loanEnabled": false,
+              "whatsAppEnabled": false,
+              "smsenabled": false
             }
           },
-          "subject": [
-            {
-              "subjectAllResponse": {
-                "uid": "f133a7be-6baf-4d51-a294-3d2367af5564",
-                "subjectName": "ENGLISH",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-07-12 13:18:15.409801",
-                "editeddate": "2024-07-12 13:18:15.408717"
-              },
-              "termName": "HALF YEARLY",
-              "max": 80,
-              "markObtained": 80,
-              "percentage": 100,
-              "grade": "A1",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "2d313014-b0d8-4a74-b153-29e752360a90",
-                "subjectName": "Hindi",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-07-15 04:50:27.217843",
-                "editeddate": "2024-07-15 04:50:27.216904"
-              },
-              "termName": "HALF YEARLY",
-              "max": 80,
-              "markObtained": 79,
-              "percentage": 98.75,
-              "grade": "A1",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
-                "subjectName": "MATHEMATICS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-07-15 04:50:57.956963",
-                "editeddate": "2024-07-15 04:50:57.956145"
-              },
-              "termName": "HALF YEARLY",
-              "max": 80,
-              "markObtained": 80,
-              "percentage": 100,
-              "grade": "A1",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
-                "subjectName": "SOCIAL SCIENCE",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-07-15 04:51:17.237184",
-                "editeddate": "2024-07-15 04:51:17.236229"
-              },
-              "termName": "HALF YEARLY",
-              "max": 80,
-              "markObtained": 79,
-              "percentage": 98.75,
-              "grade": "A1",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
-                "subjectName": "COMPUTER",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-07-15 04:51:28.553781",
-                "editeddate": "2024-07-15 06:16:04.884337"
-              },
-              "termName": "HALF YEARLY",
-              "max": 80,
-              "markObtained": 79,
-              "percentage": 98.75,
-              "grade": "A1",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "9d56228f-8144-4597-aa1a-8b97f21832fd",
-                "subjectName": "ART EDUCATION",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": false,
-                "createdUser": "QuickCampus",
-                "editedUser": "QuickCampus",
-                "createddate": "2024-08-13 06:27:54.597092",
-                "editeddate": "2024-08-13 06:27:54.596425"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7",
-                "subjectName": "General Knowledge",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": true,
-                "createdUser": "QuickCampus",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-08-13 10:21:36.039279",
-                "editeddate": "2024-09-02 05:08:29.520927"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "d4829f7f-a82f-4eb1-8455-4409ee756dfe",
-                "subjectName": "DISCIPLINE",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-02 05:09:11.358014",
-                "editeddate": "2024-09-02 05:09:11.357026"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "b00b7ccf-4462-457b-97aa-c70c37cba86b",
-                "subjectName": "WORK EDUCATION",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-02 05:09:19.41223",
-                "editeddate": "2024-09-02 05:09:19.411637"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "57fa74f8-3611-4826-bdcd-aaf15cc579e0",
-                "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [],
-                "parentName": [],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-02 05:09:41.34734",
-                "editeddate": "2024-09-02 05:09:41.346394"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "6ecce2a9-aa9b-4be4-b38a-dd9b933f7ab2",
-                "subjectName": "READING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "f133a7be-6baf-4d51-a294-3d2367af5564"
-                ],
-                "parentName": [
-                  "ENGLISH"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:12:06.343321",
-                "editeddate": "2024-09-30 12:12:06.342414"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "6e16e2e7-6e7e-4431-88f9-6e5de3af856d",
-                "subjectName": "LISTENING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "f133a7be-6baf-4d51-a294-3d2367af5564"
-                ],
-                "parentName": [
-                  "ENGLISH"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:12:18.843081",
-                "editeddate": "2024-09-30 12:12:18.842799"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "24e212c0-9730-4a3a-af9d-7e8a4e6afd14",
-                "subjectName": "Communication Skill",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "f133a7be-6baf-4d51-a294-3d2367af5564"
-                ],
-                "parentName": [
-                  "ENGLISH"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:12:51.007346",
-                "editeddate": "2024-09-30 12:12:51.007035"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "4e1a6d01-facb-430c-af0b-a5d5f906b03f",
-                "subjectName": "WRITING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "f133a7be-6baf-4d51-a294-3d2367af5564"
-                ],
-                "parentName": [
-                  "ENGLISH"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:13:04.80853",
-                "editeddate": "2024-09-30 12:13:04.807442"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "13131306-7465-4e3f-80dc-13a80ec5e602",
-                "subjectName": "READING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "2d313014-b0d8-4a74-b153-29e752360a90"
-                ],
-                "parentName": [
-                  "Hindi"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:13:18.633534",
-                "editeddate": "2024-09-30 12:13:18.632665"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "f0ea6b36-d4be-4ce2-8485-6f23a9f15e82",
-                "subjectName": "LISTENING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "2d313014-b0d8-4a74-b153-29e752360a90"
-                ],
-                "parentName": [
-                  "Hindi"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:13:26.733139",
-                "editeddate": "2024-09-30 12:13:26.732798"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "7f35e3b6-8ff2-4e88-9694-4b660f7658a2",
-                "subjectName": "Communication Skill",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "2d313014-b0d8-4a74-b153-29e752360a90"
-                ],
-                "parentName": [
-                  "Hindi"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:13:38.986856",
-                "editeddate": "2024-09-30 12:13:38.986547"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "c6c7c1e0-ce8c-4438-b962-31445a82de47",
-                "subjectName": "WRITING SKILLS",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "2d313014-b0d8-4a74-b153-29e752360a90"
-                ],
-                "parentName": [
-                  "Hindi"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:13:49.175264",
-                "editeddate": "2024-09-30 12:13:49.174963"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "75e92870-7856-4755-9661-d5d4be4ffca9",
-                "subjectName": "Understanding and Application of Concepts",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
-                ],
-                "parentName": [
-                  "MATHEMATICS"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:14:11.452377",
-                "editeddate": "2024-09-30 12:14:11.451889"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "fa72269a-d7ed-406b-921e-7f3465512873",
-                "subjectName": "Computational Skills",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
-                ],
-                "parentName": [
-                  "MATHEMATICS"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:14:24.126362",
-                "editeddate": "2024-09-30 12:14:24.126047"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "45342950-effd-4fde-9df4-54ea20851e05",
-                "subjectName": "Mental Ability",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
-                ],
-                "parentName": [
-                  "MATHEMATICS"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:14:33.867929",
-                "editeddate": "2024-09-30 12:14:33.867624"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "0f6b881b-7592-45f2-a5fe-37d4781773c8",
-                "subjectName": "Orals and Tables",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "23a98aa3-51e7-486a-ba32-d1b5be06f0c8"
-                ],
-                "parentName": [
-                  "MATHEMATICS"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:14:51.319584",
-                "editeddate": "2024-09-30 12:14:51.319202"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "b81ea92c-82ed-40c1-a51b-4554f62da412",
-                "subjectName": "Theoretical Knowledge",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
-                ],
-                "parentName": [
-                  "COMPUTER"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:15:37.392363",
-                "editeddate": "2024-09-30 12:15:37.392023"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "780ffe86-20b3-48bb-b288-f60a8243ae3c",
-                "subjectName": "Practical Applications of Concepts",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "e0bd818c-7b89-49b6-9a8e-2ce4203aec38"
-                ],
-                "parentName": [
-                  "COMPUTER"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:15:44.69619",
-                "editeddate": "2024-09-30 12:15:44.695814"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "f43b04a3-040a-402b-b9d3-7fb0b51ac360",
-                "subjectName": "Clarity of Concepts",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
-                ],
-                "parentName": [
-                  "SOCIAL SCIENCE"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:16:17.122998",
-                "editeddate": "2024-09-30 12:16:17.122315"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "b69078d4-3127-4123-83e2-5df5661804e2",
-                "subjectName": "Awareness And Interest",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
-                ],
-                "parentName": [
-                  "SOCIAL SCIENCE"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:16:23.525876",
-                "editeddate": "2024-09-30 12:16:23.525051"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "a2c899d0-4575-4f73-a16d-95a31fb14661",
-                "subjectName": "Practical Applications",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
-                ],
-                "parentName": [
-                  "SOCIAL SCIENCE"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:16:29.673011",
-                "editeddate": "2024-09-30 12:16:29.672302"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "85204315-af9a-44e2-828a-0e00e4ba4388",
-                "subjectName": "Diagrammatic Skills and Map Work",
-                "nature": "Theory",
-                "natureUid": "28e0bad6-1e8e-48fd-ac42-af07aa335995",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2"
-                ],
-                "parentName": [
-                  "SOCIAL SCIENCE"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:16:41.326137",
-                "editeddate": "2024-09-30 12:16:41.325208"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "0d8f4d39-4424-43ea-96c6-45b24a069ed3",
-                "subjectName": "Awareness And Interest",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
-                ],
-                "parentName": [
-                  "General Knowledge"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:16:59.969714",
-                "editeddate": "2024-09-30 12:16:59.968975"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            },
-            {
-              "subjectAllResponse": {
-                "uid": "ea091c3c-cba9-4aa2-93ae-df69f79e0a06",
-                "subjectName": "Class Discussions and Activities",
-                "nature": "1B Scholastic",
-                "natureUid": "1a412f09-8aef-48ff-bf79-f081f4a83522",
-                "cbseVIIICode": "",
-                "cbseXCode": "",
-                "cbseXIICode": "",
-                "status": true,
-                "parent": [
-                  "0ec35ee7-fb74-4dec-af50-8b16f6d3f2f7"
-                ],
-                "parentName": [
-                  "General Knowledge"
-                ],
-                "haveChild": false,
-                "createdUser": "Ms. Astha_491569",
-                "editedUser": "Ms. Astha_491569",
-                "createddate": "2024-09-30 12:17:10.335753",
-                "editeddate": "2024-09-30 12:17:10.335056"
-              },
-              "termName": "HALF YEARLY",
-              "max": 100,
-              "markObtained": 100,
-              "percentage": 100,
-              "grade": "A",
-              "remarkStatus": "",
-              "attachmentName": "",
-              "additional": false,
-              "scholastic": true,
-              "added": true
-            }
-          ],
+          "subject": [],
           "remarksEntry": {
             "uid": null,
             "terms": null,
@@ -3468,7 +1995,7 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             "subDomain": "dcms",
             "website": null,
             "schemaPrefix": null,
-            "editedDate": "29-08-2024 11:56 AM",
+            "editedDate": "07-10-2024 11:07 AM",
             "editedUser": "QuickCampus",
             "visitorSchool": false,
             "clientSchoolId": null,
@@ -3480,25 +2007,92 @@ ${element.student.studentInfoResponse[0]?.state}</td>
             "sessionResponse": null,
             "schoolLogoUrl": null,
             "printAcknowledge": false,
-            "whatsAppEnabled": false,
-            "smsenabled": false,
+            "wabaId": null,
+            "phoneNumberId": null,
+            "whatsappApiKey": null,
+            "isQuickCampusWhatsapp": false,
             "notificationEnabled": true,
-            "loanEnabled": false
+            "loanEnabled": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false
           },
           "promotedClass": null,
           "promotedSection": null,
           "perSignedUrlResponse": {
-            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20220001/student/images/20220001.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240902T122810Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240902%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=362cfc1c43e2ad9c2284150e7d42e2f4befeca5546f9d054b33ad457fb77a791",
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20220001/student/images/20220001.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241204T103032Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241204%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=3792ef108628d1ac8c8dfacb218c485ca2e6106416ef3a93f0cd4a5c2bc256a8",
             "fileName": "20220001.png"
           },
           "pass": false,
           "status_code": 200
+        },
+        "header": null,
+        "footer": null,
+        "printDate": "04-12-2024",
+        "studentPerfromanceData": {
+          "classWiseMarkResponse": [
+            {
+              "subjectName": "ENGLISH",
+              "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
+              "maxMark": 120,
+              "maxObtainedMark": 116.6,
+              "averageObtainedMark": 116.6,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "Hindi",
+              "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
+              "maxMark": 120,
+              "maxObtainedMark": 110.2,
+              "averageObtainedMark": 110.2,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "MATHEMATICS",
+              "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+              "maxMark": 120,
+              "maxObtainedMark": 111.2,
+              "averageObtainedMark": 111.2,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "SOCIAL SCIENCE",
+              "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+              "maxMark": 120,
+              "maxObtainedMark": 116.4,
+              "averageObtainedMark": 116.4,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "COMPUTER",
+              "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+              "maxMark": 120,
+              "maxObtainedMark": 117,
+              "averageObtainedMark": 117,
+              "attachmentName": null
+            }
+          ],
+          "groupedClassAttachmentResponse": [
+            {
+              "attachmentName": "English",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 116.6
+            },
+            {
+              "attachmentName": "Hindi",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 110.2
+            },
+            {
+              "attachmentName": "Mathematics",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 111.2
+            }
+          ],
+          "status_code": 200
         }
       }
-
-
-
     ]
+
   );
 </script>
 
