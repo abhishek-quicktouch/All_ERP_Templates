@@ -72,10 +72,13 @@
           el.termWiseSubjectResponse?.forEach((td) => {
             terms.push(td.termName);
             td.subjectMarksEntryRequests?.forEach((s) => {
+              // console.log(s, "fffffffffff s")
               if (!s.parent || s.parent.length === 0) {
                 if (!mainParent.includes(s.subjectName)) {
+
                   mainParent.push(s.subjectName);
                   subParent[s.subjectName] = [];
+                  console.log(mainParent, "ffffffffff mainParent")
                 }
               } else if (s.parent.length === 1) {
                 if (!subParent[s.parent[0]]) {
@@ -401,113 +404,112 @@ ${studentData?.header}
         console.log(subjectData, "fffffffffffffn subjectData")
         let count = 0;
         let temp = `
-    ${subjectData.mainParent.filter((item) => item !== "G.K and COMPUTER")
-            .map(
-              (main) => `
+    ${subjectData.mainParent.map(
+          (main) => `
     <div id="subjectTableContainer" class="section">
         <h3>${main}</h3>
         <table>
             <tr>
                 <th>COMPETENCIES</th>
                 ${subjectData.terms?.length &&
-                subjectData.terms
-                  ?.map(
-                    (t) => `
+            subjectData.terms
+              ?.map(
+                (t) => `
                             <th style="width: 100px; text-align:center ">${t}</th>
                         `
-                  )
-                  .join("")
-                }
+              )
+              .join("")
+            }
             </tr>
 
             ${(subjectData.subParent[main] || [])
-                  .map((sub, index) => {
-                    count++;
-                    return `
+              .map((sub, index) => {
+                count++;
+                return `
                 <tr>
                     <td colspan="${subjectData.terms.length + 1}"><strong>${`Curriculum Goal ${count}- ` + sub
-                      }</strong></td>
+                  }</strong></td>
                 </tr>
                 ${(subjectData.childs[sub] || [])
-                        .map(
-                          (child, i) => `
+                    .map(
+                      (child, i) => `
                     <tr>
                         <td>${`C-${count}.${i + 1} : ` + child.subjectName}</td>
                         ${subjectData.terms
-                              .map(
-                                (t) => `
+                          .map(
+                            (t) => `
                             <td style="text-align:center;width: 100px;font-weight:${child?.status[t] ? "bold" : ""
-                                  }">${attendanceValue[child?.status[t]] ||
-                                  child?.grade[t] ||
-                                  "-"
-                                  }</td>
+                              }">${attendanceValue[child?.status[t]] ||
+                              child?.grade[t] ||
+                              "-"
+                              }</td>
                         `
-                              )
-                              .join("")}
+                          )
+                          .join("")}
                     </tr>
                 `
-                        )
-                        .join("")}
+                    )
+                    .join("")}
             `;
-                  })
-                  .join("")}
+              })
+              .join("")}
 
             ${main === "PEER-ASSESSMENT"
-                  ? `
+              ? `
                 ${subjectData.peerSubParent
-                    .map(
-                      (peer, peerIndex) => `
+                .map(
+                  (peer, peerIndex) => `
                     <tr>
                         <td>${`${peerIndex + 1}. ` + peer.subjectName}</td>
                         ${subjectData.terms
-                          .map(
-                            (t) => `
+                      .map(
+                        (t) => `
                                 <td style="text-align:center;width: 100px;font-weight:${peer.status[t] ? "bold" : ""
-                              }">${attendanceValue[peer.status[t]] ||
-                              peer.grade[t] ||
-                              "-"
-                              }</td>
+                          }">${attendanceValue[peer.status[t]] ||
+                          peer.grade[t] ||
+                          "-"
+                          }</td>
                         `
-                          )
-                          .join("")}
+                      )
+                      .join("")}
                     </tr>
                 `
-                    )
-                    .join("")}
+                )
+                .join("")}
             `
-                  : ""
-                }
+              : ""
+            }
 
 ${main === "G.K and COMPUTER"
-                  ? `
+              ? `
                 ${subjectData.gkSubParent
-                    .map(
-                      (peer, peerIndex) => `
+                .map(
+                  (peer, peerIndex) => `
                     <tr>
                         <td style="font-weight:bold">${peer.subjectName}</td>
                         ${subjectData.terms
-                          .map(
-                            (t) => `
+                      .map(
+                        (t) => `
                                 <td style="text-align:center;width: 100px;font-weight:${peer.status[t] ? "bold" : ""
-                              }">${attendanceValue[peer.status[t]] ||
-                              peer.grade[t] ||
-                              "-"
-                              }</td>
+                          }">${attendanceValue[peer.status[t]] ||
+                          peer.grade[t] ||
+                          "-"
+                          }</td>
                         `
-                          )
-                          .join("")}
+                      )
+                      .join("")}
                     </tr>
                 `
-                    )
-                    .join("")}
+                )
+                .join("")}
             `
-                  : ""
-                }
+              : ""
+            }
 
         </table>
     </div>
     `
-            )
+        )
             .join("")}
 
              ${student?.className === "FLP 4" ? `<br/><table>
