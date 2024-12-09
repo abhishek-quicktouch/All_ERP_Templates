@@ -21,6 +21,53 @@
             const staticData = []
             const data = viewTemplate ? staticData : multiData;
 
+            const config = {
+                schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+                schoolLogo2: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+                schoolName: "THE INDIAN SCHOOL",
+                schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 </h5>
+                <h5>EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
+                studentInfoFields: [
+                    { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
+                    { label: "FATHER'S NAME", key: "fatherName", additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" } },
+                    { label: "MOTHER'S NAME", key: "motherName", additionalInfo: { label: "D.O.B", key: "dob" } },
+                    { label: "ADDRESS", key: "address" }
+                ],
+                gradingScale: "on 8-point (A1-E) Grading Scale",
+                gradeScale: [
+                    { minPercentage: 91, grade: "A1" },
+                    { minPercentage: 81, grade: "A2" },
+                    { minPercentage: 71, grade: "B1" },
+                    { minPercentage: 61, grade: "B2" },
+                    { minPercentage: 51, grade: "C1" },
+                    { minPercentage: 41, grade: "C2" },
+                    { minPercentage: 33, grade: "D" },
+                    { minPercentage: 0, grade: "E" }
+                ],
+                scholasticConfig: { nature: "THEORY" },
+                coScholasticConfig: { nature: "1B Scholastic" },
+                signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+                styles: `
+      @page { size: A4; margin: 10mm; }
+      @media print { @page { margin: auto; size: A4; } }
+      body { font-family: Arial, sans-serif; }
+      .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+      .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+      .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+      .header img { max-width: 100px; }
+      .section { margin: 1mm; }
+      .section table { width: 100%; border-collapse: collapse; }
+      .section table, .section th, .section td { border: 1px solid #000; }
+      .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
+      .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+      .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+      .signatures div { font-size: 13px; margin: 0px; padding: 0px; text-align: center; }
+      .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+    `
+            };
+
+
             const getSubjects = (markData) => {
                 let str = "";
                 const subjects = markData?.termWiseSubjectResponse;
@@ -124,45 +171,118 @@
                 };
             }
 
+            function generateStudentInfo(student) {
+                // Generate full address
+                let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
+                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
+                    ", "
+                    : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse
+                            ?.landmark + ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
+                        ", "
+                        : ""
+                    }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+                        ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+                        : ""
+                    }`;
 
-            function generateDynamicTable(data) {
+                // Generate table with student info
+                return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+        ${config.studentInfoFields?.map(
+                    (field) => `
+                    <tr>
+                        <th style="width: 25%; text-align: left">${field?.label
+                        }</th>
+                        ${field?.label?.toLowerCase() === "address"
+                            ? `<td colspan="3" style="width: 25%;">  ${fullAddress}</td>`
+                            : `  <td style="width: 25%;">  ${student?.[field?.key] || ""
+                            } </td> `
+                        }   
+                        ${field?.additionalInfo
+                            ? field?.additionalInfo?.label === "CLASS & SECTION"
+                                ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                                }</th>
+                                <td style="width: 25%;">  ${student?.["className"] || ""
+                                }-${student?.["sectionName"] || ""}</td>
+                            `
+                                : `
+                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                                }</th>
+                                <td style="width: 25%;">  ${student?.[field?.additionalInfo?.key] || ""
+                                }</td>
+                            `
+                            : ""
+                        }
+                    </tr>
+                `
+                )
+                        .join("")}
+    </table>`;
+            }
+
+            function generateDynamicTable(data, remarks) {
                 const { mainParent, subParent, peerSubParent, childs } = data;
 
-                let tableHtml = '<table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">';
+                let tableHtml = '<table style="width: 100%;margin: 10px auto; border-collapse: collapse; font-family: Arial, sans-serif;">';
 
                 // Add header row
                 tableHtml += `
         <thead>
             <tr>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;">LEARNING OUTCOME</th>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;" colspan="3">Term 1</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center; font-size: 14pt; ">LEARNING OUTCOME</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;font-size: 12pt;"colspan="3">Term 1</th>
                 
             </tr>
             <tr>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;"></th>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;">A</th>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;">B</th>
-                <th style="border: 1px solid #000; padding: 8px; text-align: left;">C</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;">
+                    </th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;"><img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_301853728.jpeg" alt="Logo" width="50" height="70"></th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;">
+                   <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_272532324.jpeg" alt="Logo" width="50" height="70"> </th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;"> 
+                    <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_227580398.jpeg" alt="Logo" width="50" height="70"> </th>
         </thead>
         <tbody>`;
+
+                let rowspan = 0
                 let parentCount = 0
+                let subParentCount = 0
+                let childCount = 0
                 mainParent.map((mainSubject) => {
+
                     parentCount++
-                    const rowspan = peerSubParent[mainSubject].length + 1
-                    // Main Subject Row
+                    rowspan = parentCount + subParentCount + childCount
+
+                    console.log(rowspan, "ffffffffffff rowspan")
 
                     tableHtml += `<tr  style="background-color: #f2f2f2;">
-            <td rowspan="1" style="border: 1px solid #000; padding: 8px; font-weight: bold; "colspan="5" >${mainSubject}</td>
+            <td  style="border: 1px solid #000;font-size: 14pt; padding: 2px; font-weight: bold; "colspan="5" >${mainSubject}</td>
         </tr>`;
 
 
                     // Loop through subParents of this mainSubject
                     peerSubParent[mainSubject].map((subParentSubject) => {
-
+                        subParentCount++
 
                         tableHtml += `<tr>
                            
-                <td style="border: 1px solid #000; padding: 8px; font-style: italic;" colspan="4">${subParentSubject}</td>
+                <td style="border: 1px solid #000;font-size: 12pt; padding: 2px;  font-weight: bold;" colspan="4">${subParentSubject}</td>
             </tr>`;
 
                         // Loop through child subjects of this subparent subject
@@ -170,24 +290,85 @@
                             const childData = childs[childSubject] || [];
 
                             childData.forEach((child) => {
+                                childCount++
                                 tableHtml += `<tr>
                       
-                        <td style="border: 1px solid #000; padding: 8px;">${child.subjectName}</td>
-                        <td style="border: 1px solid #000; padding: 8px;">${child.grade['TERM-I'] === "A" ? `<checkbox checked></checkbox>` : `<checkbox></checkbox>` || ''}</td>
-                        <td style="border: 1px solid #000; padding: 8px;">${child.grade['TERM-I'] === "B" ? `<checkbox checked></checkbox>` : `<checkbox></checkbox>` || ''}</td>
-                        <td style="border: 1px solid #000; padding: 8px;">${child.grade['TERM-I'] === "C" ? `<checkbox checked></checkbox>` : `<checkbox></checkbox>` || ''}</td>
+                        <td style="border: 1px solid #000; font-size: 12pt; padding: 2px; width: 80%;">${child.subjectName}</td>
+                        <td style="border: 1px solid #000;text-align:center; padding: 2px;">${attendanceValue[child.status['TERM-I']] || `<input type="checkbox" ${child.grade['TERM-I'] === "C" ? 'checked' : ''} />` || ""}</td>
+                        <td style="border: 1px solid #000;text-align:center; padding: 2px;">${attendanceValue[child.status['TERM-I']] || `<input type="checkbox" ${child.grade['TERM-I'] === "B" ? 'checked' : ''} />` || ""}</td>
+                        <td style="border: 1px solid #000;text-align:center; padding: 2px;">${attendanceValue[child.status['TERM-I']] || `<input type="checkbox" ${child.grade['TERM-I'] === "A" ? 'checked' : ''} />` || ""}</td>
                     </tr>`;
                             });
                         });
                     });
                 });
 
+                let extraInfo = `<tr>
+                <td style="border: 1px solid #000; font-size: 12pt; padding: 2px; width: 80%; font-weight: bold">Attendance</td>
+                <td colspan="3" style="border: 1px solid #000;text-align:center; padding: 2px;">${remarks?.fields.find((item) => item.title === "Attendance")?.value || ""}</td>
+                </tr>
+                <tre>
+                <td style="border: 1px solid #000; font-size: 12pt; padding: 2px; width: 80%;font-weight: bold">Height</td>
+                <td colspan="3" style="border: 1px solid #000;text-align:center; padding: 2px;">${remarks?.fields.find((item) => item.title === "Height")?.value || ""}</td>
+                </tre>
+                <tr>
+                <td style="border: 1px solid #000; font-size: 12pt; padding: 2px; width: 80%; font-weight: bold">Weight</td>
+                <td colspan="3" style="border: 1px solid #000;text-align:center; padding: 2px;">${remarks?.fields.find((item) => item.title === "Weight")?.value || ""}</td>
+                </tr>
+                `
+
+                tableHtml += extraInfo
                 tableHtml += '</tbody></table>';
 
                 return tableHtml;
             }
 
+            function generateGradingTable() {
+                return ` 
+                <h5 style="text-align: center; margin-top: 3mm"> The competencies mentioned at various levels are on the basis of the following description : </h5>
+                <table class="section" style="margin-top: 3mm; width: 70%;margin :auto">
+          
+          <tr>
+            <th style="text-align: center;">Level</th>
+            
+            <th style="text-align: center;">Interpretation</th>
+          </tr>
+          <tr>
+            <td style="text-align:center; vertical-align: middle ;width: 20%"><div style="display: flex; align-items: center; justify-content: space-around;"> <img style="width: 30px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_301853728.jpeg" /> <p >Beginner</p> </div></td>
+            <td style="padding-left: 10px" >Tries to achieve the competency and associated learning outcomes with a lot of support from the teachers.</td>
+          </tr>
+          <tr>
+            <td style="text-align:center; vertical-align: middle"><div style="display: flex; align-items: center; justify-content: space-around;"> <img style="width: 30px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_272532324.jpeg" /> <p >Progressing</p> </div></td>
+            
+            <td style="padding-left: 10px">Achieves the competency and associated learning outcomes with some support from the teachers.</td>
+          </tr>
+          <tr>
+            <td style="text-align:center; vertical-align: middle"><div style="display: flex; align-items: center; justify-content: space-around;"> <img style="width: 30px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-05T13_31_28_227580398.jpeg" /> <p >Proficient</p> </div></td>
+           
+            <td style="padding-left: 10px">Achieves the competency and associated learning outcomes independently</td>
+          </tr>
+        </table>
+`}
 
+            function generateHeader(element) {
+                return ` <div class="header">
+            
+${element.header
+                        ? element.header
+                        : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+              <div style="text-align:center">
+                        <h1 style="color: #2b595e" >THE INDIAN SCHOOL</h1>
+                        <div style="color: #2b595e" ><h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 </h5>
+                <h5>EmailID : contactus@theindianschool.in Website : theindianschool.in</h5></div>
+                   </div>
+              <img src="${config.schoolLogo2}" alt="School Logo"/> 
+            `
+                    }
+
+             
+</div>`;
+            }
 
             const attendanceValue = {
                 Absent: "Ab",
@@ -241,12 +422,9 @@
             /* Prevents breaking after h3 elements */
         }
 
-        .header {
-            text-align: center;
-            font-weight: bold;
-            margin: 10px 0;
-            margin-top: -20px;
-        }
+        .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+      .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+      .header img { max-width: 100px; }
 
         .page {
             page-break-after: always;
@@ -275,147 +453,51 @@
 <page class="page" orientation="portrait" format="A4" margin="0">
  <div style="display: flex; align-items: center;   padding: 0px;width:100%;justify-content:center">
                  
-${studentData?.header}
-
-
-                   
+${generateHeader(studentData)}      
     
     </div>
     
     
-<div style="display:flex; justify-content:flex-end; width:99%; text-transform:uppercase; font-weight:bold; font-size:13px; align-items:center;margin-top:-12px;">Affiliation No. : 2730712</div>
+
 
 <div style="text-align: center;">
-    <h3>HOLISTIC PROGRESS CARD</h3>
+    <h3 >HOLISTIC PROGRESS CARD</h3>
     <h3>CLASS: ${student.className || ""}</h3>
 </div>
 
-<table class="section" style="font-weight:bold;">
-    <tr>
-        <td style="width: 25%;">MY NAME IS</td>
-        <td style="width: 25%;">${student.studentName || ""}</td>
-        <td style="width: 25%;">MY FRIENDS ARE</td>
-      
-        <td style="width: 25%;" id="friends"> ${remarks?.fields.find((item) => item.title === "MY FRIENDS ARE")
-                        ?.value || ""
-                    } </td >
-    </tr >
-    <tr>
-        <td>I LIVE IN</td>
-        <td>${studentInfo.studentAddressResponse
-                        ? `${studentInfo.studentAddressResponse.houseNo || ""} 
-            ${studentInfo.studentAddressResponse.street || ""}
-            ${studentInfo.studentAddressResponse.area || ""} 
-            ${studentInfo.studentAddressResponse.city || ""} 
-            ${studentInfo.studentAddressResponse.state || ""} 
-            ${studentInfo.studentAddressResponse.pincode || ""}`.trim()
-                        : ""
-                    }</td>
-        <td>MY FAVOURITE</td>
-        <td id="favourite">${remarks?.fields.find((item) => item.title === "MY FAVOURITE")
-                        ?.value || "-"
-                    }</td>
-    </tr>
-    <tr>
-        <td>MY FATHER</td>
-        <td>${student.fatherName || "-"}</td>
-        <td>COLOUR</td>
-        <td id="favouriteColor">${remarks?.fields.find((item) => item.title === "COLOUR")?.value || "-"
-                    }</td>
-    </tr>
-    <tr>
-        <td>MY MOTHER</td>
-        <td>${student.motherName || "-"}</td>
-        <td>FOOD</td>
-        <td id="favouriteFood">${remarks?.fields.find((item) => item.title === "FOOD")?.value || "-"
-                    }</td>
-    </tr>
-    <tr>
-        <td>MY BIRTHDAY</td>
-        <td>${student.dob || "-"}</td>
-        <td>GAME</td>
-        <td id="favouriteGame">${remarks?.fields.find((item) => item.title === "GAME")?.value || "-"
-                    }</td>
-    </tr>
-    <tr>
-        <td>MY HEIGHT</td>
-        <td>${studentInfo.height || "-"} cm</td>
-        <td>ANIMAL</td>
-        <td id="favouriteAnimal">${remarks?.fields.find((item) => item.title === "ANIMAL")?.value || "-"
-                    }</td>
-    </tr>
-    <tr>
-        <td>MY WEIGHT</td>
-        <td>${studentInfo.weight || "-"} kg</td>
-        <td>MY CONTACT NO.</td>
-        <td>${studentInfo.mobileNumber || "-"}</td>
-    </tr>
-    <tr>
-        <td>MY BLOOD GROUP</td>
-        <td>${studentInfo.bloodGroup || "-"}</td>
-        <td>MY ATTENDANCE</td>
-        <td>${remarks?.fields.find((item) => item.title.toLowerCase() === "attendance")?.value ||
-                    "-"
-                    }</td>
-    </tr>
-    
-</table >
+<div>
+    ${generateStudentInfo(student)}
+    </div>
 
 
-        <table class="section" style="margin-top: 3mm;">
-          <tr colspan="3">
-            <th colspan="3">Scholastic Grading Scale</th>
 
-          </tr>
-          <tr>
-            <th style="text-align: center;">Grade</th>
-            <th>Achievement Level</th>
-            <th>Interpretation</th>
-          </tr>
-          <tr>
-            <td style="text-align: center;">A*</td>
-            <td>Proficient</td>
-            <td>Achieves the Competency and Associated Learning Outcomes on his/her own.</td>
-          </tr>
-          <tr>
-            <td style="text-align: center;">A</td>
-            <td>Progressing</td>
-            <td>Achieves the Competency and Associated Learning Outcomes with occasional/some support from teachers.</td>
-          </tr>
-          <tr>
-            <td style="text-align: center;">B</td>
-            <td>Beginner</td>
-            <td>Tries to achieve the Competency and Associated Learning Outcomes with a lot of support from teachers.</td>
-          </tr>
-        </table>
-
-${generateDynamicTable(subjectData)}
+       
+${generateDynamicTable(subjectData, remarks)}
 
         
-
-
-
-      <div style = "padding: 5px; border: 1px solid black; min-height: 50px; margin-top: 20px" >
-      <strong >Teacher’s Suggestions/Remarks:</strong> ${viewTemplate ? "__________" : remarks?.description ? remarks?.description : remarks?.fields.find((item) => item.title === "Remarks")?.value || ""
+<div style = "padding: 5px; border: 1px solid black; min-height: 50px; margin-top: 0px" >
+<strong >Teacher’s Remarks:</strong> ${viewTemplate ? "__________" : remarks?.description ? remarks?.description : remarks?.fields.find((item) => item.title === "Remarks")?.value || ""
                     }
-            </div>
-            <div style="display: flex; justify-content: center; align-items: center ;font-size: 13px;font-weight: bold">[ML-Medlcal Leave, CL-Competitlon Leave, AB-Absent, NA-Not Appllcable]</div>
+      </div>
+${generateGradingTable()}
+
+
+            <div style="display: flex; justify-content: center; align-items: center ;font-size: 13px;font-weight: bold"></div>
             
-            <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                <div>
-                        <p style="margin: 0px;padding: 0px">${studentData.student.studentInfoResponse[0]?.classTeacher || ""}</p>
-                        <p style="margin-top: ${studentData.student.studentInfoResponse[0]?.classTeacher ? "0px" : "25px"};padding: "0px;">Class Teacher</p>
+            <div style="display: flex; justify-content: space-between;  ">
+                <div style="margin-top:40px ;display: flex;flex-direction: column; align-items: flex-end ;">
+                        <p style="margin: 0px 0px 5px 0px;padding: 0px">${studentData.student.studentInfoResponse[0]?.classTeacher || ""}</p>
+                        <p style="margin: 0px;padding: 0px">Class Teacher</p>
                     </div>
-                <div>
-                  <p style="margin:0px ;padding:0px">Padmini Dubey Ojha</p>
-                    <p style="margin:0px ;padding:0px">Officiating Principal</p>
+                <div style="margin-top:40px ;display: flex; align-items: flex-end;flex-direction: column">
+                    <p >Officiating Principal</p>
                     
                 </div>
-                <div>
+                <div style="margin-top:40px ;display: flex; align-items: flex-end">
                     <p>Parent/Guardian</p>
                 </div>
             </div>
-            <p style="font-size:10px;margin-top:-5px;"><strong>Note:</strong> This is a computer-generated Report Card. It does not need any signature. In case of any typing error or discrepancy, please contact the Class Teacher.</p>
+            
         </page >
         `;
                 // singleStudentHtml.innerHTML += temp;
@@ -633,14 +715,272 @@ ${generateDynamicTable(subjectData)}
                 "rollNo": 0,
                 "termWiseSubjectResponse": [
                     {
-                        "totalMarks": 4200,
+                        "totalMarks": 3300,
                         "totalObtained": 3274.7599999999975,
                         "overAllGrade": "A",
-                        "totalPercentage": 77.97047619047613,
+                        "totalPercentage": 99.23515151515144,
                         "termName": "TERM-I",
                         "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
                         "pass": true,
                         "subjectMarksEntryRequests": [
+                            {
+                                "marks": 49.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "de9a7077-7a8c-48c4-a380-2761c51a3cce",
+                                "subjectName": "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 49.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "ea75c292-3fbd-4c1d-ad4a-f23f2eeeaac6",
+                                "subjectName": "Comprehend simple instructions, and can clearly explain the same to his or her classmates.",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "c0876601-cc00-48ea-a80d-278781b43871",
+                                "subjectName": "Listen attentively throughout the story, remembers key details, and asks related questions.",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "0e6556b7-dfde-4e1f-8be2-2ba2930845ea",
+                                "subjectName": "CURRICULUM GOAL 5- Children develop a positive attitude towards productive work and service or seva",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "3cf39ec2-a540-40eb-8b41-c6fafcc7c9d8",
+                                "subjectName": "CURRICULUM GOAL 8- Children develop mathematical understanding and abilities to recognise numbers, shapes and signs",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "COGNITIVE DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "3456ca9b-dc68-4dff-93fb-face3d371132",
+                                "subjectName": "CURRICULUM GOAL 3- Children develop a fit and flexible body",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "PHYSICAL DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "c2bc0b77-d2ac-4133-a0a6-8e62247a4abe",
+                                "subjectName": "CURRICULUM GOAL 6- Children develop a positive regard for the natural environment around them",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "06d32fa5-2131-4b8c-b1cf-4d5cd683813c",
+                                "subjectName": "Actively participates in class discussions and circle time.",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 11- Children develop abilities and sensibilities in visual and performing arts, and express their emotions through art in meaningful and joyful ways",
+                                    "AESTHETIC AND CULTURRAL DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 0,
+                                "description": "",
+                                "status": "Leave",
+                                "subject": "b97b5773-f0e5-4773-9515-ab45cb79f1d4",
+                                "subjectName": "CURRICULUM GOAL 2- Children develop sharpness in sensorial perceptions",
+                                "scholastic": true,
+                                "max": 0,
+                                "priority": 0,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "PHYSICAL DEVELOPMENT"
+                                ],
+                                "grade": null,
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": null,
+                                "graded": false
+                            },
+                            {
+                                "marks": 0,
+                                "description": "",
+                                "status": "Absent",
+                                "subject": "772364b8-8dbf-42bc-a2b1-7cd6b4d1dc68",
+                                "subjectName": "Shows a liking for and understanding for nutritious food and avoids food wastage",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 1,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 1- Children develop habits that keep them healthy and safe",
+                                    "PHYSICAL DEVELOPMENT"
+                                ],
+                                "grade": "C",
+                                "percentage": 0,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "2d36c777-be4f-4de4-afac-c312d9224ae6",
+                                "subjectName": "Practices basic self-care and hygiene",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 2,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 1- Children develop habits that keep them healthy and safe",
+                                    "PHYSICAL DEVELOPMENT"
+                                ],
+                                "grade": "A",
+                                "percentage": 100,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
                             {
                                 "marks": 100,
                                 "description": "",
@@ -669,82 +1009,11 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 100,
                                 "description": "",
                                 "status": "",
-                                "subject": "2d36c777-be4f-4de4-afac-c312d9224ae6",
-                                "subjectName": "Practices basic self-care and hygiene",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 4,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 1- Children develop habits that keep them healthy and safe",
-                                    "PHYSICAL DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 0,
-                                "description": "",
-                                "status": "Absent",
-                                "subject": "772364b8-8dbf-42bc-a2b1-7cd6b4d1dc68",
-                                "subjectName": "Shows a liking for and understanding for nutritious food and avoids food wastage",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 5,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 1- Children develop habits that keep them healthy and safe",
-                                    "PHYSICAL DEVELOPMENT"
-                                ],
-                                "grade": "C",
-                                "percentage": 0,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 0,
-                                "description": "",
-                                "status": "Leave",
-                                "subject": "b97b5773-f0e5-4773-9515-ab45cb79f1d4",
-                                "subjectName": "CURRICULUM GOAL 2- Children develop sharpness in sensorial perceptions",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 6,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "PHYSICAL DEVELOPMENT"
-                                ],
-                                "grade": "C",
-                                "percentage": 0,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
                                 "subject": "a6c5044c-4dfc-4b24-9215-e92706715153",
                                 "subjectName": "Differentiate between basic shapes and colours.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 7,
+                                "priority": 4,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -768,7 +1037,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Differentiate between different sounds, smells, taste and textures by exploring his or her surroundings.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 8,
+                                "priority": 5,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -785,22 +1054,23 @@ ${generateDynamicTable(subjectData)}
                                 "graded": true
                             },
                             {
-                                "marks": 100,
+                                "marks": 49.99,
                                 "description": "",
                                 "status": "",
-                                "subject": "3456ca9b-dc68-4dff-93fb-face3d371132",
-                                "subjectName": "CURRICULUM GOAL 3- Children develop a fit and flexible body",
+                                "subject": "1b1e4f73-1dc6-40ca-a468-ed1bd3831f95",
+                                "subjectName": "Exhibits good fine motor skills while tearing and pasting and colouring activities.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 9,
+                                "priority": 6,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
                                 "parent": [
+                                    "CURRICULUM GOAL 3- Children develop a fit and flexible body",
                                     "PHYSICAL DEVELOPMENT"
                                 ],
-                                "grade": "A",
-                                "percentage": 100,
+                                "grade": "C",
+                                "percentage": 49.99,
                                 "term": "TERM-I",
                                 "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
                                 "pass": true,
@@ -815,7 +1085,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Shows balance, co-ordination and flexibility in various physical activities such as climbing up and down the stairs, balancing, catching and throwing the ball.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 10,
+                                "priority": 7,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -839,7 +1109,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Shows precision and control in working with their hands and fingers.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 11,
+                                "priority": 8,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -856,14 +1126,14 @@ ${generateDynamicTable(subjectData)}
                                 "graded": true
                             },
                             {
-                                "marks": 49.99,
+                                "marks": 74.99,
                                 "description": "",
                                 "status": "",
-                                "subject": "1b1e4f73-1dc6-40ca-a468-ed1bd3831f95",
-                                "subjectName": "Exhibits good fine motor skills while tearing and pasting and colouring activities.",
+                                "subject": "ac198f28-1950-4794-9e34-fb8c00c750a3",
+                                "subjectName": "Ability to wear his or her skating equipment (elbow pads, knee pads and helmet) independently.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 12,
+                                "priority": 9,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -871,8 +1141,8 @@ ${generateDynamicTable(subjectData)}
                                     "CURRICULUM GOAL 3- Children develop a fit and flexible body",
                                     "PHYSICAL DEVELOPMENT"
                                 ],
-                                "grade": "C",
-                                "percentage": 49.99,
+                                "grade": "B",
+                                "percentage": 74.99,
                                 "term": "TERM-I",
                                 "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
                                 "pass": true,
@@ -883,17 +1153,17 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 74.99,
                                 "description": "",
                                 "status": "",
-                                "subject": "ac198f28-1950-4794-9e34-fb8c00c750a3",
-                                "subjectName": "Ability to wear his or her skating equipment (elbow pads, knee pads and helmet) independently.",
+                                "subject": "51f5dd8f-5c25-40ec-aaed-69195ea01095",
+                                "subjectName": "Express emotions.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 13,
+                                "priority": 10,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
                                 "parent": [
-                                    "CURRICULUM GOAL 3- Children develop a fit and flexible body",
-                                    "PHYSICAL DEVELOPMENT"
+                                    "CURRICULUM GOAL 4- Children develop emotional intelligence",
+                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
                                 ],
                                 "grade": "B",
                                 "percentage": 74.99,
@@ -911,7 +1181,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Interact comfortably with other children and adults.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 16,
+                                "priority": 11,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -935,7 +1205,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Show kindness towards others.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 17,
+                                "priority": 12,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -945,53 +1215,6 @@ ${generateDynamicTable(subjectData)}
                                 ],
                                 "grade": "B",
                                 "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "51f5dd8f-5c25-40ec-aaed-69195ea01095",
-                                "subjectName": "Express emotions.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 18,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 4- Children develop emotional intelligence",
-                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
-                                "subject": "0e6556b7-dfde-4e1f-8be2-2ba2930845ea",
-                                "subjectName": "CURRICULUM GOAL 5- Children develop a positive attitude towards productive work",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 19,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
                                 "term": "TERM-I",
                                 "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
                                 "pass": true,
@@ -1006,35 +1229,12 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Demonstrates willingness and participation in age-appropriate physical work towards helping others such as disturbing almanacs , colour bowls, pencils etc.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 20,
+                                "priority": 13,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
                                 "parent": [
-                                    "CURRICULUM GOAL 5- Children develop a positive attitude towards productive work",
-                                    "SOCIO AND EMOTIONAL DEVELOPMENT"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "c2bc0b77-d2ac-4133-a0a6-8e62247a4abe",
-                                "subjectName": "CURRICULUM GOAL 6- Children develop a positive regard for the natural environment around them",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 21,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
+                                    "CURRICULUM GOAL 5- Children develop a positive attitude towards productive work and service or seva",
                                     "SOCIO AND EMOTIONAL DEVELOPMENT"
                                 ],
                                 "grade": "B",
@@ -1053,7 +1253,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Demonstrates awareness and sensitivity towards environmental concerns like saving water, switching off lights when not in use and not wasting food.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 22,
+                                "priority": 15,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1077,7 +1277,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Observe and understands different categories of objects and relationships between them such as learning about the different types of transport and identifying various fruits and vegetables.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 25,
+                                "priority": 16,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1097,58 +1297,11 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 100,
                                 "description": "",
                                 "status": "",
-                                "subject": "3cf39ec2-a540-40eb-8b41-c6fafcc7c9d8",
-                                "subjectName": "CURRICULUM GOAL 8- Children develop mathematical understanding and abilities to recognise numbers, shapes and signs",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 26,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "COGNITIVE DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "a45771a3-7d62-4fcf-b046-7ce5bae3b796",
-                                "subjectName": "Identifies and writes the numbers 1-10 with correct formation.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 27,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 8- Children develop mathematical understanding and abilities to recognise numbers, shapes and signs",
-                                    "COGNITIVE DEVELOPMENT"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
                                 "subject": "68a7c652-5302-4341-85cd-04bc2f2fb51d",
                                 "subjectName": "Demonstrates an understanding of pre-number concepts like Big and Small, Up and Down, More and Less, Tall and Short, Far and Near, In and Out, Full and Empty, Heavy and Light.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 28,
+                                "priority": 18,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1172,7 +1325,31 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Able to sort objects as per shapes, colour and size.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 29,
+                                "priority": 19,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 8- Children develop mathematical understanding and abilities to recognise numbers, shapes and signs",
+                                    "COGNITIVE DEVELOPMENT"
+                                ],
+                                "grade": "B",
+                                "percentage": 74.99,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "a45771a3-7d62-4fcf-b046-7ce5bae3b796",
+                                "subjectName": "Identifies and writes the numbers 1-10 with correct formation.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 20,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1196,7 +1373,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Quantifies the objects easily.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 30,
+                                "priority": 21,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1216,202 +1393,11 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 100,
                                 "description": "",
                                 "status": "",
-                                "subject": "c725f6de-6b23-4851-9a3d-9233114b3214",
-                                "subjectName": "Ability to recognise and read the letters covered so far using the correct phonics.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 33,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
-                                "subject": "2d8b3519-f66a-4105-9f00-66a9750395a3",
-                                "subjectName": "Presents work meticulously.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 34,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
-                                "subject": "159a380e-0610-4272-a7e1-07d32d69dba8",
-                                "subjectName": "Writing the letter of the alphabets (lowercase and uppercase) in correct formation.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 35,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "f0c88aea-0fc4-4748-841a-09297efc80c1",
-                                "subjectName": "Reading of sight words and using them in framing simple sentences.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 36,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 49.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "de9a7077-7a8c-48c4-a380-2761c51a3cce",
-                                "subjectName": "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 37,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "C",
-                                "percentage": 49.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 49.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "ea75c292-3fbd-4c1d-ad4a-f23f2eeeaac6",
-                                "subjectName": "Comprehend simple instructions, and can clearly explain the same to his or her classmates.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 38,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "C",
-                                "percentage": 49.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "c0876601-cc00-48ea-a80d-278781b43871",
-                                "subjectName": "Listen attentively throughout the story, remembers key details, and asks related questions.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 39,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
                                 "subject": "798ab2c7-a1d6-4294-a717-e6347a2e8cd7",
                                 "subjectName": "Listens to and enjoy songs, rhymes, and poems.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 40,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
-                                    "LANGUAGE AND LITERACY DEVELOPMENT"
-                                ],
-                                "grade": "A",
-                                "percentage": 100,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 100,
-                                "description": "",
-                                "status": "",
-                                "subject": "7b635221-c876-4fe0-9fca-1a729718b18d",
-                                "subjectName": "Listen and follows simple instructions.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 41,
+                                "priority": 22,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1435,7 +1421,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Converses fluently and can hold a meaningful conversation.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 42,
+                                "priority": 23,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1452,23 +1438,119 @@ ${generateDynamicTable(subjectData)}
                                 "graded": true
                             },
                             {
-                                "marks": 74.99,
+                                "marks": 100,
                                 "description": "",
                                 "status": "",
-                                "subject": "06d32fa5-2131-4b8c-b1cf-4d5cd683813c",
-                                "subjectName": "Actively participates in class discussions and circle time.",
+                                "subject": "7b635221-c876-4fe0-9fca-1a729718b18d",
+                                "subjectName": "Listen and follows simple instructions.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 45,
+                                "priority": 24,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
                                 "parent": [
-                                    "CURRICULUM GOAL 11- Children develop abilities and sensibilities in visual and performing arts, and express their emotions through art in meaningful and joyful ways",
-                                    "AESTHETIC AND CULTURRAL DEVELOPMENT"
+                                    "CURRICULUM GOAL 9- Children develop effective communication skills for day-to-day interaction in two languages",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": "A",
+                                "percentage": 100,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "c725f6de-6b23-4851-9a3d-9233114b3214",
+                                "subjectName": "Ability to recognise and read the letters covered so far using the correct phonics.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 25,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": "A",
+                                "percentage": 100,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "f0c88aea-0fc4-4748-841a-09297efc80c1",
+                                "subjectName": "Reading of sight words and using them in framing simple sentences.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 26,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
                                 ],
                                 "grade": "B",
                                 "percentage": 74.99,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "159a380e-0610-4272-a7e1-07d32d69dba8",
+                                "subjectName": "Writing the letter of the alphabets (lowercase and uppercase) in correct formation.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 27,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": "A",
+                                "percentage": 100,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 100,
+                                "description": "",
+                                "status": "",
+                                "subject": "2d8b3519-f66a-4105-9f00-66a9750395a3",
+                                "subjectName": "Presents work meticulously.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 28,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 10- Children develop fluency in reading and writing in language",
+                                    "LANGUAGE AND LITERACY DEVELOPMENT"
+                                ],
+                                "grade": "A",
+                                "percentage": 100,
                                 "term": "TERM-I",
                                 "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
                                 "pass": true,
@@ -1483,7 +1565,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Explores and plays with variety of material and tools to create art work.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 46,
+                                "priority": 29,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1507,7 +1589,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Participating actively in music, dance, skating and creative movements like role play, class presentations etc.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 47,
+                                "priority": 30,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1527,59 +1609,11 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 74.99,
                                 "description": "",
                                 "status": "",
-                                "subject": "4ce8e924-4200-414a-9b16-1f758e4796a3",
-                                "subjectName": "Works independently and in groups.",
+                                "subject": "ea14387d-1e6a-4d32-ad49-cb2c2775ebe8",
+                                "subjectName": "Cares for one s belongings.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 50,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 12- Children develop habits of learning that allow them to engage actively in formal learning environment like a school classroom",
-                                    "POSITIVE LEARNING HABITS"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "bbe0d58c-aefa-4600-a402-065c03badf8c",
-                                "subjectName": "Works with constant supervision.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 51,
-                                "min": 0,
-                                "attachmentName": null,
-                                "subjectNature": "THEORY",
-                                "parent": [
-                                    "CURRICULUM GOAL 12- Children develop habits of learning that allow them to engage actively in formal learning environment like a school classroom",
-                                    "POSITIVE LEARNING HABITS"
-                                ],
-                                "grade": "B",
-                                "percentage": 74.99,
-                                "term": "TERM-I",
-                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
-                                "pass": true,
-                                "gradePattern": "USA 3 POINT",
-                                "graded": true
-                            },
-                            {
-                                "marks": 74.99,
-                                "description": "",
-                                "status": "",
-                                "subject": "e22f04c1-0d6c-4875-849f-1c9509d95f47",
-                                "subjectName": "Waits for his or her turn.",
-                                "scholastic": true,
-                                "max": 100,
-                                "priority": 52,
+                                "priority": 31,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1603,7 +1637,7 @@ ${generateDynamicTable(subjectData)}
                                 "subjectName": "Willingness to share",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 53,
+                                "priority": 32,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1623,11 +1657,59 @@ ${generateDynamicTable(subjectData)}
                                 "marks": 74.99,
                                 "description": "",
                                 "status": "",
-                                "subject": "ea14387d-1e6a-4d32-ad49-cb2c2775ebe8",
-                                "subjectName": "Cares for one s belongings.",
+                                "subject": "bbe0d58c-aefa-4600-a402-065c03badf8c",
+                                "subjectName": "Works with constant supervision.",
                                 "scholastic": true,
                                 "max": 100,
-                                "priority": 54,
+                                "priority": 33,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 12- Children develop habits of learning that allow them to engage actively in formal learning environment like a school classroom",
+                                    "POSITIVE LEARNING HABITS"
+                                ],
+                                "grade": "B",
+                                "percentage": 74.99,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "e22f04c1-0d6c-4875-849f-1c9509d95f47",
+                                "subjectName": "Waits for his or her turn.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 34,
+                                "min": 0,
+                                "attachmentName": null,
+                                "subjectNature": "THEORY",
+                                "parent": [
+                                    "CURRICULUM GOAL 12- Children develop habits of learning that allow them to engage actively in formal learning environment like a school classroom",
+                                    "POSITIVE LEARNING HABITS"
+                                ],
+                                "grade": "B",
+                                "percentage": 74.99,
+                                "term": "TERM-I",
+                                "termUid": "3a71d57c-5759-4910-b1ff-2f60a4b01cbe",
+                                "pass": true,
+                                "gradePattern": "USA 3 POINT",
+                                "graded": true
+                            },
+                            {
+                                "marks": 74.99,
+                                "description": "",
+                                "status": "",
+                                "subject": "4ce8e924-4200-414a-9b16-1f758e4796a3",
+                                "subjectName": "Works independently and in groups.",
+                                "scholastic": true,
+                                "max": 100,
+                                "priority": 35,
                                 "min": 0,
                                 "attachmentName": null,
                                 "subjectNature": "THEORY",
@@ -1743,22 +1825,13 @@ ${generateDynamicTable(subjectData)}
                     },
                 ],
             },
-            header: `
-        <table style="width:100%;" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="left" style="width:15%;"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/cbse-logo.png" /></td>
-            <td style="width:70%; line-height: 140%; padding-top:6mm; padding-bottom:2mm; text-align:center; font-size:11pt;" valign="top" align="center">
-              <span style="color:#53395c; font-size:16pt; font-weight:bold;">SACHDEVA PUBLIC SCHOOL</span><br />
-              <span style="color:#53395c; font-size:11pt; padding-top:5mm;">Maurya Enclave, Pitampura<br />
-                Delhi - 110088</span>
-            </td>
-            <td style="width:15%;" valign="top" align="right"><img align="left" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SPSP685/school-logo.png" /></td>
-          </tr>
-        </table>
-`,
+            header: "",
             footer:
-                '<page_footer>\n <table cellspacing="0" cellpadding="0" style="\n        padding-left: 0mm;\n        padding-right: 0mm;\n        padding-top: 2mm;\n        padding-bottom: 0mm;\n      ">\n  <tbody>\n   <tr>\n    <td width="100%" align="left" valign="top" style="\n            width: 100%;\n            padding-left: 0mm;\n            padding-right: 0mm;\n            padding-top: 0mm;\n            padding-bottom: 0mm;\n          "><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table> \n</page_footer>',
+                "",
         },
+
+
+
     ]);
 </script>
 
