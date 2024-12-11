@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+  <div id="studentsList">
+    Processed Dynamic School Report Generator Script
+  </div>
+</body>
+<script>
+
+
+
+  window.SetTemplateData = function (data) {
+    const config = {
+      schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+      schoolLogo2: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+      schoolName: "THE INDIAN SCHOOL",
+      schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+                <h5>PH.:26257551 / 52, 26264956 / 57 </h5>
+                <h5>EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
+      studentInfoFields: [
+        { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
+        { label: "FATHER'S NAME", key: "fatherName", additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" } },
+        { label: "MOTHER'S NAME", key: "motherName", additionalInfo: { label: "D.O.B", key: "dob" } },
+        { label: "ADDRESS", key: "address" }
+      ],
+      gradingScale: "on 8-point (A1-E) Grading Scale",
+      gradeScale: [
+        { minPercentage: 91, grade: "A1" },
+        { minPercentage: 81, grade: "A2" },
+        { minPercentage: 71, grade: "B1" },
+        { minPercentage: 61, grade: "B2" },
+        { minPercentage: 51, grade: "C1" },
+        { minPercentage: 41, grade: "C2" },
+        { minPercentage: 33, grade: "D" },
+        { minPercentage: 0, grade: "E" }
+      ],
+      scholasticConfig: { nature: "THEORY" },
+      coScholasticConfig: { nature: "1B Scholastic" },
+      signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+      styles: `
+      @page { size: A4; margin: 10mm; }
+      @media print { @page { margin: auto; size: A4; } }
+      body { font-family: Arial, sans-serif; }
+      .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+      .header { display: flex; align-items: center; justify-content: space-around; font-weight: bold; }
+      .header, div, p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+      .header img { max-width: 100px; }
+      .section { margin: 1mm; }
+      .section table { width: 100%; border-collapse: collapse; }
+      .section table, .section th, .section td { border: 1px solid #000; }
+      .section td { padding: 2px; text-align: left; font-size: 12px; margin: 0px; }
+      .section h4, .section th { padding: 2px; text-align: center; font-size: 12px; margin: 0px; }
+      .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
+      .signatures div { font-size: 13px; margin: 0px; padding: 0px; text-align: center; }
+      .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
+    `
+    };
+
+    // Helper function to generate graph
+    function generateGraph(graphContainer, subjects, studentPerformanceData) {
+      if (!graphContainer || !subjects || !studentPerformanceData) {
+        console.error('Invalid inputs provided');
+        return;
+      }
+      console.log(subjects, studentPerformanceData, "fffffffffffffff subjects, studentPerformanceData")
+      // Create and configure canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = 740;
+      canvas.height = 260;
+      canvas.style.paddingTop = "10px";
+      graphContainer.appendChild(canvas);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      // Filter and map subjects with matching data
+      const filteredSubjects = subjects.filter(subject =>
+        studentPerformanceData?.some(data => data.subjectName === subject.subject)
+      ).map(subject => {
+        const performanceData = studentPerformanceData.find(data => data.subjectName === subject.subject);
+        return {
+          subjectName: subject.subject,
+          marks: subject.marks || 0,
+          maxPossible: subject.maxPossible || 100,
+          percentage: subject.percentage || 0,
+          maxObtainedMark: performanceData.maxObtainedMark || 0,
+          averageObtainedMark: performanceData.averageObtainedMark || 0,
+          maxMark: performanceData.maxMark || 0,
+        };
+      });
+      console.log(filteredSubjects, "ffffffff filteredSubjects")
+      // Scaling configuration
+      const maxValue = Math.max(...filteredSubjects.map(s => Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible))) || 100;
+      const scaleFactor = 140 / maxValue; // Scale bars to fit chart height
+
+      const barWidth = 20;
+      const barGap = 80;
+      const chartHeight = 140;
+      const xOffset = 50;
+      const topPadding = 10;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw grid and Y-axis values
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillStyle = 'black';
+      ctx.font = "10px Arial";
+
+      const yStep = maxValue / 5;
+      for (let i = 0; i <= 5; i++) {
+        const y = (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(xOffset, chartHeight - y + topPadding);
+        ctx.lineTo(canvas.width, chartHeight - y + topPadding);
+        ctx.stroke();
+        const yValue = Math.round(yStep * i);
+        ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
+      }
+
+      // Draw bars
+      filteredSubjects.forEach((subject, index) => {
+        const x = xOffset + index * (barWidth + barGap);
+
+        // Calculate scaled heights
+        const markHeight = subject.marks * scaleFactor;
+        const averageHeight = subject.averageObtainedMark * scaleFactor * 5;
+        const highestHeight = subject.maxMark * scaleFactor * 5;
+
+        // Draw average bar (pink)
+        ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+        ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
+
+        // Draw marks bar (black)
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - markHeight, barWidth, markHeight);
+
+        // Draw highest bar (blue-gray)
+        ctx.fillStyle = 'rgb(193, 224, 224)';
+        ctx.fillRect(x + barWidth + 20, chartHeight + topPadding - highestHeight, barWidth, highestHeight);
+
+        // Draw subject label
+        ctx.save();
+        ctx.fillStyle = 'black'; // Ensure label text is black
+        ctx.textAlign = 'right';
+        ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(subject.subjectName, 0, 0);
+        ctx.restore();
+      });
+
+      // Draw legend
+      const legendY = canvas.height - 30;
+
+      // Marks legend
+      ctx.fillStyle = 'black';
+      ctx.fillRect(xOffset, legendY, 10, 10);
+      ctx.fillText("Marks Obtained", xOffset + 15, legendY + 10);
+
+      // Average legend
+      ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
+      ctx.fillRect(xOffset + 100, legendY, 10, 10);
+      ctx.fillStyle = 'black';
+      ctx.fillText("Average in Class", xOffset + 115, legendY + 10);
+
+      // Highest legend
+      ctx.fillStyle = 'rgb(193, 224, 224)';
+      ctx.fillRect(xOffset + 250, legendY, 10, 10);
+      ctx.fillStyle = 'black';
+      ctx.fillText("Highest in Class", xOffset + 265, legendY + 10);
+    }
+
+    function getAttendanceOrMark(status, mark) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA",
+        "Not Submitted": "NS"
+      };
+      return attendanceValue[status] || mark || "-";
+    }
+
+    function calculateGrade(percentage) {
+      for (const grade of config.gradeScale) {
+        if (percentage >= grade.minPercentage) {
+          return grade.grade;
+        }
+      }
+      return "F";
+    }
+
+    // Rest of your existing functions (generateStudentInfo, generateScholasticTable, etc.)
+    // ... [Previous functions remain the same]
+
+    function generateStudentInfo(student) {
+      // Generate full address
+      let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
+        ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
+        ", "
+        : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
+          ? student?.studentInfoResponse[0]?.studentAddressResponse
+            ?.landmark + ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
+          ", "
+          : ""
+        }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+          : ""
+        }`;
+
+      // Generate table with student info
+      return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+        ${config.studentInfoFields
+          .map(
+            (field) => `
+                    <tr>
+                        <th style="width: 25%; text-align: left">${field?.label
+              }</th>
+                        ${field?.label?.toLowerCase() === "address"
+                ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
+                : `  <td style="width: 25%;"> : ${student?.[field?.key] || ""
+                } </td> `
+              }   
+                        ${field?.additionalInfo
+                ? field?.additionalInfo?.label === "CLASS & SECTION"
+                  ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.["className"] || ""
+                  }-${student?.["sectionName"] || ""}</td>
+                            `
+                  : `
+                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
+                  }</th>
+                                <td style="width: 25%;"> : ${student?.[field?.additionalInfo?.key] || ""
+                  }</td>
+                            `
+                : ""
+              }
+                    </tr>
+                `
+          )
+          .join("")}
+    </table>`;
+    }
+
+    // Generate scholastic table
+    function generateScholasticTable(subjects, studentPerformanceData) {
+      let totalMarksObtained = 0;
+      let totalMaximumMarks = 0;
+
+      // Filter and map only MOCKS term data
+      const rows = subjects
+        .map((subject) => {
+          const mockTermReport = subject.markSheetReport.find(
+            (report) =>
+              report?.markSheetTermResponse?.headerName?.trim().toLowerCase() === "mocks"
+          );
+
+          if (!mockTermReport) return null; // Skip if no MOCKS term data
+
+          const subjectName = subject.subjectName || "-";
+          const maximumMarks = mockTermReport.max || 0;
+          const marksObtained = mockTermReport.obtained || 0;
+
+          const highestMarksInClass =
+            studentPerformanceData?.find((data) => data?.subjectName === subjectName)?.maxObtainedMark || "-";
+
+          totalMarksObtained += marksObtained;
+          totalMaximumMarks += maximumMarks;
+
+          return `
+                <tr>
+                    <td style="text-transform:uppercase; font-weight:bold; text-align:center">${subjectName}</td>
+                    <td style="text-align:center">${maximumMarks}</td>
+                    <td style="text-align:center">${marksObtained}</td>
+                    <td style="text-align:center">${highestMarksInClass}</td>
+                </tr>
+            `;
+        })
+        .filter(Boolean) // Remove null entries
+        .join("");
+
+      const percentage = totalMaximumMarks
+        ? ((totalMarksObtained / totalMaximumMarks) * 100).toFixed(2)
+        : "0.00";
+
+      // Render the final table
+      return `
+        <table>
+            <tr>
+                <td colspan="4" style="background-color: #fff; font-weight:bold; font-size: 13px; text-align: center">MOCKS</td>
+            </tr>
+            <tr style="background-color: #fff">
+                <th style="text-align: center; width: 30%;">SUBJECTS</th>
+                <th style="text-align: center; width: 14%;">MAXIMUM MARKS</th>
+                <th style="text-align: center; width: 14%;">MARKS OBTAINED</th>
+                <th style="text-align: center; width: 14%;">HIGHEST MARKS IN CLASS</th>
+            </tr>
+            ${rows}
+            <tr style="font-weight:bold">
+                <td style="text-align:center">GRAND TOTAL</td>
+                <td style="text-align:center">${totalMaximumMarks}</td>
+                <td style="text-align:center">${totalMarksObtained}</td>
+                <td></td>
+            </tr>
+            <tr style="font-weight:bold">
+                <td style="text-align:center">PERCENTAGE</td>
+                <td colspan="3" style="text-align:center">${percentage}%</td>
+            </tr>
+        </table>
+    `;
+    }
+
+    // Helper function to calculate grade based on percentage
+
+    function generateCoScholasticTable(subjects) {
+      const coScholasticSubjects = subjects?.filter(
+        (subject) =>
+          subject?.subjectAllResponse?.nature ===
+          config.coScholasticConfig.nature
+      );
+
+      let tableContent = "";
+      // console.log(coScholasticSubjects, "ffffffffffff coScholasticSubjects");
+      for (let i = 0; i < coScholasticSubjects.length; i++) {
+        const leftSubject = coScholasticSubjects[i];
+        // console.log(leftSubject, "fffffffffffff leftSubject")
+        tableContent += `
+                <tr>
+                    <td style="width: 70%;">${leftSubject?.subjectAllResponse?.subjectName || ""
+          }</td>
+                    <td style="width: 30%; text-align: center; font-weight:${leftSubject.remarkStatus ? "bold" : "normal"
+          }">${leftSubject?.remarkStatus || leftSubject?.grade || "-"
+          }</td>
+                    
+                </tr>
+            `;
+      }
+
+      return `
+            <table>
+                
+                <tr style="background-color: #fff">
+                    <th style="width: 70%;">Grade Subjects</th>
+                    <th style="width: 30%; text-align: center">HALF YEARLY</th>
+                    
+                </tr>
+                ${tableContent}
+            </table>
+        `;
+    }
+
+    function generateRemark(remark) {
+      return `
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">CLASS TEACHER'S REMARKS : </th>
+        <tr>
+            <td style="text-align: left">${remark?.description || "-"}</td>
+            
+        </tr>
+    </table>
+    `;
+    }
+
+    function generateSubjectRemark(remark, sub) {
+      let theorySub = sub?.filter(el => el?.subjectNature == "THEORY")?.map(el => el?.subjectName)
+      console.log(
+        remark?.fields,
+        theorySub,
+        "llllllll"
+      );
+      return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th colspan="2" style="text-align: center">STUDENT'S PROFILE</th>
+            </tr>
+            ${theorySub?.map(el => {
+        return remark?.fields?.map((f) =>
+          f?.value && el?.toLowerCase()?.includes(f?.title?.toLowerCase())
+            ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${f?.title || ""
+            }</td><td style="width: 80%">${f?.value || ""}</td></tr>`
+            : ""
+        )?.join("")
+      })?.join("")}
+       
+    </table>
+    `;
+    }
+
+    function generatePrincipalRemark(remark) {
+      return `
+
+    <table style="width: 100%;font-size: 12px">
+        <tr style="background-color: #fff"> 
+            <th style="text-align: left">PRINCIPAL'S REMARKS</th>
+            </tr>
+            ${remark?.masterName === "PRINCIPAL'S REMARKS"
+          ? remark?.fields
+            ?.map(
+              (f) =>
+                `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""
+                }</td></tr>`
+            )
+            .join("")
+          : ""
+        }
+       
+    </table>
+    `;
+    }
+
+    function generateGradingTable() {
+      return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <tr>
+            <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
+                INSTRUCTIONS
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: center; border: 1px solid black;">
+                Grading scale for Scholastic Areas: Grades are awarded on an 8 point grading scale as follows
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">MARKS RANGE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">GRADE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">MARKS RANGE</td>
+            <td style="border: 1px solid black; text-align: center; font-weight: bold;">GRADE</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">91 - 100</td>
+            <td style="border: 1px solid black; text-align: center;">A1</td>
+            <td style="border: 1px solid black; text-align: center;">51 - 60</td>
+            <td style="border: 1px solid black; text-align: center;">C1</td>
+            
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">81 - 90</td>
+            <td style="border: 1px solid black; text-align: center;">A2</td>
+            <td style="border: 1px solid black; text-align: center;">41 - 50</td>
+            <td style="border: 1px solid black; text-align: center;">C2</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">71 - 80</td>
+            <td style="border: 1px solid black; text-align: center;">B1</td>
+            <td style="border: 1px solid black; text-align: center;">33 - 40</td>
+            <td style="border: 1px solid black; text-align: center;">D</td>
+           
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; text-align: center;">61 - 70</td>
+            <td style="border: 1px solid black; text-align: center;">B2</td>
+           <td style="border: 1px solid black; text-align: center;">33 &amp; Below</td>
+            <td style="border: 1px solid black; text-align: center;">E (Needs Improvement)</td>
+        </tr>
+    </table>
+`;
+    }
+
+    function generateHeader(element) {
+      return ` <div class="header">
+            
+${element.header
+          ? element.header
+          : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+              <div style="text-align:center">
+                        <h1 style="color: #2b595e" >${config.schoolName}</h1>
+                        <div style="color: #2b595e" >${config.schoolAddress}</div>
+                   </div>
+              <img src="${config.schoolLogo2}" alt="School Logo"/> 
+            `
+        }
+
+             
+</div>`;
+    }
+
+    function generateSignature() {
+      return `
+             <div class="signatures">
+                        ${config.signatures
+          .map(
+            (sig) => `
+                            <div>
+                               
+                                <p style="vertical-align: bottom">${sig}</p>
+                            </div>
+                        `
+          )
+          .join("")}
+                    </div>
+            `;
+    }
+
+
+    const multipleStudents = data;
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = ``;
+
+    multipleStudents?.forEach((element) => {
+      const singleStudentHtml = document.createElement("div");
+      singleStudentHtml.style.pageBreakAfter = "always";
+
+      const termConfig = element?.markData?.markSheetTerms?.map((term) => ({
+        headerName: term?.headerName,
+        subHeaderName: term?.subHeaderName
+      })) || [];
+
+      const graphId = `graph-${element?.student?.studentId || Math.random()}`;
+
+      singleStudentHtml.innerHTML = `
+      <style type="text/css">${config.styles}</style>
+      <page orientation="portrait" format="A4" margin="0">
+        <div class="container">
+          ${generateHeader(element)}
+          <h4 style="background-color: #fff; border: 1px solid black; text-align: center; font-size: 14px">
+            PROGRESS REPORT- SESSION ${element?.markData?.academicSession || ""}
+          </h4>
+          ${generateStudentInfo(element?.student)}
+          <div class="section">
+            ${generateScholasticTable(element?.markData?.subjectWiseMarkSheetReportResponses, element?.studentPerfromanceData?.classWiseMarkResponse)}
+          </div>
+          
+          <div class="section">
+            ${generateRemark(element?.baseTermData?.remarksEntry)}
+          </div>
+          
+            <div class="section" style="width: 99%">
+              <h3 style="text-align: center; font-size: 12px; border: 1px solid black; padding: 2px; text-transform: uppercase">
+                ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+              </h3>
+              <div id="${graphId}" style="border: 1px solid black"></div>
+            </div>
+         
+         
+          <div class="section">
+            <div style="font-size: 12px; display:flex; justify-content: space-between">
+              <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()}</span>
+              <span style="font-weight: bold">Attendance: ${element?.baseTermData?.remarksEntry?.fields?.find(
+        field => field?.title === "Attendance"
+      )?.value || element?.student?.attendance}</span>
+            </div>
+          </div>
+          ${generateSignature()}
+        </div>
+      </page>
+    `;
+
+      studentHtml.appendChild(singleStudentHtml);
+
+      // Generate graph after the container is added to the DOM
+      const graphContainer = document.getElementById(graphId);
+      if (graphContainer && element?.markData?.subjectWiseMarkSheetReportResponses) {
+        // Prepare data for graph
+        // const subjects = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+        //   subject: subject.markSheetReport[0]?.attachmentName,
+        //   marks: subject.markSheetReport[0]?.obtained || 0,
+        //   maxPossible: subject.markSheetReport[0]?.maxMark || 100,
+        //   percentage: (subject.markSheetReport[0]?.obtained / subject.markSheetReport[0]?.maxMark) * 100 || 0
+        // }));
+
+        const subjects = element?.baseTermData?.subject.map(subject => ({
+          subject: subject.subjectAllResponse?.subjectName,
+          marks: subject.markObtained || 0,
+          maxPossible: subject.max || 100,
+          percentage: (subject.markObtained / subject.max) * 100 || 0
+        }));
+        // const performanceData = element.markData.subjectWiseMarkSheetReportResponses.map(subject => ({
+        //   subjectName: subject.attachmentName,
+        //   maxObtainedMark: subject.markSheetReport[0]?.maxMark || 100,
+        //   averageObtainedMark: subject.markSheetReport[0]?.obtained || 0,
+        //   maxMark: subject.markSheetReport[0]?.maxMark || 100
+        // }));
+
+        generateGraph(graphContainer, subjects, element?.studentPerfromanceData?.classWiseMarkResponse);
+      }
+    });
+  };
+
+
+</script>
+
+<script>
+  window.SetTemplateData(
+    [
+      {
+        "student": {
+          "dob": "18-10-2007",
+          "admissionNo": "C-4859",
+          "studentName": "Aahana Bhalla",
+          "className": "XII",
+          "sectionName": "A",
+          "rollNo": 31,
+          "fatherName": "Atul Bhalla",
+          "motherName": "Bhawna Bhalla",
+          "attendance": "0.0/0",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 323187,
+              "userUid": "8e5b36d6-2fdf-4897-9113-a19da96a4cc4",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+              "studentId": "C-4859",
+              "exAdmissionNo": null,
+              "studentName": "Aahana Bhalla",
+              "fatherName": "Atul Bhalla",
+              "motherName": "Bhawna Bhalla",
+              "dob": "18-10-2007",
+              "gender": "Female",
+              "studentAdhaarcard": "",
+              "joiningClass": "12",
+              "joiningSections": "A",
+              "joiningDate": "30-09-2024",
+              "plotNumber": "",
+              "area": "D-16 Lajpat Nagar-1 ",
+              "city": "DELHI",
+              "state": "DELHI",
+              "pincode": "100001",
+              "phone1": null,
+              "rollNo": 31,
+              "emergencyNumber": "",
+              "mobileNumber": "9958999714",
+              "studentEmail": null,
+              "religion": "",
+              "category": "",
+              "minority": "",
+              "motherTongue": "",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "NA",
+              "fatherState": "NA",
+              "fatherPincode": "",
+              "fatherPhone": null,
+              "fatherMobile": "",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "NA",
+              "motherState": "NA",
+              "motherPincode": "",
+              "motherPhone": null,
+              "motherMobile": "",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": null,
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": null,
+              "classTeacher": "",
+              "classTeacherUserName": "",
+              "classes": "XII",
+              "classUid": null,
+              "sections": "A",
+              "group": null,
+              "wing": "Senior",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "New",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-30 06:02:34.203891",
+              "editeddate": "2024-09-30 06:02:34.203891",
+              "permanentEducationNumber": null,
+              "studentAddressResponse": {
+                "uid": "7cbf0e16-7960-45a9-8549-b4f7aed93a43",
+                "houseNo": null,
+                "area": "D-16 Lajpat Nagar-1 ",
+                "landmark": null,
+                "city": "DELHI",
+                "district": null,
+                "state": "DELHI",
+                "poPs": null,
+                "pincode": 100001,
+                "street": "",
+                "userName": "DIS896_C-4859",
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "fatherAddressResponse": {
+                "uid": "773cabf9-32ff-4112-8a02-78381c5426e6",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "motherAddressResponse": {
+                "uid": "03b25800-3cf1-46b7-96f1-dc5bd30a8a62",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": null
+            }
+          ],
+          "classTeacher": "",
+          "classTeacherUserName": "",
+          "permanentEducationNumber": null,
+          "school": {
+            "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            "schoolName": "The Indian School",
+            "schoolAbb": "DIS",
+            "educationBoard": null,
+            "registrationNo": null,
+            "plotNumber": "NA",
+            "area": "Josip Broz Tito Marg",
+            "city": "New Delhi",
+            "pincode": "110049",
+            "state": "Delhi",
+            "phoneNo1": "1126265956",
+            "phoneNo2": "1126265957",
+            "contactName": "Simranjeet",
+            "contactMobile": "9711140936",
+            "contactEmail": "simranjeet@theindianschool.in",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": null,
+            "website": "www.theindianschool.in",
+            "schemaPrefix": null,
+            "editedDate": "11-11-2024 05:32 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          }
+        },
+        "markData": {
+          "academicSession": "2024-2025",
+          "admissionNo": "C-4859",
+          "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+          "studentName": "Aahana Bhalla",
+          "rollNo": 31,
+          "fatherName": "Atul Bhalla",
+          "className": "XII",
+          "sectionName": "A",
+          "terms": "MOCKS",
+          "markSheetName": "TERM-II",
+          "overAllRank": "1",
+          "markSheetTerms": [
+            {
+              "id": 1379,
+              "headerName": "MOCKS",
+              "subHeaderName": "",
+              "priority": 1,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 80,
+              "terms": [
+                "MOCKS"
+              ]
+            }
+          ],
+          "subjectWiseMarkSheetReportResponses": [
+            {
+              "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              "subjectName": "ENGLISH",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                  "subjectName": "ENGLISH",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 50,
+                  "grade": "B1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 50,
+              "total": 80,
+              "percentage": 62.5,
+              "grade": "B1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 1,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+              "subjectName": "PHYSICS",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+                  "subjectName": "PHYSICS",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 62.86,
+                  "grade": "B",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 62.86,
+              "total": 80,
+              "percentage": 78.57,
+              "grade": "B",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 3,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+              "subjectName": "CHEMISTRY",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+                  "subjectName": "CHEMISTRY",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 68.57,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 68.57,
+              "total": 80,
+              "percentage": 85.71,
+              "grade": "A1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 5,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+              "subjectName": "MATHS",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                  "subjectName": "MATHS",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 65,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 65,
+              "total": 80,
+              "percentage": 81.25,
+              "grade": "A1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 7,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+              "subjectName": "COMPUTER SCIENCE",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+                  "subjectName": "COMPUTER SCIENCE",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 80,
+                  "grade": "A",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 80,
+              "total": 80,
+              "percentage": 100,
+              "grade": "A",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 11,
+              "decimalPlaces": 2,
+              "visible": false
+            }
+          ],
+          "marksObtained": 326.43,
+          "total": 400,
+          "percentage": 81.61,
+          "overAllGrade": "A1",
+          "visible": false
+        },
+        "remarks": {
+          "uid": null,
+          "terms": null,
+          "studentId": null,
+          "studentName": null,
+          "rollNumber": 0,
+          "classSectionUid": null,
+          "classSection": null,
+          "description": null,
+          "fields": null,
+          "status": false,
+          "createdUser": null,
+          "editedUser": null,
+          "createdDate": null,
+          "editedDate": null
+        },
+        "baseTermData": {
+          "studentAcademic": {
+            "dob": "18-10-2007",
+            "admissionNo": "C-4859",
+            "studentName": "Aahana Bhalla",
+            "className": "XII",
+            "sectionName": "A",
+            "rollNo": 31,
+            "fatherName": "Atul Bhalla",
+            "motherName": "Bhawna Bhalla",
+            "attendance": "0.0/0",
+            "boardRollNumber": "",
+            "studentInfoResponse": [
+              {
+                "id": 323187,
+                "userUid": "8e5b36d6-2fdf-4897-9113-a19da96a4cc4",
+                "userName": null,
+                "fatherUserName": null,
+                "motherUserName": null,
+                "guardianUserName": null,
+                "uid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                "studentId": "C-4859",
+                "exAdmissionNo": null,
+                "studentName": "Aahana Bhalla",
+                "fatherName": "Atul Bhalla",
+                "motherName": "Bhawna Bhalla",
+                "dob": "18-10-2007",
+                "gender": "Female",
+                "studentAdhaarcard": "",
+                "joiningClass": "12",
+                "joiningSections": "A",
+                "joiningDate": "30-09-2024",
+                "plotNumber": "",
+                "area": "D-16 Lajpat Nagar-1 ",
+                "city": "DELHI",
+                "state": "DELHI",
+                "pincode": "100001",
+                "phone1": null,
+                "rollNo": 31,
+                "emergencyNumber": "",
+                "mobileNumber": "9958999714",
+                "studentEmail": null,
+                "religion": "",
+                "category": "",
+                "minority": "",
+                "motherTongue": "",
+                "idMark": "",
+                "height": "",
+                "weight": "",
+                "physicalDisability": "",
+                "bloodGroup": "",
+                "healthRemark": "",
+                "siblingDetails": "",
+                "alumni": "",
+                "siblingResponse": [],
+                "fatherOccupation": "",
+                "fatherQualification": "",
+                "fatherOrganization": "",
+                "fatherDesignation": "",
+                "fatherIncome": "",
+                "fatherArea": "NA",
+                "fatherCity": "NA",
+                "fatherState": "NA",
+                "fatherPincode": "",
+                "fatherPhone": null,
+                "fatherMobile": "",
+                "fatherEmail": null,
+                "fatherAdhaarNumber": "",
+                "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+                "motherQualification": "",
+                "motherOccupation": "",
+                "motherOrganization": "",
+                "motherDesignation": "",
+                "motherIncome": "",
+                "motherArea": "NA",
+                "motherCity": "NA",
+                "motherState": "NA",
+                "motherPincode": "",
+                "motherPhone": null,
+                "motherMobile": "",
+                "motherEmail": null,
+                "motherAdhaarNumber": "",
+                "guardianName": null,
+                "relation": null,
+                "guardianOccupation": null,
+                "guardianPhone": null,
+                "guardianMobile": null,
+                "guardianEmail": null,
+                "guardianAddress": null,
+                "leavingDate": null,
+                "previousSchoolName": null,
+                "otp": null,
+                "schoolName": "Demo Public School",
+                "remark": null,
+                "classTeacher": "",
+                "classTeacherUserName": "",
+                "classes": "XII",
+                "classUid": null,
+                "sections": "A",
+                "group": null,
+                "wing": "Senior",
+                "status": "Studying",
+                "academicSession": "2024-2025",
+                "joiningStatus": "New",
+                "houses": null,
+                "certificates": "",
+                "certificatesList": [],
+                "caste": "",
+                "listOfDocuments": null,
+                "attached": false,
+                "required": false,
+                "submitted": false,
+                "studentHostel": [],
+                "studentConcession": [],
+                "studentTransport": [],
+                "studentAadharCard": null,
+                "fatherAadharCard": null,
+                "motherAadharCard": null,
+                "studentImage": null,
+                "fatherImage": null,
+                "motherImage": null,
+                "guardianImage": null,
+                "birthCertificate": null,
+                "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                "aluminiProof": null,
+                "siblingProof": null,
+                "residenceProof": null,
+                "firstBornChildProof": null,
+                "medicalFitnessCertificate": null,
+                "fatherQualificationProof": null,
+                "motherQualificationProof": null,
+                "casteCertificate": null,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-30 06:02:34.203891",
+                "editeddate": "2024-09-30 06:02:34.203891",
+                "permanentEducationNumber": null,
+                "studentAddressResponse": {
+                  "uid": "7cbf0e16-7960-45a9-8549-b4f7aed93a43",
+                  "houseNo": null,
+                  "area": "D-16 Lajpat Nagar-1 ",
+                  "landmark": null,
+                  "city": "DELHI",
+                  "district": null,
+                  "state": "DELHI",
+                  "poPs": null,
+                  "pincode": 100001,
+                  "street": "",
+                  "userName": "DIS896_C-4859",
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "fatherAddressResponse": {
+                  "uid": "773cabf9-32ff-4112-8a02-78381c5426e6",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "NA",
+                  "district": null,
+                  "state": "NA",
+                  "poPs": null,
+                  "pincode": 0,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "motherAddressResponse": {
+                  "uid": "03b25800-3cf1-46b7-96f1-dc5bd30a8a62",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "NA",
+                  "district": null,
+                  "state": "NA",
+                  "poPs": null,
+                  "pincode": 0,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "guardianAddressResponse": null,
+                "correspondenceAddressResponse": null
+              }
+            ],
+            "classTeacher": "",
+            "classTeacherUserName": "",
+            "permanentEducationNumber": null,
+            "school": {
+              "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+              "schoolName": "The Indian School",
+              "schoolAbb": "DIS",
+              "educationBoard": null,
+              "registrationNo": null,
+              "plotNumber": "NA",
+              "area": "Josip Broz Tito Marg",
+              "city": "New Delhi",
+              "pincode": "110049",
+              "state": "Delhi",
+              "phoneNo1": "1126265956",
+              "phoneNo2": "1126265957",
+              "contactName": "Simranjeet",
+              "contactMobile": "9711140936",
+              "contactEmail": "simranjeet@theindianschool.in",
+              "schoolCode": null,
+              "pfCode": null,
+              "societyManagement": null,
+              "language": null,
+              "schoolLogo": null,
+              "schoolFavicon": null,
+              "enabled": true,
+              "subDomain": null,
+              "website": "www.theindianschool.in",
+              "schemaPrefix": null,
+              "editedDate": "11-11-2024 05:32 PM",
+              "editedUser": "QuickCampus",
+              "visitorSchool": false,
+              "clientSchoolId": null,
+              "cscId": null,
+              "onlinePaymentEnabled": false,
+              "registrationSeries": null,
+              "underTakingDetails": null,
+              "formNumberStart": null,
+              "sessionResponse": null,
+              "schoolLogoUrl": null,
+              "printAcknowledge": false,
+              "wabaId": "",
+              "phoneNumberId": "",
+              "whatsappApiKey": "",
+              "isQuickCampusWhatsapp": false,
+              "whatsAppEnabled": false,
+              "smsenabled": false,
+              "notificationEnabled": true,
+              "loanEnabled": false
+            }
+          },
+          "subject": [
+            {
+              "subjectAllResponse": {
+                "uid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:21:34.044469",
+                "editeddate": "2024-09-28 07:21:34.043717"
+              },
+              "termName": "MOCKS",
+              "max": 80,
+              "markObtained": 50,
+              "percentage": 62.5,
+              "grade": "B1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 1,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+                "subjectName": "PHYSICS",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:25:51.890185",
+                "editeddate": "2024-09-28 07:25:51.889509"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 55,
+              "percentage": 78.57142857142857,
+              "grade": "B",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 3,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+                "subjectName": "CHEMISTRY",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:26:17.740573",
+                "editeddate": "2024-09-28 07:26:17.740187"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 60,
+              "percentage": 85.71428571428571,
+              "grade": "A1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 5,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                "subjectName": "MATHS",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:26:54.518315",
+                "editeddate": "2024-09-28 07:26:54.517434"
+              },
+              "termName": "MOCKS",
+              "max": 80,
+              "markObtained": 65,
+              "percentage": 81.25,
+              "grade": "A1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 7,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+                "subjectName": "COMPUTER SCIENCE",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:27:47.507916",
+                "editeddate": "2024-09-28 07:27:47.507617"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 70,
+              "percentage": 100,
+              "grade": "A",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 11,
+              "scholastic": true,
+              "added": true
+            }
+          ],
+          "remarksEntry": {
+            "uid": null,
+            "terms": null,
+            "studentId": null,
+            "studentName": null,
+            "rollNumber": 0,
+            "classSectionUid": null,
+            "classSection": null,
+            "description": null,
+            "fields": null,
+            "status": false,
+            "createdUser": null,
+            "editedUser": null,
+            "createdDate": null,
+            "editedDate": null
+          },
+          "school": {
+            "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            "schoolName": "The Indian School",
+            "schoolAbb": "DIS",
+            "educationBoard": null,
+            "registrationNo": null,
+            "plotNumber": "NA",
+            "area": "Josip Broz Tito Marg",
+            "city": "New Delhi",
+            "pincode": "110049",
+            "state": "Delhi",
+            "phoneNo1": "1126265956",
+            "phoneNo2": "1126265957",
+            "contactName": "Simranjeet",
+            "contactMobile": "9711140936",
+            "contactEmail": "simranjeet@theindianschool.in",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": null,
+            "website": "www.theindianschool.in",
+            "schemaPrefix": null,
+            "editedDate": "11-11-2024 05:32 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          },
+          "promotedClass": null,
+          "promotedSection": null,
+          "perSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIS896/student-info/C-4859/student/images/C-4859.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241206T112145Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241206%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=a6f621b0786ea4fc7d2030d3f4acdf2e453388336ca2eccd8be14f2021f95a6d",
+            "fileName": "C-4859.png"
+          },
+          "pass": false,
+          "status_code": 200
+        },
+        "header": null,
+        "footer": null,
+        "printDate": "06-12-2024",
+        "studentPerfromanceData": {
+          "classWiseMarkResponse": [
+            {
+              "subjectName": "ENGLISH",
+              "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              "maxMark": 80,
+              "maxObtainedMark": 50,
+              "averageObtainedMark": 50,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "PHYSICS",
+              "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+              "maxMark": 80,
+              "maxObtainedMark": 62.86,
+              "averageObtainedMark": 62.86,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "CHEMISTRY",
+              "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+              "maxMark": 80,
+              "maxObtainedMark": 68.57,
+              "averageObtainedMark": 68.57,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "MATHS",
+              "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+              "maxMark": 80,
+              "maxObtainedMark": 65,
+              "averageObtainedMark": 65,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "COMPUTER SCIENCE",
+              "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+              "maxMark": 80,
+              "maxObtainedMark": 80,
+              "averageObtainedMark": 80,
+              "attachmentName": null
+            }
+          ],
+          "groupedClassAttachmentResponse": [
+            {
+              "attachmentName": "MATHS",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 65
+            },
+            {
+              "attachmentName": "COMPUTER SCIENCE",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 80
+            },
+            {
+              "attachmentName": "ENGLISH",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 50
+            },
+            {
+              "attachmentName": "CHEMISTRY",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 68.57
+            },
+            {
+              "attachmentName": "PHYSICS",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 62.86
+            }
+          ],
+          "status_code": 200
+        }
+      },
+
+      {
+        "student": {
+          "dob": "18-10-2007",
+          "admissionNo": "C-4859",
+          "studentName": "Aahana Bhalla",
+          "className": "XII",
+          "sectionName": "A",
+          "rollNo": 31,
+          "fatherName": "Atul Bhalla",
+          "motherName": "Bhawna Bhalla",
+          "attendance": "0.0/0",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 323187,
+              "userUid": "8e5b36d6-2fdf-4897-9113-a19da96a4cc4",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+              "studentId": "C-4859",
+              "exAdmissionNo": null,
+              "studentName": "Aahana Bhalla",
+              "fatherName": "Atul Bhalla",
+              "motherName": "Bhawna Bhalla",
+              "dob": "18-10-2007",
+              "gender": "Female",
+              "studentAdhaarcard": "",
+              "joiningClass": "12",
+              "joiningSections": "A",
+              "joiningDate": "30-09-2024",
+              "plotNumber": "",
+              "area": "D-16 Lajpat Nagar-1 ",
+              "city": "DELHI",
+              "state": "DELHI",
+              "pincode": "100001",
+              "phone1": null,
+              "rollNo": 31,
+              "emergencyNumber": "",
+              "mobileNumber": "9958999714",
+              "studentEmail": null,
+              "religion": "",
+              "category": "",
+              "minority": "",
+              "motherTongue": "",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "NA",
+              "fatherState": "NA",
+              "fatherPincode": "",
+              "fatherPhone": null,
+              "fatherMobile": "",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "NA",
+              "motherState": "NA",
+              "motherPincode": "",
+              "motherPhone": null,
+              "motherMobile": "",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": null,
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": null,
+              "classTeacher": "",
+              "classTeacherUserName": "",
+              "classes": "XII",
+              "classUid": null,
+              "sections": "A",
+              "group": null,
+              "wing": "Senior",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "New",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "SimranjeetKaur_522590",
+              "editedUser": "SimranjeetKaur_522590",
+              "createddate": "2024-09-30 06:02:34.203891",
+              "editeddate": "2024-09-30 06:02:34.203891",
+              "permanentEducationNumber": null,
+              "studentAddressResponse": {
+                "uid": "7cbf0e16-7960-45a9-8549-b4f7aed93a43",
+                "houseNo": null,
+                "area": "D-16 Lajpat Nagar-1 ",
+                "landmark": null,
+                "city": "DELHI",
+                "district": null,
+                "state": "DELHI",
+                "poPs": null,
+                "pincode": 100001,
+                "street": "",
+                "userName": "DIS896_C-4859",
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "fatherAddressResponse": {
+                "uid": "773cabf9-32ff-4112-8a02-78381c5426e6",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "motherAddressResponse": {
+                "uid": "03b25800-3cf1-46b7-96f1-dc5bd30a8a62",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "30-09-2024 11:32 AM",
+                "editedDate": "30-09-2024 11:32 AM",
+                "createdBy": "SimranjeetKaur_522590",
+                "editedBy": "SimranjeetKaur_522590"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": null
+            }
+          ],
+          "classTeacher": "",
+          "classTeacherUserName": "",
+          "permanentEducationNumber": null,
+          "school": {
+            "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            "schoolName": "The Indian School",
+            "schoolAbb": "DIS",
+            "educationBoard": null,
+            "registrationNo": null,
+            "plotNumber": "NA",
+            "area": "Josip Broz Tito Marg",
+            "city": "New Delhi",
+            "pincode": "110049",
+            "state": "Delhi",
+            "phoneNo1": "1126265956",
+            "phoneNo2": "1126265957",
+            "contactName": "Simranjeet",
+            "contactMobile": "9711140936",
+            "contactEmail": "simranjeet@theindianschool.in",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": null,
+            "website": "www.theindianschool.in",
+            "schemaPrefix": null,
+            "editedDate": "11-11-2024 05:32 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          }
+        },
+        "markData": {
+          "academicSession": "2024-2025",
+          "admissionNo": "C-4859",
+          "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+          "studentName": "Aahana Bhalla",
+          "rollNo": 31,
+          "fatherName": "Atul Bhalla",
+          "className": "XII",
+          "sectionName": "A",
+          "terms": "MOCKS",
+          "markSheetName": "TERM-II",
+          "overAllRank": "1",
+          "markSheetTerms": [
+            {
+              "id": 1379,
+              "headerName": "MOCKS",
+              "subHeaderName": "",
+              "priority": 1,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 80,
+              "terms": [
+                "MOCKS"
+              ]
+            }
+          ],
+          "subjectWiseMarkSheetReportResponses": [
+            {
+              "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              "subjectName": "ENGLISH",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                  "subjectName": "ENGLISH",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 50,
+                  "grade": "B1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 50,
+              "total": 80,
+              "percentage": 62.5,
+              "grade": "B1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 1,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+              "subjectName": "PHYSICS",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+                  "subjectName": "PHYSICS",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 62.86,
+                  "grade": "B",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 62.86,
+              "total": 80,
+              "percentage": 78.57,
+              "grade": "B",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 3,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+              "subjectName": "CHEMISTRY",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+                  "subjectName": "CHEMISTRY",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 68.57,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 68.57,
+              "total": 80,
+              "percentage": 85.71,
+              "grade": "A1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 5,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+              "subjectName": "MATHS",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                  "subjectName": "MATHS",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 65,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 65,
+              "total": 80,
+              "percentage": 81.25,
+              "grade": "A1",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 7,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+              "subjectName": "COMPUTER SCIENCE",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                  "admissionNo": "C-4859",
+                  "studentName": "Aahana Bhalla",
+                  "rollNo": 31,
+                  "fatherName": "Atul Bhalla",
+                  "className": "XII",
+                  "sectionName": "A",
+                  "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                  "terms": "MOCKS",
+                  "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+                  "subjectName": "COMPUTER SCIENCE",
+                  "subjectNature": "THEORY",
+                  "max": 80,
+                  "obtained": 80,
+                  "grade": "A",
+                  "status": "",
+                  "markSheetName": "TERM-II",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1379,
+                    "headerName": "MOCKS",
+                    "subHeaderName": "",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "MOCKS"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 80,
+              "total": 80,
+              "percentage": 100,
+              "grade": "A",
+              "className": "XII",
+              "sectionName": "A",
+              "terms": "MOCKS",
+              "markSheetName": "TERM-II",
+              "subjectPrt": 11,
+              "decimalPlaces": 2,
+              "visible": false
+            }
+          ],
+          "marksObtained": 326.43,
+          "total": 400,
+          "percentage": 81.61,
+          "overAllGrade": "A1",
+          "visible": false
+        },
+        "remarks": {
+          "uid": null,
+          "terms": null,
+          "studentId": null,
+          "studentName": null,
+          "rollNumber": 0,
+          "classSectionUid": null,
+          "classSection": null,
+          "description": null,
+          "fields": null,
+          "status": false,
+          "createdUser": null,
+          "editedUser": null,
+          "createdDate": null,
+          "editedDate": null
+        },
+        "baseTermData": {
+          "studentAcademic": {
+            "dob": "18-10-2007",
+            "admissionNo": "C-4859",
+            "studentName": "Aahana Bhalla",
+            "className": "XII",
+            "sectionName": "A",
+            "rollNo": 31,
+            "fatherName": "Atul Bhalla",
+            "motherName": "Bhawna Bhalla",
+            "attendance": "0.0/0",
+            "boardRollNumber": "",
+            "studentInfoResponse": [
+              {
+                "id": 323187,
+                "userUid": "8e5b36d6-2fdf-4897-9113-a19da96a4cc4",
+                "userName": null,
+                "fatherUserName": null,
+                "motherUserName": null,
+                "guardianUserName": null,
+                "uid": "4bc29774-016c-41a7-a17b-380e98bcfefd",
+                "studentId": "C-4859",
+                "exAdmissionNo": null,
+                "studentName": "Aahana Bhalla",
+                "fatherName": "Atul Bhalla",
+                "motherName": "Bhawna Bhalla",
+                "dob": "18-10-2007",
+                "gender": "Female",
+                "studentAdhaarcard": "",
+                "joiningClass": "12",
+                "joiningSections": "A",
+                "joiningDate": "30-09-2024",
+                "plotNumber": "",
+                "area": "D-16 Lajpat Nagar-1 ",
+                "city": "DELHI",
+                "state": "DELHI",
+                "pincode": "100001",
+                "phone1": null,
+                "rollNo": 31,
+                "emergencyNumber": "",
+                "mobileNumber": "9958999714",
+                "studentEmail": null,
+                "religion": "",
+                "category": "",
+                "minority": "",
+                "motherTongue": "",
+                "idMark": "",
+                "height": "",
+                "weight": "",
+                "physicalDisability": "",
+                "bloodGroup": "",
+                "healthRemark": "",
+                "siblingDetails": "",
+                "alumni": "",
+                "siblingResponse": [],
+                "fatherOccupation": "",
+                "fatherQualification": "",
+                "fatherOrganization": "",
+                "fatherDesignation": "",
+                "fatherIncome": "",
+                "fatherArea": "NA",
+                "fatherCity": "NA",
+                "fatherState": "NA",
+                "fatherPincode": "",
+                "fatherPhone": null,
+                "fatherMobile": "",
+                "fatherEmail": null,
+                "fatherAdhaarNumber": "",
+                "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+                "motherQualification": "",
+                "motherOccupation": "",
+                "motherOrganization": "",
+                "motherDesignation": "",
+                "motherIncome": "",
+                "motherArea": "NA",
+                "motherCity": "NA",
+                "motherState": "NA",
+                "motherPincode": "",
+                "motherPhone": null,
+                "motherMobile": "",
+                "motherEmail": null,
+                "motherAdhaarNumber": "",
+                "guardianName": null,
+                "relation": null,
+                "guardianOccupation": null,
+                "guardianPhone": null,
+                "guardianMobile": null,
+                "guardianEmail": null,
+                "guardianAddress": null,
+                "leavingDate": null,
+                "previousSchoolName": null,
+                "otp": null,
+                "schoolName": "Demo Public School",
+                "remark": null,
+                "classTeacher": "",
+                "classTeacherUserName": "",
+                "classes": "XII",
+                "classUid": null,
+                "sections": "A",
+                "group": null,
+                "wing": "Senior",
+                "status": "Studying",
+                "academicSession": "2024-2025",
+                "joiningStatus": "New",
+                "houses": null,
+                "certificates": "",
+                "certificatesList": [],
+                "caste": "",
+                "listOfDocuments": null,
+                "attached": false,
+                "required": false,
+                "submitted": false,
+                "studentHostel": [],
+                "studentConcession": [],
+                "studentTransport": [],
+                "studentAadharCard": null,
+                "fatherAadharCard": null,
+                "motherAadharCard": null,
+                "studentImage": null,
+                "fatherImage": null,
+                "motherImage": null,
+                "guardianImage": null,
+                "birthCertificate": null,
+                "classSectionUid": "3dc4a618-380b-4fc1-a2d6-fa0315f96cd2",
+                "aluminiProof": null,
+                "siblingProof": null,
+                "residenceProof": null,
+                "firstBornChildProof": null,
+                "medicalFitnessCertificate": null,
+                "fatherQualificationProof": null,
+                "motherQualificationProof": null,
+                "casteCertificate": null,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-30 06:02:34.203891",
+                "editeddate": "2024-09-30 06:02:34.203891",
+                "permanentEducationNumber": null,
+                "studentAddressResponse": {
+                  "uid": "7cbf0e16-7960-45a9-8549-b4f7aed93a43",
+                  "houseNo": null,
+                  "area": "D-16 Lajpat Nagar-1 ",
+                  "landmark": null,
+                  "city": "DELHI",
+                  "district": null,
+                  "state": "DELHI",
+                  "poPs": null,
+                  "pincode": 100001,
+                  "street": "",
+                  "userName": "DIS896_C-4859",
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "fatherAddressResponse": {
+                  "uid": "773cabf9-32ff-4112-8a02-78381c5426e6",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "NA",
+                  "district": null,
+                  "state": "NA",
+                  "poPs": null,
+                  "pincode": 0,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "motherAddressResponse": {
+                  "uid": "03b25800-3cf1-46b7-96f1-dc5bd30a8a62",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "NA",
+                  "district": null,
+                  "state": "NA",
+                  "poPs": null,
+                  "pincode": 0,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "30-09-2024 11:32 AM",
+                  "editedDate": "30-09-2024 11:32 AM",
+                  "createdBy": "SimranjeetKaur_522590",
+                  "editedBy": "SimranjeetKaur_522590"
+                },
+                "guardianAddressResponse": null,
+                "correspondenceAddressResponse": null
+              }
+            ],
+            "classTeacher": "",
+            "classTeacherUserName": "",
+            "permanentEducationNumber": null,
+            "school": {
+              "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+              "schoolName": "The Indian School",
+              "schoolAbb": "DIS",
+              "educationBoard": null,
+              "registrationNo": null,
+              "plotNumber": "NA",
+              "area": "Josip Broz Tito Marg",
+              "city": "New Delhi",
+              "pincode": "110049",
+              "state": "Delhi",
+              "phoneNo1": "1126265956",
+              "phoneNo2": "1126265957",
+              "contactName": "Simranjeet",
+              "contactMobile": "9711140936",
+              "contactEmail": "simranjeet@theindianschool.in",
+              "schoolCode": null,
+              "pfCode": null,
+              "societyManagement": null,
+              "language": null,
+              "schoolLogo": null,
+              "schoolFavicon": null,
+              "enabled": true,
+              "subDomain": null,
+              "website": "www.theindianschool.in",
+              "schemaPrefix": null,
+              "editedDate": "11-11-2024 05:32 PM",
+              "editedUser": "QuickCampus",
+              "visitorSchool": false,
+              "clientSchoolId": null,
+              "cscId": null,
+              "onlinePaymentEnabled": false,
+              "registrationSeries": null,
+              "underTakingDetails": null,
+              "formNumberStart": null,
+              "sessionResponse": null,
+              "schoolLogoUrl": null,
+              "printAcknowledge": false,
+              "wabaId": "",
+              "phoneNumberId": "",
+              "whatsappApiKey": "",
+              "isQuickCampusWhatsapp": false,
+              "whatsAppEnabled": false,
+              "smsenabled": false,
+              "notificationEnabled": true,
+              "loanEnabled": false
+            }
+          },
+          "subject": [
+            {
+              "subjectAllResponse": {
+                "uid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:21:34.044469",
+                "editeddate": "2024-09-28 07:21:34.043717"
+              },
+              "termName": "MOCKS",
+              "max": 80,
+              "markObtained": 50,
+              "percentage": 62.5,
+              "grade": "B1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 1,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+                "subjectName": "PHYSICS",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:25:51.890185",
+                "editeddate": "2024-09-28 07:25:51.889509"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 55,
+              "percentage": 78.57142857142857,
+              "grade": "B",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 3,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+                "subjectName": "CHEMISTRY",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:26:17.740573",
+                "editeddate": "2024-09-28 07:26:17.740187"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 60,
+              "percentage": 85.71428571428571,
+              "grade": "A1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 5,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+                "subjectName": "MATHS",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:26:54.518315",
+                "editeddate": "2024-09-28 07:26:54.517434"
+              },
+              "termName": "MOCKS",
+              "max": 80,
+              "markObtained": 65,
+              "percentage": 81.25,
+              "grade": "A1",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 7,
+              "scholastic": true,
+              "added": true
+            },
+            {
+              "subjectAllResponse": {
+                "uid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+                "subjectName": "COMPUTER SCIENCE",
+                "nature": "THEORY",
+                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "cbseVIIICode": "",
+                "cbseXCode": "",
+                "cbseXIICode": "",
+                "status": true,
+                "parent": [],
+                "parentName": [],
+                "haveChild": false,
+                "createdUser": "SimranjeetKaur_522590",
+                "editedUser": "SimranjeetKaur_522590",
+                "createddate": "2024-09-28 07:27:47.507916",
+                "editeddate": "2024-09-28 07:27:47.507617"
+              },
+              "termName": "MOCKS",
+              "max": 70,
+              "markObtained": 70,
+              "percentage": 100,
+              "grade": "A",
+              "remarkStatus": "",
+              "attachmentName": "",
+              "additional": false,
+              "priority": 11,
+              "scholastic": true,
+              "added": true
+            }
+          ],
+          "remarksEntry": {
+            "uid": null,
+            "terms": null,
+            "studentId": null,
+            "studentName": null,
+            "rollNumber": 0,
+            "classSectionUid": null,
+            "classSection": null,
+            "description": null,
+            "fields": null,
+            "status": false,
+            "createdUser": null,
+            "editedUser": null,
+            "createdDate": null,
+            "editedDate": null
+          },
+          "school": {
+            "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            "schoolName": "The Indian School",
+            "schoolAbb": "DIS",
+            "educationBoard": null,
+            "registrationNo": null,
+            "plotNumber": "NA",
+            "area": "Josip Broz Tito Marg",
+            "city": "New Delhi",
+            "pincode": "110049",
+            "state": "Delhi",
+            "phoneNo1": "1126265956",
+            "phoneNo2": "1126265957",
+            "contactName": "Simranjeet",
+            "contactMobile": "9711140936",
+            "contactEmail": "simranjeet@theindianschool.in",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": null,
+            "website": "www.theindianschool.in",
+            "schemaPrefix": null,
+            "editedDate": "11-11-2024 05:32 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": false,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          },
+          "promotedClass": null,
+          "promotedSection": null,
+          "perSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DIS896/student-info/C-4859/student/images/C-4859.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241206T112145Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241206%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=a6f621b0786ea4fc7d2030d3f4acdf2e453388336ca2eccd8be14f2021f95a6d",
+            "fileName": "C-4859.png"
+          },
+          "pass": false,
+          "status_code": 200
+        },
+        "header": null,
+        "footer": null,
+        "printDate": "06-12-2024",
+        "studentPerfromanceData": {
+          "classWiseMarkResponse": [
+            {
+              "subjectName": "ENGLISH",
+              "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              "maxMark": 80,
+              "maxObtainedMark": 50,
+              "averageObtainedMark": 50,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "PHYSICS",
+              "subjectUid": "fab78c8b-13e9-4f28-97dc-2c90f32392d6",
+              "maxMark": 80,
+              "maxObtainedMark": 62.86,
+              "averageObtainedMark": 62.86,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "CHEMISTRY",
+              "subjectUid": "999bc1a4-e143-4f9b-9dc5-82e6c8452f15",
+              "maxMark": 80,
+              "maxObtainedMark": 68.57,
+              "averageObtainedMark": 68.57,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "MATHS",
+              "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
+              "maxMark": 80,
+              "maxObtainedMark": 65,
+              "averageObtainedMark": 65,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "COMPUTER SCIENCE",
+              "subjectUid": "c92fe2c0-85ae-40a5-a649-ad4448efe8df",
+              "maxMark": 80,
+              "maxObtainedMark": 80,
+              "averageObtainedMark": 80,
+              "attachmentName": null
+            }
+          ],
+          "groupedClassAttachmentResponse": [
+            {
+              "attachmentName": "MATHS",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 65
+            },
+            {
+              "attachmentName": "COMPUTER SCIENCE",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 80
+            },
+            {
+              "attachmentName": "ENGLISH",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 50
+            },
+            {
+              "attachmentName": "CHEMISTRY",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 68.57
+            },
+            {
+              "attachmentName": "PHYSICS",
+              "totalMaxMark": 80,
+              "highestObtainedMark": 62.86
+            }
+          ],
+          "status_code": 200
+        }
+      }
+
+
+
+    ])
+
+
+
+
+
+</script>
+
+</html>

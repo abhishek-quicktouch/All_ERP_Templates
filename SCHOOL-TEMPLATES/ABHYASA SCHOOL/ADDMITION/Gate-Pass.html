@@ -2,42 +2,41 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dynamic Gate Pass</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Gate Pass</title>
 </head>
 
 <body>
-    <div id="studentsList">Loading...</div>
+  <div id="studentsList">Loading...</div>
 
-    <script>
-        // Function to render gate passes dynamically for multiple students
-        window.SetTemplateData = function (data) {
-            console.log(data, "ffffffff data in Gate Pass");
-            const studentsListElement = document.getElementById("studentsList");
+  <script>
 
-            // Clear any existing content
-            studentsListElement.innerHTML = "";
+    window.SetTemplateData = function (data) {
+      console.log(data, "ffffffff data in Gate Pass");
+      const studentsListElement = document.getElementById("studentsList");
 
-            // Iterate over each student in the data array
-            data.forEach((studentData, index) => {
-                const { school, contentRequest } = studentData;
-                const {
-                    studentName,
-                    className,
-                    sectionName,
-                    dob,
-                    permanentAddress,
-                    preSignedUrlResponse,
-                } = contentRequest;
-                // Create the HTML for each student's gate pass
-                const gatePassHtml = `
+      // Clear any existing content
+      studentsListElement.innerHTML = "";
+
+      // Iterate over each student in the data array
+      data.forEach((studentData, index) => {
+        const { school, contentRequest } = studentData;
+        const {
+          studentName,
+          className,
+          sectionName,
+          dob,
+          permanentAddress,
+          preSignedUrlResponse,
+        } = contentRequest;
+        // Create the HTML for each student's gate pass
+        const gatePassHtml = `
               <div style="width: 700px; border: 1px solid #000; padding: 0.3mm; font-family: Arial, sans-serif; margin: 20px auto;">
                 <!-- Header Section -->
                 <div style="text-align: center; background-color: #d9f9d9; padding: 10px;display: flex; align-items: center; ">
 
-                                    <img src="
-https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/schoolLogo.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241121T053233Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241121%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=b570a3f194a315717c442a28c7825bc3feb91f6824589c6e45f7c9d0ce4911fc" alt="School Logo" style="max-width: 100px; height: auto; display: block; margin: 0;">
+                                    <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-11T07_16_33_701959259.png" alt="School Logo" style="max-width: 100px; height: auto; display: block; margin: 0;">
 
 <div style="width: 80%;align-items: center; " >
                   <h2 style="margin: 0; font-size: 24px;">${school.schoolName}</h2>
@@ -50,18 +49,40 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
     
                 <!-- Title -->
                 <div style="padding: 10px">
-                <h3 style="text-align: center; margin: 10px 0 10px; font-size: 22px;">GATE PASS</h3>
+                <h3 style="text-align: center; margin: 0px 100px 5px 0px; font-size: 22px;">GATE PASS 
+                    <span style="text-align: center; margin: 0px -300px 0px 100px; font-size: 16px;"><strong>Time:</strong> ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </h3> 
+                
+
     
                 <!-- Details Section -->
                 <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                  <div>
-                    <p style="margin: 5px 0;"><strong>Student Name:</strong> ${studentName}</p>
-                    <p style="margin: 5px 0;"><strong>Class:</strong> ${className}-${sectionName}</p>
-                    <p style="margin: 5px 0;"><strong>Bus No:</strong> ______________________</p>
-                    <p style="margin: 5px 0;"><strong>Contact:</strong> ${permanentAddress.mobileNo}</p>
-                    <p style="margin: 5px 0;"><strong>Reason:</strong> __________________________</p>
-                    <p style="margin: 5px 0;"><strong>Taken By:</strong> ______________________</p>
-                  </div>
+                  <table style="width: 80%; border-collapse: collapse;">
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Student Name</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${studentName}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Class</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${className}-${sectionName}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Bus No</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ____________________</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Contact</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ${permanentAddress.mobileNo}</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Reason</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ________________________</td>
+                    </tr>
+                    <tr>
+                      <th style="border: none;text-align :left; padding: 5px;">Taken By</th>
+                      <td style="border: none;text-align :left; padding: 5px;"> : ____________________</td>
+                    </tr>
+                  </table>
                   <div style="border: 1px solid #000; width: 120px; height: 150px; text-align: center; display: flex; align-items: center; justify-content: center;">
                     <img src="${preSignedUrlResponse.url}" alt="Student Photo" style="max-width: 100%; max-height: 100%;" />
                   </div>
@@ -70,7 +91,7 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
                 <!-- Footer Section -->
                 <div style="display: flex; justify-content: space-between;">
                   <p style="margin: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                  <p style="margin: 0; text-align: right;"><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                  
                 </div>
                 <div style="text-align: right; margin-top: 30px;">
                   <p style="margin: 0;"><strong>Principal</strong></p>
@@ -79,11 +100,14 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
               </div>
             `;
 
-                // Append each gate pass to the DOM
-                studentsListElement.innerHTML += gatePassHtml;
-            });
-        };
-    </script>
+        // Append each gate pass to the DOM
+        studentsListElement.innerHTML += gatePassHtml;
+      }
+      );
+    };
+
+
+  </script>
 
 
 </body>
@@ -93,156 +117,156 @@ https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SAEI871/school-media/scho
 
 
 <script>
-    window.SetTemplateData(
+  window.SetTemplateData(
 
 
-        [
-            {
-                "school": {
-                    "uid": "36ecc460-7970-49fe-adbc-3ab07f1e30bb",
-                    "apikey": "XnlKPMf7TEELc-Z42eWG0IAlS1gduT7N",
-                    "schoolName": "QuickCampus QT School",
-                    "schoolAbb": "QC",
-                    "educationBoard": "Central Board of Secondary Education (CBSE)",
-                    "registrationNo": "6578",
-                    "plotNumber": "23/1",
-                    "area": "BU Block,Pitampura",
-                    "city": "New-Delhi",
-                    "pincode": "110034",
-                    "state": "Delhi",
-                    "phoneNo1": null,
-                    "phoneNo2": null,
-                    "contactName": "Demo School",
-                    "contactMobile": "7788990088",
-                    "contactEmail": null,
-                    "schoolCode": "4561",
-                    "pfCode": "QC0001",
-                    "societyManagement": null,
-                    "language": "English",
-                    "schoolLogo": null,
-                    "schoolFavicon": null,
-                    "enabled": true,
-                    "subDomain": "qc",
-                    "website": null,
-                    "schemaPrefix": null,
-                    "editedDate": "20-11-2024 03:24 PM",
-                    "editedUser": "quickadmin",
-                    "visitorSchool": false,
-                    "clientSchoolId": null,
-                    "cscId": null,
-                    "onlinePaymentEnabled": true,
-                    "registrationSeries": null,
-                    "underTakingDetails": null,
-                    "formNumberStart": null,
-                    "sessionResponse": null,
-                    "schoolLogoUrl": null,
-                    "printAcknowledge": false,
-                    "wabaId": "",
-                    "phoneNumberId": "",
-                    "whatsappApiKey": "",
-                    "isQuickCampusWhatsapp": true,
-                    "notificationEnabled": true,
-                    "loanEnabled": false,
-                    "whatsAppEnabled": true,
-                    "smsenabled": true
-                },
-                "contentRequest": {
-                    "id": 327137,
-                    "uid": "3bdebce4-cdd0-445e-b683-1121ea0dd37f",
-                    "admissionNo": "0001",
-                    "studentName": "aakash",
-                    "className": "I",
-                    "sectionName": "A",
-                    "joiningStatus": "NA",
-                    "joiningDate": "2022-01-01",
-                    "gender": "",
-                    "certificate": "",
-                    "joiningClassName": "I",
-                    "joiningSectionName": "A",
-                    "group": null,
-                    "status": "Studying",
-                    "caste": "",
-                    "wing": "NA",
-                    "house": null,
-                    "dob": "2024-10-22",
-                    "rollNo": 0,
-                    "session": "2024-2025",
-                    "permanentEducationNumber": "",
-                    "preSignedUrlResponse": {
-                        "url": "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/QC/student-info/0001/student/images/0001.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241121T045636Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241121%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=8fab0cdbd54997a02e135681a87d2e1e1afa23d6903597d9019b66de4f6867b9",
-                        "fileName": "0001.png"
-                    },
-                    "fatherInformation": {
-                        "name": "",
-                        "qualification": null,
-                        "occupation": "",
-                        "yearlyIncome": "",
-                        "email": ""
-                    },
-                    "motherInformation": {
-                        "name": "",
-                        "qualification": null,
-                        "occupation": "",
-                        "yearlyIncome": "",
-                        "email": ""
-                    },
-                    "permanentAddress": {
-                        "houseNo": null,
-                        "area": "",
-                        "street": "",
-                        "city": "",
-                        "pincode": null,
-                        "state": "",
-                        "emergencyNo": "",
-                        "phoneNo": "",
-                        "mobileNo": "8810658333"
-                    },
-                    "correspondanceAddress": {
-                        "houseNo": null,
-                        "area": "",
-                        "street": "",
-                        "city": "",
-                        "pincode": null,
-                        "state": "",
-                        "emergencyNo": "",
-                        "phoneNo": "",
-                        "mobileNo": "8810658333"
-                    },
-                    "officialAddress": {
-                        "houseNo": "",
-                        "area": "",
-                        "street": null,
-                        "city": "",
-                        "pincode": "0",
-                        "state": "",
-                        "emergencyNo": "",
-                        "phoneNo": "",
-                        "mobileNo": ""
-                    },
-                    "guardianInformation": {
-                        "guradianName": "",
-                        "guradianRelation": "",
-                        "guradianOccupation": "",
-                        "guradianEmail": "",
-                        "guradianMobileNo": ""
-                    },
-                    "characterCertificateDetail": {
-                        "uid": "c913754a-caa0-44e9-834c-5dd22665e9c4",
-                        "type": "GOOD",
-                        "issueDate": "2024-11-21"
-                    },
-                    "transportDetails": {
-                        "circleName": null,
-                        "routeName": null,
-                        "pickUp": null,
-                        "drop": null
-                    },
-                    "certificateList": null,
-                    "bloodGroup": ""
-                },
-                "header": null,
-                "footer": null,
-                "student": {}
-            }
-        ])
+    [
+      {
+        "school": {
+          "uid": "36ecc460-7970-49fe-adbc-3ab07f1e30bb",
+          "apikey": "XnlKPMf7TEELc-Z42eWG0IAlS1gduT7N",
+          "schoolName": "QuickCampus QT School",
+          "schoolAbb": "QC",
+          "educationBoard": "Central Board of Secondary Education (CBSE)",
+          "registrationNo": "6578",
+          "plotNumber": "23/1",
+          "area": "BU Block,Pitampura",
+          "city": "New-Delhi",
+          "pincode": "110034",
+          "state": "Delhi",
+          "phoneNo1": null,
+          "phoneNo2": null,
+          "contactName": "Demo School",
+          "contactMobile": "7788990088",
+          "contactEmail": null,
+          "schoolCode": "4561",
+          "pfCode": "QC0001",
+          "societyManagement": null,
+          "language": "English",
+          "schoolLogo": null,
+          "schoolFavicon": null,
+          "enabled": true,
+          "subDomain": "qc",
+          "website": null,
+          "schemaPrefix": null,
+          "editedDate": "20-11-2024 03:24 PM",
+          "editedUser": "quickadmin",
+          "visitorSchool": false,
+          "clientSchoolId": null,
+          "cscId": null,
+          "onlinePaymentEnabled": true,
+          "registrationSeries": null,
+          "underTakingDetails": null,
+          "formNumberStart": null,
+          "sessionResponse": null,
+          "schoolLogoUrl": null,
+          "printAcknowledge": false,
+          "wabaId": "",
+          "phoneNumberId": "",
+          "whatsappApiKey": "",
+          "isQuickCampusWhatsapp": true,
+          "notificationEnabled": true,
+          "loanEnabled": false,
+          "whatsAppEnabled": true,
+          "smsenabled": true
+        },
+        "contentRequest": {
+          "id": 327137,
+          "uid": "3bdebce4-cdd0-445e-b683-1121ea0dd37f",
+          "admissionNo": "0001",
+          "studentName": "aakash",
+          "className": "I",
+          "sectionName": "A",
+          "joiningStatus": "NA",
+          "joiningDate": "2022-01-01",
+          "gender": "",
+          "certificate": "",
+          "joiningClassName": "I",
+          "joiningSectionName": "A",
+          "group": null,
+          "status": "Studying",
+          "caste": "",
+          "wing": "NA",
+          "house": null,
+          "dob": "2024-10-22",
+          "rollNo": 0,
+          "session": "2024-2025",
+          "permanentEducationNumber": "",
+          "preSignedUrlResponse": {
+            "url": "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/QC/student-info/0001/student/images/0001.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241121T045636Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241121%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=8fab0cdbd54997a02e135681a87d2e1e1afa23d6903597d9019b66de4f6867b9",
+            "fileName": "0001.png"
+          },
+          "fatherInformation": {
+            "name": "",
+            "qualification": null,
+            "occupation": "",
+            "yearlyIncome": "",
+            "email": ""
+          },
+          "motherInformation": {
+            "name": "",
+            "qualification": null,
+            "occupation": "",
+            "yearlyIncome": "",
+            "email": ""
+          },
+          "permanentAddress": {
+            "houseNo": null,
+            "area": "",
+            "street": "",
+            "city": "",
+            "pincode": null,
+            "state": "",
+            "emergencyNo": "",
+            "phoneNo": "",
+            "mobileNo": "8810658333"
+          },
+          "correspondanceAddress": {
+            "houseNo": null,
+            "area": "",
+            "street": "",
+            "city": "",
+            "pincode": null,
+            "state": "",
+            "emergencyNo": "",
+            "phoneNo": "",
+            "mobileNo": "8810658333"
+          },
+          "officialAddress": {
+            "houseNo": "",
+            "area": "",
+            "street": null,
+            "city": "",
+            "pincode": "0",
+            "state": "",
+            "emergencyNo": "",
+            "phoneNo": "",
+            "mobileNo": ""
+          },
+          "guardianInformation": {
+            "guradianName": "",
+            "guradianRelation": "",
+            "guradianOccupation": "",
+            "guradianEmail": "",
+            "guradianMobileNo": ""
+          },
+          "characterCertificateDetail": {
+            "uid": "c913754a-caa0-44e9-834c-5dd22665e9c4",
+            "type": "GOOD",
+            "issueDate": "2024-11-21"
+          },
+          "transportDetails": {
+            "circleName": null,
+            "routeName": null,
+            "pickUp": null,
+            "drop": null
+          },
+          "certificateList": null,
+          "bloodGroup": ""
+        },
+        "header": null,
+        "footer": null,
+        "student": {}
+      }
+    ])
 </script>

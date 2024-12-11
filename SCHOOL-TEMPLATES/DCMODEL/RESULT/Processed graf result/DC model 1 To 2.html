@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D C model 1 to 2</title>
+</head>
+
+<body>
+  <div id="studentsList">D C model 1 to 2</div>
+</body>
+<script>
+  window.SetTemplateData = function (data) {
+    const dataList = Array.isArray(data) ? data : [data];
+    const viewTemplate = dataList[0]?.viewTemplate;
+    const staticData = [
+    ];
+
+    function getAttendanceOrMark(status, mark) {
+      const attendanceValue = {
+        Absent: "AB",
+        Medical: "M",
+        Sports: "S",
+        Leave: "L",
+        "Late Admission": "LA",
+        Exempted: "EX",
+        NA: "NA"
+      };
+      return attendanceValue[status] || mark || "-";
+    }
+
+
+
+
+    function generateBarGraph(jsonData, graphContainer) {
+      // Create a canvas element dynamically
+      const canvas = document.createElement("canvas");
+      canvas.width = 796;
+      canvas.height = 400;
+      canvas.style.paddingTop = "10px";
+
+      canvas.style.margin = "0px auto";
+      const ctx = canvas.getContext("2d");
+
+      // Find the graph container and append the canvas
+      if (graphContainer) {
+        graphContainer.appendChild(canvas);
+      }
+
+      // Prepare data for the bar graph
+      const labels = [];
+      const termData = {};
+      const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"];
+
+      // Process jsonData
+      jsonData
+        .filter((subject) => subject.subjectNature === "Theory")
+        .forEach((subject) => {
+          labels.push(subject.subjectName);
+          subject.termsMarks.forEach((term, index) => {
+            if (!termData[term.termName]) {
+              termData[term.termName] = {
+                data: [],
+                color: colors[index % colors.length]
+              };
+            }
+            termData[term.termName].data.push(term.obtainedMarks || 0);
+          });
+        });
+
+      const terms = Object.keys(termData);
+      const datasets = terms.map((term) => termData[term]);
+
+      // Set up graph dimensions
+      const barWidth = 20;
+      const gapBetweenBars = 0;
+      const gapBetweenGroups = 20;
+      const chartHeight = canvas.height - 100;
+      const chartWidth = canvas.width - 100;
+      const maxMarks = 100;
+
+      const totalBarWidth = terms.length * (barWidth + gapBetweenBars);
+      const startX =
+        (chartWidth - labels.length * (totalBarWidth + gapBetweenGroups)) / 3 + 10;
+
+      // Draw Y-axis
+      ctx.beginPath();
+      ctx.moveTo(50, chartHeight);
+      ctx.lineTo(50, 10);
+      ctx.stroke();
+
+      // Draw X-axis
+      ctx.beginPath();
+      ctx.moveTo(50, chartHeight);
+      ctx.lineTo(canvas.width - 50, chartHeight);
+      ctx.stroke();
+
+      // Y-axis labels
+      for (let i = 0; i <= maxMarks; i += 10) {
+        const y = chartHeight - (i / maxMarks) * (chartHeight - 10);
+        ctx.fillText(i, 25, y);
+        ctx.beginPath();
+        ctx.moveTo(50, y);
+        ctx.lineTo(55, y);
+        ctx.stroke();
+      }
+
+      // Draw bars
+      labels.forEach((label, i) => {
+        const groupStartX = startX + i * (totalBarWidth + gapBetweenGroups);
+
+        datasets.forEach((dataset, j) => {
+          const barHeight = (dataset.data[i] / maxMarks) * (chartHeight - 10);
+          const barX = groupStartX + j * (barWidth + gapBetweenBars);
+          const barY = chartHeight - barHeight;
+
+          ctx.fillStyle = dataset.color;
+          ctx.fillRect(barX, barY, barWidth, barHeight);
+
+          // Bar label
+          ctx.fillStyle = "#000";
+          ctx.font = "12px Arial";
+          ctx.fillText(dataset.data[i], barX + barWidth / 4, barY - 5);
+        });
+
+        // Group label with tilted text
+        ctx.save(); // Save the current canvas state
+        ctx.translate(
+          groupStartX + totalBarWidth / 2, // Move to label position
+          chartHeight + 10
+        );
+        ctx.rotate(-Math.PI / 4); // Rotate text by -45 degrees
+        ctx.fillStyle = "#000";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "right"; // Align text for proper tilt
+        ctx.fillText(label, 0, 0);
+        ctx.restore(); // Restore the canvas state to default
+      });
+
+      // Draw legend
+      terms.forEach((term, index) => {
+        const legendX = canvas.width - 200;
+        const legendY = 20 + index * 20;
+
+        ctx.fillStyle = termData[term].color;
+        ctx.fillRect(legendX, legendY, 15, 15);
+
+        ctx.fillStyle = "#000";
+        ctx.font = "12px Arial";
+        ctx.fillText(term, legendX + 20, legendY + 12);
+      });
+    }
+
+
+
+    // Helper function to calculate grades based on percentage
+    function calculateGrade(percentage) {
+      if (percentage >= 90) return "A1";
+      if (percentage >= 80) return "A2";
+      if (percentage >= 70) return "B1";
+      if (percentage >= 60) return "B2";
+      if (percentage >= 50) return "C1";
+      if (percentage >= 40) return "C2";
+      return "D";
+    }
+
+
+    function generateScholasticRows(subjects) {
+      let totalMarksObtained = 0;
+      let totalPossibleMarks = 0;
+      let graphData = [];
+
+      const rows = subjects
+        ?.map((subject, index) => {
+          let pt1 = "-",
+            pt1Total = "",
+            sa1 = "-",
+            sa1Total = "",
+            pt2 = "-",
+            pt2Total = "",
+            assessment = "-",
+            assessmentTotal = "",
+            midTerm = "-",
+            midTermTotal = "";
+
+          let subjectGraphData = {
+            subjectName: subject?.subjectName || "",
+            subjectNature: subject?.subjectNature || "",
+            termsMarks: []
+          };
+
+          subject?.markSheetReport?.forEach((report) => {
+            console.log(report, "ffffffffff report")
+
+
+            let termData = {
+              termName: report?.markSheetTermResponse?.headerName || "",
+              maxMarks: report?.max || 0,
+              obtainedMarks: report?.obtained || 0,
+            };
+
+            switch (report?.markSheetTermResponse?.headerName) {
+              case "PERIODIC TEST 1":
+                pt1 = getAttendanceOrMark(report?.status, report?.obtained);
+                pt1Total = report?.max;
+                break;
+              case "HALF YEARLY":
+                sa1 = getAttendanceOrMark(report?.status, report?.obtained);
+                sa1Total = report?.max;
+                break;
+              case "PERIODIC TEST 2":
+                pt2 = getAttendanceOrMark(report?.status, report?.obtained);
+                pt2Total = report?.max;
+                break;
+
+            }
+
+            // Add the term data to subjectGraphData
+
+            subjectGraphData.termsMarks.push(termData);
+
+          });
+
+          // Push subjectGraphData to graphData array
+          graphData.push(subjectGraphData);
+
+          if (!subject?.markSheetReport[0]?.graded) {
+            totalMarksObtained += Number(subject?.marksObtained) || 0;
+            totalPossibleMarks +=
+              Number(pt1Total) +
+              Number(sa1Total) +
+              Number(pt2Total) +
+              Number(assessmentTotal) +
+              Number(midTermTotal);
+
+            return `
+          <tr>
+            <td style=" ; text-align:center">${index + 1}</td>
+            <td style="text-transform: uppercase">${subject?.subjectName}</td>
+            <td style="font-weight:${isNaN(pt1) ? "bold" : "normal"}; text-align:center">${pt1}</td>
+            <td style="font-weight:${isNaN(sa1) ? "bold" : "normal"}; text-align:center">${sa1}</td>
+            <td style="font-weight:${isNaN(pt2) ? "bold" : "normal"}; text-align:center">${pt2}</td>
+            
+          </tr>
+        `;
+          } else {
+            return "";
+          }
+        })
+        .join("");
+
+      return {
+        rows,
+        totalMarksObtained,
+        totalPossibleMarks,
+        graphData
+      };
+    }
+
+    function handleGetDate() {
+      let date = new Date(Date.now())
+      let day = date.getDate().toString().padStart(2, "0")
+      let month = (date.getMonth() + 1).toString().padStart(2, "0")
+      let year = date.getFullYear()
+      return `${day}-${month}-${year}`
+    }
+
+
+
+    const multipleStudents = viewTemplate ? staticData : dataList;
+    const studentHtml = document.getElementById("studentsList");
+    studentHtml.innerHTML = ``;
+    multipleStudents?.forEach((element) => {
+      const singleStudentHtml = document.createElement("div");
+      singleStudentHtml.style.pageBreakBefore = "always";
+      const graphId = `graph-${element?.student?.studentId || Math.random()}`;
+
+      const scholasticResult = generateScholasticRows(
+        element?.markData?.subjectWiseMarkSheetReportResponses
+      );
+      let totalHeaderName = 0;
+
+
+
+      singleStudentHtml.innerHTML = `
+            <style type="text/css">
+@page {
+size: A4
+}
+
+                @media print {
+@page {
+margin:2mm;
+size: A4;
+
+
+}
+
+}
+                 body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+         .header {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+      
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .section table,
+        .section th,
+        .section td {
+            border: 1px solid #000;
+        }
+
+       
+        .section td {
+            padding: 2px;
+            text-align:left;
+            font-size: 14px;
+            margin: 0px;
+        }
+            .section h4,
+        .section th {
+            padding: 2px;
+            text-align:center;
+            font-size: 14px;
+            margin: 0px;
+        }
+
+
+
+        .remarks {
+            margin-bottom: 20px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+
+        }
+
+        .signatures div {
+font-size: 14px;
+margin-bottom: 5px;
+padding: 0px;
+            width: 30%;
+            text-align: center;
+           
+        }
+             .graphContainer {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+        .signatures p{
+        margin: 0px;
+         font-weight: bold;
+        }
+            </style>
+                      <page orientation="portrait" format="A4" margin="0">
+                <div class="container">
+
+
+
+            <div class="container">
+
+
+
+            
+ <div class="header">
+              <img style="width:80px" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png" alt="School Logo">
+              <div >
+                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_51_48_973290348.png" alt="Heading" style="height:35px;width:70%;"/>
+                <p style="font-size:13px ;margin:0px ;padding:0px">Affiliated to CBSE vide Aff No. 530531</p>
+                <p style="font-size:13px ;margin:0px ;padding:0px>Sector-9, Faridabad, (Haryana) India-121006</p>
+                <p style="font-size:13px ;margin:0px ;padding:0px>Email Id : dcmodelfaridabad@gmail.com Help Desk : +91-129-2226000, 9871583000</p>
+                
+              </div>
+              <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_24_05_218290156.png" alt="School Logo">
+
+
+            </div>
+                                               <p style="font-size:13px; margin-top:5px;text-align:center;font-weight:bold">ACADEMIC SESSION-${element.markData.academicSession
+        }</p> 
+                          
+                        <p style="font-size:13px; margin-top:-10px;margin-bottom:0px;text-align:center;font-weight:bold">PROGRESS REPORT CARD ( ${element.markData.markSheetName} )</p>
+
+                    </div>
+
+
+                    <div class="section">
+                        <table style="margin: 2px;">
+                            <tr>
+                                <th style="width: 25%; text-align: left">NAME OF THE STUDENT :</th>
+                                <td style="width: 25%;">${element.student.studentName
+        }</td>
+                                <th style="width: 25%;text-align: left">ADMISSION NO. :</th>
+                                <td style="width: 25%;">${element.student.admissionNo
+        }</td>
+                            </tr>
+                            <tr>
+                                <th style="width: 25%;text-align: left">FATHER'S NAME :</th>
+                                <td>${element.student.fatherName}</td>
+                               <th style="text-align: left">CLASS & SECTION :</th>
+                                <td>${element.student.className} - ${element.student.sectionName
+        }</td>
+                            </tr>
+                            <tr>
+                                <th     style="text-align:left">MOTHER'S NAME :</th>
+                                <td>${element.student.motherName}</td>
+ <th      style="width: 25%;text-align: left">HOUSE :</th>
+                                <td>${element?.student?.studentInfoResponse[0]?.houses || ""}</td>
+
+                                
+                            </tr>
+                            <tr>
+                                <th     style="text-align:left">ADDRESS :</th>
+                                <td>${element.student.studentInfoResponse[0]?.area},${element.student.studentInfoResponse[0]?.city},
+${element.student.studentInfoResponse[0]?.state}</td>
+ <th      style="width: 25%;text-align: left">ROLL NO. :</th>
+                                <td>${element.student.rollNo}</td>
+
+                                
+                            </tr>
+                            <tr>
+                                <th     style="text-align:left">DATE OF BIRTH :</th>
+                                <td>${element.student.dob}</td>
+ <th      style="width: 25%;text-align: left">CONTACT NO. : </th>
+                                <td>${element.student.studentInfoResponse[0]?.mobileNumber}</td>
+
+                                
+                            </tr>
+                        </table>
+                    </div>
+
+
+                    <div class="section">
+                        <h3 style="text-align: left; margin: 0px; margin-top: -15px ; font-size: 14px;">SCHOLASTIC AREAS (8 POINT GRADING SCALE )</h3>
+                        <table >
+                            
+                         
+                              
+                                 <tr> <th rowspan="2">SR.NO.</th>
+                           <th rowspan="2" style="text-align: center; ">SUBJECT</th>  </tr>
+                                
+                                ${element?.markData?.markSheetTerms
+          ?.map((term) => {
+            const headerValue =
+              parseInt(
+                term?.headerName?.replace(/[()]/g, "")
+              ) || 0;
+            totalHeaderName += headerValue;
+            return `
+            
+            <th style="text-align: center; ">${term?.headerName}<h4>${term?.subHeaderName}</h4></th>`;
+          })
+          .join("")}
+                                
+                            </tr>
+                            <tr>
+                              
+</tr>
+                            ${scholasticResult.rows}
+                            
+                        </table>
+                    </div>
+                  <div class="graphContainer">
+            <h4>Performance Graph ${element?.student?.studentName}</h4>
+                        <div id="${graphId}" style="border: 1px solid black"></div>
+
+          </div>
+<div class="section">
+                    <table style="margin-bottom: 5px;" >
+                        <tr >
+                     
+                         <td style="white-space: nowrap;" >
+                            
+                                <strong>ATTENDANCE:</strong> ${element?.remarks?.fields?.find(e => e.title.toLowerCase() === "sa1")?.value || ""
+        }    
+                            </td >
+                        </tr >
+            <tr>
+                <td > <strong>REMARKS: </strong>${element.baseTermData?.remarksEntry?.description ||
+        " __________________________________________________________________________________"
+        }</td>
+            </tr>
+                    </table >
+
+                    <table style="border: none;
+    margin-top: 10px;">
+                        <tr style="border-top: none">
+                            <th style="width: 30%; text-align: left">DATE: ${element?.printDate || handleGetDate()
+        }</th>
+                            <td style="width: 30%; text-align: left ; border-top: none ; border-bottom: none"></td>
+                            <th style="width: 30%; text-align: left">PLACE:${element.baseTermData?.school?.city || "______"
+        }
+</th>
+                        </tr>
+                    </table >
+
+                    </div >
+                    <div class="signatures">
+                        <div>
+                            <p style=" height: 60px" ></p>
+                            <p>CLASS TEACHER</p>
+                        </div>
+
+                        ${element.student.className === "VI" || element.student.className === "VII" || element.student.className === "VIII" ? `  <div>
+ <img style="width: 120px; height: 60px " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_35_704961643.png" alt="School Logo" class="logo"/>
+                            <p>Academic Co ordinator</p>
+                        </div>
+` : `  <div>
+                            <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_22_22_114274846.png" alt="School Logo" class="logo"/>
+                            <p>WING INCHARGE</p>
+                        </div>
+`}
+                      
+
+                        <div>
+                            <img style="width: 100px; " src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-03T07_23_07_369478690.png" alt="School Logo" class="logo"/>
+                            <p>PRINCIPAL</p>
+                        </div>
+                    </div>
+                    <div>
+                     
+                      <div style="border: 1px solid; padding: 5px ;display: flex;width: 99%;font-size: 12px; font-weight: bold ;margin-bottom: 10px">
+                        <div style="width: 25%; text-align: center;" >8 POINT GRADING SCALE :-</div>
+                        <div style="width: 75%; text-align: left;">A1=91%-100%, A2= 81%-90%, B1=71%-80%,B2=61%-70%, C1=51%-60%,C2=41%-50%, D=33%-40%, E =32%-00%</div>
+                        
+
+</div>
+<div style="border: 1px solid; padding: 5px ;display: flex;width: 99%;font-size: 12px; font-weight: bold">
+                        <div style="width: 25%; text-align: center;" >5 POINT GRADING SCALE :- </div>
+                        <div style="width: 75%; text-align: left;">A= OUTSTANDING, B = VERY GOOD, C = FAIR,  D = SATISFACTORY,E = NEEDS IMPROVMENT,</div>
+                        
+
+</div>
+
+
+
+
+                </div >
+                </page>
+            `;
+
+
+      studentHtml.appendChild(singleStudentHtml);
+
+      const graphContainer = document.getElementById(graphId);
+
+      generateBarGraph(scholasticResult?.graphData, graphContainer)
+    });
+  };
+
+</script>
+
+<!-- <script>
+    window.SetTemplateData(
+        {
+            viewTemplate: true,
+        }
+
+    );
+</script> -->
+
+<script>
+  window.SetTemplateData(
+    [
+      {
+        "student": {
+          "dob": "04-10-2018",
+          "admissionNo": "20220001",
+          "studentName": "Shivaan Ahuja",
+          "className": "I",
+          "sectionName": "A",
+          "rollNo": 26,
+          "fatherName": "Mr. Sanjeev Ahuja",
+          "motherName": "Mrs. Garima Ahuja",
+          "attendance": "64.0/77",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 290572,
+              "userUid": "c09f421e-dc99-4210-a808-0b612bd8b720",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+              "studentId": "20220001",
+              "exAdmissionNo": null,
+              "studentName": "Shivaan Ahuja",
+              "fatherName": "Mr. Sanjeev Ahuja",
+              "motherName": "Mrs. Garima Ahuja",
+              "dob": "04-10-2018",
+              "gender": "Male",
+              "studentAdhaarcard": "711340553451",
+              "joiningClass": "I",
+              "joiningSections": "A",
+              "joiningDate": "10-03-2022",
+              "plotNumber": "AAGMAN SOCIETY ,TOWER -3",
+              "area": "Sector-70",
+              "city": "Faridabad",
+              "state": "Haryana",
+              "pincode": "121004",
+              "phone1": "9711911528",
+              "rollNo": 26,
+              "emergencyNumber": "7678419759",
+              "mobileNumber": "9711911528",
+              "studentEmail": null,
+              "religion": "HINDU",
+              "category": "GENERAL",
+              "minority": "No",
+              "motherTongue": "Hindi",
+              "idMark": "",
+              "height": "111",
+              "weight": "20",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "GOOD",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "FBD",
+              "fatherState": "Haryana",
+              "fatherPincode": "121004",
+              "fatherPhone": "",
+              "fatherMobile": "9711911528",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "299346710861",
+              "schoolUid": "55e97712-7e3a-4962-9929-d63cee64c452",
+              "motherQualification": "",
+              "motherOccupation": "HOME MAKER",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "FBD",
+              "motherState": "Haryana",
+              "motherPincode": "121004",
+              "motherPhone": "",
+              "motherMobile": "7678419759",
+              "motherEmail": null,
+              "motherAdhaarNumber": "297145978302",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": "SMART KIT ,SEC 8",
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": "PASS",
+              "classTeacher": "",
+              "classTeacherUserName": "",
+              "classes": "I",
+              "classUid": null,
+              "sections": "A",
+              "group": "I",
+              "wing": "Junior",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "Old",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "APR"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "MAY"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "JUN"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "JUL"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "AUG"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "SEP"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "OCT"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "NOV"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "DEC"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "JAN"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "FEB"
+                },
+                {
+                  "concessionName": "ANNUAL 20%",
+                  "consessionType": null,
+                  "employeeId": null,
+                  "installment": "MAR"
+                }
+              ],
+              "studentTransport": [
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "APR"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "MAY"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "JUN"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "AUG"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "SEP"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "OCT"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "NOV"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "DEC"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "JAN"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "FEB"
+                },
+                {
+                  "circle": "SLAB-2",
+                  "route": "BUS-12 A",
+                  "pick": "AAGMAN SOCIETY",
+                  "drop": "AAGMAN SOCIETY",
+                  "installment": "MAR"
+                }
+              ],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "QuickCampus",
+              "editedUser": "varuniBhatia_507415",
+              "createddate": "2024-05-16 04:57:19.991299",
+              "editeddate": "2024-09-21 04:54:01.914258",
+              "permanentEducationNumber": "",
+              "studentAddressResponse": {
+                "uid": "849c3235-f467-46c3-9ea0-8e39aedeb979",
+                "houseNo": null,
+                "area": "Sector-70",
+                "landmark": null,
+                "city": "Faridabad",
+                "district": null,
+                "state": "Haryana",
+                "poPs": null,
+                "pincode": 121004,
+                "street": "AAGMAN SOCIETY ,TOWER -3 ",
+                "userName": "dcms832_20220001",
+                "createdDate": "16-05-2024 10:27 AM",
+                "editedDate": "21-09-2024 10:24 AM",
+                "createdBy": "QuickCampus",
+                "editedBy": "varuniBhatia_507415"
+              },
+              "fatherAddressResponse": {
+                "uid": "35477170-957a-4501-a406-c9f5e5b0cacd",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "FBD",
+                "district": null,
+                "state": "Haryana",
+                "poPs": null,
+                "pincode": 121004,
+                "street": null,
+                "userName": null,
+                "createdDate": "16-05-2024 10:27 AM",
+                "editedDate": "21-09-2024 10:24 AM",
+                "createdBy": "QuickCampus",
+                "editedBy": "varuniBhatia_507415"
+              },
+              "motherAddressResponse": {
+                "uid": "5f68b3c1-72cc-48d3-8c40-83e26dcc4563",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "FBD",
+                "district": null,
+                "state": "Haryana",
+                "poPs": null,
+                "pincode": 121004,
+                "street": null,
+                "userName": null,
+                "createdDate": "16-05-2024 10:27 AM",
+                "editedDate": "21-09-2024 10:24 AM",
+                "createdBy": "QuickCampus",
+                "editedBy": "varuniBhatia_507415"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": {
+                "uid": "fa3d4f2f-35b5-4533-b1e2-cbae32dab536",
+                "houseNo": null,
+                "area": "Sector-70",
+                "landmark": null,
+                "city": "Faridabad",
+                "district": null,
+                "state": "Haryana",
+                "poPs": null,
+                "pincode": 121004,
+                "street": "AAGMAN SOCIETY ,TOWER -3 ",
+                "userName": "dcms832_20220001",
+                "createdDate": "20-07-2024 07:47 AM",
+                "editedDate": "21-09-2024 10:24 AM",
+                "createdBy": "Ms. Astha_491569",
+                "editedBy": "varuniBhatia_507415"
+              }
+            }
+          ],
+          "classTeacher": "",
+          "classTeacherUserName": "",
+          "permanentEducationNumber": "",
+          "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "07-10-2024 11:07 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": null,
+            "phoneNumberId": null,
+            "whatsappApiKey": null,
+            "isQuickCampusWhatsapp": false,
+            "notificationEnabled": true,
+            "loanEnabled": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false
+          }
+        },
+        "markData": {
+          "academicSession": "2024-2025",
+          "admissionNo": "20220001",
+          "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+          "studentName": "Shivaan Ahuja",
+          "rollNo": 26,
+          "fatherName": "Mr. Sanjeev Ahuja",
+          "className": "I",
+          "sectionName": "A",
+          "terms": "PERIODIC TEST 2",
+          "markSheetName": "GRAPHICAL REPORT CARD",
+          "overAllRank": "1",
+          "markSheetTerms": [
+            {
+              "id": 1380,
+              "headerName": "PERIODIC TEST 1",
+              "subHeaderName": "(40)",
+              "priority": 1,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 40,
+              "terms": [
+                "PERIODIC TEST 1"
+              ]
+            },
+            {
+              "id": 1381,
+              "headerName": "HALF YEARLY",
+              "subHeaderName": "(80)",
+              "priority": 2,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 80,
+              "terms": [
+                "HALF YEARLY"
+              ]
+            },
+            {
+              "id": 1382,
+              "headerName": "PERIODIC TEST 2",
+              "subHeaderName": "(40)",
+              "priority": 3,
+              "bestOf": 0,
+              "decimalPlaces": 2,
+              "weightage": 40,
+              "terms": [
+                "PERIODIC TEST 2"
+              ]
+            }
+          ],
+          "subjectWiseMarkSheetReportResponses": [
+            {
+              "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
+              "subjectName": "ENGLISH",
+              "subjectNature": "Theory",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
+                  "subjectName": "ENGLISH",
+                  "subjectNature": "Theory",
+                  "max": 40,
+                  "obtained": 37.6,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 40,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
+                  "subjectName": "ENGLISH",
+                  "subjectNature": "Theory",
+                  "max": 80,
+                  "obtained": 79,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 116.6,
+              "total": 120,
+              "percentage": 97.17,
+              "grade": "A1",
+              "className": "I",
+              "sectionName": "A",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
+              "subjectPrt": 1,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
+              "subjectName": "Hindi",
+              "subjectNature": "Theory",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
+                  "subjectName": "Hindi",
+                  "subjectNature": "Theory",
+                  "max": 40,
+                  "obtained": 39.2,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 40,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
+                  "subjectName": "Hindi",
+                  "subjectNature": "Theory",
+                  "max": 80,
+                  "obtained": 71,
+                  "grade": "A2",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 110.2,
+              "total": 120,
+              "percentage": 91.83,
+              "grade": "A1",
+              "className": "I",
+              "sectionName": "A",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
+              "subjectPrt": 2,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+              "subjectName": "MATHEMATICS",
+              "subjectNature": "Theory",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+                  "subjectName": "MATHEMATICS",
+                  "subjectNature": "Theory",
+                  "max": 40,
+                  "obtained": 31.2,
+                  "grade": "B1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 40,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+                  "subjectName": "MATHEMATICS",
+                  "subjectNature": "Theory",
+                  "max": 80,
+                  "obtained": 80,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 111.2,
+              "total": 120,
+              "percentage": 92.67,
+              "grade": "A1",
+              "className": "I",
+              "sectionName": "A",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
+              "subjectPrt": 3,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+              "subjectName": "SOCIAL SCIENCE",
+              "subjectNature": "Theory",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+                  "subjectName": "SOCIAL SCIENCE",
+                  "subjectNature": "Theory",
+                  "max": 40,
+                  "obtained": 38.4,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 40,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+                  "subjectName": "SOCIAL SCIENCE",
+                  "subjectNature": "Theory",
+                  "max": 80,
+                  "obtained": 78,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 116.4,
+              "total": 120,
+              "percentage": 97,
+              "grade": "A1",
+              "className": "I",
+              "sectionName": "A",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
+              "subjectPrt": 4,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+              "subjectName": "COMPUTER",
+              "subjectNature": "Theory",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+                  "subjectName": "COMPUTER",
+                  "subjectNature": "Theory",
+                  "max": 40,
+                  "obtained": 40,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1380,
+                    "headerName": "PERIODIC TEST 1",
+                    "subHeaderName": "(40)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 40,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                  "admissionNo": "20220001",
+                  "studentName": "Shivaan Ahuja",
+                  "rollNo": 26,
+                  "fatherName": "Mr. Sanjeev Ahuja",
+                  "className": "I",
+                  "sectionName": "A",
+                  "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                  "terms": "PERIODIC TEST 2",
+                  "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+                  "subjectName": "COMPUTER",
+                  "subjectNature": "Theory",
+                  "max": 80,
+                  "obtained": 77,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "GRAPHICAL REPORT CARD",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1381,
+                    "headerName": "HALF YEARLY",
+                    "subHeaderName": "(80)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 80,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 117,
+              "total": 120,
+              "percentage": 97.5,
+              "grade": "A1",
+              "className": "I",
+              "sectionName": "A",
+              "terms": "PERIODIC TEST 2",
+              "markSheetName": "GRAPHICAL REPORT CARD",
+              "subjectPrt": 5,
+              "decimalPlaces": 2,
+              "visible": false
+            }
+          ],
+          "marksObtained": 571.4,
+          "total": 600,
+          "percentage": 95.23,
+          "overAllGrade": "A1",
+          "visible": false
+        },
+        "remarks": {
+          "uid": null,
+          "terms": null,
+          "studentId": null,
+          "studentName": null,
+          "rollNumber": 0,
+          "classSectionUid": null,
+          "classSection": null,
+          "description": null,
+          "fields": null,
+          "status": false,
+          "createdUser": null,
+          "editedUser": null,
+          "createdDate": null,
+          "editedDate": null
+        },
+        "baseTermData": {
+          "studentAcademic": {
+            "dob": "04-10-2018",
+            "admissionNo": "20220001",
+            "studentName": "Shivaan Ahuja",
+            "className": "I",
+            "sectionName": "A",
+            "rollNo": 26,
+            "fatherName": "Mr. Sanjeev Ahuja",
+            "motherName": "Mrs. Garima Ahuja",
+            "attendance": "64.0/77",
+            "boardRollNumber": "",
+            "studentInfoResponse": [
+              {
+                "id": 290572,
+                "userUid": "c09f421e-dc99-4210-a808-0b612bd8b720",
+                "userName": null,
+                "fatherUserName": null,
+                "motherUserName": null,
+                "guardianUserName": null,
+                "uid": "55f8d7e7-76b1-43ae-91fc-fb5448cba791",
+                "studentId": "20220001",
+                "exAdmissionNo": null,
+                "studentName": "Shivaan Ahuja",
+                "fatherName": "Mr. Sanjeev Ahuja",
+                "motherName": "Mrs. Garima Ahuja",
+                "dob": "04-10-2018",
+                "gender": "Male",
+                "studentAdhaarcard": "711340553451",
+                "joiningClass": "I",
+                "joiningSections": "A",
+                "joiningDate": "10-03-2022",
+                "plotNumber": "AAGMAN SOCIETY ,TOWER -3",
+                "area": "Sector-70",
+                "city": "Faridabad",
+                "state": "Haryana",
+                "pincode": "121004",
+                "phone1": "9711911528",
+                "rollNo": 26,
+                "emergencyNumber": "7678419759",
+                "mobileNumber": "9711911528",
+                "studentEmail": null,
+                "religion": "HINDU",
+                "category": "GENERAL",
+                "minority": "No",
+                "motherTongue": "Hindi",
+                "idMark": "",
+                "height": "111",
+                "weight": "20",
+                "physicalDisability": "",
+                "bloodGroup": "",
+                "healthRemark": "GOOD",
+                "siblingDetails": "",
+                "alumni": "",
+                "siblingResponse": [],
+                "fatherOccupation": "",
+                "fatherQualification": "",
+                "fatherOrganization": "",
+                "fatherDesignation": "",
+                "fatherIncome": "",
+                "fatherArea": "NA",
+                "fatherCity": "FBD",
+                "fatherState": "Haryana",
+                "fatherPincode": "121004",
+                "fatherPhone": "",
+                "fatherMobile": "9711911528",
+                "fatherEmail": null,
+                "fatherAdhaarNumber": "299346710861",
+                "schoolUid": "55e97712-7e3a-4962-9929-d63cee64c452",
+                "motherQualification": "",
+                "motherOccupation": "HOME MAKER",
+                "motherOrganization": "",
+                "motherDesignation": "",
+                "motherIncome": "",
+                "motherArea": "NA",
+                "motherCity": "FBD",
+                "motherState": "Haryana",
+                "motherPincode": "121004",
+                "motherPhone": "",
+                "motherMobile": "7678419759",
+                "motherEmail": null,
+                "motherAdhaarNumber": "297145978302",
+                "guardianName": null,
+                "relation": null,
+                "guardianOccupation": null,
+                "guardianPhone": null,
+                "guardianMobile": null,
+                "guardianEmail": null,
+                "guardianAddress": null,
+                "leavingDate": null,
+                "previousSchoolName": "SMART KIT ,SEC 8",
+                "otp": null,
+                "schoolName": "Demo Public School",
+                "remark": "PASS",
+                "classTeacher": "",
+                "classTeacherUserName": "",
+                "classes": "I",
+                "classUid": null,
+                "sections": "A",
+                "group": "I",
+                "wing": "Junior",
+                "status": "Studying",
+                "academicSession": "2024-2025",
+                "joiningStatus": "Old",
+                "houses": null,
+                "certificates": "",
+                "certificatesList": [],
+                "caste": "",
+                "listOfDocuments": null,
+                "attached": false,
+                "required": false,
+                "submitted": false,
+                "studentHostel": [],
+                "studentConcession": [
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "APR"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "MAY"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "JUN"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "JUL"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "AUG"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "SEP"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "OCT"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "NOV"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "DEC"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "JAN"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "FEB"
+                  },
+                  {
+                    "concessionName": "ANNUAL 20%",
+                    "consessionType": null,
+                    "employeeId": null,
+                    "installment": "MAR"
+                  }
+                ],
+                "studentTransport": [
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "APR"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "MAY"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "JUN"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "AUG"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "SEP"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "OCT"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "NOV"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "DEC"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "JAN"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "FEB"
+                  },
+                  {
+                    "circle": "SLAB-2",
+                    "route": "BUS-12 A",
+                    "pick": "AAGMAN SOCIETY",
+                    "drop": "AAGMAN SOCIETY",
+                    "installment": "MAR"
+                  }
+                ],
+                "studentAadharCard": null,
+                "fatherAadharCard": null,
+                "motherAadharCard": null,
+                "studentImage": null,
+                "fatherImage": null,
+                "motherImage": null,
+                "guardianImage": null,
+                "birthCertificate": null,
+                "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                "aluminiProof": null,
+                "siblingProof": null,
+                "residenceProof": null,
+                "firstBornChildProof": null,
+                "medicalFitnessCertificate": null,
+                "fatherQualificationProof": null,
+                "motherQualificationProof": null,
+                "casteCertificate": null,
+                "createdUser": "QuickCampus",
+                "editedUser": "varuniBhatia_507415",
+                "createddate": "2024-05-16 04:57:19.991299",
+                "editeddate": "2024-09-21 04:54:01.914258",
+                "permanentEducationNumber": "",
+                "studentAddressResponse": {
+                  "uid": "849c3235-f467-46c3-9ea0-8e39aedeb979",
+                  "houseNo": null,
+                  "area": "Sector-70",
+                  "landmark": null,
+                  "city": "Faridabad",
+                  "district": null,
+                  "state": "Haryana",
+                  "poPs": null,
+                  "pincode": 121004,
+                  "street": "AAGMAN SOCIETY ,TOWER -3 ",
+                  "userName": "dcms832_20220001",
+                  "createdDate": "16-05-2024 10:27 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
+                  "createdBy": "QuickCampus",
+                  "editedBy": "varuniBhatia_507415"
+                },
+                "fatherAddressResponse": {
+                  "uid": "35477170-957a-4501-a406-c9f5e5b0cacd",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "FBD",
+                  "district": null,
+                  "state": "Haryana",
+                  "poPs": null,
+                  "pincode": 121004,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "16-05-2024 10:27 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
+                  "createdBy": "QuickCampus",
+                  "editedBy": "varuniBhatia_507415"
+                },
+                "motherAddressResponse": {
+                  "uid": "5f68b3c1-72cc-48d3-8c40-83e26dcc4563",
+                  "houseNo": null,
+                  "area": "NA",
+                  "landmark": null,
+                  "city": "FBD",
+                  "district": null,
+                  "state": "Haryana",
+                  "poPs": null,
+                  "pincode": 121004,
+                  "street": null,
+                  "userName": null,
+                  "createdDate": "16-05-2024 10:27 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
+                  "createdBy": "QuickCampus",
+                  "editedBy": "varuniBhatia_507415"
+                },
+                "guardianAddressResponse": null,
+                "correspondenceAddressResponse": {
+                  "uid": "fa3d4f2f-35b5-4533-b1e2-cbae32dab536",
+                  "houseNo": null,
+                  "area": "Sector-70",
+                  "landmark": null,
+                  "city": "Faridabad",
+                  "district": null,
+                  "state": "Haryana",
+                  "poPs": null,
+                  "pincode": 121004,
+                  "street": "AAGMAN SOCIETY ,TOWER -3 ",
+                  "userName": "dcms832_20220001",
+                  "createdDate": "20-07-2024 07:47 AM",
+                  "editedDate": "21-09-2024 10:24 AM",
+                  "createdBy": "Ms. Astha_491569",
+                  "editedBy": "varuniBhatia_507415"
+                }
+              }
+            ],
+            "classTeacher": "",
+            "classTeacherUserName": "",
+            "permanentEducationNumber": "",
+            "school": {
+              "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+              "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+              "schoolName": "D.C. Model Sr. Sec. School",
+              "schoolAbb": "dcms",
+              "educationBoard": "Central Board of Secondary Education (CBSE)",
+              "registrationNo": null,
+              "plotNumber": "Sector-9",
+              "area": "Near Church",
+              "city": "Faridabad",
+              "pincode": "121006",
+              "state": "Haryana",
+              "phoneNo1": null,
+              "phoneNo2": null,
+              "contactName": "Aastha",
+              "contactMobile": "9990363000",
+              "contactEmail": null,
+              "schoolCode": null,
+              "pfCode": null,
+              "societyManagement": null,
+              "language": null,
+              "schoolLogo": null,
+              "schoolFavicon": null,
+              "enabled": true,
+              "subDomain": "dcms",
+              "website": null,
+              "schemaPrefix": null,
+              "editedDate": "07-10-2024 11:07 AM",
+              "editedUser": "QuickCampus",
+              "visitorSchool": false,
+              "clientSchoolId": null,
+              "cscId": null,
+              "onlinePaymentEnabled": true,
+              "registrationSeries": null,
+              "underTakingDetails": null,
+              "formNumberStart": null,
+              "sessionResponse": null,
+              "schoolLogoUrl": null,
+              "printAcknowledge": false,
+              "wabaId": null,
+              "phoneNumberId": null,
+              "whatsappApiKey": null,
+              "isQuickCampusWhatsapp": false,
+              "notificationEnabled": true,
+              "loanEnabled": false,
+              "whatsAppEnabled": false,
+              "smsenabled": false
+            }
+          },
+          "subject": [],
+          "remarksEntry": {
+            "uid": null,
+            "terms": null,
+            "studentId": null,
+            "studentName": null,
+            "rollNumber": 0,
+            "classSectionUid": null,
+            "classSection": null,
+            "description": null,
+            "fields": null,
+            "status": false,
+            "createdUser": null,
+            "editedUser": null,
+            "createdDate": null,
+            "editedDate": null
+          },
+          "school": {
+            "uid": "55e97712-7e3a-4962-9929-d63cee64c452",
+            "apikey": "zNHfK5BQUlyC8ZiNZ2wkRqC40wPivOaC",
+            "schoolName": "D.C. Model Sr. Sec. School",
+            "schoolAbb": "dcms",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "Sector-9",
+            "area": "Near Church",
+            "city": "Faridabad",
+            "pincode": "121006",
+            "state": "Haryana",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "Aastha",
+            "contactMobile": "9990363000",
+            "contactEmail": null,
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": null,
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "dcms",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "07-10-2024 11:07 AM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": null,
+            "phoneNumberId": null,
+            "whatsappApiKey": null,
+            "isQuickCampusWhatsapp": false,
+            "notificationEnabled": true,
+            "loanEnabled": false,
+            "whatsAppEnabled": false,
+            "smsenabled": false
+          },
+          "promotedClass": null,
+          "promotedSection": null,
+          "perSignedUrlResponse": {
+            "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/DCMS/student-info/20220001/student/images/20220001.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241204T103032Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241204%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=3792ef108628d1ac8c8dfacb218c485ca2e6106416ef3a93f0cd4a5c2bc256a8",
+            "fileName": "20220001.png"
+          },
+          "pass": false,
+          "status_code": 200
+        },
+        "header": null,
+        "footer": null,
+        "printDate": "04-12-2024",
+        "studentPerfromanceData": {
+          "classWiseMarkResponse": [
+            {
+              "subjectName": "ENGLISH",
+              "subjectUid": "f133a7be-6baf-4d51-a294-3d2367af5564",
+              "maxMark": 120,
+              "maxObtainedMark": 116.6,
+              "averageObtainedMark": 116.6,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "Hindi",
+              "subjectUid": "2d313014-b0d8-4a74-b153-29e752360a90",
+              "maxMark": 120,
+              "maxObtainedMark": 110.2,
+              "averageObtainedMark": 110.2,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "MATHEMATICS",
+              "subjectUid": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+              "maxMark": 120,
+              "maxObtainedMark": 111.2,
+              "averageObtainedMark": 111.2,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "SOCIAL SCIENCE",
+              "subjectUid": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+              "maxMark": 120,
+              "maxObtainedMark": 116.4,
+              "averageObtainedMark": 116.4,
+              "attachmentName": null
+            },
+            {
+              "subjectName": "COMPUTER",
+              "subjectUid": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+              "maxMark": 120,
+              "maxObtainedMark": 117,
+              "averageObtainedMark": 117,
+              "attachmentName": null
+            }
+          ],
+          "groupedClassAttachmentResponse": [
+            {
+              "attachmentName": "English",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 116.6
+            },
+            {
+              "attachmentName": "Hindi",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 110.2
+            },
+            {
+              "attachmentName": "Mathematics",
+              "totalMaxMark": 120,
+              "highestObtainedMark": 111.2
+            }
+          ],
+          "status_code": 200
+        }
+      }
+    ]
+
+  );
+</script>
+
+</html>
