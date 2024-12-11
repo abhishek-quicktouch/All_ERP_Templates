@@ -96,7 +96,7 @@
       });
       console.log(filteredSubjects, "ffffffff filteredSubjects")
       // Scaling configuration
-      const maxValue = Math.max(...filteredSubjects.map(s => Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible)));
+      const maxValue = Math.max(...filteredSubjects.map(s => Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible))) || 100;
       const scaleFactor = 140 / maxValue; // Scale bars to fit chart height
 
       const barWidth = 20;

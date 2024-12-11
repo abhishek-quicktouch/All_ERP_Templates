@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DAV Result</title>
+</head>
+
+<body>
+    <div id="studentsList">DAV RESULT</div>
+</body>
+<script>
+    window.SetTemplateData = function (data) {
+        const dataList = Array.isArray(data) ? data : [data];
+        const viewTemplate = dataList[0]?.viewTemplate;
+        const staticData = []
+
+
+
+        const attendanceValue = {
+            Absent: "AB",
+            Medical: "ML",
+            Sports: "S",
+            Leave: "L",
+            "Late Admission": "LA",
+            Exempted: "EX",
+            NA: "NA",
+        };
+        function ConvertData(data) {
+            let allSubjects = [];
+            let subjectData = {};
+            let allTotal = {};
+            let rowSpan = {};
+            let overallTotal = 0;
+            let overallTotalMax = 0;
+
+            let terms = data?.markSheetTerms?.map((el) => ({
+                headerName: el?.headerName,
+                subHeaderName: el?.subHeaderName,
+            }));
+
+            let groupedAttachments = {};
+
+            data?.subjectWiseMarkSheetReportResponses?.forEach((el) => {
+                let markSheet = el?.markSheetReport;
+                subjectData[el?.subjectName] = {};
+
+                markSheet?.forEach((t) => {
+                    if (t?.attachmentName) {
+                        if (!groupedAttachments[t.attachmentName]) {
+                            groupedAttachments[t.attachmentName] = [];
+                        }
+                        if (!groupedAttachments[t.attachmentName].includes(el?.subjectName)) {
+                            groupedAttachments[t.attachmentName].push(el?.subjectName);
+                        }
+                    }
+
+                    if (!allTotal[t?.markSheetTermResponse?.headerName]) {
+                        allTotal[t?.markSheetTermResponse?.headerName] = { max: 0, obt: 0 };
+                    }
+                    if (!t?.graded) {
+                        allTotal[t?.markSheetTermResponse?.headerName].max += t?.max || 0;
+                        allTotal[t?.markSheetTermResponse?.headerName].obt += t?.obtained || 0;
+                    }
+
+                    subjectData[el?.subjectName][t?.markSheetTermResponse?.headerName] = {
+                        status: t?.status,
+                        max: t?.max,
+                        obt: t?.graded ? "" : t?.obtained,
+                        grade: t?.graded ? "" : t?.grade,
+                    };
+                });
+
+                subjectData[el?.subjectName]["GRADE"] = el?.grade || 0;
+                subjectData[el?.subjectName]["TOTAL"] = el?.marksObtained || 0;
+                subjectData[el?.subjectName]["PER"] = el?.percentage || 0;
+
+                allSubjects.push(el?.subjectName);
+            });
+
+            // Calculate totals and percentages for grouped subjects
+            for (let [attachmentName, subjects] of Object.entries(groupedAttachments)) {
+                let totalObt = 0;
+                let totalMax = 0;
+                let combinedGrade = "";
+
+                subjects.forEach((subject) => {
+                    totalObt += subjectData[subject]["TOTAL"] || 0;
+                    totalMax += 100; // Assuming max marks per subject are 100
+                });
+
+                let percentage = (totalObt / totalMax) * 100;
+                combinedGrade = calculateGrade(percentage);
+
+                subjects.forEach((subject, index) => {
+                    subjectData[subject]["TOTAL"] = totalObt;
+                    subjectData[subject]["PER"] = percentage;
+                    subjectData[subject]["GRADE"] = combinedGrade;
+                    if (index === 0) {
+                        subjectData[subject]["SPAN"] = subjects.length;
+                    } else {
+                        subjectData[subject]["SPAN"] = 0;
+                    }
+                });
+            }
+
+            for (let k in subjectData) {
+                overallTotal += subjectData[k]["TOTAL"] || 0;
+                overallTotalMax += subjectData[k]["TOTAL"] ? 100 : 0;
+            }
+
+            return {
+                terms,
+                allSubjects,
+                subjectData,
+                allTotal,
+                rowSpan: groupedAttachments,
+                overallTotal,
+                overallTotalMax,
+            };
+        }
+
+        // Grade calculation helper
+        function calculateGrade(percentage) {
+            if (percentage >= 90) return "A1";
+            if (percentage >= 80) return "A2";
+            if (percentage >= 70) return "B1";
+            if (percentage >= 60) return "B2";
+            if (percentage >= 50) return "C1";
+            if (percentage >= 40) return "C2";
+            return "D";
+        }
+
+        function generateTable(processedData, baseTermData, attendanceValue) {
+            const { terms, allSubjects, subjectData, overallTotalMax, overallTotal } = processedData;
+
+            return `
+        <table style="width: 100%; border:none;">
+            <tr style="text-align:center; height:60px;">
+                <th style="width:40%; font-size:12px;">SUBJECTS</th>
+                ${terms
+                    .map(
+                        (term, i) => `
+                <th style="text-align:center;font-size:12px; width:20%; border-right:${i === 0 ? "1.5px solid black;" : ""}">
+                    ${term.headerName}</br>(${term.subHeaderName})
+                </th>`
+                    )
+                    .join("")}
+                <th style="text-align:center; font-size:12px;">TOTAL</br>(100)</th>
+                <th style="text-align:center; font-size:12px;">%</th>
+                <th style="text-align:center; font-size:12px;">GRADE</th>
+            </tr>
+            ${allSubjects
+                    .map((subject) => {
+                        const subjectRow = terms
+                            .map((term) => {
+                                const cellData = subjectData?.[subject]?.[term.headerName] || {};
+                                return `
+                    <td style="text-align:center; font-weight:${cellData?.status ? "bold;" : ""}">
+                        ${attendanceValue[cellData?.status] || cellData?.obt || "-"}
+                    </td>`;
+                            })
+                            .join("");
+
+                        const total = subjectData[subject]?.TOTAL || "-";
+                        const percentage = subjectData[subject]?.PER || "-";
+                        const grade = subjectData[subject]?.GRADE || "-";
+                        const span = subjectData[subject]["SPAN"];
+
+                        return `
+                <tr>
+                    <td style="font-size:12px;">${subject}</td>
+                    ${subjectRow}
+                    ${span == 0 ? "" : span ? `<td style="text-align:center;" rowspan="${span}">${total}</td>` : `<td style="text-align:center;">${total}</td>`}
+                    ${span == 0 ? "" : span ? `<td style="text-align:center;" rowspan="${span}">${percentage}</td>` : `<td style="text-align:center;">${percentage}</td>`}
+                    ${span == 0 ? "" : span ? `<td style="text-align:center;" rowspan="${span}">${grade}</td>` : `<td style="text-align:center;">${grade}</td>`}
+                </tr>`;
+                    })
+                    .join("")}
+                    <tr > 
+                        <th style="text-align:center; font-size:12px;" >Grand Total /
+Grade</th>
+<th colspan="${terms.length}"></th>
+                        <th style="text-align:center; font-size:12px;">${overallTotal}</th>
+                        <th style="text-align:center; font-size:12px;">${((overallTotal / overallTotalMax) * 100).toFixed(2)}</th>
+                        <th style="text-align:center; font-size:12px;">${calculateGrade((overallTotal / overallTotalMax) * 100)}</th>
+                    </tr>
+
+        </table>`;
+        }
+
+        // Process the raw data first
+
+
+
+        const CalculateAverage = (arr, data, key) => {
+            let sum = 0;
+            arr.forEach((el) => {
+                if (data[el]) {
+                    sum += (data[el]["ASSESSMENT"] ? (data[el]["ASSESSMENT"]["obt"] || 0) : 0) + (data[el]["EXAM"] ? (data[el]["EXAM"]["obt"] || 0) : 0);
+                }
+            });
+            arr.forEach((el, i) => {
+                if (data[el] && i == 0) {
+                    data[el]["AVG"] = Math.round(sum / arr?.length);
+                    data[el]["SPAN"] = arr?.length;
+                } else {
+                    delete data[el]["TOTAL"];
+                }
+            });
+            return data;
+        };
+
+
+
+        const multipleStudents = viewTemplate ? staticData : dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        multipleStudents?.forEach((element) => {
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakBefore = "always";
+
+            function GenerateAttendance() {
+                const remarks = element?.baseTermData?.remarksEntry?.fields
+                let unqArr = []
+                let detail = {}
+                remarks?.forEach(el => {
+                    if (!unqArr.includes(el?.masterName)) {
+                        unqArr.push(el?.masterName)
+                    }
+                    detail[el?.masterName] = {
+                        working: el?.title?.includes("WORKING") ? el?.value : detail[el?.masterName]?.working,
+                        present: el?.title?.includes("PRESENT") ? el?.value : detail[el?.masterName]?.present
+                    }
+                })
+                return { attendanceMonth: unqArr, attendanceDetail: detail }
+            }
+            const { attendanceMonth, attendanceDetail } = GenerateAttendance()
+            let processedData = ConvertData(element?.markData);
+            console.log(processedData, "fffffffffffffff processedData")
+
+
+
+
+            const {
+                terms,
+                allSubjects,
+                subjectData,
+
+                allTotal,
+                rowSpan,
+                overallTotal,
+                overallTotalMax,
+            } = ConvertData(element?.markData);
+
+
+            const baseTermData = (element?.baseTermData?.subject || [])?.filter((t => !t?.scholastic))
+            let totalHeaderName = 0;
+            const tableContent = generateTable(processedData, baseTermData, attendanceValue)
+
+
+            singleStudentHtml.innerHTML = `
+            <style type="text/css">
+@page {
+size: A4
+}
+
+                @media print {
+@page {
+margin:2mm;
+size: A4;
+
+
+}
+
+}
+                 body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+         
+
+      
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .section table,
+        .section th,
+        .section td {
+            border: 1px solid #000;
+        }
+
+       
+        .section td {
+            padding: 2px;
+            text-align:left;
+            font-size: 14px;
+            margin: 0px;
+        }
+            .section h4,
+        .section th {
+            padding: 2px;
+            text-align:center;
+            font-size: 14px;
+            margin: 0px;
+        }
+            h6,h5{
+            margin: 0px;
+            padding: 0px;}
+
+
+
+        .remarks {
+            margin-bottom: 20px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+
+        }
+
+        .signatures div {
+font-size: 14px;
+margin: 0px;
+padding: 0px;
+            width: 30%;
+            text-align: center;
+           
+        }
+
+        .signatures p{
+        margin: 5px 0px 0px 0px;
+         font-weight: bold;
+        }
+            </style>
+                      <page orientation="portrait" format="A4" margin="0">
+                <div class="container">
+
+
+
+            <div class="container">
+
+
+
+            
+ <div class="header">
+
+<div style="text-align: center; padding: 20px; ">
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-16T12_01_20_927838718.png" alt="School Logo" style="width: 80px; height: auto; float: left;">
+        <div style="display: inline-block; text-align: center; margin-left: 15px;">
+            <div style="font-size: 30px; font-weight: bold; color: #000080;">SIDDHARTHA HIGH SCHOOL</div>
+            <div style="font-size: 14px; margin-top: 5px; color: #000080;">
+                Krishnanagar, Bommakal Road, Karimnagar, Telangana, 505002<br>
+                Contact No.: 9866235525 | Email Id: sravanthi20@gmail.com<br>
+                Reg. No. 1066/83
+
+            </div>
+            <div style="margin-top: 5px; font-size: 15px; font-weight: bold;">
+                
+                Academic Session : ${element.markData.academicSession}<br>
+                ${element.markData.markSheetName}
+            </div>
+        </div>
+    </div>
+            </div>
+                  </div>
+
+
+                    <div class="section">
+                        <table style="margin: 2px;">
+                            <tr>
+                                <th style="width: 25%; text-align: left">STUDENT'S NAME :</th>
+                                <td style="width: 25%;">${element.student.studentName
+                }</td>
+                                <th style="width: 25%;text-align: left">ADMISSION NO. :</th>
+                                <td style="width: 25%;">${element.student.admissionNo
+                }</td>
+                            </tr>
+                            <tr>
+                                <th style="width: 25%;text-align: left">FATHER'S NAME :</th>
+                                <td>${element.student.fatherName}</td>
+                               <th style="text-align: left">CLASS & SECTION :</th>
+                                <td>${element.student.className} - ${element.student.sectionName
+                }</td>
+                            </tr>
+                            <tr>
+                                <th     style="text-align:left">MOTHER'S NAME :</th>
+                                <td>${element.student.motherName}</td>
+  <th      style="width: 25%;text-align: left">ROLL NO. :</th>
+                                <td>${element.student.rollNo}</td>
+
+
+                                
+                            </tr>
+                            
+                            <tr>
+                                <th     style="text-align:left">DATE OF BIRTH :</th>
+                                <td>${element.student.dob}</td>
+ <th      style="width: 25%;text-align: left">CONTACT NO. : </th>
+                                <td>${element.student.studentInfoResponse[0]
+                    ?.mobileNumber
+                }</td>
+
+                                
+                            </tr>
+                            <tr>
+                                <th     style="text-align:left">ADDRESS :</th>
+                                <td colspan="3">${element.student.studentInfoResponse[0]?.area
+                },${element.student.studentInfoResponse[0]?.city
+                },
+${element.student.studentInfoResponse[0]?.state}</td>
+
+                                
+                            </tr>
+                        </table>
+                    </div>
+<div style="border:20px solid rgba(30,46,116,0.2); padding: 0px; background-color: rgba(30,46,116,0.8); "> 
+    <h3 style=" text-align: center; color: white; background-color: #6699CC ; padding: 0px; margin:0px">Summative Assessment - 1</h3>
+
+<div style=" border-bottom-right-radius: 20px ; border-bottom-left-radius:20px; background-color: white; padding:3px 3px 3px 3px;">
+    
+    
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;" >
+
+                    <div class="section">
+                        
+${tableContent}
+</div>
+                   
+            <div class="section">
+                    <table style="margin-bottom: 5px;">
+                        <tr>
+                        <th colspan="3" style="text-align: center;  background-color: #C7E6F5;">ATTENDANCE</th>
+                        <tr>
+                            <th style="text-align: center; width: 33%;font-size: 13px">Month</th>
+                            <th style="text-align: center; width: 33%;font-size: 13px">Working Days</th>
+                            <th style="text-align: center; width: 33%;font-size: 13px">Days Attended </th>
+                        </tr>
+                        ${attendanceMonth?.map(el => {
+                    return `<tr height="20px" >
+                                <td style="text-align: center; font-size:13px;">${el}</td>
+                                <td style="text-align: center; font-size:13px;">${attendanceDetail[el]?.working || 0}</td>
+                                <td style="text-align: center; font-size:13px;">${attendanceDetail[el]?.present || 0}</td>
+                            </tr >`
+                }).join("")}
+                </table >
+
+<div  style="border: 1px solid black; padding: 5px; height:30% ">
+    <span >Remarks:</span>
+     ${element.baseTermData?.remarksEntry?.description || "-"}
+
+    </div>
+
+            </div >
+
+
+            </div>
+                    <div class="signatures">
+                        <div>
+                            
+                            <p>Class Teacher</p>
+                        </div>
+                        <div>
+                           
+                            <p>Head of the Institute</p>
+                        </div>
+                        <div>
+                            
+                            <p>Parent / Guardian</p>
+                        </div>
+                    </div>
+                   
+
+
+
+                </div >
+
+                </div>
+                </div>
+                </page>
+            `;
+            studentHtml.appendChild(singleStudentHtml);
+        });
+    };
+</script>
+
+<script>
+    window.SetTemplateData(
+
+
+        [
+            {
+                "student": {
+                    "dob": "11-09-2011",
+                    "admissionNo": "1991",
+                    "studentName": "Md Tasneem",
+                    "className": "VIII",
+                    "sectionName": "A",
+                    "rollNo": 9,
+                    "fatherName": "Syed Jaffar",
+                    "motherName": "Haseena Tabassum",
+                    "attendance": "51.0/54",
+                    "boardRollNumber": "",
+                    "studentInfoResponse": [
+                        {
+                            "id": 300530,
+                            "userUid": "ad641082-0d4f-44a2-8926-635c4997dd77",
+                            "userName": null,
+                            "fatherUserName": null,
+                            "motherUserName": null,
+                            "guardianUserName": null,
+                            "uid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                            "studentId": "1991",
+                            "exAdmissionNo": null,
+                            "studentName": "Md Tasneem",
+                            "fatherName": "Syed Jaffar",
+                            "motherName": "Haseena Tabassum",
+                            "dob": "11-09-2011",
+                            "gender": "Female",
+                            "studentAdhaarcard": "490206945184",
+                            "joiningClass": "VIII",
+                            "joiningSections": "A",
+                            "joiningDate": "13-06-2024",
+                            "plotNumber": "",
+                            "area": "Hussainipura",
+                            "city": "Karimnagar",
+                            "state": "Telangana",
+                            "pincode": "505001",
+                            "phone1": "",
+                            "rollNo": 9,
+                            "emergencyNumber": "",
+                            "mobileNumber": "9573318246",
+                            "studentEmail": null,
+                            "religion": "MUSLIM",
+                            "category": "BC E",
+                            "minority": "No",
+                            "motherTongue": "Urdu",
+                            "idMark": "",
+                            "height": "",
+                            "weight": "",
+                            "physicalDisability": "",
+                            "bloodGroup": "",
+                            "healthRemark": "",
+                            "siblingDetails": "",
+                            "alumni": "",
+                            "siblingResponse": [],
+                            "fatherOccupation": "",
+                            "fatherQualification": "",
+                            "fatherOrganization": "",
+                            "fatherDesignation": "",
+                            "fatherIncome": "",
+                            "fatherArea": "Hussainipura",
+                            "fatherCity": "Karimnagar",
+                            "fatherState": "Telangana",
+                            "fatherPincode": "505001",
+                            "fatherPhone": "",
+                            "fatherMobile": "9573318246",
+                            "fatherEmail": null,
+                            "fatherAdhaarNumber": "",
+                            "schoolUid": "682f3e14-fc35-4a57-b1b0-695e0a6de91e",
+                            "motherQualification": "",
+                            "motherOccupation": "",
+                            "motherOrganization": "",
+                            "motherDesignation": "",
+                            "motherIncome": "",
+                            "motherArea": "Hussainipura",
+                            "motherCity": "Karimnagar",
+                            "motherState": "Telangana",
+                            "motherPincode": "505001",
+                            "motherPhone": "",
+                            "motherMobile": "9573318246",
+                            "motherEmail": null,
+                            "motherAdhaarNumber": "",
+                            "guardianName": null,
+                            "relation": null,
+                            "guardianOccupation": null,
+                            "guardianPhone": null,
+                            "guardianMobile": null,
+                            "guardianEmail": null,
+                            "guardianAddress": null,
+                            "leavingDate": null,
+                            "previousSchoolName": "",
+                            "otp": null,
+                            "schoolName": "Demo Public School",
+                            "remark": "",
+                            "classTeacher": "Gousiya Hashmi",
+                            "classTeacherUserName": "GousiyaGousiya_495684",
+                            "classes": "VIII",
+                            "classUid": null,
+                            "sections": "A",
+                            "group": null,
+                            "wing": "NA",
+                            "status": "Studying",
+                            "academicSession": "2024 - 2025",
+                            "joiningStatus": "Old",
+                            "houses": "Challengers B",
+                            "certificates": "",
+                            "certificatesList": [],
+                            "caste": "",
+                            "listOfDocuments": null,
+                            "attached": false,
+                            "required": false,
+                            "submitted": false,
+                            "studentHostel": [],
+                            "studentConcession": [],
+                            "studentTransport": [],
+                            "studentAadharCard": null,
+                            "fatherAadharCard": null,
+                            "motherAadharCard": null,
+                            "studentImage": null,
+                            "fatherImage": null,
+                            "motherImage": null,
+                            "guardianImage": null,
+                            "birthCertificate": null,
+                            "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                            "aluminiProof": null,
+                            "siblingProof": null,
+                            "residenceProof": null,
+                            "firstBornChildProof": null,
+                            "medicalFitnessCertificate": null,
+                            "fatherQualificationProof": null,
+                            "motherQualificationProof": null,
+                            "casteCertificate": null,
+                            "createdUser": "QuickCampus",
+                            "editedUser": "MDYOUSUF_495572",
+                            "createddate": "2024-06-13 07:40:35.487718",
+                            "editeddate": "2024-07-04 07:32:38.038905",
+                            "permanentEducationNumber": "20005391602",
+                            "studentAddressResponse": {
+                                "uid": "653f646b-d569-43b4-bbbc-497c0c2e24a7",
+                                "houseNo": null,
+                                "area": "Hussainipura",
+                                "landmark": null,
+                                "city": "Karimnagar",
+                                "district": null,
+                                "state": "Telangana",
+                                "poPs": null,
+                                "pincode": 505001,
+                                "street": "NA",
+                                "userName": "SHC844_1991",
+                                "createdDate": "13-06-2024 01:10 PM",
+                                "editedDate": "04-07-2024 01:02 PM",
+                                "createdBy": "QuickCampus",
+                                "editedBy": "MDYOUSUF_495572"
+                            },
+                            "fatherAddressResponse": {
+                                "uid": "d8fc8331-419f-4db5-b0b4-a9b18052f413",
+                                "houseNo": null,
+                                "area": "Hussainipura",
+                                "landmark": null,
+                                "city": "Karimnagar",
+                                "district": null,
+                                "state": "Telangana",
+                                "poPs": null,
+                                "pincode": 505001,
+                                "street": null,
+                                "userName": null,
+                                "createdDate": "13-06-2024 01:10 PM",
+                                "editedDate": "04-07-2024 01:02 PM",
+                                "createdBy": "QuickCampus",
+                                "editedBy": "MDYOUSUF_495572"
+                            },
+                            "motherAddressResponse": {
+                                "uid": "e48c2384-b2f5-48bb-8fd0-393ad9df4063",
+                                "houseNo": null,
+                                "area": "Hussainipura",
+                                "landmark": null,
+                                "city": "Karimnagar",
+                                "district": null,
+                                "state": "Telangana",
+                                "poPs": null,
+                                "pincode": 505001,
+                                "street": null,
+                                "userName": null,
+                                "createdDate": "13-06-2024 01:10 PM",
+                                "editedDate": "04-07-2024 01:02 PM",
+                                "createdBy": "QuickCampus",
+                                "editedBy": "MDYOUSUF_495572"
+                            },
+                            "guardianAddressResponse": null,
+                            "correspondenceAddressResponse": {
+                                "uid": "80c98cda-817f-4895-88c9-e229ece653f8",
+                                "houseNo": null,
+                                "area": "",
+                                "landmark": null,
+                                "city": "",
+                                "district": null,
+                                "state": "",
+                                "poPs": null,
+                                "pincode": null,
+                                "street": "",
+                                "userName": "SHC844_1991",
+                                "createdDate": "04-07-2024 01:01 PM",
+                                "editedDate": "04-07-2024 01:02 PM",
+                                "createdBy": "MDYOUSUF_495572",
+                                "editedBy": "MDYOUSUF_495572"
+                            }
+                        }
+                    ],
+                    "classTeacher": "Gousiya Hashmi",
+                    "classTeacherUserName": "GousiyaGousiya_495684",
+                    "permanentEducationNumber": "20005391602",
+                    "school": {
+                        "uid": "682f3e14-fc35-4a57-b1b0-695e0a6de91e",
+                        "apikey": "8e4f209c-5007-4d54-b50c-f242085de7ca",
+                        "schoolName": "SIDDHARTHA HIGH SCHOOL",
+                        "schoolAbb": "SHC",
+                        "educationBoard": null,
+                        "registrationNo": "1066/83",
+                        "plotNumber": "Krishnanagar",
+                        "area": "Bommakal Road",
+                        "city": "Karimnagar",
+                        "pincode": "505002",
+                        "state": "Telangana",
+                        "phoneNo1": null,
+                        "phoneNo2": null,
+                        "contactName": "Sravanthi Ganji",
+                        "contactMobile": "9866235525",
+                        "contactEmail": "sravanthi20@gmail.com",
+                        "schoolCode": null,
+                        "pfCode": null,
+                        "societyManagement": null,
+                        "language": null,
+                        "schoolLogo": null,
+                        "schoolFavicon": null,
+                        "enabled": true,
+                        "subDomain": null,
+                        "website": null,
+                        "schemaPrefix": null,
+                        "editedDate": "19-11-2024 11:56 AM",
+                        "editedUser": "QuickCampus",
+                        "visitorSchool": false,
+                        "clientSchoolId": null,
+                        "cscId": null,
+                        "onlinePaymentEnabled": false,
+                        "registrationSeries": null,
+                        "underTakingDetails": null,
+                        "formNumberStart": null,
+                        "sessionResponse": null,
+                        "schoolLogoUrl": null,
+                        "printAcknowledge": false,
+                        "wabaId": "",
+                        "phoneNumberId": "",
+                        "whatsappApiKey": "",
+                        "isQuickCampusWhatsapp": true,
+                        "whatsAppEnabled": true,
+                        "smsenabled": false,
+                        "notificationEnabled": true,
+                        "loanEnabled": false
+                    }
+                },
+                "markData": {
+                    "academicSession": "2024 - 2025",
+                    "admissionNo": "1991",
+                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                    "studentName": "Md Tasneem",
+                    "rollNo": 9,
+                    "fatherName": "Syed Jaffar",
+                    "className": "VIII",
+                    "sectionName": "A",
+                    "terms": "SUMMATIVE ASSESSMENT - I",
+                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                    "overAllRank": "2",
+                    "markSheetTerms": [
+                        {
+                            "id": 1307,
+                            "headerName": "FA-1",
+                            "subHeaderName": "10",
+                            "priority": 1,
+                            "bestOf": 0,
+                            "decimalPlaces": 0,
+                            "weightage": 10,
+                            "terms": [
+                                "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                            ]
+                        },
+                        {
+                            "id": 1333,
+                            "headerName": "FA-2",
+                            "subHeaderName": "10",
+                            "priority": 2,
+                            "bestOf": 0,
+                            "decimalPlaces": 0,
+                            "weightage": 10,
+                            "terms": [
+                                "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                            ]
+                        },
+                        {
+                            "id": 1334,
+                            "headerName": "SA-1",
+                            "subHeaderName": "80",
+                            "priority": 3,
+                            "bestOf": 0,
+                            "decimalPlaces": 0,
+                            "weightage": 80,
+                            "terms": [
+                                "SUMMATIVE ASSESSMENT - I"
+                            ]
+                        }
+                    ],
+                    "subjectWiseMarkSheetReportResponses": [
+                        {
+                            "subjectUid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                            "subjectName": "TELUGU",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                                    "subjectName": "TELUGU",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 8.5,
+                                    "grade": "A2",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                                    "subjectName": "TELUGU",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.5,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                                    "subjectName": "TELUGU",
+                                    "subjectNature": "Theory",
+                                    "max": 80,
+                                    "obtained": 47,
+                                    "grade": "C1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 65,
+                            "total": 100,
+                            "percentage": 65,
+                            "grade": "B2",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 1,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                            "subjectName": "HINDI",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                                    "subjectName": "HINDI",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.5,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                                    "subjectName": "HINDI",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.25,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                                    "subjectName": "HINDI",
+                                    "subjectNature": "Theory",
+                                    "max": 80,
+                                    "obtained": 55,
+                                    "grade": "B2",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 73.75,
+                            "total": 100,
+                            "percentage": 74,
+                            "grade": "B1",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 2,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                            "subjectName": "ENGLISH",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                                    "subjectName": "ENGLISH",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.25,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                                    "subjectName": "ENGLISH",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.75,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                                    "subjectName": "ENGLISH",
+                                    "subjectNature": "Theory",
+                                    "max": 80,
+                                    "obtained": 73,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 92,
+                            "total": 100,
+                            "percentage": 92,
+                            "grade": "A1",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 3,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "e5816792-dcea-4681-b677-cf99fe378791",
+                            "subjectName": "MATHS",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "e5816792-dcea-4681-b677-cf99fe378791",
+                                    "subjectName": "MATHS",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.25,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "e5816792-dcea-4681-b677-cf99fe378791",
+                                    "subjectName": "MATHS",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.5,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "e5816792-dcea-4681-b677-cf99fe378791",
+                                    "subjectName": "MATHS",
+                                    "subjectNature": "Theory",
+                                    "max": 80,
+                                    "obtained": 48,
+                                    "grade": "C1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 66.75,
+                            "total": 100,
+                            "percentage": 67,
+                            "grade": "B2",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 4,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                            "subjectName": "PHYSICS",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                                    "subjectName": "PHYSICS",
+                                    "subjectNature": "Theory",
+                                    "max": 5,
+                                    "obtained": 4.75,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                                    "subjectName": "PHYSICS",
+                                    "subjectNature": "Theory",
+                                    "max": 5,
+                                    "obtained": 5,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                                    "subjectName": "PHYSICS",
+                                    "subjectNature": "Theory",
+                                    "max": 40,
+                                    "obtained": 21,
+                                    "grade": "C1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 30.75,
+                            "total": 50,
+                            "percentage": 62,
+                            "grade": "B2",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 5,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                            "subjectName": "BIOLOGY",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                                    "subjectName": "BIOLOGY",
+                                    "subjectNature": "Theory",
+                                    "max": 5,
+                                    "obtained": 4.75,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                                    "subjectName": "BIOLOGY",
+                                    "subjectNature": "Theory",
+                                    "max": 5,
+                                    "obtained": 4.75,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                                    "subjectName": "BIOLOGY",
+                                    "subjectNature": "Theory",
+                                    "max": 40,
+                                    "obtained": 29,
+                                    "grade": "B1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "SCIENCE",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 38.5,
+                            "total": 50,
+                            "percentage": 77,
+                            "grade": "B1",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 6,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        },
+                        {
+                            "subjectUid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                            "subjectName": "SOCIAL",
+                            "subjectNature": "Theory",
+                            "markSheetReport": [
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                                    "subjectName": "SOCIAL",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9,
+                                    "grade": "A2",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1307,
+                                        "headerName": "FA-1",
+                                        "subHeaderName": "10",
+                                        "priority": 1,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - I (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (PROJECT SKILLS)",
+                                            "FORMATIVE ASSESSMENT - I (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - I (WRITING SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                                    "subjectName": "SOCIAL",
+                                    "subjectNature": "Theory",
+                                    "max": 10,
+                                    "obtained": 9.25,
+                                    "grade": "A1",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1333,
+                                        "headerName": "FA-2",
+                                        "subHeaderName": "10",
+                                        "priority": 2,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 10,
+                                        "terms": [
+                                            "FORMATIVE ASSESSMENT - II (WRITING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (READING SKILLS)",
+                                            "FORMATIVE ASSESSMENT - II (SLIP TEST ASSIGNMENT)",
+                                            "FORMATIVE ASSESSMENT - II (PROJECT SKILLS)"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                },
+                                {
+                                    "studentInfoUid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                    "admissionNo": "1991",
+                                    "studentName": "Md Tasneem",
+                                    "rollNo": 9,
+                                    "fatherName": "Syed Jaffar",
+                                    "className": "VIII",
+                                    "sectionName": "A",
+                                    "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                    "terms": "SUMMATIVE ASSESSMENT - I",
+                                    "subjectUid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                                    "subjectName": "SOCIAL",
+                                    "subjectNature": "Theory",
+                                    "max": 80,
+                                    "obtained": 50,
+                                    "grade": "B2",
+                                    "status": "",
+                                    "markSheetName": "SUMMATIVE ASSESMENT - I",
+                                    "attachmentName": "",
+                                    "session": "2024 - 2025",
+                                    "decimalPlaces": 0,
+                                    "markSheetTermResponse": {
+                                        "id": 1334,
+                                        "headerName": "SA-1",
+                                        "subHeaderName": "80",
+                                        "priority": 3,
+                                        "bestOf": 0,
+                                        "decimalPlaces": 0,
+                                        "weightage": 80,
+                                        "terms": [
+                                            "SUMMATIVE ASSESSMENT - I"
+                                        ]
+                                    },
+                                    "visible": false,
+                                    "pass": true,
+                                    "graded": false
+                                }
+                            ],
+                            "marksObtained": 68.25,
+                            "total": 100,
+                            "percentage": 68,
+                            "grade": "B2",
+                            "className": "VIII",
+                            "sectionName": "A",
+                            "terms": "SUMMATIVE ASSESSMENT - I",
+                            "markSheetName": "SUMMATIVE ASSESMENT - I",
+                            "subjectPrt": 7,
+                            "decimalPlaces": 0,
+                            "visible": false
+                        }
+                    ],
+                    "marksObtained": 435,
+                    "total": 600,
+                    "percentage": 73,
+                    "overAllGrade": "B1",
+                    "visible": false
+                },
+                "remarks": {
+                    "uid": null,
+                    "terms": null,
+                    "studentId": null,
+                    "studentName": null,
+                    "rollNumber": 0,
+                    "classSectionUid": null,
+                    "classSection": null,
+                    "description": null,
+                    "fields": null,
+                    "status": false,
+                    "createdUser": null,
+                    "editedUser": null,
+                    "createdDate": null,
+                    "editedDate": null
+                },
+                "baseTermData": {
+                    "studentAcademic": {
+                        "dob": "11-09-2011",
+                        "admissionNo": "1991",
+                        "studentName": "Md Tasneem",
+                        "className": "VIII",
+                        "sectionName": "A",
+                        "rollNo": 9,
+                        "fatherName": "Syed Jaffar",
+                        "motherName": "Haseena Tabassum",
+                        "attendance": "51.0/54",
+                        "boardRollNumber": "",
+                        "studentInfoResponse": [
+                            {
+                                "id": 300530,
+                                "userUid": "ad641082-0d4f-44a2-8926-635c4997dd77",
+                                "userName": null,
+                                "fatherUserName": null,
+                                "motherUserName": null,
+                                "guardianUserName": null,
+                                "uid": "58f70e2e-abd0-465f-b7be-6bc383748848",
+                                "studentId": "1991",
+                                "exAdmissionNo": null,
+                                "studentName": "Md Tasneem",
+                                "fatherName": "Syed Jaffar",
+                                "motherName": "Haseena Tabassum",
+                                "dob": "11-09-2011",
+                                "gender": "Female",
+                                "studentAdhaarcard": "490206945184",
+                                "joiningClass": "VIII",
+                                "joiningSections": "A",
+                                "joiningDate": "13-06-2024",
+                                "plotNumber": "",
+                                "area": "Hussainipura",
+                                "city": "Karimnagar",
+                                "state": "Telangana",
+                                "pincode": "505001",
+                                "phone1": "",
+                                "rollNo": 9,
+                                "emergencyNumber": "",
+                                "mobileNumber": "9573318246",
+                                "studentEmail": null,
+                                "religion": "MUSLIM",
+                                "category": "BC E",
+                                "minority": "No",
+                                "motherTongue": "Urdu",
+                                "idMark": "",
+                                "height": "",
+                                "weight": "",
+                                "physicalDisability": "",
+                                "bloodGroup": "",
+                                "healthRemark": "",
+                                "siblingDetails": "",
+                                "alumni": "",
+                                "siblingResponse": [],
+                                "fatherOccupation": "",
+                                "fatherQualification": "",
+                                "fatherOrganization": "",
+                                "fatherDesignation": "",
+                                "fatherIncome": "",
+                                "fatherArea": "Hussainipura",
+                                "fatherCity": "Karimnagar",
+                                "fatherState": "Telangana",
+                                "fatherPincode": "505001",
+                                "fatherPhone": "",
+                                "fatherMobile": "9573318246",
+                                "fatherEmail": null,
+                                "fatherAdhaarNumber": "",
+                                "schoolUid": "682f3e14-fc35-4a57-b1b0-695e0a6de91e",
+                                "motherQualification": "",
+                                "motherOccupation": "",
+                                "motherOrganization": "",
+                                "motherDesignation": "",
+                                "motherIncome": "",
+                                "motherArea": "Hussainipura",
+                                "motherCity": "Karimnagar",
+                                "motherState": "Telangana",
+                                "motherPincode": "505001",
+                                "motherPhone": "",
+                                "motherMobile": "9573318246",
+                                "motherEmail": null,
+                                "motherAdhaarNumber": "",
+                                "guardianName": null,
+                                "relation": null,
+                                "guardianOccupation": null,
+                                "guardianPhone": null,
+                                "guardianMobile": null,
+                                "guardianEmail": null,
+                                "guardianAddress": null,
+                                "leavingDate": null,
+                                "previousSchoolName": "",
+                                "otp": null,
+                                "schoolName": "Demo Public School",
+                                "remark": "",
+                                "classTeacher": "Gousiya Hashmi",
+                                "classTeacherUserName": "GousiyaGousiya_495684",
+                                "classes": "VIII",
+                                "classUid": null,
+                                "sections": "A",
+                                "group": null,
+                                "wing": "NA",
+                                "status": "Studying",
+                                "academicSession": "2024 - 2025",
+                                "joiningStatus": "Old",
+                                "houses": "Challengers B",
+                                "certificates": "",
+                                "certificatesList": [],
+                                "caste": "",
+                                "listOfDocuments": null,
+                                "attached": false,
+                                "required": false,
+                                "submitted": false,
+                                "studentHostel": [],
+                                "studentConcession": [],
+                                "studentTransport": [],
+                                "studentAadharCard": null,
+                                "fatherAadharCard": null,
+                                "motherAadharCard": null,
+                                "studentImage": null,
+                                "fatherImage": null,
+                                "motherImage": null,
+                                "guardianImage": null,
+                                "birthCertificate": null,
+                                "classSectionUid": "9e250298-710c-4a12-9e22-f2576872c9c0",
+                                "aluminiProof": null,
+                                "siblingProof": null,
+                                "residenceProof": null,
+                                "firstBornChildProof": null,
+                                "medicalFitnessCertificate": null,
+                                "fatherQualificationProof": null,
+                                "motherQualificationProof": null,
+                                "casteCertificate": null,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "MDYOUSUF_495572",
+                                "createddate": "2024-06-13 07:40:35.487718",
+                                "editeddate": "2024-07-04 07:32:38.038905",
+                                "permanentEducationNumber": "20005391602",
+                                "studentAddressResponse": {
+                                    "uid": "653f646b-d569-43b4-bbbc-497c0c2e24a7",
+                                    "houseNo": null,
+                                    "area": "Hussainipura",
+                                    "landmark": null,
+                                    "city": "Karimnagar",
+                                    "district": null,
+                                    "state": "Telangana",
+                                    "poPs": null,
+                                    "pincode": 505001,
+                                    "street": "NA",
+                                    "userName": "SHC844_1991",
+                                    "createdDate": "13-06-2024 01:10 PM",
+                                    "editedDate": "04-07-2024 01:02 PM",
+                                    "createdBy": "QuickCampus",
+                                    "editedBy": "MDYOUSUF_495572"
+                                },
+                                "fatherAddressResponse": {
+                                    "uid": "d8fc8331-419f-4db5-b0b4-a9b18052f413",
+                                    "houseNo": null,
+                                    "area": "Hussainipura",
+                                    "landmark": null,
+                                    "city": "Karimnagar",
+                                    "district": null,
+                                    "state": "Telangana",
+                                    "poPs": null,
+                                    "pincode": 505001,
+                                    "street": null,
+                                    "userName": null,
+                                    "createdDate": "13-06-2024 01:10 PM",
+                                    "editedDate": "04-07-2024 01:02 PM",
+                                    "createdBy": "QuickCampus",
+                                    "editedBy": "MDYOUSUF_495572"
+                                },
+                                "motherAddressResponse": {
+                                    "uid": "e48c2384-b2f5-48bb-8fd0-393ad9df4063",
+                                    "houseNo": null,
+                                    "area": "Hussainipura",
+                                    "landmark": null,
+                                    "city": "Karimnagar",
+                                    "district": null,
+                                    "state": "Telangana",
+                                    "poPs": null,
+                                    "pincode": 505001,
+                                    "street": null,
+                                    "userName": null,
+                                    "createdDate": "13-06-2024 01:10 PM",
+                                    "editedDate": "04-07-2024 01:02 PM",
+                                    "createdBy": "QuickCampus",
+                                    "editedBy": "MDYOUSUF_495572"
+                                },
+                                "guardianAddressResponse": null,
+                                "correspondenceAddressResponse": {
+                                    "uid": "80c98cda-817f-4895-88c9-e229ece653f8",
+                                    "houseNo": null,
+                                    "area": "",
+                                    "landmark": null,
+                                    "city": "",
+                                    "district": null,
+                                    "state": "",
+                                    "poPs": null,
+                                    "pincode": null,
+                                    "street": "",
+                                    "userName": "SHC844_1991",
+                                    "createdDate": "04-07-2024 01:01 PM",
+                                    "editedDate": "04-07-2024 01:02 PM",
+                                    "createdBy": "MDYOUSUF_495572",
+                                    "editedBy": "MDYOUSUF_495572"
+                                }
+                            }
+                        ],
+                        "classTeacher": "Gousiya Hashmi",
+                        "classTeacherUserName": "GousiyaGousiya_495684",
+                        "permanentEducationNumber": "20005391602",
+                        "school": {
+                            "uid": "682f3e14-fc35-4a57-b1b0-695e0a6de91e",
+                            "apikey": "8e4f209c-5007-4d54-b50c-f242085de7ca",
+                            "schoolName": "SIDDHARTHA HIGH SCHOOL",
+                            "schoolAbb": "SHC",
+                            "educationBoard": null,
+                            "registrationNo": "1066/83",
+                            "plotNumber": "Krishnanagar",
+                            "area": "Bommakal Road",
+                            "city": "Karimnagar",
+                            "pincode": "505002",
+                            "state": "Telangana",
+                            "phoneNo1": null,
+                            "phoneNo2": null,
+                            "contactName": "Sravanthi Ganji",
+                            "contactMobile": "9866235525",
+                            "contactEmail": "sravanthi20@gmail.com",
+                            "schoolCode": null,
+                            "pfCode": null,
+                            "societyManagement": null,
+                            "language": null,
+                            "schoolLogo": null,
+                            "schoolFavicon": null,
+                            "enabled": true,
+                            "subDomain": null,
+                            "website": null,
+                            "schemaPrefix": null,
+                            "editedDate": "19-11-2024 11:56 AM",
+                            "editedUser": "QuickCampus",
+                            "visitorSchool": false,
+                            "clientSchoolId": null,
+                            "cscId": null,
+                            "onlinePaymentEnabled": false,
+                            "registrationSeries": null,
+                            "underTakingDetails": null,
+                            "formNumberStart": null,
+                            "sessionResponse": null,
+                            "schoolLogoUrl": null,
+                            "printAcknowledge": false,
+                            "wabaId": "",
+                            "phoneNumberId": "",
+                            "whatsappApiKey": "",
+                            "isQuickCampusWhatsapp": true,
+                            "whatsAppEnabled": true,
+                            "smsenabled": false,
+                            "notificationEnabled": true,
+                            "loanEnabled": false
+                        }
+                    },
+                    "subject": [
+                        {
+                            "subjectAllResponse": {
+                                "uid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                                "subjectName": "TELUGU",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:23.369045",
+                                "editeddate": "2024-06-10 12:20:23.367806"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 80,
+                            "markObtained": 47,
+                            "percentage": 58.75,
+                            "grade": "C1",
+                            "remarkStatus": "",
+                            "attachmentName": "",
+                            "additional": false,
+                            "priority": 1,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                                "subjectName": "HINDI",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:26.139592",
+                                "editeddate": "2024-06-10 12:20:26.138487"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 80,
+                            "markObtained": 55,
+                            "percentage": 68.75,
+                            "grade": "B2",
+                            "remarkStatus": "",
+                            "attachmentName": "",
+                            "additional": false,
+                            "priority": 2,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                                "subjectName": "ENGLISH",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:08.58012",
+                                "editeddate": "2024-06-10 12:20:08.579041"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 80,
+                            "markObtained": 73,
+                            "percentage": 91.25,
+                            "grade": "A1",
+                            "remarkStatus": "",
+                            "attachmentName": "",
+                            "additional": false,
+                            "priority": 3,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "e5816792-dcea-4681-b677-cf99fe378791",
+                                "subjectName": "MATHS",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:11.893115",
+                                "editeddate": "2024-06-10 12:20:11.891899"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 80,
+                            "markObtained": 48,
+                            "percentage": 60,
+                            "grade": "C1",
+                            "remarkStatus": "",
+                            "attachmentName": "",
+                            "additional": false,
+                            "priority": 4,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                                "subjectName": "PHYSICS",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:40.355004",
+                                "editeddate": "2024-06-10 12:20:40.35406"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 40,
+                            "markObtained": 21,
+                            "percentage": 52.5,
+                            "grade": "C1",
+                            "remarkStatus": "",
+                            "attachmentName": "SCIENCE",
+                            "additional": false,
+                            "priority": 5,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                                "subjectName": "BIOLOGY",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:44.60879",
+                                "editeddate": "2024-06-10 12:20:44.607657"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 40,
+                            "markObtained": 29,
+                            "percentage": 72.5,
+                            "grade": "B1",
+                            "remarkStatus": "",
+                            "attachmentName": "SCIENCE",
+                            "additional": false,
+                            "priority": 6,
+                            "scholastic": true,
+                            "added": true
+                        },
+                        {
+                            "subjectAllResponse": {
+                                "uid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                                "subjectName": "SOCIAL",
+                                "nature": "Theory",
+                                "natureUid": "91a6d976-a7d0-4b7b-a990-831d92ba9d38",
+                                "cbseVIIICode": "",
+                                "cbseXCode": "",
+                                "cbseXIICode": "",
+                                "status": true,
+                                "parent": [],
+                                "parentName": [],
+                                "haveChild": false,
+                                "createdUser": "QuickCampus",
+                                "editedUser": "QuickCampus",
+                                "createddate": "2024-06-10 12:20:33.597642",
+                                "editeddate": "2024-06-10 12:20:33.596634"
+                            },
+                            "termName": "SUMMATIVE ASSESSMENT - I",
+                            "max": 80,
+                            "markObtained": 50,
+                            "percentage": 62.5,
+                            "grade": "B2",
+                            "remarkStatus": "",
+                            "attachmentName": "",
+                            "additional": false,
+                            "priority": 7,
+                            "scholastic": true,
+                            "added": true
+                        }
+                    ],
+                    "remarksEntry": {
+                        "uid": null,
+                        "terms": null,
+                        "studentId": null,
+                        "studentName": null,
+                        "rollNumber": 0,
+                        "classSectionUid": null,
+                        "classSection": null,
+                        "description": null,
+                        "fields": null,
+                        "status": false,
+                        "createdUser": null,
+                        "editedUser": null,
+                        "createdDate": null,
+                        "editedDate": null
+                    },
+                    "school": {
+                        "uid": "682f3e14-fc35-4a57-b1b0-695e0a6de91e",
+                        "apikey": "8e4f209c-5007-4d54-b50c-f242085de7ca",
+                        "schoolName": "SIDDHARTHA HIGH SCHOOL",
+                        "schoolAbb": "SHC",
+                        "educationBoard": null,
+                        "registrationNo": "1066/83",
+                        "plotNumber": "Krishnanagar",
+                        "area": "Bommakal Road",
+                        "city": "Karimnagar",
+                        "pincode": "505002",
+                        "state": "Telangana",
+                        "phoneNo1": null,
+                        "phoneNo2": null,
+                        "contactName": "Sravanthi Ganji",
+                        "contactMobile": "9866235525",
+                        "contactEmail": "sravanthi20@gmail.com",
+                        "schoolCode": null,
+                        "pfCode": null,
+                        "societyManagement": null,
+                        "language": null,
+                        "schoolLogo": null,
+                        "schoolFavicon": null,
+                        "enabled": true,
+                        "subDomain": null,
+                        "website": null,
+                        "schemaPrefix": null,
+                        "editedDate": "19-11-2024 11:56 AM",
+                        "editedUser": "QuickCampus",
+                        "visitorSchool": false,
+                        "clientSchoolId": null,
+                        "cscId": null,
+                        "onlinePaymentEnabled": false,
+                        "registrationSeries": null,
+                        "underTakingDetails": null,
+                        "formNumberStart": null,
+                        "sessionResponse": null,
+                        "schoolLogoUrl": null,
+                        "printAcknowledge": false,
+                        "wabaId": "",
+                        "phoneNumberId": "",
+                        "whatsappApiKey": "",
+                        "isQuickCampusWhatsapp": true,
+                        "whatsAppEnabled": true,
+                        "smsenabled": false,
+                        "notificationEnabled": true,
+                        "loanEnabled": false
+                    },
+                    "promotedClass": null,
+                    "promotedSection": null,
+                    "perSignedUrlResponse": {
+                        "url": "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SHC844/student-info/1991/student/images/1991.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241209T121124Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241209%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=a99f5e6c81a7963b0157d7bbf587b4ed7b4699543f95e5a83efb211599c4b3a9",
+                        "fileName": "1991.png"
+                    },
+                    "pass": false,
+                    "status_code": 200
+                },
+                "header": null,
+                "footer": null,
+                "printDate": "09-12-2024",
+                "studentPerfromanceData": {
+                    "classWiseMarkResponse": [
+                        {
+                            "subjectName": "ENGLISH",
+                            "subjectUid": "5b333d6b-06c1-4769-8828-26952756fd1c",
+                            "maxMark": 100,
+                            "maxObtainedMark": 96.25,
+                            "averageObtainedMark": 84.875,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "MATHS",
+                            "subjectUid": "e5816792-dcea-4681-b677-cf99fe378791",
+                            "maxMark": 100,
+                            "maxObtainedMark": 76.75,
+                            "averageObtainedMark": 67,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "TELUGU",
+                            "subjectUid": "76cb94c6-8a1c-469e-8b27-3ff3e977220a",
+                            "maxMark": 100,
+                            "maxObtainedMark": 83.5,
+                            "averageObtainedMark": 71.70833333333333,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "HINDI",
+                            "subjectUid": "131d9642-1ab2-49ea-82b3-6d0f6dcdfc38",
+                            "maxMark": 100,
+                            "maxObtainedMark": 96.5,
+                            "averageObtainedMark": 64.84722222222221,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "SOCIAL",
+                            "subjectUid": "d2bceb2d-831a-4e9e-9f25-98ac82d8b89b",
+                            "maxMark": 100,
+                            "maxObtainedMark": 86,
+                            "averageObtainedMark": 63,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "PHYSICS",
+                            "subjectUid": "29f922d2-bfb3-48ab-9b19-47bf7abf2316",
+                            "maxMark": 50,
+                            "maxObtainedMark": 42.5,
+                            "averageObtainedMark": 30.833333333333332,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "BIOLOGY",
+                            "subjectUid": "280016dd-91a4-4abe-b88d-c4a6b2cecd49",
+                            "maxMark": 50,
+                            "maxObtainedMark": 42.75,
+                            "averageObtainedMark": 33.38888888888889,
+                            "attachmentName": null
+                        },
+                        {
+                            "subjectName": "COMPUTERS",
+                            "subjectUid": "21bb5370-cd73-40d3-99be-0852e4cc1586",
+                            "maxMark": 100,
+                            "maxObtainedMark": 34,
+                            "averageObtainedMark": 34,
+                            "attachmentName": null
+                        }
+                    ],
+                    "groupedClassAttachmentResponse": [
+                        {
+                            "attachmentName": "SCIENCE",
+                            "totalMaxMark": 100,
+                            "highestObtainedMark": 82.58333333333334
+                        }
+                    ],
+                    "status_code": 200
+                }
+            },
+        ]
+    )
+</script>
+
+</html>
