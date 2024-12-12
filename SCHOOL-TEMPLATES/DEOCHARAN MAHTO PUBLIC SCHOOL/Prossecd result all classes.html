@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="student"></div>
+</body>
+<script>
+  window.SetTemplateData = function (data) {
+    const attendanceValue = {
+      Absent: "AB",
+      Medical: "ML",
+      Sports: "S",
+      Leave: "L",
+      "Late Admission": "LA",
+      Exempted: "EX",
+      NA: "NA",
+    };
+
+    const getTerms = (termData) => {
+      const res = termData?.markSheetTerms
+        ?.map((d) => {
+          return `<th >${d?.headerName}  </th>`;
+        })
+        .join("");
+
+      return res;
+    };
+    let gradeRequests = [
+      {
+        remark: "",
+        grade: "A1",
+        floorValue: 91,
+        ceilingValue: 100,
+        weightage: 10,
+      },
+      {
+        remark: "",
+        grade: "A2",
+        floorValue: 81,
+        ceilingValue: 90.99,
+        weightage: 9,
+      },
+      {
+        remark: "",
+        grade: "B1",
+        floorValue: 71,
+        ceilingValue: 80.99,
+        weightage: 8,
+      },
+      {
+        remark: "",
+        grade: "B2",
+        floorValue: 61,
+        ceilingValue: 70.99,
+        weightage: 7,
+      },
+      {
+        remark: "",
+        grade: "C1",
+        floorValue: 51,
+        ceilingValue: 60.99,
+        weightage: 6,
+      },
+      {
+        remark: "",
+        grade: "C2",
+        floorValue: 41,
+        ceilingValue: 50.99,
+        weightage: 5,
+      },
+      {
+        remark: "",
+        grade: "D",
+        floorValue: 33,
+        ceilingValue: 40.99,
+        weightage: 4,
+      },
+      {
+        remark: "",
+        grade: "E",
+        floorValue: 0,
+        ceilingValue: 32.99,
+        weightage: 3,
+      },
+    ];
+
+    const getGradeCustomFunction = (int) => {
+      let num = int;
+      if (typeof num != "number") {
+        num = +int;
+      }
+      return gradeRequests?.find(
+        (el) => num >= el?.floorValue && num <= el?.ceilingValue
+      )?.grade;
+    };
+    const getSubjectMarks = (marksData) => {
+      const subjects = marksData?.baseTermData?.subject.filter((d) => {
+        return d.scholastic;
+      });
+
+      const subj =
+        marksData?.markData?.subjectWiseMarkSheetReportResponses.filter(
+          (item) => {
+            return (
+              item.subjectNature?.toLowerCase() === "theory" ||
+              item.subjectNature?.toLowerCase() === "grade"
+            );
+          }
+        );
+      let check = true;
+      let arr = [];
+      let str = "";
+      let subStr = "";
+      let totalStr = "";
+      let totalIndex0 = 0;
+      let totalIndex1 = 0;
+      let totalIndex2 = 0;
+      let totalIndex3 = 0;
+
+      const arr1 = marksData?.markData?.subjectWiseMarkSheetReportResponses
+        .filter((item) => item.subjectNature.toLowerCase() === "theory")
+        .map((ele) => ele.marksObtained)
+        .reduce((curr, acc) => acc + curr, 0);
+
+      marksData?.markData?.subjectWiseMarkSheetReportResponses
+        .filter((item) => item.subjectNature.toLowerCase() === "theory")
+        .map((ele) => arr.push(ele.markSheetReport));
+
+      totalIndex1 = arr.reduce((sum, subArr) => {
+        return sum + (subArr[1]?.obtained || 0); // Add the `obtained` from index 1, with a fallback of 0
+      }, 0);
+      totalIndex2 = arr.reduce((sum, subArr) => {
+        return sum + (subArr[2]?.obtained || 0); // Add the `obtained` from index 1, with a fallback of 0
+      }, 0);
+      totalIndex0 = arr.reduce((sum, subArr) => {
+        return sum + (subArr[0]?.obtained || 0); // Add the `obtained` from index 1, with a fallback of 0
+      }, 0);
+      totalIndex3 = arr.reduce((sum, subArr) => {
+        return sum + (subArr[3]?.obtained || 0); // Add the `obtained` from index 1, with a fallback of 0
+      }, 0);
+      let subHeadings = marksData?.markData?.markSheetTerms?.map(
+        (item) => item.subHeaderName
+      );
+      subj.forEach((sub, i) => {
+        subStr = `<tr> 
+                <td style="text-align: center; border-top:none;"></td>
+                <td style="text-align: center; font-weight:bold ">${subHeadings[0]
+          }</td>
+                <td style="text-align: center ;font-weight:bold">${subHeadings[1]
+          }</td>
+                <td style="text-align: center; font-weight:bold">70</td>
+                <td style="text-align: center; font-weight:bold">100</td>
+               
+ <td style="text-align: center; border-top:none;"></td>
+                </tr>`;
+        marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
+          (d) => {
+            if (sub?.subjectName === d?.subjectName) {
+              str += `
+
+                <tr>
+
+                        
+                        <td class="text-align:left";  style="padding-left: 0.3rem; font-weight:bold;">${d?.subjectName
+                }</td>${d.markSheetReport
+                  .map((v) => {
+                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""
+                      } font-size:11pt;">${v?.subjectNature.toLowerCase() === "grade"
+                        ? attendanceValue[v?.status] || v?.grade
+                        : attendanceValue[v?.status] || Math.floor(v?.obtained)
+                      }</td>`;
+                  })
+                  .join("")} <td style="text-align: center" >${d?.subjectNature.toLowerCase() === "grade"
+                    ? d?.grade
+                    : Math.floor(d?.marksObtained)
+                }</td>
+                <td style="text-align: center" >${d?.percentage}</td>
+                <td style="text-align: center">${d?.percentage}</td>
+                 <td style="text-align: center">${d?.grade}</td>
+                     </tr>`;
+            }
+            if (check && subj.length - 1 === i) {
+              check = false;
+              totalStr += `<tr>
+
+                     <td colspan=1 style="text-align:center;font-weight:bold">Total
+                        </td> <td style="text-align:center;font-weight:bold" > ${Math.floor(
+                totalIndex0
+              )}</td>
+             <td style="text-align:center;font-weight:bold" > ${Math.floor(
+                totalIndex1
+              )}</td>
+             <td style="text-align:center;font-weight:bold" > ${Math.floor(
+                arr1
+              )}</td>
+              
+                    <td style="text-align:center;font-weight:bold" > ${Math.floor(
+                marksData?.markData?.percentage
+              )}</td>
+<td style="text-align:center;font-weight:bold">${Math.floor(
+                marksData?.markData?.percentage
+              )}%</td>
+                      <td style="text-align:center;font-weight:bold">${getGradeCustomFunction(
+                marksData?.markData?.percentage
+              )}</td>
+                       
+
+                  </tr>
+                  `;
+            }
+          }
+        );
+      });
+      return subStr + str + totalStr;
+    };
+
+    const getCoScholasticSub = (marksData) => {
+      const subjects = marksData?.baseTermData?.subject
+        .filter((d) => d.scholastic === false)
+        .filter(
+          (ele) =>
+            ele.subjectAllResponse?.nature.toLowerCase() === "co scholastic"
+        );
+
+      // Split subjects into two equal parts
+      const midIndex = Math.ceil(subjects.length / 2);
+      const leftSubjects = subjects.slice(0, midIndex);
+      const rightSubjects = subjects.slice(midIndex);
+
+      let str = "";
+
+      // Calculate the max number of rows
+      const maxRows = Math.max(leftSubjects.length, rightSubjects.length);
+
+      for (let i = 0; i < maxRows; i++) {
+        const leftSub = leftSubjects[i];
+        const rightSub = rightSubjects[i];
+
+        str += `
+      <tr>
+        <td class="align-left" style="padding-left: 0.3rem;">
+          ${leftSub?.subjectAllResponse?.subjectName || ""}
+        </td>
+        <td align="center" style="font-weight:${leftSub?.remarkStatus ? "bold" : ""}">
+          ${attendanceValue[leftSub?.remarkStatus] || leftSub?.grade || ""}
+        </td>
+        <td class="align-left" style="padding-left: 0.3rem;">
+          ${rightSub?.subjectAllResponse?.subjectName || ""}
+        </td>
+        <td align="center" style="font-weight:${rightSub?.remarkStatus ? "bold" : ""}">
+          ${attendanceValue[rightSub?.remarkStatus] || rightSub?.grade || ""}
+        </td>
+      </tr>
+    `;
+      }
+
+      return str;
+    };
+
+    const student = document.getElementById("student");
+    student.innerHTML = `
+                   <style>
+                    #student{
+                    padding:1.2rem;
+                    }
+
+                       @page {
+                            size: A4
+                            }
+                .student-header-card {
+                  width: 45%;
+                  border: 1px solid;
+                }
+
+
+                  .alignLeft{
+                  text-align: left;
+                   }
+
+  
+                .scholastic-areas {
+                  margin-top: 3rem;
+                  border: 1px solid;
+                }
+                .subject-head,
+                .subject-list {
+                  display: flex;
+                  justify-content: space-between;
+                  border: 1px solid;
+                  padding: 3px;
+                }
+   
+                .subject-head div {
+                }
+
+                .Co Scholastic-areas {
+                  border: 1px solid;
+                  margin-top: 1.5rem;
+                }
+
+                .Co Scholastic-sub-list {
+                  display: flex;
+                  justify-content: space-between;
+                }
+                .Co Scholastic-sub-list div {
+                  width: 50%;
+                  border: 1px solid;
+                }
+                .flex-btw {
+                  display: flex;
+                  justify-content: space-between;
+                }
+
+                .other-detail-table {
+                  border: 1px solid;
+                }
+                p {
+                  margin: 4px 0;
+                  font-size: small;
+                }
+                .other-details-list {
+                  width: 33%;
+                  border-right: 1px solid;
+                }
+                .other-details-list p {
+                  margin: 4px 16px;
+                }
+                .other-details-list-2 {
+                  display: flex;
+                  flex-direction: column;
+                  width: 33%;
+                  border-right: 1px solid;
+                }
+                .other-details-list-2 div {
+                  display: flex;
+                  justify-content: space-between;
+                  margin: 0 1rem;
+                  font-size:small;
+                  text-align:center;
+                }
+                .student-header-card {
+                  padding: 4px;
+                  padding-left: 8px;
+                }
+                .student-header-card div {
+                  width: 50%;
+                }
+                .align-left {
+                  text-align: left;
+                }
+
+
+  table th.align-center.subject-header {
+  border-bottom: none !important;
+}
+
+
+                table,
+                th,
+                td {
+                  border-collapse: collapse;
+                  border: 1px solid;
+                  padding: 2px;
+                }
+                .paddingLeft {
+                  padding-left: 2rem;
+                }
+              </style>`;
+
+    data?.forEach((st) => {
+      student.innerHTML += `<div style="page-break-before: always;"></div>
+            <page orientation="portrait" format="A4" margin="0">
+              <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+              <div style="width:12%; ">
+                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-24T06_21_00_707077629.jpeg" alt="" style="width:100%;"/>
+              </div>
+        <div style="width: 100%; text-align: center; margin: 0px;">
+              <h1 style=" margin-bottom: 0.1rem;">DCM PUBLIC SCHOOL</h1>
+              <h2 style="margin-bottom: 0rem;">GEREBIR, RAMPUR, SILLI - 835101</h3>
+              <h3 style="margin: 0;">Email – dcmpublicschoolsilli@gmail.com</h3>
+              <h2 style="padding:0px;margin:0px;text-align:center;"> Progress Report ${st?.markData?.academicSession}</h2>
+            </div>
+
+
+              <div style="width:15%; ">
+                <img src="" alt="" style="width:100%; "/>
+              </div>
+              </div>
+             
+                
+               
+<hr style="border: none; border-top: 1px solid black; margin: 20px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border-right:none; width: 20%">
+              <strong>Student's Name</strong>
+            </td>
+            <td style="text-align: left;   border-left:none; ">: ${st?.student?.studentName
+        }</td>
+            <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none ; width: 20%">
+              <strong>GR No.</strong>
+            </td>
+               <td style="text-align: left;   border-left:none; ">: ${st?.student?.admissionNo
+        }</td>
+         
+          </tr>
+          <tr>
+            <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+              <strong>Father's Name</strong>
+            </td>
+            <td style="text-align: left;  border-left:none;">: ${st?.student?.fatherName
+        }</td>
+            <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px;border-right:none">
+              <strong>Class / Section</strong>
+            </td>
+            <td style="text-align: left;  border-left:none;">: ${st?.student?.className + "-" + st?.student?.sectionName
+        }</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; padding-left: 0.3rem;   padding-right: 10px;border-right:none">
+              <strong>Mother's Name</strong>
+            </td>
+            <td style="text-align: left;  border-left:none;">: ${st?.student?.motherName
+        }</td>
+            <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+              <strong>Roll No</strong>
+            </td>
+            <td style="text-align: left;  border-left:none;">: ${st?.student?.rollNo
+        }</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+              <strong>Date of Birth</strong>
+            </td>
+            <td style="text-align: left;   border-left:none;">: ${st?.student.studentInfoResponse?.[0]?.dob
+        }</td>
+            <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+              <strong>UID No</strong>
+            </td>
+          
+          </tr>
+        </table>
+
+<h3 style="text-align:center;padding:0px;margin:10px 0px -15px 0px ">Scholastic Area</h3>
+               <table style="width: 100%; border: 1px solid; ">
+                  <colgroup>
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                    <col style="width: 14.28%">
+                  </colgroup>
+                  <tr>
+                   <br/>
+                    <th class="align-center subject-header" style=" padding-left: 0.3rem;padding-top:20px;">Subject</th>
+                  ${getTerms(st?.markData)}
+                  <th >UT1 + HY</th>
+                 <th >TOTAL</th>
+                 <th class="align-center subject-header" style=" padding-left: 0.3rem;padding-top:20px;">%</th>
+          <th class="align-center subject-header" style="padding-left: 0.3rem;padding-top:20px;">Grade</th>
+
+
+
+                  </tr>
+                  <tr>
+                    ${getSubjectMarks(st)}
+
+                  </tr>
+                </table>
+
+  <table style="width:100%;">
+  <div style="margin: 20px 0;text-align: center;font-size:14px;font-weight:bold;margin-top:8px;"></div>
+  
+  <tr>
+    <th colspan="4" style="padding-left: 0.3rem;">Co Scholastic Area</th>
+    
+  </tr>
+  <tr>
+    <th style="width:30%">Activity</th>
+    <th style="width:20%">T1</th>
+    <th style="width:30%">Activity</th>
+    <th style="width:20%">T1</th>
+  </tr>
+         ${getCoScholasticSub(st)}
+
+
+</table>
+
+<br>
+
+
+<table border="1" style="width:100%;border-collapse: collapse;">
+  <th colspan=10 style="font-size:14px;font-weight:bold;margin-top:8px;align-item:center">9-POINT GRADING SCALE FOR SCHOLASTIC AREAS</th>
+  <tr>
+    <th style="text-align:center;">A1</th>
+    <th style="text-align:center;">A2</th>
+    <th style="text-align:center;">B1</th>
+    <th style="text-align:center;">B2</th>
+    <th style="text-align:center;">C1</th>
+    <th style="text-align:center;">C2</th>
+    <th style="text-align:center;">D</th>
+    <th style="text-align:center;">E1</th>
+    <th style="text-align:center;">E2</th>
+  </tr>
+  <tr>
+    <td style="text-align:center;">91-100</td>
+    <td style="text-align:center;">81-90.99</td>
+    <td style="text-align:center;">71-80.99</td>
+    <td style="text-align:center;">61-70.99</td>
+    <td style="text-align:center;">51-60.99</td>
+    <td style="text-align:center;">41-50.99</td>
+    <td style="text-align:center;">33-40.99</td>
+    <td style="text-align:center;">21-32.99</td>
+    <td style="text-align:center;">0-20.99</td>
+  </tr>
+</table>
+<br>
+<div style="min-height:40px;border:1px solid black; padding:2px">
+  <strong>Teacher’s suggestive remarks : - ${st?.remarks.description} <strong/>
+
+  </div>
+
+ </div> 
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 0px; font-weight: bold;font-family: sans-serif;">
+              <div style="text-align: center; position: relative;margin-top: 2px;">
+    <img style="width: 210px; min-height: 120px; margin-bottom: 0;" src="" />
+    <p style="margin: 0;position: absolute;left: 34px;top: 100px;font-size:20px;">Principal</p>
+  </div>
+              <div style="text-align: center;">
+                <p style="margin: 0;font-size:20px;">Class Teacher</p>
+              </div>
+              <div style="text-align: center;">
+                 <p style="margin-bottom:0; font-size:22px;">${st?.printDate
+          ? st.printDate
+          : `${String(new Date().getDate()).padStart(
+            2,
+            "0"
+          )}-${String(new Date().getMonth() + 1).padStart(
+            2,
+            "0"
+          )}-${new Date().getFullYear()}`
+        }</p>
+
+                <p style="margin:0;font-size:20px;">Date</p>
+              </div>
+            </div>
+
+
+               </page>
+             
+
+              `;
+    });
+  };
+
+
+</script>
+<script>
+  window.SetTemplateData([
+    {
+      student: {
+        dob: "29-06-2010",
+        admissionNo: "20148970",
+        studentName: "Ridhima",
+        className: "IX",
+        sectionName: "A",
+        rollNo: 9125,
+        fatherName: "Kamal",
+        motherName: "Sangeeta",
+        attendance: "5.0/8",
+        boardRollNumber: "",
+        studentInfoResponse: [
+          {
+            id: 282700,
+            userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
+            userName: null,
+            fatherUserName: null,
+            motherUserName: null,
+            guardianUserName: null,
+            uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
+            studentId: "20148970",
+            exAdmissionNo: null,
+            studentName: "Ridhima",
+            fatherName: "Kamal",
+            motherName: "Sangeeta",
+            dob: "29-06-2010",
+            gender: "Female",
+            studentAdhaarcard: "",
+            joiningClass: "IX",
+            joiningSections: "A",
+            joiningDate: "19-04-2024",
+            plotNumber: "",
+            area: "New Moti Nagar",
+            city: "New Delhi",
+            state: "NA",
+            pincode: "110015",
+            phone1: null,
+            rollNo: 9125,
+            emergencyNumber: "",
+            mobileNumber: "8802424733",
+            studentEmail: null,
+            religion: "",
+            category: "",
+            minority: "",
+            motherTongue: "",
+            idMark: "",
+            height: "",
+            weight: "",
+            physicalDisability: "",
+            bloodGroup: "",
+            healthRemark: "",
+            siblingDetails: "",
+            alumni: "",
+            siblingResponse: [],
+            fatherOccupation: "",
+            fatherQualification: "",
+            fatherOrganization: "",
+            fatherDesignation: "",
+            fatherIncome: "",
+            fatherArea: "NA",
+            fatherCity: "NA",
+            fatherState: "NA",
+            fatherPincode: "",
+            fatherPhone: null,
+            fatherMobile: "8802225545",
+            fatherEmail: null,
+            fatherAdhaarNumber: "",
+            schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            motherQualification: "",
+            motherOccupation: "",
+            motherOrganization: "",
+            motherDesignation: "",
+            motherIncome: "",
+            motherArea: "NA",
+            motherCity: "NA",
+            motherState: "NA",
+            motherPincode: "",
+            motherPhone: null,
+            motherMobile: "",
+            motherEmail: null,
+            motherAdhaarNumber: "",
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: null,
+            otp: null,
+            schoolName: "Demo Public School",
+            remark: null,
+            classTeacher: "",
+            classTeacherUserName: "",
+            classes: "IX",
+            classUid: null,
+            sections: "A",
+            group: "IX-X(HINDI)",
+            wing: "NA",
+            status: "Studying",
+            academicSession: "2024-2025",
+            joiningStatus: "Old",
+            houses: null,
+            certificates: "",
+            certificatesList: [],
+            caste: "",
+            listOfDocuments: null,
+            attached: false,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "APR",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "MAY",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "JUN",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "JUL",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "AUG",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "SEP",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "OCT",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "NOV",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "DEC",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "JAN",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "FEB",
+              },
+              {
+                concessionName: "HALF T.FEE",
+                consessionType: null,
+                employeeId: null,
+                installment: "MAR",
+              },
+            ],
+            studentTransport: [],
+            studentAadharCard: null,
+            fatherAadharCard: null,
+            motherAadharCard: null,
+            studentImage: null,
+            fatherImage: null,
+            motherImage: null,
+            guardianImage: null,
+            birthCertificate: null,
+            classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
+            aluminiProof: null,
+            siblingProof: null,
+            residenceProof: null,
+            firstBornChildProof: null,
+            medicalFitnessCertificate: null,
+            fatherQualificationProof: null,
+            motherQualificationProof: null,
+            casteCertificate: null,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createddate: "2024-04-19 12:30:13.725495",
+            editeddate: "2024-04-19 12:30:13.725495",
+            permanentEducationNumber: null,
+            studentAddressResponse: {
+              uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
+              houseNo: null,
+              area: "New Moti Nagar",
+              landmark: null,
+              city: "New Delhi",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 110015,
+              street: "B-1/112",
+              userName: "SPB303_20148970",
+              createdDate: "19-04-2024 06:00 PM",
+              editedDate: "19-04-2024 06:00 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            fatherAddressResponse: {
+              uid: "80b031ab-293b-488e-9752-a0d48ff88055",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "19-04-2024 06:00 PM",
+              editedDate: "19-04-2024 06:00 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            motherAddressResponse: {
+              uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "19-04-2024 06:00 PM",
+              editedDate: "19-04-2024 06:00 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            guardianAddressResponse: null,
+            correspondenceAddressResponse: null,
+          },
+        ],
+        classTeacher: "",
+        classTeacherUserName: "",
+        permanentEducationNumber: null,
+        school: {
+          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+          schoolName: "SDPS Punjabi Bagh",
+          schoolAbb: "SPB",
+          educationBoard: null,
+          registrationNo: null,
+          plotNumber: null,
+          area: null,
+          city: null,
+          pincode: null,
+          state: null,
+          phoneNo1: null,
+          phoneNo2: null,
+          contactName: "VANDANA GUPTA",
+          contactMobile: "9868359499",
+          contactEmail: "sg4vgoyal@gmail.com",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "sdps",
+          website: null,
+          schemaPrefix: null,
+          editedDate: "02-08-2024 01:11 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+      },
+      markData: {
+        "academicSession": "2024-25",
+        "admissionNo": "35",
+        "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+        "studentName": "Ramesh Mahto",
+        "rollNo": 0,
+        "fatherName": "NA",
+        "className": "III",
+        "sectionName": "A",
+        "terms": "Half Yearly",
+        "markSheetName": "TERM 1",
+        "overAllRank": "1",
+        "markSheetTerms": [
+          {
+            "id": 1337,
+            "headerName": "UT-I",
+            "subHeaderName": "20",
+            "priority": 1,
+            "bestOf": 0,
+            "decimalPlaces": 0,
+            "weightage": 20,
+            "terms": [
+              "Unit Test 1"
+            ]
+          },
+          {
+            "id": 1338,
+            "headerName": "HY",
+            "subHeaderName": "50",
+            "priority": 2,
+            "bestOf": 0,
+            "decimalPlaces": 0,
+            "weightage": 50,
+            "terms": [
+              "Half Yearly"
+            ]
+          }
+        ],
+        "subjectWiseMarkSheetReportResponses": [
+          {
+            "subjectUid": "c187a627-d567-4a22-8f34-322b2671eaf7",
+            "subjectName": "English",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "c187a627-d567-4a22-8f34-322b2671eaf7",
+                "subjectName": "English",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 13,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "c187a627-d567-4a22-8f34-322b2671eaf7",
+                "subjectName": "English",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 33,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 46,
+            "total": 70,
+            "percentage": 66,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 1,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "d737479c-3ad0-4ae4-b1b0-b4be6eef5059",
+            "subjectName": "Hindi",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "d737479c-3ad0-4ae4-b1b0-b4be6eef5059",
+                "subjectName": "Hindi",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 15,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "d737479c-3ad0-4ae4-b1b0-b4be6eef5059",
+                "subjectName": "Hindi",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 34,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 49,
+            "total": 70,
+            "percentage": 70,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 2,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "52df56e1-e3df-4b0e-9e27-f33990d603d1",
+            "subjectName": "Math",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "52df56e1-e3df-4b0e-9e27-f33990d603d1",
+                "subjectName": "Math",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 16,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "52df56e1-e3df-4b0e-9e27-f33990d603d1",
+                "subjectName": "Math",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 35,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 51,
+            "total": 70,
+            "percentage": 73,
+            "grade": "B1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 3,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "5883007e-b95b-4ae1-ba3d-4c107cc2552f",
+            "subjectName": "Social Science",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "5883007e-b95b-4ae1-ba3d-4c107cc2552f",
+                "subjectName": "Social Science",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 13,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "5883007e-b95b-4ae1-ba3d-4c107cc2552f",
+                "subjectName": "Social Science",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 34,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 47,
+            "total": 70,
+            "percentage": 67,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 4,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "7c9ef2f6-b37c-4deb-bea7-f33a560e676f",
+            "subjectName": "Science",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "7c9ef2f6-b37c-4deb-bea7-f33a560e676f",
+                "subjectName": "Science",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 12,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "7c9ef2f6-b37c-4deb-bea7-f33a560e676f",
+                "subjectName": "Science",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 22,
+                "grade": "C2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 34,
+            "total": 70,
+            "percentage": 49,
+            "grade": "C2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 5,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "780e7cf8-66a7-4f73-8a41-f479b0779526",
+            "subjectName": "GK",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "780e7cf8-66a7-4f73-8a41-f479b0779526",
+                "subjectName": "GK",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 11,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "780e7cf8-66a7-4f73-8a41-f479b0779526",
+                "subjectName": "GK",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 25,
+                "grade": "C2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 36,
+            "total": 70,
+            "percentage": 51,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 6,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "3726f518-cf03-416a-920e-1feb1b6e4fd9",
+            "subjectName": "Computer",
+            "subjectNature": "Theory",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "3726f518-cf03-416a-920e-1feb1b6e4fd9",
+                "subjectName": "Computer",
+                "subjectNature": "Theory",
+                "max": 20,
+                "obtained": 9,
+                "grade": "C2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1337,
+                  "headerName": "UT-I",
+                  "subHeaderName": "20",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 20,
+                  "terms": [
+                    "Unit Test 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "3726f518-cf03-416a-920e-1feb1b6e4fd9",
+                "subjectName": "Computer",
+                "subjectNature": "Theory",
+                "max": 50,
+                "obtained": 37,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 46,
+            "total": 70,
+            "percentage": 66,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 7,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "827e0da9-aa78-4720-84d5-490893b0982d",
+            "subjectName": "Regularity Cleanliness Punctuality",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "827e0da9-aa78-4720-84d5-490893b0982d",
+                "subjectName": "Regularity Cleanliness Punctuality",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 45,
+                "grade": "A2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 45,
+            "total": 50,
+            "percentage": 90,
+            "grade": "A2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 8,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "f03e23a4-7afb-4650-8aba-dccbecf84155",
+            "subjectName": "Collaboration Co-Operation",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "f03e23a4-7afb-4650-8aba-dccbecf84155",
+                "subjectName": "Collaboration Co-Operation",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 35,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 35,
+            "total": 50,
+            "percentage": 70,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 9,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "56338a1d-031c-47a1-bc77-04a9ef60a8ae",
+            "subjectName": "Care of School Property",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "56338a1d-031c-47a1-bc77-04a9ef60a8ae",
+                "subjectName": "Care of School Property",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 30,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 30,
+            "total": 50,
+            "percentage": 60,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 10,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "39442073-9e5c-4b0a-b22f-cd8673081ab9",
+            "subjectName": "Values and Life Skill",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "39442073-9e5c-4b0a-b22f-cd8673081ab9",
+                "subjectName": "Values and Life Skill",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 30,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 30,
+            "total": 50,
+            "percentage": 60,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 11,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "a0098eb2-9e72-467c-b754-567d754950fd",
+            "subjectName": "Art craft & Painting",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "a0098eb2-9e72-467c-b754-567d754950fd",
+                "subjectName": "Art craft & Painting",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 45,
+                "grade": "A2",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 45,
+            "total": 50,
+            "percentage": 90,
+            "grade": "A2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 12,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "368c2fc3-8be8-4118-870d-f4063359e50a",
+            "subjectName": "Music & Dance",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "368c2fc3-8be8-4118-870d-f4063359e50a",
+                "subjectName": "Music & Dance",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 50,
+                "grade": "A1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 50,
+            "total": 50,
+            "percentage": 100,
+            "grade": "A1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 13,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "f6b6658e-26b1-4018-9893-0c5270700fa0",
+            "subjectName": "Sports & Karate",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "f6b6658e-26b1-4018-9893-0c5270700fa0",
+                "subjectName": "Sports & Karate",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 50,
+                "grade": "A1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 50,
+            "total": 50,
+            "percentage": 100,
+            "grade": "A1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 14,
+            "decimalPlaces": 0,
+            "visible": false
+          },
+          {
+            "subjectUid": "38b692af-b063-4568-b139-87aee1019b13",
+            "subjectName": "Yoga",
+            "subjectNature": "Co Scholastic",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "c91de630-0f0b-4058-adc6-ba7ee39eda7c",
+                "admissionNo": "35",
+                "studentName": "Ramesh Mahto",
+                "rollNo": 0,
+                "fatherName": "NA",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "bb539dd2-01e5-4402-a69e-1cbf241ac432",
+                "terms": "Half Yearly",
+                "subjectUid": "38b692af-b063-4568-b139-87aee1019b13",
+                "subjectName": "Yoga",
+                "subjectNature": "Co Scholastic",
+                "max": 50,
+                "obtained": 50,
+                "grade": "A1",
+                "status": "",
+                "markSheetName": "TERM 1",
+                "attachmentName": "",
+                "session": "2024-25",
+                "decimalPlaces": 0,
+                "markSheetTermResponse": {
+                  "id": 1338,
+                  "headerName": "HY",
+                  "subHeaderName": "50",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 0,
+                  "weightage": 50,
+                  "terms": [
+                    "Half Yearly"
+                  ]
+                },
+                "visible": false,
+                "graded": true,
+                "pass": true
+              }
+            ],
+            "marksObtained": 50,
+            "total": 50,
+            "percentage": 100,
+            "grade": "A1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "Half Yearly",
+            "markSheetName": "TERM 1",
+            "subjectPrt": 15,
+            "decimalPlaces": 0,
+            "visible": false
+          }
+        ],
+        "marksObtained": 644,
+        "total": 890,
+        "percentage": 72,
+        "overAllGrade": "B1",
+        "visible": false
+      },
+      remarks: {
+        uid: null,
+        terms: null,
+        studentId: null,
+        studentName: null,
+        rollNumber: 0,
+        classSectionUid: null,
+        classSection: null,
+        description: "asdkjhas asjkasf asfoiasf qekqwe ",
+        fields: null,
+        status: false,
+        createdUser: null,
+        editedUser: null,
+        createdDate: null,
+        editedDate: null,
+      },
+      baseTermData: {
+        studentAcademic: {
+          dob: "29-06-2010",
+          admissionNo: "20148970",
+          studentName: "Ridhima",
+          className: "IX",
+          sectionName: "A",
+          rollNo: 9125,
+          fatherName: "Kamal",
+          motherName: "Sangeeta",
+          attendance: "5.0/8",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 282700,
+              userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
+              studentId: "20148970",
+              exAdmissionNo: null,
+              studentName: "Ridhima",
+              fatherName: "Kamal",
+              motherName: "Sangeeta",
+              dob: "29-06-2010",
+              gender: "Female",
+              studentAdhaarcard: "",
+              joiningClass: "IX",
+              joiningSections: "A",
+              joiningDate: "19-04-2024",
+              plotNumber: "",
+              area: "New Moti Nagar",
+              city: "New Delhi",
+              state: "NA",
+              pincode: "110015",
+              phone1: null,
+              rollNo: 9125,
+              emergencyNumber: "",
+              mobileNumber: "8802424733",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "8802225545",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "IX",
+              classUid: null,
+              sections: "A",
+              group: "IX-X(HINDI)",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-2025",
+              joiningStatus: "Old",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "APR",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "MAY",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JUN",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JUL",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "AUG",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "SEP",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "OCT",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "NOV",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "DEC",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "JAN",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "FEB",
+                },
+                {
+                  concessionName: "HALF T.FEE",
+                  consessionType: null,
+                  employeeId: null,
+                  installment: "MAR",
+                },
+              ],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-04-19 12:30:13.725495",
+              editeddate: "2024-04-19 12:30:13.725495",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
+                houseNo: null,
+                area: "New Moti Nagar",
+                landmark: null,
+                city: "New Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110015,
+                street: "B-1/112",
+                userName: "SPB303_20148970",
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "80b031ab-293b-488e-9752-a0d48ff88055",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 06:00 PM",
+                editedDate: "19-04-2024 06:00 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "02-08-2024 01:11 PM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        subject: [
+          {
+            "subjectAllResponse": {
+              "uid": "c187a627-d567-4a22-8f34-322b2671eaf7",
+              "subjectName": "English",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:05:15.365254",
+              "editeddate": "2024-10-21 05:05:51.060494"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 30,
+            "percentage": 60,
+            "grade": "C1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 1,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "d737479c-3ad0-4ae4-b1b0-b4be6eef5059",
+              "subjectName": "Hindi",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:05:27.082468",
+              "editeddate": "2024-10-21 05:05:27.081868"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 22,
+            "percentage": 44,
+            "grade": "C2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 2,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "52df56e1-e3df-4b0e-9e27-f33990d603d1",
+              "subjectName": "Math",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:06:07.403437",
+              "editeddate": "2024-10-21 05:06:07.40303"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 46,
+            "percentage": 92,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 3,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "5883007e-b95b-4ae1-ba3d-4c107cc2552f",
+              "subjectName": "Social Science",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:09:27.607406",
+              "editeddate": "2024-10-21 05:09:27.605526"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 36,
+            "percentage": 72,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 4,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "7c9ef2f6-b37c-4deb-bea7-f33a560e676f",
+              "subjectName": "Science",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:10:14.755115",
+              "editeddate": "2024-10-21 05:10:14.754615"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 42,
+            "percentage": 84,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 5,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "780e7cf8-66a7-4f73-8a41-f479b0779526",
+              "subjectName": "GK",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:09:42.095304",
+              "editeddate": "2024-10-21 05:09:42.094257"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 33,
+            "percentage": 66,
+            "grade": "B2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 6,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "3726f518-cf03-416a-920e-1feb1b6e4fd9",
+              "subjectName": "Computer",
+              "nature": "Theory",
+              "natureUid": "7fd23698-b9a9-42f2-adbe-6f5ec5a6462c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-10-21 05:09:59.772529",
+              "editeddate": "2024-10-21 05:09:59.771654"
+            },
+            "termName": "Half Yearly",
+            "max": 50,
+            "markObtained": 30,
+            "percentage": 60,
+            "grade": "C1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 7,
+            "added": true,
+            "scholastic": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "827e0da9-aa78-4720-84d5-490893b0982d",
+              "subjectName": "Regularity Cleanliness Punctuality",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:08:00.956927",
+              "editeddate": "2024-11-22 11:08:00.956692"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 8,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "f03e23a4-7afb-4650-8aba-dccbecf84155",
+              "subjectName": "Collaboration Co-Operation",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:09:03.571213",
+              "editeddate": "2024-11-22 11:09:03.570537"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 90.99,
+            "percentage": 90.99,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 9,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "56338a1d-031c-47a1-bc77-04a9ef60a8ae",
+              "subjectName": "Care of School Property",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:09:24.211135",
+              "editeddate": "2024-11-22 11:09:24.210927"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 100,
+            "percentage": 100,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 10,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "39442073-9e5c-4b0a-b22f-cd8673081ab9",
+              "subjectName": "Values and Life Skill",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:09:50.670464",
+              "editeddate": "2024-11-22 11:09:50.670234"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 11,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "a0098eb2-9e72-467c-b754-567d754950fd",
+              "subjectName": "Art craft & Painting",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:11:39.585555",
+              "editeddate": "2024-11-22 11:11:39.585323"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 90.99,
+            "percentage": 90.99,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 12,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "368c2fc3-8be8-4118-870d-f4063359e50a",
+              "subjectName": "Music & Dance",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:12:25.958013",
+              "editeddate": "2024-11-22 11:12:25.957783"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 13,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "f6b6658e-26b1-4018-9893-0c5270700fa0",
+              "subjectName": "Sports & Karate",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:12:41.655134",
+              "editeddate": "2024-11-22 11:12:41.653767"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 90.99,
+            "percentage": 90.99,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 14,
+            "added": false,
+            "scholastic": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "38b692af-b063-4568-b139-87aee1019b13",
+              "subjectName": "Yoga",
+              "nature": "Co Scholastic",
+              "natureUid": "d96557fb-abdf-432a-91ab-1ffbcd85883c",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-11-22 11:13:18.927021",
+              "editeddate": "2024-11-22 11:13:18.926272"
+            },
+            "termName": "Half Yearly",
+            "max": 100,
+            "markObtained": 80.99,
+            "percentage": 80.99,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 15,
+            "added": false,
+            "scholastic": false
+          }
+        ],
+        remarksEntry: {
+          uid: null,
+          terms: null,
+          studentId: null,
+          studentName: null,
+          rollNumber: 0,
+          classSectionUid: null,
+          classSection: null,
+          description: null,
+          fields: null,
+          status: false,
+          createdUser: null,
+          editedUser: null,
+          createdDate: null,
+          editedDate: null,
+        },
+        school: {
+          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+          schoolName: "SDPS Punjabi Bagh",
+          schoolAbb: "SPB",
+          educationBoard: null,
+          registrationNo: null,
+          plotNumber: null,
+          area: null,
+          city: null,
+          pincode: null,
+          state: null,
+          phoneNo1: null,
+          phoneNo2: null,
+          contactName: "VANDANA GUPTA",
+          contactMobile: "9868359499",
+          contactEmail: "sg4vgoyal@gmail.com",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "sdps",
+          website: null,
+          schemaPrefix: null,
+          editedDate: "02-08-2024 01:11 PM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+        promotedClass: null,
+        promotedSection: null,
+        perSignedUrlResponse: {
+          url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SDPS/student-info/20148970/student/images/20148970.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240904T072906Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240904%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=4865ffdff2f26050f07da6477a9be357fb267db2d678f2e3e54a077ecb1689fa",
+          fileName: "20148970.png",
+        },
+        pass: false,
+        status_code: 200,
+      },
+    },
+
+
+
+  ]);
+</script>
+
+</html>
