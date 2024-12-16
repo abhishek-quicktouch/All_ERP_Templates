@@ -1,208 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Biglows</title>
-  </head>
-  <body>
-    <div id="studentsList">Student Fee</div>
-   <script>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biglows</title>
+</head>
+
+<body>
+  <div id="studentsList">Student Fee</div>
+  <script>
     window.SetTemplateData = function (dataList) {
-        function convertNumberToWords(number) {
-          const units = [
-            "",
-            "ONE",
-            "TWO",
-            "THREE",
-            "FOUR",
-            "FIVE",
-            "SIX",
-            "SEVEN",
-            "EIGHT",
-            "NINE",
-          ];
-          const teens = [
-            "TEN",
-            "ELEVEN",
-            "TWELVE",
-            "THIRTEEN",
-            "FOURTEEN",
-            "FIFTEEN",
-            "SIXTEEN",
-            "SEVENTEEN",
-            "EIGHTEEN",
-            "NINETEEN",
-          ];
-          const tens = [
-            "",
-            "",
-            "TWENTY",
-            "THIRTY",
-            "FORTY",
-            "FIFTY",
-            "SIXTY",
-            "SEVENTY",
-            "EIGHTY",
-            "NINETY",
-          ];
+      function convertNumberToWords(number) {
+        const units = [
+          "",
+          "ONE",
+          "TWO",
+          "THREE",
+          "FOUR",
+          "FIVE",
+          "SIX",
+          "SEVEN",
+          "EIGHT",
+          "NINE",
+        ];
+        const teens = [
+          "TEN",
+          "ELEVEN",
+          "TWELVE",
+          "THIRTEEN",
+          "FOURTEEN",
+          "FIFTEEN",
+          "SIXTEEN",
+          "SEVENTEEN",
+          "EIGHTEEN",
+          "NINETEEN",
+        ];
+        const tens = [
+          "",
+          "",
+          "TWENTY",
+          "THIRTY",
+          "FORTY",
+          "FIFTY",
+          "SIXTY",
+          "SEVENTY",
+          "EIGHTY",
+          "NINETY",
+        ];
 
-          function convertChunk(chunk) {
-            let words = "";
+        function convertChunk(chunk) {
+          let words = "";
 
-            if (chunk >= 100) {
-              words += units[Math.floor(chunk / 100)] + " HUNDRED";
-              chunk %= 100;
+          if (chunk >= 100) {
+            words += units[Math.floor(chunk / 100)] + " HUNDRED";
+            chunk %= 100;
 
-              if (chunk > 0) {
-                words += " ";
-              }
+            if (chunk > 0) {
+              words += " ";
             }
+          }
 
-            if (chunk >= 10 && chunk < 20) {
-              words += teens[chunk - 10];
-            } else if (chunk >= 20) {
-              words += tens[Math.floor(chunk / 10)];
+          if (chunk >= 10 && chunk < 20) {
+            words += teens[chunk - 10];
+          } else if (chunk >= 20) {
+            words += tens[Math.floor(chunk / 10)];
 
-              if (chunk % 10 > 0) {
-                words += " " + units[chunk % 10];
-              }
-            } else if (chunk > 0) {
-              words += units[chunk];
+            if (chunk % 10 > 0) {
+              words += " " + units[chunk % 10];
             }
-
-            return words;
+          } else if (chunk > 0) {
+            words += units[chunk];
           }
 
-          if (number === 0) {
-            return "RUPEES ZERO ONLY";
-          }
-
-          const crore = Math.floor(number / 10000000);
-          const lakh = Math.floor((number % 10000000) / 100000);
-          const thousand = Math.floor((number % 100000) / 1000);
-          const remainder = number % 1000;
-
-          let result = "";
-
-          if (crore > 0) {
-            result += convertChunk(crore) + " CRORE ";
-          }
-
-          if (lakh > 0) {
-            result += convertChunk(lakh) + " LAKH ";
-          }
-
-          if (thousand > 0) {
-            result += convertChunk(thousand) + " THOUSAND ";
-          }
-
-          if (remainder > 0) {
-            result += convertChunk(remainder);
-          }
-
-          return "RUPEES " + result.trim() + " ONLY";
+          return words;
         }
 
-        const installmentStartEndDate = (val) => {
-          const obj = {
-            JAN: "31-JAN-2024",
-            FEB: "28-FEB-2024",
-            MAR: "31-MAR-2024",
-            APR: "30-APR-2023",
-            MAY: "31-MAY-2023",
-            JUN: "30-JUN-2023",
-            JUL: "31-JUL-2023",
-            AUG: "31-AUG-2023",
-            SEP: "30-SEP-2023",
-            OCT: "31-OCT-2023",
-            NOV: "30-NOV-2023",
-            DEC: "31-DEC-2023",
-          };
-          const obj2 = {
-            JAN: "2024",
-            FEB: "2024",
-            MAR: "2024",
-          };
-          const installments = val.split(",");
+        if (number === 0) {
+          return "RUPEES ZERO ONLY";
+        }
 
-          const string = `01-${installments[0]}-${
-            obj2[installments[0]] ?? "2023"
+        const crore = Math.floor(number / 10000000);
+        const lakh = Math.floor((number % 10000000) / 100000);
+        const thousand = Math.floor((number % 100000) / 1000);
+        const remainder = number % 1000;
+
+        let result = "";
+
+        if (crore > 0) {
+          result += convertChunk(crore) + " CRORE ";
+        }
+
+        if (lakh > 0) {
+          result += convertChunk(lakh) + " LAKH ";
+        }
+
+        if (thousand > 0) {
+          result += convertChunk(thousand) + " THOUSAND ";
+        }
+
+        if (remainder > 0) {
+          result += convertChunk(remainder);
+        }
+
+        return "RUPEES " + result.trim() + " ONLY";
+      }
+
+      const installmentStartEndDate = (val) => {
+        const obj = {
+          JAN: "31-JAN-2024",
+          FEB: "28-FEB-2024",
+          MAR: "31-MAR-2024",
+          APR: "30-APR-2023",
+          MAY: "31-MAY-2023",
+          JUN: "30-JUN-2023",
+          JUL: "31-JUL-2023",
+          AUG: "31-AUG-2023",
+          SEP: "30-SEP-2023",
+          OCT: "31-OCT-2023",
+          NOV: "30-NOV-2023",
+          DEC: "31-DEC-2023",
+        };
+        const obj2 = {
+          JAN: "2024",
+          FEB: "2024",
+          MAR: "2024",
+        };
+        const installments = val.split(",");
+
+        const string = `01-${installments[0]}-${obj2[installments[0]] ?? "2023"
           } TO ${obj[installments[installments.length - 1]]}`;
 
-          return string;
-        };
-        const multipleStudents = dataList;
-        const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
-        multipleStudents?.forEach((element) => {
-          const basicDetails = {
-            academicSession: element?.student?.studentInfoResponse?.[0]?.academicSession,
-            admissionNo: element?.contentRequest?.admissionNo,
-            // rollNo:
-            studentName: element?.contentRequest?.studentName,
-            fatherName: element?.student?.fatherName,
-            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
-            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
-            address: `${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.houseNo
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.houseNo + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.street
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.street + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.landmark
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.landmark + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.area
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.area + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.city
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.city + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.district
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.district + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.pincode
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.pincode
-                : ""
+        return string;
+      };
+      const multipleStudents = dataList;
+      const studentHtml = document.getElementById("studentsList");
+      studentHtml.innerHTML = ``;
+      multipleStudents?.forEach((element) => {
+        const basicDetails = {
+          academicSession: element?.student?.studentInfoResponse?.[0]?.academicSession,
+          admissionNo: element?.contentRequest?.admissionNo,
+          // rollNo:
+          studentName: element?.contentRequest?.studentName,
+          fatherName: element?.student?.fatherName,
+          phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+          classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+          address: `${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+            ?.houseNo
+            ? element?.student?.studentInfoResponse?.[0]
+              ?.studentAddressResponse?.houseNo + ", "
+            : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.street
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.street + ", "
+              : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.landmark
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.landmark + ", "
+              : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.area
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.area + ", "
+              : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.city
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.city + ", "
+              : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.district
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.district + ", "
+              : ""
+            }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+              ?.pincode
+              ? element?.student?.studentInfoResponse?.[0]
+                ?.studentAddressResponse?.pincode
+              : ""
             }`,
-          };
+        };
 
-          const feeDetails = element?.contentRequest;
-          const studentDetails = element?.student;
-          const componentTotal = (component) => {
-            let amount = feeDetails?.studentFeeCollectionReceiptList?.reduce(
-              (prev, current) => prev + Number(current[component]),
-              0
-            );
-            return amount.toFixed(2)
-          };
+        const feeDetails = element?.contentRequest;
+        const studentDetails = element?.student;
+        const componentTotal = (component) => {
+          let amount = feeDetails?.studentFeeCollectionReceiptList?.reduce(
+            (prev, current) => prev + Number(current[component]),
+            0
+          );
+          return amount.toFixed(2)
+        };
+        console.log(feeDetails, "fffffffffffff feeDetails")
 
-
-          const singleStudentHtml = document.createElement("div");
-          singleStudentHtml.style.pageBreakAfter = "always";
-          singleStudentHtml.innerHTML = `<style type="text/css">
+        const singleStudentHtml = document.createElement("div");
+        singleStudentHtml.style.pageBreakAfter = "always";
+        singleStudentHtml.innerHTML = `<style type="text/css">
 @page {
 size: A4
 }
@@ -280,7 +274,7 @@ size: A4 landscape;
 								<table width="100%" border="0" cellspacing="0">
 									<tr>
 										<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Parent Name</td>
-										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.fatherName || ""} ${basicDetails?.motherName ?`& ${basicDetails?.motherName}` : ""}</td>
+										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.fatherName || ""} ${basicDetails?.motherName ? `& ${basicDetails?.motherName}` : ""}</td>
 									</tr>
 								</table>
 							</td>
@@ -310,7 +304,7 @@ size: A4 landscape;
 								<table width="100%" border="0" cellspacing="0">
 									<tr>
 										<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Class</td>
-										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.classSection|| ""}</td>
+										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.classSection || ""}</td>
 									</tr>
 								</table>
 							</td>
@@ -320,8 +314,7 @@ size: A4 landscape;
 								<table width="100%" border="0" cellspacing="0">
 									<tr>
 										<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Mobile No.</td>
-										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${
-                                            basicDetails?.phoneNo || studentDetails?.studentInfoResponse?.[0]?.fatherMobile || ""}</td>
+										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.phoneNo || studentDetails?.studentInfoResponse?.[0]?.fatherMobile || ""}</td>
 									</tr>
 								</table>
 							</td>
@@ -332,6 +325,16 @@ size: A4 landscape;
 									<tr>
 										<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Address</td>
 										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${basicDetails?.address || ""}</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+            <tr>
+							<td style="width:100%;">
+								<table width="100%" border="0" cellspacing="0">
+									<tr>
+										<td style="width:25%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-weight:bold;">Paid Installment Mo.</td>
+										<td style="width:75%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform:uppercase;">: ${feeDetails?.paidInstallmentsName || ""}</td>
 									</tr>
 								</table>
 							</td>
@@ -357,9 +360,9 @@ size: A4 landscape;
 							<td align="right" style="width:15%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000; font-weight:bold;">Transaction No</td>
 						</tr>
 						<tr>
-							<td align="left" style="width:15%;">${feeDetails?.feeMode||"-"}</td>
-							<td align="right" style="width:15%;">${feeDetails?.feeDate||"-"}</td>
-							<td align="right" style="width:15%;">${feeDetails?.bank||"-"}</td>
+							<td align="left" style="width:15%;">${feeDetails?.feeMode || "-"}</td>
+							<td align="right" style="width:15%;">${feeDetails?.feeDate || "-"}</td>
+							<td align="right" style="width:15%;">${feeDetails?.bank || "-"}</td>
 							<td align="right" style="width:15%;">${feeDetails?.feeModeNumber || feeDetails?.modeNo || "-"}</td>
 						</tr>		
 					</table>
@@ -431,26 +434,44 @@ size: A4 landscape;
                                     <td align="left" style="width:35%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Description</td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Due</td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Con</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Dis</td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000; padding:2mm;font-weight:bold;">Paid</td>
                                 </tr>
-                                ${feeDetails?.studentFeeCollectionReceiptList?.map(((comp,i)=>{
-                                    return `
+                                ${feeDetails?.studentFeeCollectionReceiptList?.map(((comp, i) => {
+          return `
                                      <tr>
-                                    <td align="left" style="width:5%; font-weight:bold;">${i+1}</td>
+                                    <td align="left" style="width:5%; font-weight:bold;">${i + 1}</td>
                                     <td align="left" style="width:35%; font-weight:bold; text-transform:uppercase;">${comp?.componentName || ""}</td>
                                     <td align="right" style="width:20%;">${comp?.componentAmount || ""}</td>
                                     <td align="right" style="width:20%;">${comp?.componentConcession || ""}</td>
+                                    <td align="right" style="width:20%;">${comp?.componentDiscount || ""}</td>
                                     <td align="right" style="width:20%; font-weight:bold;">${comp?.componentReceived || ""}</td>
                                 </tr>
                                     `
-                                })).join("")}
-                                
+        })).join("")}
+                                ${feeDetails?.excessBalance > 0 ? ` <tr>
+                                    <td align="left" style="width:5%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Excess Balance</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${feeDetails?.excessBalance || ""}</td>
+                                </tr>` : ""}
                                 <tr>
-                                    <td align="left" style="width:5%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
-                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Total Amount</td>
-                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">${componentTotal("componentAmount")||""}</td>
-                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">${componentTotal("componentConcession")||""}</td>
-                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; border-bottom: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${componentTotal("componentReceived")||""}</td>
+                                    <td align="left" style="width:5%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Total Amount</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">${componentTotal("componentAmount") || ""}</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">${componentTotal("componentConcession") || ""}</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${componentTotal("componentDiscount") || ""}</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${componentTotal("componentReceived") || ""}</td>
+                                </tr>
+                                <tr>
+                                    <td align="left" style="width:5%; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="left" style="width:35%; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Balance</td>
+                                    <td align="right" style="width:20%; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-bottom: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-bottom: solid 0.25mm #000000; padding:2mm;font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-bottom: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${componentTotal("componentAmount") - componentTotal("componentConcession") - componentTotal("componentReceived") - componentTotal("componentDiscount")}</td>
                                 </tr>
                                 
                             </table>
@@ -509,286 +530,638 @@ size: A4 landscape;
 
       `;
 
-          studentHtml.appendChild(singleStudentHtml);
-        });
-      };
-   </script>
-    <script>
-      window.SetTemplateData([
-        {
-          student: {
-    "dob": "08-09-2017",
-    "admissionNo": "3218",
-    "studentName": "ABHISHEK",
-    "className": "I",
-    "sectionName": "A",
-    "rollNo": 0,
-    "fatherName": "RAJESH SHAH",
-    "motherName": "BABITA SHAH",
-    "attendance": "8.0/8",
-    "boardRollNumber": "",
-    "studentInfoResponse": [
-        {
-            "id": 305314,
-            "userUid": "4f3d158b-a760-4a04-a801-7f074c2a7952",
-            "userName": null,
-            "fatherUserName": null,
-            "motherUserName": null,
-            "guardianUserName": null,
-            "uid": "c8490e1f-1eb3-415c-9a4f-df4be76c3051",
-            "studentId": "3218",
-            "exAdmissionNo": null,
-            "studentName": "ABHISHEK",
-            "fatherName": "RAJESH SHAH",
-            "motherName": "BABITA SHAH",
-            "dob": "08-09-2017",
-            "gender": "Male",
-            "studentAdhaarcard": "",
-            "joiningClass": "I",
-            "joiningSections": "A",
-            "joiningDate": "02-07-2024",
-            "plotNumber": "H.NO-296,RAM NAGAR",
-            "area": "RAM NAGAR, KRISHNA NAGAR",
-            "city": "DELHI",
-            "state": "Delhi",
-            "pincode": "110051",
-            "phone1": "9354967384",
-            "rollNo": 0,
-            "emergencyNumber": "",
-            "mobileNumber": "8750886635",
-            "studentEmail": null,
-            "religion": "",
-            "category": "",
-            "minority": "",
-            "motherTongue": "",
-            "idMark": "",
-            "height": "",
-            "weight": "",
-            "physicalDisability": "",
-            "bloodGroup": "",
-            "healthRemark": "",
-            "siblingDetails": "",
-            "alumni": "",
-            "siblingResponse": [],
-            "fatherOccupation": "",
-            "fatherQualification": "",
-            "fatherOrganization": "",
-            "fatherDesignation": "",
-            "fatherIncome": "",
-            "fatherArea": "",
-            "fatherCity": "",
-            "fatherState": "",
-            "fatherPincode": "0",
-            "fatherPhone": "",
-            "fatherMobile": "",
-            "fatherEmail": null,
-            "fatherAdhaarNumber": "",
-            "schoolUid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
-            "motherQualification": "",
-            "motherOccupation": "",
-            "motherOrganization": "",
-            "motherDesignation": "",
-            "motherIncome": "",
-            "motherArea": "",
-            "motherCity": "",
-            "motherState": "",
-            "motherPincode": "0",
-            "motherPhone": "",
-            "motherMobile": "",
-            "motherEmail": null,
-            "motherAdhaarNumber": "",
-            "guardianName": "",
-            "relation": "",
-            "guardianOccupation": "",
-            "guardianPhone": "",
-            "guardianMobile": "",
-            "guardianEmail": null,
-            "guardianAddress": "",
-            "leavingDate": null,
-            "previousSchoolName": "",
-            "otp": null,
-            "schoolName": "Demo Public School",
-            "remark": "",
-            "classTeacher": "",
-            "classTeacherUserName": "",
-            "classes": "I",
-            "classUid": null,
-            "sections": "A",
-            "group": null,
-            "wing": "NA",
-            "status": "Studying",
-            "academicSession": "2024-2025",
-            "joiningStatus": "New",
-            "houses": null,
-            "certificates": "",
-            "certificatesList": [],
-            "caste": "",
-            "listOfDocuments": null,
-            "attached": false,
-            "required": false,
-            "submitted": false,
-            "studentHostel": [],
-            "studentConcession": [],
-            "studentTransport": [],
-            "studentAadharCard": null,
-            "fatherAadharCard": null,
-            "motherAadharCard": null,
-            "studentImage": null,
-            "fatherImage": null,
-            "motherImage": null,
-            "guardianImage": null,
-            "birthCertificate": null,
-            "classSectionUid": "bc1192db-cf90-4774-92c0-a4e50e91e5ef",
-            "aluminiProof": null,
-            "siblingProof": null,
-            "residenceProof": null,
-            "firstBornChildProof": null,
-            "medicalFitnessCertificate": null,
-            "fatherQualificationProof": null,
-            "motherQualificationProof": null,
-            "casteCertificate": null,
-            "createdUser": "BIGLOWSPUBLIC SCHOOL_384900",
-            "editedUser": "BIGLOWSPUBLIC SCHOOL_384900",
-            "createddate": "2024-07-06 05:30:44.047285",
-            "editeddate": "2024-07-06 05:30:44.047285",
-            "permanentEducationNumber": "",
-            "studentAddressResponse": {
-                "uid": "f8a4e78e-20d6-467c-9f55-7df25ba534aa",
+        studentHtml.appendChild(singleStudentHtml);
+      });
+    };
+  </script>
+  <script>
+    window.SetTemplateData([
+      {
+        "student": {
+          "dob": "15-05-2012",
+          "admissionNo": "3145",
+          "studentName": "Tanmay Jain",
+          "className": "VII",
+          "sectionName": "B",
+          "rollNo": 23,
+          "fatherName": "Mr. Sachin Jain",
+          "motherName": "Mrs. Priyanka Jain",
+          "attendance": "24.0/44",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 192477,
+              "userUid": "72fb1545-aa73-4c28-80e2-18016c4d6fbf",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "80d08ffd-f7b6-4ddc-bc00-d9383d1fc853",
+              "studentId": "3145",
+              "exAdmissionNo": null,
+              "studentName": "Tanmay Jain",
+              "fatherName": "Mr. Sachin Jain",
+              "motherName": "Mrs. Priyanka Jain",
+              "dob": "15-05-2012",
+              "gender": "NA",
+              "studentAdhaarcard": "",
+              "joiningClass": "VI",
+              "joiningSections": "B",
+              "joiningDate": "25-11-2023",
+              "plotNumber": "",
+              "area": "T-165,, Gali No-6, Gautampuri-110053",
+              "city": "NA",
+              "state": "NA",
+              "pincode": "",
+              "phone1": null,
+              "rollNo": 23,
+              "emergencyNumber": "",
+              "mobileNumber": "8920902299",
+              "studentEmail": null,
+              "religion": "",
+              "category": "",
+              "minority": "",
+              "motherTongue": "",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "NA",
+              "fatherState": "NA",
+              "fatherPincode": "",
+              "fatherPhone": null,
+              "fatherMobile": "8920902299",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "NA",
+              "motherState": "NA",
+              "motherPincode": "",
+              "motherPhone": null,
+              "motherMobile": "",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": null,
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": null,
+              "classTeacher": "KIRTI GOLA",
+              "classTeacherUserName": "KIRTIGOLA_387074",
+              "classes": "VII",
+              "classUid": null,
+              "sections": "B",
+              "group": null,
+              "wing": "NA",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "OLD",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "c0eaa15f-4eea-427e-adb8-c4a0b1e1b9e8",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2023-11-25 09:39:28.490276",
+              "editeddate": "2023-11-25 09:39:28.490276",
+              "permanentEducationNumber": null,
+              "studentAddressResponse": {
+                "uid": "accfb6cd-9b4f-4720-b4e3-060f2876827c",
                 "houseNo": null,
-                "area": "RAM NAGAR, KRISHNA NAGAR",
+                "area": "T-165,, Gali No-6, Gautampuri-110053",
                 "landmark": null,
-                "city": "DELHI",
+                "city": "NA",
                 "district": null,
-                "state": "Delhi",
+                "state": "NA",
                 "poPs": null,
-                "pincode": 110051,
-                "street": "H.NO-296,RAM NAGAR",
-                "userName": "BPS329_3218",
-                "createdDate": "06-07-2024 11:00 AM",
-                "editedDate": "06-07-2024 11:00 AM",
-                "createdBy": "BIGLOWSPUBLIC SCHOOL_384900",
-                "editedBy": "BIGLOWSPUBLIC SCHOOL_384900"
-            },
-            "fatherAddressResponse": null,
-            "motherAddressResponse": null,
-            "guardianAddressResponse": null,
-            "correspondenceAddressResponse": {
-                "uid": "d65f4022-d14b-4629-b226-bdf597a07bd8",
+                "pincode": 0,
+                "street": "NA",
+                "userName": "BPS329_3145",
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "fatherAddressResponse": {
+                "uid": "766be6c4-6bc2-4ae1-b14a-95454defabdb",
                 "houseNo": null,
-                "area": "RAM NAGAR, KRISHNA NAGAR",
+                "area": "NA",
                 "landmark": null,
-                "city": "DELHI",
+                "city": "NA",
                 "district": null,
-                "state": "Delhi",
+                "state": "NA",
                 "poPs": null,
-                "pincode": 110051,
-                "street": "H.NO-296,RAM NAGAR",
-                "userName": "BPS329_3218",
-                "createdDate": "06-07-2024 11:00 AM",
-                "editedDate": "06-07-2024 11:00 AM",
-                "createdBy": "BIGLOWSPUBLIC SCHOOL_384900",
-                "editedBy": "BIGLOWSPUBLIC SCHOOL_384900"
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "motherAddressResponse": {
+                "uid": "4610ab2a-f457-4c6e-842a-e446b822cff2",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": null
             }
-        }
-    ],
-    "classTeacher": "",
-    "classTeacherUserName": "",
-    "permanentEducationNumber": "",
-    "school": {
-        "uid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
-        "apikey": "kB51SdtZ-qXcJikzM7pQd0Ijp6mLl4nK",
-        "schoolName": "BIGLOW'S PUBLIC SCHOOL",
-        "schoolAbb": "BPS",
-        "educationBoard": "Central Board of Secondary Education (CBSE)",
-        "registrationNo": null,
-        "plotNumber": "C5-15",
-        "area": "Lala Hans Raj Mahajan Rd, Block-C, Krishna Nagar",
-        "city": "Delhi",
-        "pincode": "110051",
-        "state": "Delhi",
-        "phoneNo1": null,
-        "phoneNo2": null,
-        "contactName": "PREM KUMAR",
-        "contactMobile": null,
-        "contactEmail": "biglowspublicschool@gmail.com",
-        "schoolCode": null,
-        "pfCode": null,
-        "societyManagement": null,
-        "language": "ENGLISH, HINDI",
-        "schoolLogo": null,
-        "schoolFavicon": null,
-        "enabled": true,
-        "subDomain": null,
-        "website": null,
-        "schemaPrefix": null,
-        "editedDate": "02-07-2024 10:46 AM",
-        "editedUser": "QuickCampus",
-        "visitorSchool": false,
-        "clientSchoolId": null,
-        "cscId": null,
-        "onlinePaymentEnabled": false,
-        "registrationSeries": null,
-        "underTakingDetails": null,
-        "formNumberStart": null,
-        "sessionResponse": null,
-        "schoolLogoUrl": null,
-        "printAcknowledge": false,
-        "whatsAppEnabled": false,
-        "smsenabled": false,
-        "notificationEnabled": true,
-        "loanEnabled": false
-    }
-},
-
-          contentRequest: {
-    "feeUid": "27de4557-fd5e-462a-be36-850fd0aebb2a",
-    "receiptNo": "1178",
-    "admissionNo": "3218",
-    "studentName": "ABHISHEK",
-    "studentClass": "I",
-    "studentSection": "A",
-    "paidInstallmentsName": "AUG",
-    "feeDate": "05-08-2024",
-    "feeTime": "10:40:32",
-    "userName": "POOJAJAIN_387075",
-    "feeMode": "CASH",
-    "feeModeNumber": "-",
-    "modeBank": "-",
-    "modeBranch": "-",
-    "feeModeDate": "-",
-    "feeModeRemark": "-",
-    "feeDeleteRemark": "-",
-    "isBounced": "0",
-    "bouncedDate": "-",
-    "totalAmount": "2400.00",
-    "excessPaid": "0.00",
-    "excessUsed": "0.00",
-    "excessBalance": "0.0",
-    "netReceived": "2400.00",
-    "studentFeeCollectionReceiptList": [
-        {
-            "componentName": "TUITION FEE",
-            "componentAmount": "2400.00",
-            "componentType": "",
-            "componentConcession": "0.00",
-            "componentDiscount": "0.00",
-            "accountName": "ACCOUNT 1",
-            "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
-            "componentReceived": "2400.00"
-        }
-    ],
-    "classSection": "I-A",
-    "TUITION FEE Amount(₹)": "2400.00",
-    "TUITION FEE Received(₹)": "2400.00",
-    "TUITION FEE Concession(₹)": "0.00",
-    "TUITION FEE Discount(₹)": "0.00"
-},
-
-          header: null,
-          footer:null,
-
+          ],
+          "classTeacher": "KIRTI GOLA",
+          "classTeacherUserName": "KIRTIGOLA_387074",
+          "permanentEducationNumber": null,
+          "school": {
+            "uid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
+            "apikey": "kB51SdtZ-qXcJikzM7pQd0Ijp6mLl4nK",
+            "schoolName": "BIGLOW'S PUBLIC SCHOOL",
+            "schoolAbb": "BPS",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "C5-15",
+            "area": "Lala Hans Raj Mahajan Rd, Block-C, Krishna Nagar",
+            "city": "Delhi",
+            "pincode": "110051",
+            "state": "Delhi",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "BPS",
+            "contactMobile": null,
+            "contactEmail": "biglowspublicschool@gmail.com",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": "ENGLISH, HINDI",
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "biglow",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "09-12-2024 04:48 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": true,
+            "whatsAppEnabled": true,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          }
         },
-      ]);
-    </script>
-  </body>
+        "contentRequest": {
+          "studentName": "Tanmay Jain",
+          "fatherName": "Mr. Sachin Jain",
+          "className": "VII",
+          "groupName": "-",
+          "concessionDetails": "-",
+          "transportDetails": "-",
+          "hostelDetails": "--",
+          "feeUid": "57d3daaa-8543-4bf2-a582-34048e12113e",
+          "receiptNo": 218,
+          "paidInstallmentsName": "APR",
+          "netReceived": "9500.00",
+          "feeDate": "22-04-2024",
+          "feeTime": "",
+          "userName": "BIGLOWSPUBLIC SCHOOL_384900",
+          "feeMode": "CASH",
+          "feeModeRemark": "",
+          "netConcession": 9500,
+          "modeNo": "NULL",
+          "modeDate": "-",
+          "bank": "-",
+          "branch": "-",
+          "isBounced": "0",
+          "bouncedDate": "-",
+          "netAmount": "19000.00",
+          "excessPaid": "0.00",
+          "excessUsed": "0.00",
+          "excessBalance": 1.0,
+          "feeDeleteRemark": null,
+          "studentFeeCollectionReceiptList": [
+            {
+              "componentName": "TUITION FEE",
+              "componentAmount": "5000.00",
+              "componentType": "",
+              "componentConcession": "2500.00",
+              "componentDiscount": "0.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "2500.00"
+            },
+            {
+              "componentName": "DEVELOPMENT CHARGES",
+              "componentAmount": "1000.00",
+              "componentType": "",
+              "componentConcession": "500.00",
+              "componentDiscount": "0.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "500.00"
+            },
+            {
+              "componentName": "ANNUAL CHARGES",
+              "componentAmount": "12000.00",
+              "componentType": "",
+              "componentConcession": "6000.00",
+              "componentDiscount": "0.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "6000.00"
+            },
+            {
+              "componentName": "SOFTWARE CHARGES",
+              "componentAmount": "1000.00",
+              "componentType": "",
+              "componentConcession": "500.00",
+              "componentDiscount": "0.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "500.00"
+            }
+          ],
+          "totalAmount": "9500.00",
+          "sectionName": "B",
+          "admissionNo": "3145"
+        },
+        "header": null,
+        "footer": null
+      },
+      {
+        "student": {
+          "dob": "15-05-2012",
+          "admissionNo": "3145",
+          "studentName": "Tanmay Jain",
+          "className": "VII",
+          "sectionName": "B",
+          "rollNo": 23,
+          "fatherName": "Mr. Sachin Jain",
+          "motherName": "Mrs. Priyanka Jain",
+          "attendance": "24.0/44",
+          "boardRollNumber": "",
+          "studentInfoResponse": [
+            {
+              "id": 192477,
+              "userUid": "72fb1545-aa73-4c28-80e2-18016c4d6fbf",
+              "userName": null,
+              "fatherUserName": null,
+              "motherUserName": null,
+              "guardianUserName": null,
+              "uid": "80d08ffd-f7b6-4ddc-bc00-d9383d1fc853",
+              "studentId": "3145",
+              "exAdmissionNo": null,
+              "studentName": "Tanmay Jain",
+              "fatherName": "Mr. Sachin Jain",
+              "motherName": "Mrs. Priyanka Jain",
+              "dob": "15-05-2012",
+              "gender": "NA",
+              "studentAdhaarcard": "",
+              "joiningClass": "VI",
+              "joiningSections": "B",
+              "joiningDate": "25-11-2023",
+              "plotNumber": "",
+              "area": "T-165,, Gali No-6, Gautampuri-110053",
+              "city": "NA",
+              "state": "NA",
+              "pincode": "",
+              "phone1": null,
+              "rollNo": 23,
+              "emergencyNumber": "",
+              "mobileNumber": "8920902299",
+              "studentEmail": null,
+              "religion": "",
+              "category": "",
+              "minority": "",
+              "motherTongue": "",
+              "idMark": "",
+              "height": "",
+              "weight": "",
+              "physicalDisability": "",
+              "bloodGroup": "",
+              "healthRemark": "",
+              "siblingDetails": "",
+              "alumni": "",
+              "siblingResponse": [],
+              "fatherOccupation": "",
+              "fatherQualification": "",
+              "fatherOrganization": "",
+              "fatherDesignation": "",
+              "fatherIncome": "",
+              "fatherArea": "NA",
+              "fatherCity": "NA",
+              "fatherState": "NA",
+              "fatherPincode": "",
+              "fatherPhone": null,
+              "fatherMobile": "8920902299",
+              "fatherEmail": null,
+              "fatherAdhaarNumber": "",
+              "schoolUid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
+              "motherQualification": "",
+              "motherOccupation": "",
+              "motherOrganization": "",
+              "motherDesignation": "",
+              "motherIncome": "",
+              "motherArea": "NA",
+              "motherCity": "NA",
+              "motherState": "NA",
+              "motherPincode": "",
+              "motherPhone": null,
+              "motherMobile": "",
+              "motherEmail": null,
+              "motherAdhaarNumber": "",
+              "guardianName": null,
+              "relation": null,
+              "guardianOccupation": null,
+              "guardianPhone": null,
+              "guardianMobile": null,
+              "guardianEmail": null,
+              "guardianAddress": null,
+              "leavingDate": null,
+              "previousSchoolName": null,
+              "otp": null,
+              "schoolName": "Demo Public School",
+              "remark": null,
+              "classTeacher": "KIRTI GOLA",
+              "classTeacherUserName": "KIRTIGOLA_387074",
+              "classes": "VII",
+              "classUid": null,
+              "sections": "B",
+              "group": null,
+              "wing": "NA",
+              "status": "Studying",
+              "academicSession": "2024-2025",
+              "joiningStatus": "OLD",
+              "houses": null,
+              "certificates": "",
+              "certificatesList": [],
+              "caste": "",
+              "listOfDocuments": null,
+              "attached": false,
+              "required": false,
+              "submitted": false,
+              "studentHostel": [],
+              "studentConcession": [],
+              "studentTransport": [],
+              "studentAadharCard": null,
+              "fatherAadharCard": null,
+              "motherAadharCard": null,
+              "studentImage": null,
+              "fatherImage": null,
+              "motherImage": null,
+              "guardianImage": null,
+              "birthCertificate": null,
+              "classSectionUid": "c0eaa15f-4eea-427e-adb8-c4a0b1e1b9e8",
+              "aluminiProof": null,
+              "siblingProof": null,
+              "residenceProof": null,
+              "firstBornChildProof": null,
+              "medicalFitnessCertificate": null,
+              "fatherQualificationProof": null,
+              "motherQualificationProof": null,
+              "casteCertificate": null,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2023-11-25 09:39:28.490276",
+              "editeddate": "2023-11-25 09:39:28.490276",
+              "permanentEducationNumber": null,
+              "studentAddressResponse": {
+                "uid": "accfb6cd-9b4f-4720-b4e3-060f2876827c",
+                "houseNo": null,
+                "area": "T-165,, Gali No-6, Gautampuri-110053",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": "NA",
+                "userName": "BPS329_3145",
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "fatherAddressResponse": {
+                "uid": "766be6c4-6bc2-4ae1-b14a-95454defabdb",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "motherAddressResponse": {
+                "uid": "4610ab2a-f457-4c6e-842a-e446b822cff2",
+                "houseNo": null,
+                "area": "NA",
+                "landmark": null,
+                "city": "NA",
+                "district": null,
+                "state": "NA",
+                "poPs": null,
+                "pincode": 0,
+                "street": null,
+                "userName": null,
+                "createdDate": "25-11-2023 03:09 PM",
+                "editedDate": "25-11-2023 03:09 PM",
+                "createdBy": "QuickCampus",
+                "editedBy": "QuickCampus"
+              },
+              "guardianAddressResponse": null,
+              "correspondenceAddressResponse": null
+            }
+          ],
+          "classTeacher": "KIRTI GOLA",
+          "classTeacherUserName": "KIRTIGOLA_387074",
+          "permanentEducationNumber": null,
+          "school": {
+            "uid": "c077c08d-3cb1-4138-8cea-096f53b7b933",
+            "apikey": "kB51SdtZ-qXcJikzM7pQd0Ijp6mLl4nK",
+            "schoolName": "BIGLOW'S PUBLIC SCHOOL",
+            "schoolAbb": "BPS",
+            "educationBoard": "Central Board of Secondary Education (CBSE)",
+            "registrationNo": null,
+            "plotNumber": "C5-15",
+            "area": "Lala Hans Raj Mahajan Rd, Block-C, Krishna Nagar",
+            "city": "Delhi",
+            "pincode": "110051",
+            "state": "Delhi",
+            "phoneNo1": null,
+            "phoneNo2": null,
+            "contactName": "BPS",
+            "contactMobile": null,
+            "contactEmail": "biglowspublicschool@gmail.com",
+            "schoolCode": null,
+            "pfCode": null,
+            "societyManagement": null,
+            "language": "ENGLISH, HINDI",
+            "schoolLogo": null,
+            "schoolFavicon": null,
+            "enabled": true,
+            "subDomain": "biglow",
+            "website": null,
+            "schemaPrefix": null,
+            "editedDate": "09-12-2024 04:48 PM",
+            "editedUser": "QuickCampus",
+            "visitorSchool": false,
+            "clientSchoolId": null,
+            "cscId": null,
+            "onlinePaymentEnabled": true,
+            "registrationSeries": null,
+            "underTakingDetails": null,
+            "formNumberStart": null,
+            "sessionResponse": null,
+            "schoolLogoUrl": null,
+            "printAcknowledge": false,
+            "wabaId": "",
+            "phoneNumberId": "",
+            "whatsappApiKey": "",
+            "isQuickCampusWhatsapp": true,
+            "whatsAppEnabled": true,
+            "smsenabled": false,
+            "notificationEnabled": true,
+            "loanEnabled": false
+          }
+        },
+        "contentRequest": {
+          "studentName": "Tanmay Jain",
+          "fatherName": "Mr. Sachin Jain",
+          "className": "VII",
+          "groupName": "-",
+          "concessionDetails": "-",
+          "transportDetails": "-",
+          "hostelDetails": "--",
+          "feeUid": "4f6dfee5-1775-4ce8-af11-c8a8b8b897b9",
+          "receiptNo": 704,
+          "paidInstallmentsName": "MAY,JUN,JUL",
+          "netReceived": "7500.00",
+          "feeDate": "04-07-2024",
+          "feeTime": "13:38:58",
+          "userName": "BIGLOWSPUBLIC SCHOOL_384900",
+          "feeMode": "CASH",
+          "feeModeRemark": null,
+          "netConcession": 0,
+          "modeNo": "-",
+          "modeDate": "-",
+          "bank": "-",
+          "branch": "-",
+          "isBounced": "0",
+          "bouncedDate": "-",
+          "netAmount": "7500.00",
+          "excessPaid": "0.00",
+          "excessUsed": "0.00",
+          "excessBalance": null,
+          "feeDeleteRemark": null,
+          "studentFeeCollectionReceiptList": [
+            {
+              "componentName": "TUITION FEE",
+              "componentAmount": "7500.00",
+              "componentType": "",
+              "componentConcession": "0.00",
+              "componentDiscount": "0.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "7500.00"
+            },
+            {
+              "componentName": "FINE",
+              "componentAmount": "690.00",
+              "componentType": "FINE",
+              "componentConcession": "0.00",
+              "componentDiscount": "690.00",
+              "accountName": "ACCOUNT 1",
+              "accountUid": "eb78c2c7-57a8-4efe-8465-fe0b61d20f54",
+              "componentReceived": "0.00"
+            }
+          ],
+          "totalAmount": "7500.00",
+          "sectionName": "B",
+          "admissionNo": "3145"
+        },
+        "header": null,
+        "footer": null
+      }
+    ]);
+  </script>
+</body>
+
 </html>
