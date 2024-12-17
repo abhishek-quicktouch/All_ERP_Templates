@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="student">HHHHH</div>
+</body>
+<script>
+  window.SetTemplateData = function (data) {
+    const attendanceValue = {
+      Absent: "AB",
+      Medical: "ML",
+      Sports: "S",
+      Leave: "L",
+      "Late Admission": "LA",
+      Exempted: "EX",
+      NA: "NA",
+    };
+
+    let gradeRequests = [
+      {
+        remark: "",
+        grade: "A1",
+        floorValue: 91,
+        ceilingValue: 100,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "A2",
+        floorValue: 81,
+        ceilingValue: 90.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "B1",
+        floorValue: 71,
+        ceilingValue: 80.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "B2",
+        floorValue: 61,
+        ceilingValue: 70.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "C1",
+        floorValue: 51,
+        ceilingValue: 60.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "C2",
+        floorValue: 41,
+        ceilingValue: 50.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "D",
+        floorValue: 33,
+        ceilingValue: 40.99,
+        weightage: 0,
+      },
+      {
+        remark: "",
+        grade: "E",
+        floorValue: 0,
+        ceilingValue: 32.99,
+        weightage: 0,
+      },
+    ];
+
+    const getGradeCustomFunction = (int) => {
+      let num = int;
+      if (typeof num != "number") {
+        num = +int;
+      }
+      return gradeRequests?.find(
+        (el) => num >= el?.floorValue && num <= el?.ceilingValue
+      )?.grade;
+    };
+
+    const getTerms = (termData, hideLastTerm) => {
+      const res = termData?.markSheetTerms
+        ?.map((d, i) => {
+          if (hideLastTerm && i <= termData?.markSheetTerms?.length - 2) {
+            return `<th style="width:8%; font-size:13px;" >${d?.headerName} <br/> ${d?.subHeaderName}</th>`;
+          }
+          else if (!hideLastTerm && i == termData?.markSheetTerms?.length - 1) {
+            return `<th rowspan=2 style="width:8%; font-size:13px; border-bottom:none;" >${d?.headerName} <br/> ${d?.subHeaderName}</th>`;
+          }
+        })
+        .join("");
+
+      return res;
+    };
+
+    const getSubjectMarks = (marksData) => {
+      const subjects = marksData?.baseTermData?.subject.filter((d) => {
+        return d.scholastic;
+      });
+
+      let check = true;
+
+      let str = "";
+
+      subjects.forEach((sub, i) => {
+        marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
+          (d) => {
+            if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
+              let temp = d?.markSheetReport?.find(
+                (m) =>
+                  m?.markSheetTermResponse?.headerName?.toLowerCase() ==
+                  "mid term"
+              )?.obtained;
+              let midTermOutOf = temp ? +(temp / 3).toFixed(2) : 0;
+
+              str += `<tr><td class="align-left" style="padding-left: 0.3rem; font-size:12px;">${d?.subjectName
+                }</td>${d.markSheetReport
+                  .map((v) => {
+                    return `<td  style="text-align: center; font-size:12px;  font-weight:${v?.status ? "bold" : ""
+                      }">${attendanceValue[v?.status] || v?.obtained}</td>`;
+                  })
+                  .join("")} 
+                  <td style="text-align: center; font-size:12px;" >${midTermOutOf}</td>
+                  <td style="text-align: center; font-size:12px;" >${(
+                  (d?.marksObtained || 0) -
+                  (temp || 0) +
+                  midTermOutOf
+                ).toFixed(2)}</td>
+                 <td style="text-align: center; font-size:12px;" >${(
+                  ((d?.marksObtained || 0) - (temp || 0) + midTermOutOf) *
+                  2
+                ).toFixed(2)}</td>
+              <td style="text-align: center; font-size:12px;">${getGradeCustomFunction((
+                  ((d?.marksObtained || 0) - (temp || 0) + midTermOutOf) *
+                  2
+                ).toFixed(2))
+                }</td></tr>`;
+            }
+          }
+        );
+      });
+
+      return str;
+    };
+
+    const getCoScholasticSub = (marksData) => {
+      const subjects = marksData?.baseTermData?.subject.filter((d) => {
+        return d.scholastic == false;
+      });
+
+      let str = "";
+
+      subjects.forEach((sub) => {
+        str += `<tr><td class="align-left" colspan="10" style="padding-left: 0.3rem; font-size:13px;">${sub?.subjectAllResponse?.subjectName
+          }</td>
+              <td align="center" style="font-size:13px; font-weight:${sub?.remarkStatus ? "bold;" : ""
+          }">${sub?.remarkStatus || sub?.grade}</td></tr> `;
+      });
+
+      return str;
+    };
+
+    const student = document.getElementById("student");
+
+    student.innerHTML = `
+           <style>
+            body{
+                font-family:arial;
+            }
+            #student{
+            padding:1.2rem;
+            }
+
+            @media print {
+            @page {
+                size: A4 landscape; 
+                margin: 2mm;       
+            }
+           }
+        .student-header-card {
+          width: 45%;
+          border: 1px solid;
+        }
+
+
+          .alignLeft{
+          text-align: left;
+           }
+
+        .scholastic-areas {
+          margin-top: 3rem;
+          border: 1px solid;
+        }
+        .subject-head,
+        .subject-list {
+          display: flex;
+          justify-content: space-between;
+          border: 1px solid;
+          padding: 3px;
+        }
+        .subject-head div {
+        }
+
+        .co-scholastic-areas {
+          border: 1px solid;
+          margin-top: 1.5rem;
+        }
+
+        .co-scholastic-sub-list {
+          display: flex;
+          justify-content: space-between;
+        }
+        .co-scholastic-sub-list div {
+          width: 50%;
+          border: 1px solid;
+        }
+        .flex-btw {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .other-detail-table {
+          border: 1px solid;
+        }
+        p {
+          margin: 4px 0;
+          font-size: small;
+        }
+        .other-details-list {
+          width: 33%;
+          border-right: 1px solid;
+        }
+        .other-details-list p {
+          margin: 4px 16px;
+        }
+        .other-details-list-2 {
+          display: flex;
+          flex-direction: column;
+          width: 33%;
+          border-right: 1px solid;
+        }
+        .other-details-list-2 div {
+          display: flex;
+          justify-content: space-between;
+          margin: 0 1rem;
+          font-size:small;
+          text-align:center;
+        }
+        .student-header-card {
+          padding: 4px;
+          padding-left: 8px;
+        }
+        .student-header-card div {
+          width: 50%;
+        }
+        .align-left {
+          text-align: left;
+        }
+        table,
+        th,
+        td {
+          border-collapse: collapse;
+          border: 1px solid;
+          padding: 2px;
+        }
+        .paddingLeft {
+          padding-left: 2rem;
+        }
+      </style>`;
+
+    data?.forEach((st) => {
+      let { street, area, city, state, pincode } = st?.student.studentInfoResponse?.[0]?.studentAddressResponse
+      let address = `${street || ""}${area || ""} ${city + "." || ""}  `
+      student.innerHTML += `<div style="page-break-before: always;"></div>
+    <page orientation="portrait" format="A3" margin="0">
+      <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div style="width:15%; ">
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png" alt="" style="width:100%; "/>
+      </div>
+      <div style="width:50%; text-align:center; color:#2B595E">
+        <p style="font-size:40px; font-weight:bold;">THE INDIAN SCHOOL</p>
+        <p style="font-size:15px;">J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</p>
+        <p style="font-size:15px;">PH. : 011-26257551 / 52, 26265956 / 57 </p>
+        <p style="font-size:15px;">Email ID : contactus@theindianschool.in Website : www.theindianschool.in</p>
+      </div>
+      <div style="width:15%; ">
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png" alt="" style="width:100%; "/>
+      </div>
+      </div>
+      <div style="text-align: center; font-weight: bold; margin-top:5px; border:1px solid; padding:5px;">
+          <p style="font-size:15px; padding:0px; margin:0px;">PROGRESS REPORT - SESSION ${st?.markData?.academicSession
+        }</p>
+        </div>
+
+<table style="width: 100%; border-collapse: collapse; font-size:13px;">
+  <tr>
+    <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border:none; width: 20%;">
+      <strong>NAME</strong>
+    </td>
+    <td style="text-align: left;  border:none; ">: ${st?.student?.studentName
+        }</td>
+    <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border:none">
+      <strong>CLASS & SECTION</strong> 
+    </td>
+    <td style="text-align: left;  border:none;">: ${st?.student?.className + "-" + st?.student?.sectionName
+        }</td>
+  </tr>
+  <tr>
+    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border:none">
+      <strong>FATHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left;  border:none;">: ${st?.student?.fatherName
+        }</td>
+    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border:none ; width: 20%">
+      <strong>ADM. NO.</strong> 
+    </td>
+    <td style="text-align: left;  border:none;">: ${st?.student?.admissionNo
+        }</td>
+  </tr>
+  <tr>
+    <td style="text-align: left; padding-left: 0.3rem;   padding-right: 10px;border:none">
+      <strong>MOTHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left;  border:none;">: ${st?.student?.motherName
+        }</td>
+    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border:none">
+      <strong>D.O.B</strong> 
+    </td>
+    <td style="text-align: left;   border:none;">: ${st?.student.studentInfoResponse?.[0]?.dob
+        }</td>
+  </tr>
+  <tr>
+    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border:none">
+      <strong>ADDRESS</strong> 
+    </td>
+    <td colspan="3" style="text-align: left;   border:none;">: ${address
+        }</td>
+
+  </tr>
+</table>
+        <table style="width: 100%; border:none; ">
+            <tr>
+                <th rowspan=2 style="width: 12%; padding-left: 0.3rem; font-size:14px;">SUBJECTS</th>
+                <th style="font-size:13px;" colspan="5">INTERNAL ASSESSMENT (Term-I)</th>
+                ${getTerms(st?.markData, false)}
+                <th rowspan=2 style="width:8%; font-size:13px;">Mid Term (weightage out of)<br/>(20)</th>
+                <th rowspan=2 style="width:8%; font-size:13px;">Total (out of 50)</th>
+                <th rowspan=2 style="width:8%; font-size:13px;">Weightage (out of 100)</th>
+                <th rowspan=2 style="width:8%; font-size:13px;">Grade</th>
+            </tr>
+          <tr>
+            <div style="margin:4px 0;text-align: center;font-size:14px;font-weight:bold;">SCHOLASTIC AREAS</div>
+          ${getTerms(st?.markData, true)}
+          </tr>
+          <tr>
+            ${getSubjectMarks(st)}
+          </tr>
+        </table>
+
+         <table style="width:100%;">
+            <div style="margin: 4px 0;text-align: center;font-size:14px;font-weight:bold;margin-top:8px;">CO-SCHOLASTIC AREAS</div>
+          <tr style="margin-top:4px;">
+              <th class="alignLeft" colspan="10" style="padding-left: 0.3rem; font-size:13px;">SUBJECTS</th>
+              <th style="min-width:73px; font-size:13px;">GRADE</th>
+          </tr>
+        ${getCoScholasticSub(st)}
+
+      </table>
+        <div
+          class="total"
+          style="display: flex; justify-content: space-between; margin: 2rem 0"
+        >
+        </div>
+        <div style="border: 1px solid; margin:0px; padding: 0px; width:100%; font-size:13px; text-align:center; margin-bottom:20px; min-height:70px;">
+        <p style="font-weight:bold; margin:0px; margin-bottom:5px; width:100%; border-bottom:1px solid;"> CLASS TEACHER REMARKS </p>
+        <div style="text-align:left;padding:5px;">
+             ${st?.baseTermData?.remarksEntry?.description || ""}    
+        </div>
+        </div>
+
+        <div style="border: 1px solid; padding: 0.3rem; font-size:13px; text-align:center;">
+        <strong> INSTRUCTIONS </strong><br/>
+        <p style="font-weight:bold; margin:0px; margin-top:5px; width:100%; "> Grading scale for Scholastic Areas: Grades are awarded on a 8 point grading scale as follows </p>
+        <table style="width: 80%; margin:auto; border-collapse: collapse; margin-top:5px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">MARKS RANGE</th>
+                    <th style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">GRADE</th>
+                    <th style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">MARKS RANGE</th>
+                    <th style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">GRADE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">91 - 100</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">A1</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">51 - 60</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">C1</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">81 - 90</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">A2</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">41 - 50</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">C2</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">71 - 80</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">B1</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">33 - 40</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">D</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">61 - 70</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">B2</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">33 & Below</td>
+                    <td style="border: 1px solid black; padding: 2px; font-size:13px; text-align: center;">E (Needs Improvement)</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <div class="flex-btw" style="margin-top: 0.3rem; margin-bottom: 8px; padding:0px 1px; font-weight:bold; font-size:13px;">
+            <div>DATE: ${st?.printDate || ""}</div>
+            <div>ATTENDANCE: ${st?.baseTermData?.remarksEntry?.fields?.find(
+          (field) => field?.title === "Attendance"
+        )?.value || st?.student?.attendance
+        }</div>
+          </div>
+
+         <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; padding:0px 2px; font-weight:bold;">
+            <div>CLASS TEACHER</div>
+            <div>PRINCIPAL</div>
+            <div>PARENT</div>
+          </div>
+    </page>
+
+      `;
+    });
+  };
+
+</script>
+<script>
+  window.SetTemplateData([
+    {
+      student: {
+        dob: "23-08-2018",
+        admissionNo: "20222286",
+        studentName: "Jaitvik Jaiswal",
+        className: "I",
+        sectionName: "A",
+        rollNo: 1111,
+        fatherName: "Anshul Jaiswal",
+        motherName: "Anu Jaiswal",
+        attendance: "0.0/0",
+        boardRollNumber: "",
+        studentInfoResponse: [
+          {
+            id: 281665,
+            userUid: "a7b5c1a0-2e28-4a95-b06a-14c5b7785b83",
+            userName: null,
+            fatherUserName: null,
+            motherUserName: null,
+            guardianUserName: null,
+            uid: "df5df604-f5a4-4b7b-aad9-fa370100a3ef",
+            studentId: "20222286",
+            exAdmissionNo: null,
+            studentName: "Jaitvik Jaiswal",
+            fatherName: "Anshul Jaiswal",
+            motherName: "Anu Jaiswal",
+            dob: "23-08-2018",
+            gender: "Male",
+            studentAdhaarcard: "",
+            joiningClass: "I",
+            joiningSections: "A",
+            joiningDate: "19-04-2024",
+            plotNumber: "",
+            area: "Tri Nagar",
+            city: "New Delhi",
+            state: "NA",
+            pincode: "110035",
+            phone1: null,
+            rollNo: 1111,
+            emergencyNumber: "",
+            mobileNumber: "7557564755",
+            studentEmail: null,
+            religion: "",
+            category: "",
+            minority: "",
+            motherTongue: "",
+            idMark: "",
+            height: "",
+            weight: "",
+            physicalDisability: "",
+            bloodGroup: "",
+            healthRemark: "",
+            siblingDetails: "",
+            alumni: "",
+            siblingResponse: [],
+            fatherOccupation: "",
+            fatherQualification: "",
+            fatherOrganization: "",
+            fatherDesignation: "",
+            fatherIncome: "",
+            fatherArea: "NA",
+            fatherCity: "NA",
+            fatherState: "NA",
+            fatherPincode: "",
+            fatherPhone: null,
+            fatherMobile: "8882972149",
+            fatherEmail: null,
+            fatherAdhaarNumber: "",
+            schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            motherQualification: "",
+            motherOccupation: "",
+            motherOrganization: "",
+            motherDesignation: "",
+            motherIncome: "",
+            motherArea: "NA",
+            motherCity: "NA",
+            motherState: "NA",
+            motherPincode: "",
+            motherPhone: null,
+            motherMobile: "",
+            motherEmail: null,
+            motherAdhaarNumber: "",
+            guardianName: null,
+            relation: null,
+            guardianOccupation: null,
+            guardianPhone: null,
+            guardianMobile: null,
+            guardianEmail: null,
+            guardianAddress: null,
+            leavingDate: null,
+            previousSchoolName: null,
+            otp: null,
+            schoolName: "Demo Public School",
+            remark: null,
+            classTeacher: "",
+            classTeacherUserName: "",
+            classes: "I",
+            classUid: null,
+            sections: "A",
+            group: "I-IV",
+            wing: "NA",
+            status: "Studying",
+            academicSession: "2024-2025",
+            joiningStatus: "Old",
+            houses: null,
+            certificates: "",
+            certificatesList: [],
+            caste: "",
+            listOfDocuments: null,
+            attached: false,
+            required: false,
+            submitted: false,
+            studentHostel: [],
+            studentConcession: [],
+            studentTransport: [],
+            studentAadharCard: null,
+            fatherAadharCard: null,
+            motherAadharCard: null,
+            studentImage: null,
+            fatherImage: null,
+            motherImage: null,
+            guardianImage: null,
+            birthCertificate: null,
+            classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+            aluminiProof: null,
+            siblingProof: null,
+            residenceProof: null,
+            firstBornChildProof: null,
+            medicalFitnessCertificate: null,
+            fatherQualificationProof: null,
+            motherQualificationProof: null,
+            casteCertificate: null,
+            createdUser: "QuickCampus",
+            editedUser: "QuickCampus",
+            createddate: "2024-04-19 12:21:38.822751",
+            editeddate: "2024-04-19 12:21:38.822751",
+            permanentEducationNumber: null,
+            studentAddressResponse: {
+              uid: "b0121e3e-9df6-4fb9-aec2-9c745623f563",
+              houseNo: null,
+              area: "Tri Nagar",
+              landmark: null,
+              city: "New Delhi",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 110035,
+              street: "1185/80 Shanti Nagar",
+              userName: "SPB303_20222286",
+              createdDate: "19-04-2024 05:51 PM",
+              editedDate: "19-04-2024 05:51 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            fatherAddressResponse: {
+              uid: "d11175eb-abb7-4fdf-9721-a7a740a46982",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "19-04-2024 05:51 PM",
+              editedDate: "19-04-2024 05:51 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            motherAddressResponse: {
+              uid: "6e10df62-8520-472d-87bc-fdda2dc2922a",
+              houseNo: null,
+              area: "NA",
+              landmark: null,
+              city: "NA",
+              district: null,
+              state: "NA",
+              poPs: null,
+              pincode: 0,
+              street: null,
+              userName: null,
+              createdDate: "19-04-2024 05:51 PM",
+              editedDate: "19-04-2024 05:51 PM",
+              createdBy: "QuickCampus",
+              editedBy: "QuickCampus",
+            },
+            guardianAddressResponse: null,
+            correspondenceAddressResponse: null,
+          },
+        ],
+        classTeacher: "",
+        classTeacherUserName: "",
+        permanentEducationNumber: null,
+        school: {
+          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+          schoolName: "SDPS Punjabi Bagh",
+          schoolAbb: "SPB",
+          educationBoard: null,
+          registrationNo: null,
+          plotNumber: null,
+          area: null,
+          city: null,
+          pincode: null,
+          state: null,
+          phoneNo1: null,
+          phoneNo2: null,
+          contactName: "VANDANA GUPTA",
+          contactMobile: "9868359499",
+          contactEmail: "sg4vgoyal@gmail.com",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "sdps",
+          website: null,
+          schemaPrefix: null,
+          editedDate: "13-09-2024 10:57 AM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+      },
+      markData: {
+        "academicSession": "2024-2025",
+        "admissionNo": "7454",
+        "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+        "studentName": "Aadya Bhardwaj",
+        "rollNo": 1,
+        "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+        "className": "III",
+        "sectionName": "A",
+        "terms": "HALF YEARLY",
+        "markSheetName": "TERM-I",
+        "overAllRank": "1",
+        "markSheetTerms": [
+          {
+            "id": 1361,
+            "headerName": "Attendance",
+            "subHeaderName": "(5)",
+            "priority": 1,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "ATTENDANCE"
+            ]
+          },
+          {
+            "id": 1362,
+            "headerName": "Subject Enrichment",
+            "subHeaderName": "(5)",
+            "priority": 2,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "SUBJECT ENRICHMENT"
+            ]
+          },
+          {
+            "id": 1363,
+            "headerName": "Project based activities",
+            "subHeaderName": "(5)",
+            "priority": 3,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "PROJECT BASED ACTIVITIES"
+            ]
+          },
+          {
+            "id": 1364,
+            "headerName": "Portfolio",
+            "subHeaderName": "(5)",
+            "priority": 4,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "PORTFOLIO"
+            ]
+          },
+          {
+            "id": 1365,
+            "headerName": "Multiple assessment",
+            "subHeaderName": "(5)",
+            "priority": 5,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "MULTIPLE ASSESSMENT"
+            ]
+          },
+          {
+            "id": 1366,
+            "headerName": "Periodic Test I",
+            "subHeaderName": "(5)",
+            "priority": 6,
+            "bestOf": 0,
+            "decimalPlaces": 2,
+            "weightage": 5,
+            "terms": [
+              "PERIODIC TEST 1"
+            ]
+          }
+        ],
+        "subjectWiseMarkSheetReportResponses": [
+          {
+            "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+            "subjectName": "ENGLISH",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 2,
+                "grade": "D",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1361,
+                  "headerName": "Attendance",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "ATTENDANCE"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1362,
+                  "headerName": "Subject Enrichment",
+                  "subHeaderName": "(5)",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "SUBJECT ENRICHMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1363,
+                  "headerName": "Project based activities",
+                  "subHeaderName": "(5)",
+                  "priority": 3,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PROJECT BASED ACTIVITIES"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1364,
+                  "headerName": "Portfolio",
+                  "subHeaderName": "(5)",
+                  "priority": 4,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PORTFOLIO"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1365,
+                  "headerName": "Multiple assessment",
+                  "subHeaderName": "(5)",
+                  "priority": 5,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "MULTIPLE ASSESSMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                "subjectName": "ENGLISH",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0.7,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1366,
+                  "headerName": "Periodic Test I",
+                  "subHeaderName": "(5)",
+                  "priority": 6,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": false
+              }
+            ],
+            "marksObtained": 17.7,
+            "total": 30,
+            "percentage": 59,
+            "grade": "C1",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "HALF YEARLY",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 1,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+            "subjectName": "HINDI",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 2,
+                "grade": "D",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1361,
+                  "headerName": "Attendance",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "ATTENDANCE"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1362,
+                  "headerName": "Subject Enrichment",
+                  "subHeaderName": "(5)",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "SUBJECT ENRICHMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1363,
+                  "headerName": "Project based activities",
+                  "subHeaderName": "(5)",
+                  "priority": 3,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PROJECT BASED ACTIVITIES"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 5,
+                "grade": "A1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1364,
+                  "headerName": "Portfolio",
+                  "subHeaderName": "(5)",
+                  "priority": 4,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PORTFOLIO"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1365,
+                  "headerName": "Multiple assessment",
+                  "subHeaderName": "(5)",
+                  "priority": 5,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "MULTIPLE ASSESSMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
+                "subjectName": "HINDI",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 1.7,
+                "grade": "D",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1366,
+                  "headerName": "Periodic Test I",
+                  "subHeaderName": "(5)",
+                  "priority": 6,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 19.7,
+            "total": 30,
+            "percentage": 65.67,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "HALF YEARLY",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 2,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+            "subjectName": "MATHEMATICS",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 2,
+                "grade": "D",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1361,
+                  "headerName": "Attendance",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "ATTENDANCE"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1362,
+                  "headerName": "Subject Enrichment",
+                  "subHeaderName": "(5)",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "SUBJECT ENRICHMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 4,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1363,
+                  "headerName": "Project based activities",
+                  "subHeaderName": "(5)",
+                  "priority": 3,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PROJECT BASED ACTIVITIES"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 5,
+                "grade": "A1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1364,
+                  "headerName": "Portfolio",
+                  "subHeaderName": "(5)",
+                  "priority": 4,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PORTFOLIO"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1365,
+                  "headerName": "Multiple assessment",
+                  "subHeaderName": "(5)",
+                  "priority": 5,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "MULTIPLE ASSESSMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                "subjectName": "MATHEMATICS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 0.8,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1366,
+                  "headerName": "Periodic Test I",
+                  "subHeaderName": "(5)",
+                  "priority": 6,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": false
+              }
+            ],
+            "marksObtained": 18.8,
+            "total": 30,
+            "percentage": 62.67,
+            "grade": "B2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "HALF YEARLY",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 3,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+            "subjectName": "EVS",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 2,
+                "grade": "D",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1361,
+                  "headerName": "Attendance",
+                  "subHeaderName": "(5)",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "ATTENDANCE"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1362,
+                  "headerName": "Subject Enrichment",
+                  "subHeaderName": "(5)",
+                  "priority": 2,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "SUBJECT ENRICHMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1363,
+                  "headerName": "Project based activities",
+                  "subHeaderName": "(5)",
+                  "priority": 3,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PROJECT BASED ACTIVITIES"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1364,
+                  "headerName": "Portfolio",
+                  "subHeaderName": "(5)",
+                  "priority": 4,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PORTFOLIO"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 3,
+                "grade": "C1",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1365,
+                  "headerName": "Multiple assessment",
+                  "subHeaderName": "(5)",
+                  "priority": 5,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "MULTIPLE ASSESSMENT"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              },
+              {
+                "studentInfoUid": "bca33a67-9fa1-4b3c-9d04-76d969ae51c8",
+                "admissionNo": "7454",
+                "studentName": "Aadya Bhardwaj",
+                "rollNo": 1,
+                "fatherName": "DIG ARUN KUMAR BHARDWAJ",
+                "className": "III",
+                "sectionName": "A",
+                "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                "terms": "HALF YEARLY",
+                "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                "subjectName": "EVS",
+                "subjectNature": "THEORY",
+                "max": 5,
+                "obtained": 1,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "TERM-I",
+                "attachmentName": "",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1366,
+                  "headerName": "Periodic Test I",
+                  "subHeaderName": "(5)",
+                  "priority": 6,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 5,
+                  "terms": [
+                    "PERIODIC TEST 1"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": false
+              }
+            ],
+            "marksObtained": 15,
+            "total": 30,
+            "percentage": 50,
+            "grade": "C2",
+            "className": "III",
+            "sectionName": "A",
+            "terms": "HALF YEARLY",
+            "markSheetName": "TERM-I",
+            "subjectPrt": 4,
+            "decimalPlaces": 2,
+            "visible": false
+          }
+        ],
+        "marksObtained": 71.2,
+        "total": 120,
+        "percentage": 59.33,
+        "overAllGrade": "C1",
+        "visible": false
+      },
+      remarks: {
+        uid: null,
+        terms: null,
+        studentId: null,
+        studentName: null,
+        rollNumber: 0,
+        classSectionUid: null,
+        classSection: null,
+        description: null,
+        fields: null,
+        status: false,
+        createdUser: null,
+        editedUser: null,
+        createdDate: null,
+        editedDate: null,
+      },
+      baseTermData: {
+        studentAcademic: {
+          dob: "23-08-2018",
+          admissionNo: "20222286",
+          studentName: "Jaitvik Jaiswal",
+          className: "I",
+          sectionName: "A",
+          rollNo: 1111,
+          fatherName: "Anshul Jaiswal",
+          motherName: "Anu Jaiswal",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
+            {
+              id: 281665,
+              userUid: "a7b5c1a0-2e28-4a95-b06a-14c5b7785b83",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "df5df604-f5a4-4b7b-aad9-fa370100a3ef",
+              studentId: "20222286",
+              exAdmissionNo: null,
+              studentName: "Jaitvik Jaiswal",
+              fatherName: "Anshul Jaiswal",
+              motherName: "Anu Jaiswal",
+              dob: "23-08-2018",
+              gender: "Male",
+              studentAdhaarcard: "",
+              joiningClass: "I",
+              joiningSections: "A",
+              joiningDate: "19-04-2024",
+              plotNumber: "",
+              area: "Tri Nagar",
+              city: "New Delhi",
+              state: "NA",
+              pincode: "110035",
+              phone1: null,
+              rollNo: 1111,
+              emergencyNumber: "",
+              mobileNumber: "7557564755",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "8882972149",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "I",
+              classUid: null,
+              sections: "A",
+              group: "I-IV",
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-2025",
+              joiningStatus: "Old",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "QuickCampus",
+              editedUser: "QuickCampus",
+              createddate: "2024-04-19 12:21:38.822751",
+              editeddate: "2024-04-19 12:21:38.822751",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "b0121e3e-9df6-4fb9-aec2-9c745623f563",
+                houseNo: null,
+                area: "Tri Nagar",
+                landmark: null,
+                city: "New Delhi",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 110035,
+                street: "1185/80 Shanti Nagar",
+                userName: "SPB303_20222286",
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              fatherAddressResponse: {
+                uid: "d11175eb-abb7-4fdf-9721-a7a740a46982",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              motherAddressResponse: {
+                uid: "6e10df62-8520-472d-87bc-fdda2dc2922a",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "19-04-2024 05:51 PM",
+                editedDate: "19-04-2024 05:51 PM",
+                createdBy: "QuickCampus",
+                editedBy: "QuickCampus",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+            schoolName: "SDPS Punjabi Bagh",
+            schoolAbb: "SPB",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: null,
+            area: null,
+            city: null,
+            pincode: null,
+            state: null,
+            phoneNo1: null,
+            phoneNo2: null,
+            contactName: "VANDANA GUPTA",
+            contactMobile: "9868359499",
+            contactEmail: "sg4vgoyal@gmail.com",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: "sdps",
+            website: null,
+            schemaPrefix: null,
+            editedDate: "13-09-2024 10:57 AM",
+            editedUser: "QuickCampus",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: true,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        subject: [
+          {
+            subjectAllResponse: {
+              uid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              subjectName: "ENGLISH",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:21:34.044469",
+              editeddate: "2024-09-28 07:21:34.043717",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 50.2,
+            percentage: 83.66666666666667,
+            grade: "A2",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 1,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "b6c5404e-c32b-4115-b523-73a055a95318",
+              subjectName: "HINDI",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:21:40.540336",
+              editeddate: "2024-09-28 07:21:40.539652",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 36,
+            percentage: 60,
+            grade: "C",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 2,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "4b67fac7-5fef-4075-8f81-05c0b50fd585",
+              subjectName: "FRENCH",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:25:24.442052",
+              editeddate: "2024-09-28 07:25:24.438718",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 41,
+            percentage: 68.33333333333333,
+            grade: "B2",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 3,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "eac5c643-3186-4371-be82-77420d86279e",
+              subjectName: "MATHEMATICS",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:21:57.212543",
+              editeddate: "2024-09-28 07:21:57.211775",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 36.5,
+            percentage: 60.833333333333336,
+            grade: "C",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 5,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "797948d9-f85b-475c-b274-c1ab4f2a32b7",
+              subjectName: "SCIENCE",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:22:56.442158",
+              editeddate: "2024-09-28 07:22:56.440594",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 27,
+            percentage: 45,
+            grade: "C2",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 6,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
+              subjectName: "SOCIAL SCIENCE",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:22:49.258754",
+              editeddate: "2024-09-28 07:22:49.25807",
+            },
+            termName: "HALF YEARLY",
+            max: 60,
+            markObtained: 32.5,
+            percentage: 54.166666666666664,
+            grade: "C",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 7,
+            added: true,
+            scholastic: true,
+          },
+          {
+            subjectAllResponse: {
+              uid: "ec64d046-6d68-40b0-8e78-a0adc5397152",
+              subjectName: "Physical Education .",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:46:47.279201",
+              editeddate: "2024-09-28 07:46:47.278476",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 8,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "c74f903b-a195-467a-b714-3fbb8fea4c76",
+              subjectName: "ART",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:47:01.766585",
+              editeddate: "2024-09-28 07:47:01.765634",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 9,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "64a97937-ce5c-4dd5-abf5-6ef0c38a8ff1",
+              subjectName: "COMPUTERS",
+              nature: "THEORY",
+              natureUid: "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:45:26.255154",
+              editeddate: "2024-09-28 07:45:26.254429",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 79.99,
+            percentage: 79.99,
+            grade: "B",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 10,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "b14875b9-a8cb-4a8c-ba72-4ccb3f322b76",
+              subjectName: "MUSIC",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:44:50.610674",
+              editeddate: "2024-09-28 07:44:50.610178",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 11,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "a470cf8b-961c-4802-a882-5ba5f3236a65",
+              subjectName: "DANCE",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:44:42.338331",
+              editeddate: "2024-09-28 07:44:42.336725",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 12,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "f978102b-1cc5-4b3b-bbcc-c0f67c802aa4",
+              subjectName: "Drama",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:47:31.564124",
+              editeddate: "2024-09-28 07:47:31.563418",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 13,
+            added: true,
+            scholastic: false,
+          },
+          {
+            subjectAllResponse: {
+              uid: "cfe4c7c5-8a14-4ae3-9a67-10f41268bd84",
+              subjectName: "CITIZENSHIP",
+              nature: "1B Scholastic",
+              natureUid: "89388935-b07e-44ce-8eb8-e92357785a67",
+              cbseVIIICode: "",
+              cbseXCode: "",
+              cbseXIICode: "",
+              status: true,
+              parent: [],
+              parentName: [],
+              haveChild: false,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-28 07:45:05.667885",
+              editeddate: "2024-09-28 07:45:05.66726",
+            },
+            termName: "HALF YEARLY",
+            max: 100,
+            markObtained: 100,
+            percentage: 100,
+            grade: "A",
+            remarkStatus: "",
+            attachmentName: "",
+            additional: false,
+            priority: 14,
+            added: true,
+            scholastic: false,
+          },
+        ],
+        remarksEntry: {
+          uid: "f1907672-b0cc-4965-9578-867970e5ae0c",
+          terms: ["TERM-I"],
+          studentId: "20222314",
+          studentName: "Aaditya Narayan",
+          rollNumber: 1101,
+          classSectionUid: "7aa8d641-9304-4aa2-98f3-d2440bd0a18c",
+          classSection: "I-A",
+          description: "Good",
+          fields: [
+            {
+              uid: "7c102678-202a-489c-b47d-3f7798044083",
+              title: "Attendance",
+              type: "OPEN",
+              value: "75/100",
+              masterUid: "0491a44f-cea2-42d0-ab73-e3c527c4b975",
+              masterName: "Remark",
+            },
+          ],
+          status: true,
+          createdUser: "QuickCampus",
+          editedUser: "QuickCampus",
+          createdDate: "16-09-2024 03:30 PM",
+          editedDate: "16-09-2024 03:30 PM",
+        },
+        school: {
+          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
+          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
+          schoolName: "SDPS Punjabi Bagh",
+          schoolAbb: "SPB",
+          educationBoard: null,
+          registrationNo: null,
+          plotNumber: null,
+          area: null,
+          city: null,
+          pincode: null,
+          state: null,
+          phoneNo1: null,
+          phoneNo2: null,
+          contactName: "VANDANA GUPTA",
+          contactMobile: "9868359499",
+          contactEmail: "sg4vgoyal@gmail.com",
+          schoolCode: null,
+          pfCode: null,
+          societyManagement: null,
+          language: null,
+          schoolLogo: null,
+          schoolFavicon: null,
+          enabled: true,
+          subDomain: "sdps",
+          website: null,
+          schemaPrefix: null,
+          editedDate: "13-09-2024 10:57 AM",
+          editedUser: "QuickCampus",
+          visitorSchool: false,
+          clientSchoolId: null,
+          cscId: null,
+          onlinePaymentEnabled: true,
+          registrationSeries: null,
+          underTakingDetails: null,
+          formNumberStart: null,
+          sessionResponse: null,
+          schoolLogoUrl: null,
+          printAcknowledge: false,
+          whatsAppEnabled: false,
+          smsenabled: false,
+          notificationEnabled: true,
+          loanEnabled: false,
+        },
+        promotedClass: null,
+        promotedSection: null,
+        perSignedUrlResponse: {
+          url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SDPS/student-info/20222286/student/images/20222286.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240913T104830Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240913%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=5d48c7a29dc804e84f32ff1985efe74f6243eeae09eedc91faa80a89c7e58327",
+          fileName: "20222286.png",
+        },
+        pass: false,
+        status_code: 200,
+      },
+      header: null,
+      footer: null,
+      printDate: "12-10-2024"
+    },
+  ]);
+</script>
+
+</html>
