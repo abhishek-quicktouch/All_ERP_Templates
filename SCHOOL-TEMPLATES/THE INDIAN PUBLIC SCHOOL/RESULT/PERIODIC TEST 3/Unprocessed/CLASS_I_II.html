@@ -1,50 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CLASS I</title>
-</head>
+  </head>
 
-<body>
-    <div id="studentsList">
-        CLASS_I
-    </div>
-</body>
-<script>
-
-
-
-    window.SetTemplateData = function (data) {
-        const config = {
-            schoolLogo: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
-            schoolLogo2: "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
-            schoolName: "THE INDIAN SCHOOL",
-            schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
+  <body>
+    <div id="studentsList">CLASS_I</div>
+  </body>
+  <script>
+    window.SetTemplateData = function (data) {      const config = {
+        schoolLogo:
+          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png",
+        schoolLogo2:
+          "https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/SRDAV/web-content/event/images/UploadFile2024-10-18T10_53_18_045641727.png",
+        schoolName: "THE INDIAN SCHOOL",
+        schoolAddress: `<h5>J.B. TITO MARG, SADIQ NAGAR, NEW DELHI - 110049</h5>
                 <h5>PH.:26257551 / 52, 26264956 / 57 </h5>
                 <h5>EmailID : contactus@theindianschool.in Website : theindianschool.in</h5>`,
-            studentInfoFields: [
-                { label: "NAME", key: "studentName", additionalInfo: { label: "CLASS & SECTION", key: "className" } },
-                { label: "FATHER'S NAME", key: "fatherName", additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" } },
-                { label: "MOTHER'S NAME", key: "motherName", additionalInfo: { label: "D.O.B", key: "dob" } },
-                { label: "ADDRESS", key: "address" }
-            ],
-            gradingScale: "on 8-point (A1-E) Grading Scale",
-            gradeScale: [
-                { minPercentage: 91, grade: "A1" },
-                { minPercentage: 81, grade: "A2" },
-                { minPercentage: 71, grade: "B1" },
-                { minPercentage: 61, grade: "B2" },
-                { minPercentage: 51, grade: "C1" },
-                { minPercentage: 41, grade: "C2" },
-                { minPercentage: 33, grade: "D" },
-                { minPercentage: 0, grade: "E" }
-            ],
-            scholasticConfig: { nature: "THEORY" },
-            coScholasticConfig: { nature: "1B Scholastic" },
-            signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
-            styles: `
+        studentInfoFields: [
+          {
+            label: "NAME",
+            key: "studentName",
+            additionalInfo: { label: "CLASS & SECTION", key: "className" },
+          },
+          {
+            label: "FATHER'S NAME",
+            key: "fatherName",
+            additionalInfo: { label: "ADMISSION NO.", key: "admissionNo" },
+          },
+          {
+            label: "MOTHER'S NAME",
+            key: "motherName",
+            additionalInfo: { label: "D.O.B", key: "dob" },
+          },
+          { label: "ADDRESS", key: "address" },
+        ],
+        gradingScale: "on 8-point (A1-E) Grading Scale",
+        gradeScale: [
+          { minPercentage: 91, grade: "A1" },
+          { minPercentage: 81, grade: "A2" },
+          { minPercentage: 71, grade: "B1" },
+          { minPercentage: 61, grade: "B2" },
+          { minPercentage: 51, grade: "C1" },
+          { minPercentage: 41, grade: "C2" },
+          { minPercentage: 33, grade: "D" },
+          { minPercentage: 0, grade: "E" },
+        ],
+        scholasticConfig: { nature: "THEORY" },
+        coScholasticConfig: { nature: "1B Scholastic" },
+        signatures: ["CLASS TEACHER", "PRINCIPAL", "PARENT"],
+        styles: `
       @page { size: A4; margin: 10mm; }
       @media print { @page { margin: auto; size: A4; } }
       body { font-family: Arial, sans-serif; }
@@ -60,248 +67,281 @@
       .signatures { margin-top: 40px; display: flex; justify-content: space-between; }
       .signatures div { font-size: 13px; margin: 0px; padding: 0px; text-align: center; }
       .signatures p { margin: 0px; padding: 0px; font-weight: bold; }
-    `
-        };
+    `,
+      };
 
-        // Helper function to generate graph 
-        function generateGraph(graphContainer, subjects, studentPerformanceData) {
+      // Helper function to generate graph
+      function generateGraph(graphContainer, subjects, studentPerformanceData) {
+        // Create and configure canvas
+        const canvas = document.createElement("canvas");
+        canvas.width = 740;
+        canvas.height = 260;
+        canvas.style.paddingTop = "10px";
+        graphContainer.appendChild(canvas);
 
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-            // Create and configure canvas
-            const canvas = document.createElement("canvas");
-            canvas.width = 740;
-            canvas.height = 260;
-            canvas.style.paddingTop = "10px";
-            graphContainer.appendChild(canvas);
-
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
-            console.log(subjects, "ffffffffff subjects")
-
-            // Filter and map subjects with matching data
-            const filteredSubjects = subjects.filter(subject =>
-                subject.subjectNature === "THEORY" &&
-                studentPerformanceData.some(data => data.subjectName.toLowerCase() === subject.subjectName.toLowerCase())
-
-            ).map(subject => {
-                const performanceData = studentPerformanceData.find(data => data.subjectName.toLowerCase() === subject.subjectName.toLowerCase());
-                console.log(performanceData, "fffffffffffffffff performanceData")
-                return {
-                    subjectName: subject.subjectName,
-                    marks: subject.marks || 0,
-                    maxPossible: subject.max || 20,
-                    percentage: subject.percentage || 0,
-                    maxObtainedMark: performanceData.maxObtainedMark || 0,
-                    averageObtainedMark: performanceData.averageObtainedMark || 0,
-                    maxMark: performanceData.maxMark || 0,
-                };
-            });
-            console.log(filteredSubjects, "ffffffff filteredSubjects")
-            // Scaling configuration
-            const maxValue = Math.max(...filteredSubjects.map(s => Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible)));
-            const scaleFactor = 140 / maxValue; // Scale bars to fit chart height
-
-            const barWidth = 20;
-            const barGap = 80;
-            const chartHeight = 140;
-            const xOffset = 50;
-            const topPadding = 10;
-
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw grid and Y-axis values
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.fillStyle = 'black';
-            ctx.font = "10px Arial";
-
-            const yStep = maxValue / 5;
-            for (let i = 0; i <= 5; i++) {
-                const y = (chartHeight / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(xOffset, chartHeight - y + topPadding);
-                ctx.lineTo(canvas.width, chartHeight - y + topPadding);
-                ctx.stroke();
-                const yValue = Math.round(yStep * i);
-                ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
-            }
-
-            // Draw bars
-            filteredSubjects.forEach((subject, index) => {
-                const x = xOffset + index * (barWidth + barGap);
-
-                // Calculate scaled heights
-                const markHeight = subject.marks * scaleFactor;
-                const averageHeight = subject.averageObtainedMark * scaleFactor;
-                const highestHeight = subject.maxObtainedMark * scaleFactor;
-
-                // Draw average bar (pink)
-                ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-                ctx.fillRect(x, chartHeight + topPadding - averageHeight, barWidth, averageHeight);
-
-                // Draw marks bar (black)
-                ctx.fillStyle = 'black';
-                ctx.fillRect(x + barWidth + 5, chartHeight + topPadding - markHeight, barWidth, markHeight);
-
-                // Draw highest bar (blue-gray)
-                ctx.fillStyle = 'rgb(193, 224, 224)';
-                ctx.fillRect(x + barWidth + 20, chartHeight + topPadding - highestHeight, barWidth, highestHeight);
-
-                // Draw subject label
-                ctx.save();
-                ctx.fillStyle = 'black'; // Ensure label text is black
-                ctx.textAlign = 'right';
-                ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
-                ctx.rotate(-Math.PI / 4);
-                ctx.fillText(subject.subjectName, 0, 0);
-                ctx.restore();
-            });
-
-            // Draw legend
-            const legendY = canvas.height - 30;
-
-            // Marks legend
-            ctx.fillStyle = 'black';
-            ctx.fillRect(xOffset, legendY, 10, 10);
-            ctx.fillText("Marks Obtained", xOffset + 15, legendY + 10);
-
-            // Average legend
-            ctx.fillStyle = 'rgba(255, 192, 203, 0.6)';
-            ctx.fillRect(xOffset + 100, legendY, 10, 10);
-            ctx.fillStyle = 'black';
-            ctx.fillText("Average in Class", xOffset + 115, legendY + 10);
-
-            // Highest legend
-            ctx.fillStyle = 'rgb(193, 224, 224)';
-            ctx.fillRect(xOffset + 250, legendY, 10, 10);
-            ctx.fillStyle = 'black';
-            ctx.fillText("Highest in Class", xOffset + 265, legendY + 10);
-        }
-
-        function getAttendanceOrMark(status, mark) {
-            const attendanceValue = {
-                Absent: "AB",
-                Medical: "M",
-                Sports: "S",
-                Leave: "L",
-                "Late Admission": "LA",
-                Exempted: "EX",
-                NA: "NA",
-                "Not Submitted": "NS"
+        // Filter and map subjects with matching data
+        const filteredSubjects = subjects
+          .filter((subject) =>
+            studentPerformanceData?.some(
+              (data) =>
+                data.subjectName.toLowerCase() ===
+                subject.subjectName.toLowerCase()
+            )
+          )
+          .map((subject) => {
+            const performanceData = studentPerformanceData.find(
+              (data) =>
+                data.subjectName.toLowerCase() ===
+                subject.subjectName.toLowerCase()
+            );
+            return {
+              subjectName: subject.subjectName,
+              marks: subject.marks || 0,
+              maxPossible: subject.max || 20,
+              percentage: subject.percentage || 0,
+              maxObtainedMark: performanceData.maxObtainedMark || 0,
+              averageObtainedMark: performanceData.averageObtainedMark || 0,
+              maxMark: performanceData.maxMark || 0,
             };
-            return attendanceValue[status] || mark || "-";
+          });
+        // Scaling configuration
+        const maxValue = Math.max(
+          ...filteredSubjects.map((s) =>
+            Math.max(s.marks, s.averageObtainedMark, s.maxMark, s.maxPossible)
+          )
+        );
+        const scaleFactor = 140 / maxValue; // Scale bars to fit chart height
+
+        const barWidth = 20;
+        const barGap = 80;
+        const chartHeight = 140;
+        const xOffset = 50;
+        const topPadding = 10;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw grid and Y-axis values
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.fillStyle = "black";
+        ctx.font = "10px Arial";
+
+        const yStep = maxValue / 5;
+        for (let i = 0; i <= 5; i++) {
+          const y = (chartHeight / 5) * i;
+          ctx.beginPath();
+          ctx.moveTo(xOffset, chartHeight - y + topPadding);
+          ctx.lineTo(canvas.width, chartHeight - y + topPadding);
+          ctx.stroke();
+          const yValue = Math.round(yStep * i);
+          ctx.fillText(yValue, 5, chartHeight - y + topPadding + 5);
         }
 
-        function calculateGrade(percentage) {
-            for (const grade of config.gradeScale) {
-                if (percentage >= grade.minPercentage) {
-                    return grade.grade;
-                }
-            }
-            return "F";
+        // Draw bars
+        filteredSubjects.forEach((subject, index) => {
+          const x = xOffset + index * (barWidth + barGap);
+
+          // Calculate scaled heights
+          const markHeight = subject.marks * scaleFactor;
+          const averageHeight = subject.averageObtainedMark * scaleFactor * 5;
+          const highestHeight = subject.maxMark * scaleFactor * 5;
+
+          // Draw average bar (pink)
+          ctx.fillStyle = "rgba(255, 192, 203, 0.6)";
+          ctx.fillRect(
+            x,
+            chartHeight + topPadding - averageHeight,
+            barWidth,
+            averageHeight
+          );
+
+          // Draw marks bar (black)
+          ctx.fillStyle = "black";
+          ctx.fillRect(
+            x + barWidth + 5,
+            chartHeight + topPadding - markHeight,
+            barWidth,
+            markHeight
+          );
+
+          // Draw highest bar (blue-gray)
+          ctx.fillStyle = "rgb(193, 224, 224)";
+          ctx.fillRect(
+            x + barWidth + 20,
+            chartHeight + topPadding - highestHeight,
+            barWidth,
+            highestHeight
+          );
+
+          // Draw subject label
+          ctx.save();
+          ctx.fillStyle = "black"; // Ensure label text is black
+          ctx.textAlign = "right";
+          ctx.translate(x + barWidth + 15, chartHeight + 15 + topPadding);
+          ctx.rotate(-Math.PI / 4);
+          ctx.fillText(subject.subjectName, 0, 0);
+          ctx.restore();
+        });
+
+        // Draw legend
+        const legendY = canvas.height - 30;
+
+        // Marks legend
+        ctx.fillStyle = "black";
+        ctx.fillRect(xOffset, legendY, 10, 10);
+        ctx.fillText("Marks Obtained", xOffset + 15, legendY + 10);
+
+        // Average legend
+        ctx.fillStyle = "rgba(255, 192, 203, 0.6)";
+        ctx.fillRect(xOffset + 100, legendY, 10, 10);
+        ctx.fillStyle = "black";
+        ctx.fillText("Average in Class", xOffset + 115, legendY + 10);
+
+        // Highest legend
+        ctx.fillStyle = "rgb(193, 224, 224)";
+        ctx.fillRect(xOffset + 250, legendY, 10, 10);
+        ctx.fillStyle = "black";
+        ctx.fillText("Highest in Class", xOffset + 265, legendY + 10);
+      }
+
+      function getAttendanceOrMark(status, mark) {
+        const attendanceValue = {
+          Absent: "AB",
+          Medical: "M",
+          Sports: "S",
+          Leave: "L",
+          "Late Admission": "LA",
+          Exempted: "EX",
+          NA: "NA",
+          "Not Submitted": "NS",
+        };
+        return attendanceValue[status] || mark || "-";
+      }
+
+      function calculateGrade(percentage) {
+        for (const grade of config.gradeScale) {
+          if (percentage >= grade.minPercentage) {
+            return grade.grade;
+          }
         }
+        return "F";
+      }
 
-        // Rest of your existing functions (generateStudentInfo, generateScholasticTable, etc.)
-        // ... [Previous functions remain the same]
+      // Rest of your existing functions (generateStudentInfo, generateScholasticTable, etc.)
+      // ... [Previous functions remain the same]
 
-        function generateStudentInfo(student) {
-            // Generate full address
-            let fullAddress = `${student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
-                ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
-                ", "
-                : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.street
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
-                    ", "
-                    : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.area
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
-                    ", "
-                    : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse
-                        ?.landmark + ", "
-                    : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.city
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
-                    ", "
-                    : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.state
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
-                    ", "
-                    : ""
-                }${student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-                    ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
-                    : ""
-                }`;
+      function generateStudentInfo(student) {
+        // Generate full address
+        let fullAddress = `${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.houseNo +
+              ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.street
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.street +
+              ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.area
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.area +
+              ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.landmark
+            ? student?.studentInfoResponse[0]?.studentAddressResponse
+                ?.landmark + ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.city
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.city +
+              ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.state
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.state +
+              ", "
+            : ""
+        }${
+          student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+            ? student?.studentInfoResponse[0]?.studentAddressResponse?.pincode
+            : ""
+        }`;
 
-            // Generate table with student info
-            return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
-        ${config.studentInfoFields?.map(
-                (field) => `
+        // Generate table with student info
+        return `<table style="width: 100%;font-size: 12px ; text-transform: uppercase">
+        ${config.studentInfoFields
+          ?.map(
+            (field) => `
                     <tr>
-                        <th style="width: 25%; text-align: left">${field?.label
-                    }</th>
-                        ${field?.label?.toLowerCase() === "address"
-                        ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
-                        : `  <td style="width: 25%;"> : ${student?.[field?.key] || ""
-                        } </td> `
-                    }   
-                        ${field?.additionalInfo
-                        ? field?.additionalInfo?.label === "CLASS & SECTION"
-                            ? `<th style="width: 25%; text-align: left">${field?.additionalInfo?.label
-                            }</th>
-                                <td style="width: 25%;"> : ${student?.["className"] || ""
-                            }-${student?.["sectionName"] || ""}</td>
+                        <th style="width: 25%; text-align: left">${
+                          field?.label
+                        }</th>
+                        ${
+                          field?.label?.toLowerCase() === "address"
+                            ? `<td colspan="3" style="width: 25%;"> : ${fullAddress}</td>`
+                            : `  <td style="width: 25%;"> : ${
+                                student?.[field?.key] || ""
+                              } </td> `
+                        }   
+                        ${
+                          field?.additionalInfo
+                            ? field?.additionalInfo?.label === "CLASS & SECTION"
+                              ? `<th style="width: 25%; text-align: left">${
+                                  field?.additionalInfo?.label
+                                }</th>
+                                <td style="width: 25%;"> : ${
+                                  student?.["className"] || ""
+                                }-${student?.["sectionName"] || ""}</td>
                             `
-                            : `
-                                <th style="width: 25%; text-align: left">${field?.additionalInfo?.label
-                            }</th>
-                                <td style="width: 25%;"> : ${student?.[field?.additionalInfo?.key] || ""
-                            }</td>
+                              : `
+                                <th style="width: 25%; text-align: left">${
+                                  field?.additionalInfo?.label
+                                }</th>
+                                <td style="width: 25%;"> : ${
+                                  student?.[field?.additionalInfo?.key] || ""
+                                }</td>
                             `
-                        : ""
-                    }
+                            : ""
+                        }
                     </tr>
                 `
-            )
-                    .join("")}
+          )
+          .join("")}
     </table>`;
-        }
+      }
 
-        // Generate scholastic table
-        function generateScholasticTable(subjects) {
-            let totalMarksObtained = 0;
-            let grandTotalMarks = 0;
+      // Generate scholastic table
+      function generateScholasticTable(subjects) {
+        let totalMarksObtained = 0;
+        let grandTotalMarks = 0;
 
-            const rows = subjects?.subjectMarksEntryRequests
-                .filter((subject) => subject.subjectNature === "THEORY")
-                .map((subject) => {
-                    const subjectName = subject.subjectName || "N/A";
+        const rows = subjects?.subjectMarksEntryRequests
+          .map((subject) => {
+            const subjectName = subject.subjectName || "N/A";
 
-                    // Find the corresponding base term subject for PERIODIC TEST 3
+            // Find the corresponding base term subject for PERIODIC TEST 3
 
-
-
-
-
-                    // Render table row for each subject
-                    return `
+            // Render table row for each subject
+            return `
                 <tr>
                     <td style="text-transform:uppercase; font-weight:bold;">${subjectName}</td>
                     <td style="text-align:center;">${subject?.marks}</td>
                     
                 </tr>
             `;
-                })
-                .join("");
+          })
+          .join("");
 
-            const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
-            const overallGrade = calculateGrade(overallPercentage);
+        const overallPercentage = (totalMarksObtained / grandTotalMarks) * 100;
+        const overallGrade = calculateGrade(overallPercentage);
 
-            // Render the final table
-            return `
+        // Render the final table
+        return `
     <table>
         <tr>
             <td colspan="2" style="background-color: #fff; font-weight:bold; font-size: 13px; text-align: center">SCHOLASTIC AREAS</td>
@@ -314,13 +354,12 @@
         ${rows}
     </table>
     `;
-        }
+      }
 
-        // Helper function to calculate grade based on percentage
+      // Helper function to calculate grade based on percentage
 
-
-        function generateRemark(remark) {
-            return `
+      function generateRemark(remark) {
+        return `
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: center">CLASS TEACHER'S REMARKS</th>
@@ -330,58 +369,65 @@
         </tr>
     </table>
     `;
-        }
+      }
 
-        function generateSubjectRemark(remark, sub) {
-            let theorySub = sub?.filter(el => el?.subjectNature == "THEORY")?.map(el => el?.subjectName)
-            console.log(
-                remark?.fields,
-                theorySub,
-                "llllllll"
-            );
-            return `
+      function generateSubjectRemark(remark, sub) {
+        let theorySub = sub
+          ?.filter((el) => el?.subjectNature == "THEORY")
+          ?.map((el) => el?.subjectName);
+        return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th colspan="2" style="text-align: center">STUDENT'S PROFILE</th>
             </tr>
-            ${theorySub?.map(el => {
-                return remark?.fields?.map((f) =>
-                    f?.value && el?.toLowerCase()?.includes(f?.title?.toLowerCase())
-                        ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${f?.title || ""
-                        }</td><td style="width: 80%">${f?.value || ""}</td></tr>`
-                        : ""
-                )?.join("")
-            })?.join("")}
+            ${theorySub
+              ?.map((el) => {
+                return remark?.fields
+                  ?.map((f) =>
+                    f?.value &&
+                    el?.toLowerCase()?.includes(f?.title?.toLowerCase())
+                      ? `<tr style="background-color: #fff"> <td style="text-align: left ; width: 20%">${
+                          f?.title || ""
+                        }</td><td style="width: 80%">${
+                          f?.value || ""
+                        }</td></tr>`
+                      : ""
+                  )
+                  ?.join("");
+              })
+              ?.join("")}
        
     </table>
     `;
-        }
+      }
 
-        function generatePrincipalRemark(remark) {
-            return `
+      function generatePrincipalRemark(remark) {
+        return `
 
     <table style="width: 100%;font-size: 12px">
         <tr style="background-color: #fff"> 
             <th style="text-align: left">PRINCIPAL'S REMARKS</th>
             </tr>
-            ${remark?.masterName === "PRINCIPAL'S REMARKS"
-                    ? remark?.fields
-                        ?.map(
-                            (f) =>
-                                `<tr  style="background-color: #fff, min-height: 20px;"><td>${f?.value || ""
-                                }</td></tr>`
-                        )
-                        .join("")
-                    : ""
-                }
+            ${
+              remark?.masterName === "PRINCIPAL'S REMARKS"
+                ? remark?.fields
+                    ?.map(
+                      (f) =>
+                        `<tr  style="background-color: #fff, min-height: 20px;"><td>${
+                          f?.value || ""
+                        }</td></tr>`
+                    )
+                    .join("")
+                : ""
+            }
        
     </table>
     `;
-        }
+      }
 
-        function generateGradingTable() {
-            return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+      function generateGradingTable() {
+        return `    <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <tr>
             <td colspan="6" style="text-align: center; border: 1px solid black; font-weight: bold;">
                 INSTRUCTIONS
@@ -428,60 +474,61 @@
         </tr>
     </table>
 `;
-        }
+      }
 
-        function generateHeader(element) {
-            return ` <div class="header">
+      function generateHeader(element) {
+        return ` <div class="header">
             
-${element.header
-                    ? element.header
-                    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
+${
+  element.header
+    ? element.header
+    : ` <img src="${config.schoolLogo}" alt="School Logo"/>
               <div style="text-align:center">
                         <h1 style="color: #2b595e" >${config.schoolName}</h1>
                         <div style="color: #2b595e" >${config.schoolAddress}</div>
                    </div>
               <img src="${config.schoolLogo2}" alt="School Logo"/> 
             `
-                }
+}
 
              
 </div>`;
-        }
+      }
 
-        function generateSignature() {
-            return `
+      function generateSignature() {
+        return `
              <div class="signatures">
                         ${config.signatures
-                    .map(
-                        (sig) => `
+                          .map(
+                            (sig) => `
                             <div>
                                
                                 <p style="vertical-align: bottom">${sig}</p>
                             </div>
                         `
-                    )
-                    .join("")}
+                          )
+                          .join("")}
                     </div>
             `;
-        }
+      }
 
+      const multipleStudents = data;
+      const studentHtml = document.getElementById("studentsList");
+      studentHtml.innerHTML = ``;
 
-        const multipleStudents = data;
-        const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
+      multipleStudents?.forEach((element) => {
+        const singleStudentHtml = document.createElement("div");
+        singleStudentHtml.style.pageBreakAfter = "always";
 
-        multipleStudents?.forEach((element) => {
-            const singleStudentHtml = document.createElement("div");
-            singleStudentHtml.style.pageBreakAfter = "always";
+        const termConfig =
+          element?.markData?.markSheetTerms?.map((term) => ({
+            headerName: term?.headerName,
+            subHeaderName: term?.subHeaderName,
+          })) || [];
 
-            const termConfig = element?.markData?.markSheetTerms?.map((term) => ({
-                headerName: term?.headerName,
-                subHeaderName: term?.subHeaderName
-            })) || [];
+        const graphId = `graph-${element?.student?.studentId || Math.random()}`;
 
-            const graphId = `graph-${element?.student?.studentId || Math.random()}`;
-
-            singleStudentHtml.innerHTML = `
+        singleStudentHtml.innerHTML = `
       <style type="text/css">${config.styles}</style>
       <page orientation="portrait" format="A4" margin="0">
         <div class="container">
@@ -491,7 +538,9 @@ ${element.header
           </h4>
           ${generateStudentInfo(element?.student)}
           <div class="section">
-            ${generateScholasticTable(element?.markData?.termWiseSubjectResponse[0])}
+            ${generateScholasticTable(
+              element?.markData?.termWiseSubjectResponse[0]
+            )}
           </div>
           <div class="section">
            
@@ -500,7 +549,9 @@ ${element.header
           
             <div class="section" style="width: 99%">
               <h3 style="text-align: center; font-size: 12px; border: 1px solid black; padding: 2px; text-transform: uppercase">
-                ${element?.student?.studentName || "STUDENT"}'S PERFORMANCE ANALYSIS
+                ${
+                  element?.student?.studentName || "STUDENT"
+                }'S PERFORMANCE ANALYSIS
               </h3>
               <div id="${graphId}" style="border: 1px solid black"></div>
             </div>
@@ -508,7 +559,9 @@ ${element.header
             
           <div class="section">
             <div style="font-size: 12px; display:flex; justify-content: space-between">
-              <span style="font-weight: bold">ISSUED DATE: ${element?.printDate || new Date().toLocaleDateString()}</span>
+              <span style="font-weight: bold">ISSUED DATE: ${
+                element?.printDate || new Date().toLocaleDateString()
+              }</span>
              
             </div>
           </div>
@@ -517,1094 +570,578 @@ ${element.header
       </page>
     `;
 
-            studentHtml.appendChild(singleStudentHtml);
+        studentHtml.appendChild(singleStudentHtml);
 
-            // Generate graph after the container is added to the DOM
-            const graphContainer = document.getElementById(graphId);
-            if (graphContainer && element?.markData?.termWiseSubjectResponse[0]) {
-
-
-
-
-
-                generateGraph(graphContainer, element?.markData?.termWiseSubjectResponse[0]?.subjectMarksEntryRequests, element?.studentPerfromanceData?.data);
-            }
-        });
+        // Generate graph after the container is added to the DOM
+        const graphContainer = document.getElementById(graphId);
+        if (graphContainer && element?.markData?.termWiseSubjectResponse[0]) {
+          generateGraph(
+            graphContainer,
+            element?.markData?.termWiseSubjectResponse[0]
+              ?.subjectMarksEntryRequests,
+            element?.studentPerfromanceData?.data
+          );
+        }
+      });
     };
+  </script>
 
-
-</script>
-
-<script>
-    window.SetTemplateData(
-        [
+  <script>
+    window.SetTemplateData([
+      {
+        student: {
+          dob: "28-03-2009",
+          admissionNo: "C-4783",
+          studentName: "Lakshya Sherwal",
+          className: "IX",
+          sectionName: "A",
+          rollNo: 19,
+          fatherName: "Shashi Bhushan",
+          motherName: "Urmila",
+          attendance: "0.0/0",
+          boardRollNumber: "",
+          studentInfoResponse: [
             {
-                "student": {
-                    "dob": "28-03-2009",
-                    "admissionNo": "C-4783",
-                    "studentName": "Lakshya Sherwal",
-                    "className": "IX",
-                    "sectionName": "A",
-                    "rollNo": 19,
-                    "fatherName": "Shashi Bhushan",
-                    "motherName": "Urmila",
-                    "attendance": "0.0/0",
-                    "boardRollNumber": "",
-                    "studentInfoResponse": [
-                        {
-                            "id": 321121,
-                            "userUid": "81953584-db84-4fbd-bf36-eb9278d66d3a",
-                            "userName": null,
-                            "fatherUserName": null,
-                            "motherUserName": null,
-                            "guardianUserName": null,
-                            "uid": "2f16f45e-9e89-4fa5-ac1d-a373c256a5b5",
-                            "studentId": "C-4783",
-                            "exAdmissionNo": null,
-                            "studentName": "Lakshya Sherwal",
-                            "fatherName": "Shashi Bhushan",
-                            "motherName": "Urmila",
-                            "dob": "28-03-2009",
-                            "gender": "NA",
-                            "studentAdhaarcard": "",
-                            "joiningClass": "IX",
-                            "joiningSections": "A",
-                            "joiningDate": "18-09-2024",
-                            "plotNumber": "",
-                            "area": "Sanwal Nagar",
-                            "city": "New Delhi",
-                            "state": "Delhi",
-                            "pincode": "110049",
-                            "phone1": null,
-                            "rollNo": 19,
-                            "emergencyNumber": "",
-                            "mobileNumber": "8802942085",
-                            "studentEmail": null,
-                            "religion": "",
-                            "category": "",
-                            "minority": "",
-                            "motherTongue": "",
-                            "idMark": "",
-                            "height": "",
-                            "weight": "",
-                            "physicalDisability": "",
-                            "bloodGroup": "",
-                            "healthRemark": "",
-                            "siblingDetails": "",
-                            "alumni": "",
-                            "siblingResponse": [],
-                            "fatherOccupation": "",
-                            "fatherQualification": "",
-                            "fatherOrganization": "",
-                            "fatherDesignation": "",
-                            "fatherIncome": "",
-                            "fatherArea": "NA",
-                            "fatherCity": "NA",
-                            "fatherState": "NA",
-                            "fatherPincode": "",
-                            "fatherPhone": null,
-                            "fatherMobile": "",
-                            "fatherEmail": null,
-                            "fatherAdhaarNumber": "",
-                            "schoolUid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
-                            "motherQualification": "",
-                            "motherOccupation": "",
-                            "motherOrganization": "",
-                            "motherDesignation": "",
-                            "motherIncome": "",
-                            "motherArea": "NA",
-                            "motherCity": "NA",
-                            "motherState": "NA",
-                            "motherPincode": "",
-                            "motherPhone": null,
-                            "motherMobile": "",
-                            "motherEmail": null,
-                            "motherAdhaarNumber": "",
-                            "guardianName": null,
-                            "relation": null,
-                            "guardianOccupation": null,
-                            "guardianPhone": null,
-                            "guardianMobile": null,
-                            "guardianEmail": null,
-                            "guardianAddress": null,
-                            "leavingDate": null,
-                            "previousSchoolName": null,
-                            "otp": null,
-                            "schoolName": "Demo Public School",
-                            "remark": null,
-                            "classTeacher": "",
-                            "classTeacherUserName": "",
-                            "classes": "IX",
-                            "classUid": null,
-                            "sections": "A",
-                            "group": null,
-                            "wing": "NA",
-                            "status": "Studying",
-                            "academicSession": "2024-2025",
-                            "joiningStatus": "New",
-                            "houses": null,
-                            "certificates": "",
-                            "certificatesList": [],
-                            "caste": "",
-                            "listOfDocuments": null,
-                            "attached": false,
-                            "required": false,
-                            "submitted": false,
-                            "studentHostel": [],
-                            "studentConcession": [],
-                            "studentTransport": [],
-                            "studentAadharCard": null,
-                            "fatherAadharCard": null,
-                            "motherAadharCard": null,
-                            "studentImage": null,
-                            "fatherImage": null,
-                            "motherImage": null,
-                            "guardianImage": null,
-                            "birthCertificate": null,
-                            "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
-                            "aluminiProof": null,
-                            "siblingProof": null,
-                            "residenceProof": null,
-                            "firstBornChildProof": null,
-                            "medicalFitnessCertificate": null,
-                            "fatherQualificationProof": null,
-                            "motherQualificationProof": null,
-                            "casteCertificate": null,
-                            "createdUser": "SimranjeetKaur_522590",
-                            "editedUser": "SimranjeetKaur_522590",
-                            "createddate": "2024-09-18 10:54:57.398263",
-                            "editeddate": "2024-09-18 10:54:57.398263",
-                            "permanentEducationNumber": null,
-                            "studentAddressResponse": {
-                                "uid": "c3828e81-d4f4-4c01-8167-0750606d0e5c",
-                                "houseNo": null,
-                                "area": "Sanwal Nagar",
-                                "landmark": null,
-                                "city": "New Delhi",
-                                "district": null,
-                                "state": "Delhi",
-                                "poPs": null,
-                                "pincode": 110049,
-                                "street": "C-22",
-                                "userName": "DIS896_C-4783",
-                                "createdDate": "18-09-2024 04:24 PM",
-                                "editedDate": "18-09-2024 04:24 PM",
-                                "createdBy": "SimranjeetKaur_522590",
-                                "editedBy": "SimranjeetKaur_522590"
-                            },
-                            "fatherAddressResponse": {
-                                "uid": "f45aed95-fe2b-49da-b33d-c65f3ae99425",
-                                "houseNo": null,
-                                "area": "NA",
-                                "landmark": null,
-                                "city": "NA",
-                                "district": null,
-                                "state": "NA",
-                                "poPs": null,
-                                "pincode": 0,
-                                "street": null,
-                                "userName": null,
-                                "createdDate": "18-09-2024 04:24 PM",
-                                "editedDate": "18-09-2024 04:24 PM",
-                                "createdBy": "SimranjeetKaur_522590",
-                                "editedBy": "SimranjeetKaur_522590"
-                            },
-                            "motherAddressResponse": {
-                                "uid": "015fe03a-4575-4d0e-86b2-f960b62e6020",
-                                "houseNo": null,
-                                "area": "NA",
-                                "landmark": null,
-                                "city": "NA",
-                                "district": null,
-                                "state": "NA",
-                                "poPs": null,
-                                "pincode": 0,
-                                "street": null,
-                                "userName": null,
-                                "createdDate": "18-09-2024 04:24 PM",
-                                "editedDate": "18-09-2024 04:24 PM",
-                                "createdBy": "SimranjeetKaur_522590",
-                                "editedBy": "SimranjeetKaur_522590"
-                            },
-                            "guardianAddressResponse": null,
-                            "correspondenceAddressResponse": null
-                        }
-                    ],
-                    "classTeacher": "",
-                    "classTeacherUserName": "",
-                    "permanentEducationNumber": null,
-                    "school": {
-                        "uid": "20d01e7a-51bd-4e6f-87a4-68d25781078a",
-                        "apikey": "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
-                        "schoolName": "The Indian School",
-                        "schoolAbb": "DIS",
-                        "educationBoard": null,
-                        "registrationNo": null,
-                        "plotNumber": "NA",
-                        "area": "Josip Broz Tito Marg",
-                        "city": "New Delhi",
-                        "pincode": "110049",
-                        "state": "Delhi",
-                        "phoneNo1": "1126265956",
-                        "phoneNo2": "1126265957",
-                        "contactName": "Simranjeet",
-                        "contactMobile": "9711140936",
-                        "contactEmail": "simranjeet@theindianschool.in",
-                        "schoolCode": null,
-                        "pfCode": null,
-                        "societyManagement": null,
-                        "language": null,
-                        "schoolLogo": null,
-                        "schoolFavicon": null,
-                        "enabled": true,
-                        "subDomain": null,
-                        "website": "www.theindianschool.in",
-                        "schemaPrefix": null,
-                        "editedDate": "05-12-2024 03:17 PM",
-                        "editedUser": "quickadmin",
-                        "visitorSchool": false,
-                        "clientSchoolId": null,
-                        "cscId": null,
-                        "onlinePaymentEnabled": false,
-                        "registrationSeries": null,
-                        "underTakingDetails": null,
-                        "formNumberStart": null,
-                        "sessionResponse": null,
-                        "schoolLogoUrl": null,
-                        "printAcknowledge": false,
-                        "wabaId": "",
-                        "phoneNumberId": "",
-                        "whatsappApiKey": "",
-                        "isQuickCampusWhatsapp": false,
-                        "whatsAppEnabled": false,
-                        "smsenabled": false,
-                        "notificationEnabled": true,
-                        "loanEnabled": false
-                    }
+              id: 321121,
+              userUid: "81953584-db84-4fbd-bf36-eb9278d66d3a",
+              userName: null,
+              fatherUserName: null,
+              motherUserName: null,
+              guardianUserName: null,
+              uid: "2f16f45e-9e89-4fa5-ac1d-a373c256a5b5",
+              studentId: "C-4783",
+              exAdmissionNo: null,
+              studentName: "Lakshya Sherwal",
+              fatherName: "Shashi Bhushan",
+              motherName: "Urmila",
+              dob: "28-03-2009",
+              gender: "NA",
+              studentAdhaarcard: "",
+              joiningClass: "IX",
+              joiningSections: "A",
+              joiningDate: "18-09-2024",
+              plotNumber: "",
+              area: "Sanwal Nagar",
+              city: "New Delhi",
+              state: "Delhi",
+              pincode: "110049",
+              phone1: null,
+              rollNo: 19,
+              emergencyNumber: "",
+              mobileNumber: "8802942085",
+              studentEmail: null,
+              religion: "",
+              category: "",
+              minority: "",
+              motherTongue: "",
+              idMark: "",
+              height: "",
+              weight: "",
+              physicalDisability: "",
+              bloodGroup: "",
+              healthRemark: "",
+              siblingDetails: "",
+              alumni: "",
+              siblingResponse: [],
+              fatherOccupation: "",
+              fatherQualification: "",
+              fatherOrganization: "",
+              fatherDesignation: "",
+              fatherIncome: "",
+              fatherArea: "NA",
+              fatherCity: "NA",
+              fatherState: "NA",
+              fatherPincode: "",
+              fatherPhone: null,
+              fatherMobile: "",
+              fatherEmail: null,
+              fatherAdhaarNumber: "",
+              schoolUid: "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+              motherQualification: "",
+              motherOccupation: "",
+              motherOrganization: "",
+              motherDesignation: "",
+              motherIncome: "",
+              motherArea: "NA",
+              motherCity: "NA",
+              motherState: "NA",
+              motherPincode: "",
+              motherPhone: null,
+              motherMobile: "",
+              motherEmail: null,
+              motherAdhaarNumber: "",
+              guardianName: null,
+              relation: null,
+              guardianOccupation: null,
+              guardianPhone: null,
+              guardianMobile: null,
+              guardianEmail: null,
+              guardianAddress: null,
+              leavingDate: null,
+              previousSchoolName: null,
+              otp: null,
+              schoolName: "Demo Public School",
+              remark: null,
+              classTeacher: "",
+              classTeacherUserName: "",
+              classes: "IX",
+              classUid: null,
+              sections: "A",
+              group: null,
+              wing: "NA",
+              status: "Studying",
+              academicSession: "2024-2025",
+              joiningStatus: "New",
+              houses: null,
+              certificates: "",
+              certificatesList: [],
+              caste: "",
+              listOfDocuments: null,
+              attached: false,
+              required: false,
+              submitted: false,
+              studentHostel: [],
+              studentConcession: [],
+              studentTransport: [],
+              studentAadharCard: null,
+              fatherAadharCard: null,
+              motherAadharCard: null,
+              studentImage: null,
+              fatherImage: null,
+              motherImage: null,
+              guardianImage: null,
+              birthCertificate: null,
+              classSectionUid: "36b9240f-4647-4aa0-9d48-3ec095a91622",
+              aluminiProof: null,
+              siblingProof: null,
+              residenceProof: null,
+              firstBornChildProof: null,
+              medicalFitnessCertificate: null,
+              fatherQualificationProof: null,
+              motherQualificationProof: null,
+              casteCertificate: null,
+              createdUser: "SimranjeetKaur_522590",
+              editedUser: "SimranjeetKaur_522590",
+              createddate: "2024-09-18 10:54:57.398263",
+              editeddate: "2024-09-18 10:54:57.398263",
+              permanentEducationNumber: null,
+              studentAddressResponse: {
+                uid: "c3828e81-d4f4-4c01-8167-0750606d0e5c",
+                houseNo: null,
+                area: "Sanwal Nagar",
+                landmark: null,
+                city: "New Delhi",
+                district: null,
+                state: "Delhi",
+                poPs: null,
+                pincode: 110049,
+                street: "C-22",
+                userName: "DIS896_C-4783",
+                createdDate: "18-09-2024 04:24 PM",
+                editedDate: "18-09-2024 04:24 PM",
+                createdBy: "SimranjeetKaur_522590",
+                editedBy: "SimranjeetKaur_522590",
+              },
+              fatherAddressResponse: {
+                uid: "f45aed95-fe2b-49da-b33d-c65f3ae99425",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "18-09-2024 04:24 PM",
+                editedDate: "18-09-2024 04:24 PM",
+                createdBy: "SimranjeetKaur_522590",
+                editedBy: "SimranjeetKaur_522590",
+              },
+              motherAddressResponse: {
+                uid: "015fe03a-4575-4d0e-86b2-f960b62e6020",
+                houseNo: null,
+                area: "NA",
+                landmark: null,
+                city: "NA",
+                district: null,
+                state: "NA",
+                poPs: null,
+                pincode: 0,
+                street: null,
+                userName: null,
+                createdDate: "18-09-2024 04:24 PM",
+                editedDate: "18-09-2024 04:24 PM",
+                createdBy: "SimranjeetKaur_522590",
+                editedBy: "SimranjeetKaur_522590",
+              },
+              guardianAddressResponse: null,
+              correspondenceAddressResponse: null,
+            },
+          ],
+          classTeacher: "",
+          classTeacherUserName: "",
+          permanentEducationNumber: null,
+          school: {
+            uid: "20d01e7a-51bd-4e6f-87a4-68d25781078a",
+            apikey: "6f7cfaec-d7d4-4df4-9082-79d9f0ccb70b",
+            schoolName: "The Indian School",
+            schoolAbb: "DIS",
+            educationBoard: null,
+            registrationNo: null,
+            plotNumber: "NA",
+            area: "Josip Broz Tito Marg",
+            city: "New Delhi",
+            pincode: "110049",
+            state: "Delhi",
+            phoneNo1: "1126265956",
+            phoneNo2: "1126265957",
+            contactName: "Simranjeet",
+            contactMobile: "9711140936",
+            contactEmail: "simranjeet@theindianschool.in",
+            schoolCode: null,
+            pfCode: null,
+            societyManagement: null,
+            language: null,
+            schoolLogo: null,
+            schoolFavicon: null,
+            enabled: true,
+            subDomain: null,
+            website: "www.theindianschool.in",
+            schemaPrefix: null,
+            editedDate: "05-12-2024 03:17 PM",
+            editedUser: "quickadmin",
+            visitorSchool: false,
+            clientSchoolId: null,
+            cscId: null,
+            onlinePaymentEnabled: false,
+            registrationSeries: null,
+            underTakingDetails: null,
+            formNumberStart: null,
+            sessionResponse: null,
+            schoolLogoUrl: null,
+            printAcknowledge: false,
+            wabaId: "",
+            phoneNumberId: "",
+            whatsappApiKey: "",
+            isQuickCampusWhatsapp: false,
+            whatsAppEnabled: false,
+            smsenabled: false,
+            notificationEnabled: true,
+            loanEnabled: false,
+          },
+        },
+        markData: {
+          admissionNo: "8125",
+          permanentEducationNumber: null,
+          studentName: "Aadhya Priya",
+          className: "I",
+          sectionName: "A",
+          classSectionUid: "8b714c83-2572-46a3-82d2-60855aa8f980",
+          academicSession: "2024-2025",
+          fatherName: "KESARI KISHOR",
+          uid: "299e697a-e1f3-4827-8dde-76a8f72e64a3",
+          attendanceResponse: null,
+          pass: false,
+          rollNo: 1,
+          termWiseSubjectResponse: [
+            {
+              totalMarks: 60,
+              totalObtained: 52,
+              overAllGrade: "A2",
+              totalPercentage: 86.66666666666667,
+              termName: "PERIODIC TEST 1",
+              termUid: "a3c7c226-5fe7-40c3-93f5-2136565bc58e",
+              pass: true,
+              subjectMarksEntryRequests: [
+                {
+                  marks: 16,
+                  description: "",
+                  status: "",
+                  subject: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+                  subjectName: "ENGLISH",
+                  scholastic: true,
+                  max: 20,
+                  priority: 1,
+                  min: 0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: [],
+                  grade: "B1",
+                  percentage: 80,
+                  term: "PERIODIC TEST 1",
+                  termUid: "a3c7c226-5fe7-40c3-93f5-2136565bc58e",
+                  pass: true,
+                  gradePattern: "USA 8 POINT",
+                  graded: false,
                 },
-                "markData": {
-                    "admissionNo": "C-4783",
-                    "permanentEducationNumber": null,
-                    "studentName": "Lakshya Sherwal",
-                    "className": "IX",
-                    "sectionName": "A",
-                    "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
-                    "academicSession": "2024-2025",
-                    "fatherName": "Shashi Bhushan",
-                    "uid": "2f16f45e-9e89-4fa5-ac1d-a373c256a5b5",
-                    "attendanceResponse": null,
-                    "pass": false,
-                    "rollNo": 19,
-                    "termWiseSubjectResponse": [
-                        {
-                            "totalMarks": 1300,
-                            "totalObtained": 1242.86,
-                            "overAllGrade": "A1",
-                            "totalPercentage": 95.60461538461537,
-                            "termName": "PERIODIC TEST 2",
-                            "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                            "pass": false,
-                            "subjectMarksEntryRequests": [
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "7353c069-b0ba-4a88-b1c7-7a0e13a3e361",
-                                    "subjectName": "WORK EXPERIENCE",
-                                    "scholastic": true,
-                                    "max": 0,
-                                    "priority": 0,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": null,
-                                    "percentage": 0,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": null,
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "cfe4c7c5-8a14-4ae3-9a67-10f41268bd84",
-                                    "subjectName": "CITIZENSHIP",
-                                    "scholastic": true,
-                                    "max": 0,
-                                    "priority": 0,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": null,
-                                    "percentage": 0,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": null,
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "11d3df9e-535a-41e5-a43c-c95ff4b34f46",
-                                    "subjectName": "Self Discipline",
-                                    "scholastic": true,
-                                    "max": 0,
-                                    "priority": 0,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": null,
-                                    "percentage": 0,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": null,
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "57a303c0-06ed-474c-b75f-a44619cdc81d",
-                                    "subjectName": "ART EDUCATION",
-                                    "scholastic": true,
-                                    "max": 0,
-                                    "priority": 0,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": null,
-                                    "percentage": 0,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": null,
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 33,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
-                                    "subjectName": "ENGLISH",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 1,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "C1",
-                                    "percentage": 55.00000000000001,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 28,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "b6c5404e-c32b-4115-b523-73a055a95318",
-                                    "subjectName": "HINDI",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 2,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "C2",
-                                    "percentage": 46.666666666666664,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 31.5,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
-                                    "subjectName": "MATHS",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 6,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "C1",
-                                    "percentage": 52.5,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 21,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
-                                    "subjectName": "SCIENCE",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 8,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "D",
-                                    "percentage": 35,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 29.5,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
-                                    "subjectName": "SOCIAL SCIENCE",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 9,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "C2",
-                                    "percentage": 49.166666666666664,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 11,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "680f221d-c435-4736-a764-3e26aeda7dbf",
-                                    "subjectName": "ARTIFICIAL INTELLIGENCE",
-                                    "scholastic": true,
-                                    "max": 60,
-                                    "priority": 10,
-                                    "min": 20,
-                                    "attachmentName": null,
-                                    "subjectNature": "THEORY",
-                                    "parent": [],
-                                    "grade": "E",
-                                    "percentage": 18.333333333333332,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": false,
-                                    "gradePattern": "USA 8 POINT",
-                                    "graded": false
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-                                    "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 12,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "2ff038e1-c337-476b-a203-0ceb1b34f896",
-                                    "subjectName": "DISCIPLINE",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 13,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "e07f3c70-d36d-4d92-8cb5-cf3f2fa345ec",
-                                    "subjectName": "SEWA  AND WORK EDUCATION",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 14,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 59.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "e3a41ab3-867d-43bc-8f55-4bcf89d0c299",
-                                    "subjectName": "THINKING SKILLS",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 16,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "C",
-                                    "percentage": 59.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "63f8341b-b675-4a5f-9c12-dc182fcdba61",
-                                    "subjectName": "ATTITUDE TOWARDS CLASSMATES",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 17,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "058a4315-9742-4fdc-b4ba-d7f092d775ab",
-                                    "subjectName": "ATTITUDE TOWARDS SCHOOL PROGRAMMES",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 18,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "7b2c8749-b838-45f4-89a7-46e3209d74b1",
-                                    "subjectName": "ATTITUDE TOWARDS TEACHERS",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 19,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "fc15229f-af46-4613-91fd-770a1b3f88cd",
-                                    "subjectName": "ATTITUDE TOWARDS THE ENVIRONMENT",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 20,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "aa6ec9ed-084d-4845-a62b-aeb1b328911c",
-                                    "subjectName": "ART EDUCATION- PERFORMING ARTS",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 21,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                },
-                                {
-                                    "marks": 79.99,
-                                    "description": "",
-                                    "status": "",
-                                    "subject": "1e94b624-3cea-4458-a0c3-0c21b0f59af9",
-                                    "subjectName": "ART EDUCATION- VISUAL ARTS",
-                                    "scholastic": true,
-                                    "max": 100,
-                                    "priority": 22,
-                                    "min": 0,
-                                    "attachmentName": null,
-                                    "subjectNature": "1B Scholastic",
-                                    "parent": [],
-                                    "grade": "B",
-                                    "percentage": 79.99,
-                                    "term": "PERIODIC TEST 2",
-                                    "termUid": "702a4ce5-0515-455b-af07-bf2ad2d9c594",
-                                    "pass": true,
-                                    "gradePattern": "USA 5 POINT",
-                                    "graded": true
-                                }
-                            ]
-                        }
-                    ]
+                {
+                  marks: 18.5,
+                  description: "",
+                  status: "",
+                  subject: "b6c5404e-c32b-4115-b523-73a055a95318",
+                  subjectName: "HINDI",
+                  scholastic: true,
+                  max: 20,
+                  priority: 2,
+                  min: 0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: [],
+                  grade: "A1",
+                  percentage: 92.5,
+                  term: "PERIODIC TEST 1",
+                  termUid: "a3c7c226-5fe7-40c3-93f5-2136565bc58e",
+                  pass: true,
+                  gradePattern: "USA 8 POINT",
+                  graded: false,
                 },
-                "remarks": {
-                    "classSection": "IX-A",
-                    "totalNumber": 1,
-                    "termName": "PERIODIC TEST 2",
-                    "details": [
-                        {
-                            "uid": "89cfd494-7d87-4a37-a3cb-fba6bfb3136b",
-                            "terms": [
-                                "PERIODIC TEST 2"
-                            ],
-                            "studentId": "C-4783",
-                            "studentName": "Lakshya Sherwal",
-                            "rollNumber": 19,
-                            "classSectionUid": "36b9240f-4647-4aa0-9d48-3ec095a91622",
-                            "classSection": "IX-A",
-                            "description": "Lakshya struggles to focus in class, which harms his ability to engage well with class activities and assignments. He is encouraged to demonstrate a more responsible attitude in the classroom.",
-                            "fields": [
-                                {
-                                    "uid": "203ac76a-e77f-4ac8-ab1c-6a0924502904",
-                                    "title": "Accountancy",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "b20e3dc7-b539-4085-805b-b20fbf93f429",
-                                    "title": "Applied Maths",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "a97deab6-513c-4fd8-aa08-629706aed8aa",
-                                    "title": "Attendance",
-                                    "type": "OPEN",
-                                    "value": "98/117",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "837e6762-34eb-46dd-9f85-46e92674a707",
-                                    "title": "Biology",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "74be6e7d-4872-4349-b1bc-681ed5498feb",
-                                    "title": "Business Studies",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "78a0ce0d-569e-4119-b8e1-6ce7a12a255e",
-                                    "title": "Chemistry",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "4c6ab83a-cee9-4130-abb0-ebf430dcf9a8",
-                                    "title": "Computer Science",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "16ea3e4c-c9ea-4936-b269-838dcd8875cb",
-                                    "title": "Economics",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "04a493e4-4e2e-4fe2-8391-8b827d9bbb7b",
-                                    "title": "English",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "61a35fd4-19fd-4fe8-845d-411e9604547b",
-                                    "title": "Fashion Studies",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "9b0b60b1-5550-4822-b3d4-89967a471fcc",
-                                    "title": "History",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "5bf03bc8-5002-48e7-b84d-15f778886fa4",
-                                    "title": "Informatics Practices",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "717e1ba1-c28c-4427-b2e0-292d6a96e8db",
-                                    "title": "Maths",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "35133555-d727-48d8-9f1e-69bfe980caf0",
-                                    "title": "Painting",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "fb66041b-a89c-4f36-a9ee-47b5d025e465",
-                                    "title": "Physical Education",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "ee0e37df-2930-41f5-9df0-c8894bca3aad",
-                                    "title": "Physics",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "ab3b4544-0c08-4985-b87c-117209918c70",
-                                    "title": "Political Science",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "c7514c27-85a3-437b-bed6-338f68e81ed2",
-                                    "title": "Psychology",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                },
-                                {
-                                    "uid": "041dba83-3062-4aeb-887e-6c174ab67892",
-                                    "title": "Sociology",
-                                    "type": "OPEN",
-                                    "value": "",
-                                    "masterUid": "88a76b15-b62b-41d0-9f06-28c7d1133349",
-                                    "masterName": "Remarks"
-                                }
-                            ],
-                            "status": true,
-                            "createdUser": "GandharviMukherjee_526114",
-                            "editedUser": "GandharviMukherjee_526114",
-                            "createdDate": "19-10-2024 09:28 PM",
-                            "editedDate": "23-10-2024 11:46 AM"
-                        }
-                    ],
-                    "enteredStudents": 1
+                {
+                  marks: 17.5,
+                  description: "",
+                  status: "",
+                  subject: "eac5c643-3186-4371-be82-77420d86279e",
+                  subjectName: "MATHEMATICS",
+                  scholastic: true,
+                  max: 20,
+                  priority: 3,
+                  min: 0,
+                  attachmentName: null,
+                  subjectNature: "THEORY",
+                  parent: [],
+                  grade: "A2",
+                  percentage: 87.5,
+                  term: "PERIODIC TEST 1",
+                  termUid: "a3c7c226-5fe7-40c3-93f5-2136565bc58e",
+                  pass: true,
+                  gradePattern: "USA 8 POINT",
+                  graded: false,
                 },
-                "header": null,
-                "footer": null,
-                "printDate": "06-12-2024",
-                "studentPerfromanceData": {
-                    "message": "Number of records fetched is 18",
-                    "data": [
-                        {
-                            "subjectName": "ENGLISH",
-                            "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
-                            "maxMark": 60,
-                            "maxObtainedMark": 59,
-                            "averageObtainedMark": 40.983428571428576,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "9eca2198-b477-4663-8b27-68b04539c36c",
-                            "maxObtainedStudentName": "Mahak Mahto"
-                        },
-                        {
-                            "subjectName": "HINDI",
-                            "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
-                            "maxMark": 60,
-                            "maxObtainedMark": 56.5,
-                            "averageObtainedMark": 35.77430555555556,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "9bdcaf3e-3b43-4ab9-943b-c91c8c1bd283",
-                            "maxObtainedStudentName": "Pratham Chitkara"
-                        },
-                        {
-                            "subjectName": "SOCIAL SCIENCE",
-                            "subjectUid": "9ee362fc-1b54-47f5-8e3c-7cebf0c83945",
-                            "maxMark": 60,
-                            "maxObtainedMark": 59,
-                            "averageObtainedMark": 35.53028571428572,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "c450e92a-a9b2-429f-95b6-89b8f9293517",
-                            "maxObtainedStudentName": "Rayaan Paul Sah"
-                        },
-                        {
-                            "subjectName": "SCIENCE",
-                            "subjectUid": "797948d9-f85b-475c-b274-c1ab4f2a32b7",
-                            "maxMark": 60,
-                            "maxObtainedMark": 54,
-                            "averageObtainedMark": 31.077142857142857,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "9eca2198-b477-4663-8b27-68b04539c36c",
-                            "maxObtainedStudentName": "Mahak Mahto"
-                        },
-                        {
-                            "subjectName": "MATHS",
-                            "subjectUid": "5b1d61e9-8d34-457b-a73d-a4c3512988dc",
-                            "maxMark": 60,
-                            "maxObtainedMark": 59,
-                            "averageObtainedMark": 34.66,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "b41c5077-d90a-4989-b200-c3e06eaea850",
-                            "maxObtainedStudentName": "Vedanshi Tak"
-                        },
-                        {
-                            "subjectName": "ARTIFICIAL INTELLIGENCE",
-                            "subjectUid": "680f221d-c435-4736-a764-3e26aeda7dbf",
-                            "maxMark": 60,
-                            "maxObtainedMark": 58,
-                            "averageObtainedMark": 37.357142857142854,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "d41152b6-3261-43dc-b74f-80b0246afc18",
-                            "maxObtainedStudentName": "Navya Puri"
-                        },
-                        {
-                            "subjectName": "SEWA  AND WORK EDUCATION",
-                            "subjectUid": "e07f3c70-d36d-4d92-8cb5-cf3f2fa345ec",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 84.90685714285698,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "6af4083a-b54b-4eb0-99d9-77e75c4064cc",
-                            "maxObtainedStudentName": "Anusha Lathwal"
-                        },
-                        {
-                            "subjectName": "HEALTH AND PHYSICAL EDUCATION",
-                            "subjectUid": "731107ab-00ea-4df6-b8b3-8ce8b7917161",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 83.64897142857124,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "de0fced3-4dca-4d01-b7a8-b7b9099c7038",
-                            "maxObtainedStudentName": "Kartik Majhi"
-                        },
-                        {
-                            "subjectName": "DISCIPLINE",
-                            "subjectUid": "2ff038e1-c337-476b-a203-0ceb1b34f896",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 93.93999999999994,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "2bc3234f-42a8-4275-8f24-162dcc8ddbe8",
-                            "maxObtainedStudentName": "Shriyans Kalita"
-                        },
-                        {
-                            "subjectName": "THINKING SKILLS",
-                            "subjectUid": "e3a41ab3-867d-43bc-8f55-4bcf89d0c299",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 88.90965714285704,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "cf3f500b-428b-4fb4-8988-dbf94115a567",
-                            "maxObtainedStudentName": "Pragun Bhola"
-                        },
-                        {
-                            "subjectName": "ATTITUDE TOWARDS TEACHERS",
-                            "subjectUid": "7b2c8749-b838-45f4-89a7-46e3209d74b1",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 94.96897142857141,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "e9942360-38a7-41fe-bf98-8d8921f54262",
-                            "maxObtainedStudentName": "Prisha Malhotra"
-                        },
-                        {
-                            "subjectName": "ATTITUDE TOWARDS CLASSMATES",
-                            "subjectUid": "63f8341b-b675-4a5f-9c12-dc182fcdba61",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 93.82571428571423,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "d41152b6-3261-43dc-b74f-80b0246afc18",
-                            "maxObtainedStudentName": "Navya Puri"
-                        },
-                        {
-                            "subjectName": "ATTITUDE TOWARDS SCHOOL PROGRAMMES",
-                            "subjectUid": "058a4315-9742-4fdc-b4ba-d7f092d775ab",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 92.68234285714279,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "da903f0c-4810-4124-8b98-41a81661b950",
-                            "maxObtainedStudentName": "Md. Ameer Kareem"
-                        },
-                        {
-                            "subjectName": "ATTITUDE TOWARDS THE ENVIRONMENT",
-                            "subjectUid": "fc15229f-af46-4613-91fd-770a1b3f88cd",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 91.42428571428562,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "a8b4c6e6-cba2-4631-bc80-a966cac01532",
-                            "maxObtainedStudentName": "Aelin Thakur"
-                        },
-                        {
-                            "subjectName": "ART EDUCATION- PERFORMING ARTS",
-                            "subjectUid": "aa6ec9ed-084d-4845-a62b-aeb1b328911c",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 86.05057142857129,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "733f9fe4-c50f-492c-b680-1811ce4cad7c",
-                            "maxObtainedStudentName": "Gautam"
-                        },
-                        {
-                            "subjectName": "ART EDUCATION- VISUAL ARTS",
-                            "subjectUid": "1e94b624-3cea-4458-a0c3-0c21b0f59af9",
-                            "maxMark": 0,
-                            "maxObtainedMark": 100,
-                            "averageObtainedMark": 83.42079999999983,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "b8979379-7b71-4417-aa51-86e2182982ad",
-                            "maxObtainedStudentName": "Grisha Bhatia"
-                        },
-                        {
-                            "subjectName": "FRENCH",
-                            "subjectUid": "4b67fac7-5fef-4075-8f81-05c0b50fd585",
-                            "maxMark": 60,
-                            "maxObtainedMark": 59,
-                            "averageObtainedMark": 39.96296296296296,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "c450e92a-a9b2-429f-95b6-89b8f9293517",
-                            "maxObtainedStudentName": "Rayaan Paul Sah"
-                        },
-                        {
-                            "subjectName": "SANSKRIT",
-                            "subjectUid": "f81600d4-a295-478d-b814-73d53e9430ee",
-                            "maxMark": 60,
-                            "maxObtainedMark": 53,
-                            "averageObtainedMark": 43.5,
-                            "attachmentName": null,
-                            "maxObtainedStudentUid": "9eca2198-b477-4663-8b27-68b04539c36c",
-                            "maxObtainedStudentName": "Mahak Mahto"
-                        }
-                    ],
-                    "totalRecords": 18,
-                    "smsCredit": null,
-                    "status_code": 200
-                }
-            }
-        ]
-
-
-    );
-
-</script>
-
+              ],
+            },
+          ],
+        },
+        remarks: {
+          classSection: "IX-A",
+          totalNumber: 1,
+          termName: "PERIODIC TEST 2",
+          details: [
+            {
+              uid: "89cfd494-7d87-4a37-a3cb-fba6bfb3136b",
+              terms: ["PERIODIC TEST 2"],
+              studentId: "C-4783",
+              studentName: "Lakshya Sherwal",
+              rollNumber: 19,
+              classSectionUid: "36b9240f-4647-4aa0-9d48-3ec095a91622",
+              classSection: "IX-A",
+              description:
+                "Lakshya struggles to focus in class, which harms his ability to engage well with class activities and assignments. He is encouraged to demonstrate a more responsible attitude in the classroom.",
+              fields: [
+                {
+                  uid: "203ac76a-e77f-4ac8-ab1c-6a0924502904",
+                  title: "Accountancy",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "b20e3dc7-b539-4085-805b-b20fbf93f429",
+                  title: "Applied Maths",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "a97deab6-513c-4fd8-aa08-629706aed8aa",
+                  title: "Attendance",
+                  type: "OPEN",
+                  value: "98/117",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "837e6762-34eb-46dd-9f85-46e92674a707",
+                  title: "Biology",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "74be6e7d-4872-4349-b1bc-681ed5498feb",
+                  title: "Business Studies",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "78a0ce0d-569e-4119-b8e1-6ce7a12a255e",
+                  title: "Chemistry",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "4c6ab83a-cee9-4130-abb0-ebf430dcf9a8",
+                  title: "Computer Science",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "16ea3e4c-c9ea-4936-b269-838dcd8875cb",
+                  title: "Economics",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "04a493e4-4e2e-4fe2-8391-8b827d9bbb7b",
+                  title: "English",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "61a35fd4-19fd-4fe8-845d-411e9604547b",
+                  title: "Fashion Studies",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "9b0b60b1-5550-4822-b3d4-89967a471fcc",
+                  title: "History",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "5bf03bc8-5002-48e7-b84d-15f778886fa4",
+                  title: "Informatics Practices",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "717e1ba1-c28c-4427-b2e0-292d6a96e8db",
+                  title: "Maths",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "35133555-d727-48d8-9f1e-69bfe980caf0",
+                  title: "Painting",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "fb66041b-a89c-4f36-a9ee-47b5d025e465",
+                  title: "Physical Education",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "ee0e37df-2930-41f5-9df0-c8894bca3aad",
+                  title: "Physics",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "ab3b4544-0c08-4985-b87c-117209918c70",
+                  title: "Political Science",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "c7514c27-85a3-437b-bed6-338f68e81ed2",
+                  title: "Psychology",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+                {
+                  uid: "041dba83-3062-4aeb-887e-6c174ab67892",
+                  title: "Sociology",
+                  type: "OPEN",
+                  value: "",
+                  masterUid: "88a76b15-b62b-41d0-9f06-28c7d1133349",
+                  masterName: "Remarks",
+                },
+              ],
+              status: true,
+              createdUser: "GandharviMukherjee_526114",
+              editedUser: "GandharviMukherjee_526114",
+              createdDate: "19-10-2024 09:28 PM",
+              editedDate: "23-10-2024 11:46 AM",
+            },
+          ],
+          enteredStudents: 1,
+        },
+        header: null,
+        footer: null,
+        printDate: "06-12-2024",
+        studentPerfromanceData: {
+          message: "Number of records fetched is 18",
+          data: [
+            {
+              subjectName: "ENGLISH",
+              subjectUid: "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
+              maxMark: 20,
+              maxObtainedMark: 20,
+              averageObtainedMark: 12.022388059701493,
+              attachmentName: null,
+              maxObtainedStudentUid: "c0a27da7-d4fc-40ef-9f3f-35eda280b728",
+              maxObtainedStudentName: "Sanmeet Singh",
+            },
+            {
+              subjectName: "HINDI",
+              subjectUid: "b6c5404e-c32b-4115-b523-73a055a95318",
+              maxMark: 20,
+              maxObtainedMark: 20,
+              averageObtainedMark: 14.914925373134329,
+              attachmentName: null,
+              maxObtainedStudentUid: "900d86b9-61c3-4b70-ae40-25f311b09a42",
+              maxObtainedStudentName: "Twisha Raj",
+            },
+            {
+              subjectName: "MATHEMATICS",
+              subjectUid: "eac5c643-3186-4371-be82-77420d86279e",
+              maxMark: 20,
+              maxObtainedMark: 20,
+              averageObtainedMark: 13.512437810945274,
+              attachmentName: null,
+              maxObtainedStudentUid: "75eaf7d6-9da3-444d-bb6a-57036c09a280",
+              maxObtainedStudentName: "Sanvika Pandey",
+            },
+          ],
+          totalRecords: 18,
+          smsCredit: null,
+          status_code: 200,
+        },
+      },
+    ]);
+  </script>
 </html>

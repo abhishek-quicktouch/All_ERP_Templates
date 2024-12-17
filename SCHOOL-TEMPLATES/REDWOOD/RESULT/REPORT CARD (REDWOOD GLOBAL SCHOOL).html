@@ -297,7 +297,7 @@ size: A4
           ${value?.markSheetReport
             ?.map(
               (val) => `
-            <td align="center" style="width:5%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${val?.obtained}</td>
+            <td align="center" style="width:5%; font-weight:${val?.status ?"bold" :""}; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${attendanceValue[val?.status] || val?.obtained}</td>
             `
             )
             .join("")}
