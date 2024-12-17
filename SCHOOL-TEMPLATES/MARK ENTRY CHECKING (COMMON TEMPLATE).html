@@ -162,13 +162,14 @@
                             ${pageHeaders[i]
                               ?.map((el) => {
                                 if (colspan4.includes(el)) {
-                                  return `<th colspan="4" style="border: 1px solid;font-size:12px;min-width:60px; text-align: left"></th>`;
+                                  return `
+                                  <th colspan=${handleGetColspan()} style="border: 1px solid;font-size:12px;min-width:60px; text-align: left;"></th>`
                                 }
                                 return `
-                               <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                               <th style="border: 1px solid; width: 100px;font-size:12px; text-align: left"> 
                                 Total.
                             </th>
-                              <th style="border: 1px solid;width: 100px;font-size:12px; text-align: left"> 
+                              <th style="border: 1px solid; width: 100px;font-size:12px; text-align: left"> 
                                 Obt.
                             </th>
                               ${
@@ -207,7 +208,7 @@
                                ${pageHeaders[i]
                                  ?.map((h) => {
                                    if (colspan4.includes(h)) {
-                                     return `<th colspan="4" style="border: 1px solid;font-size:12px;min-width:60px; text-align: left">
+                                     return `<th colspan=${handleGetColspan()} style="border: 1px solid;font-size:12px;min-width:60px; text-align: left">
                                     ${
                                       h == "Grand Percentage"
                                         ? `${el[h]}%`
@@ -9992,10 +9993,10 @@
           studentBased: "",
           nature: "",
           baseTerm: "SA 2",
-          other: ["subTotal", "subPercentage", "grade"],
+          other: ["subPercentage","grade"],
           gradePoint: "",
           filter: true,
-          columns: 7,
+          columns: 6,
           rows: 6,
         },
       });

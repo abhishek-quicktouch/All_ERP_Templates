@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="payroll" style="margin: 20px">IPR Report</div>
+  </body>
+  <script>
+    window.SetTemplateData = function (data) {
+      const apiData = data?.viewTemplate
+        ? {
+            allowances: [
+              {
+                uid: "0e5cb59c-d40b-4d15-9c07-448b1bb60cd6",
+                name: "GP",
+                amount: "1900.00",
+              },
+              {
+                uid: "4cd43b3e-bebf-4788-bb05-cc26dafe3d29",
+                name: "HRA",
+                amount: "9950.00",
+              },
+              {
+                uid: "741e893e-4e35-46e0-8677-7c12238f1341",
+                name: "TA",
+                amount: "3500.00",
+              },
+              {
+                uid: "ae2d5df6-acb8-4b19-b99a-c2dbe075fccc",
+                name: "DA",
+                amount: "9950.00",
+              },
+              {
+                uid: "f594a9b4-1a3f-47f4-8edc-bcdbea11b08d",
+                name: "MA",
+                amount: "1493.00",
+              },
+            ],
+            deductions: [
+              {
+                uid: "b2bef175-0f0a-4f84-8293-512425fefbd1",
+                name: "EPP",
+                amount: "2487.00",
+              },
+              {
+                uid: "d2815035-60d3-44fa-bec9-6cb9636ec9f2",
+                name: "EPC",
+                amount: "3582.00",
+              },
+              {
+                uid: "ed3935ac-b9e0-42be-b74b-c2e5e5474fe8",
+                name: "EPF",
+                amount: "731.00",
+              },
+            ],
+            remittances: [
+              {
+                uid: "92704a6d-89f4-4204-904c-ec04afbc7e5d",
+                name: "Test Recalculate",
+                amount: "1990.00",
+              },
+              {
+                uid: "d784a85b-39e2-45a4-adae-f5a5eb6b9eeb",
+                name: "EDLI",
+                amount: "75.00",
+              },
+            ],
+          }
+        : data?.data || {};
+      const mainDiv = document.getElementById("payroll");
+
+      mainDiv.innerHTML = `<style>
+                    @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+                    .container {
+                      font-family: "Roboto", sans-serif;
+                    }
+
+                    .container__body__section__top {
+                      display: flex;
+                    }
+                    .container__head {
+                      display: flex;
+                      justify-content: center;
+                      font-size: 20px;
+                      font-weight: bold;
+                     text-decoration:underline;
+                    }
+                     .container__head__right{
+                     display:flex;
+                     justify-content:flex-end;
+                     }
+                    .container__body__section__top {
+                      display: flex;
+                      flex-wrap: wrap;
+                    }
+                    .container__body__section__top div {
+                      width: 25%;
+                    }
+                    .container__body__section__top div div {
+                      width: 100%;
+                    }
+                    .container__body__section__mid {
+                      display: flex;
+                      justify-content: space-between;
+                      margin: 1rem 0;
+                    }
+                    .container__body__section__mid div {
+                      width: 25%;
+                    }
+                    .container__body__section__mid div div {
+                      width: 100%;
+                    }
+                    .container__body__section__bottom {
+                      display: flex;
+                      justify-content: space-between;
+                    }
+                    .container__body__section__bottom__left {
+                      /* display: flex; */
+                      width: 50%;
+                    }
+                    .container__body__section__bottom__left div {
+                      display: flex;
+                      justify-content: space-between;
+                    }
+                    .container__body__section__bottom__right {
+                      width: 50%;
+                      padding-left: 2rem;
+                    }
+                    .container__body__section__bottom__right div {
+                      display: flex;
+                      justify-content: space-between;
+                    }
+                    .bold {
+                      font-weight: bold;
+                    }
+                    .line {
+                      border: 1px solid;
+                      background-color: #000;
+                    }
+                    .grayLine {
+                      height: 1px;
+                      background-color: lightgray;
+                    }
+                  </style>`;
+
+      const div = document.createElement("div");
+      const totalEarnings = () => {
+        let html = `<div>
+                            <div>Basic</div>
+                              <div>${`₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(apiData?.basic || 0).toLocaleString(
+                                      "en-IN"
+                                    )
+                              }`}</div>
+                            </div>`;
+        apiData?.monthlyResponse?.forEach((d) => {
+          html += `<div>
+                              <div>${d?.componentName}</div>
+                              <div>₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(d?.value || 0).toLocaleString(
+                                      "en-IN"
+                                    )
+                              }</div>
+                            </div>`;
+        });
+        html += ` <div style="font-weight:600">
+                              <div >Total Earnings</div>
+                              <div>₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(apiData?.gross || 0).toLocaleString(
+                                      "en-IN"
+                                    )
+                              }</div>
+                            </div>
+                            <div style="font-weight:600">
+                              <div>Net Salary Payable</div>
+                              <div>₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(
+                                      apiData?.netSalary || 0
+                                    ).toLocaleString("en-IN")
+                              }</div>
+                            </div>`;
+        return html;
+      };
+      const totalDeductions = () => {
+        let html = ``;
+        apiData?.deductions?.forEach((d) => {
+          html += `<div>
+                              <div> ${d?.componentName}</div>
+                              <div>₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(d?.value || 0).toLocaleString(
+                                      "en-IN"
+                                    )
+                              }</div>
+                            </div>`;
+        });
+
+        html += `<div style="font-weight:600">
+                              <div>Total Deductions</div>
+                              <div>₹ ${
+                                data?.viewTemplate
+                                  ? "_______________"
+                                  : Number(
+                                      apiData?.totalDeductions || 0
+                                    ).toLocaleString("en-IN")
+                              }</div>
+                            </div>`;
+
+        return html;
+      };
+      let totalAllowances = data?.data?.monthlyResponse?.map((item) =>
+        item?.allowances?.reduce((sum, allowance) => sum + allowance.value, 0)
+      );
+      div.innerHTML = `
+<div style="font-size:16px;margin-bottom:20px;position:relative;">
+    <p>
+        <img style="height:100px;position:absolute;top:5px;width:100px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-15T06_48_00_367827780.jpeg" alt="School Logo">&nbsp;
+    </p>
+    <div style="align-items:center;display:flex;flex-direction:column;height:100px;justify-content:center;text-align:center;">
+        <span style="font-size:36px;"><strong>Quicktouch Technologies Ltd.</strong></span><br>
+        <span style="font-size:18px;">203, D-Mall, Netaji Subhash Place, Pitampura, Delhi-110034</span><br>
+        &nbsp;
+    </div>
+</div>                      <div class="container">
+                        <div class= "container__head__right">${
+                          data?.viewTemplate
+                            ? `Date : <strong>${new Date().toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )} </strong>`
+                            : `Date :  <strong>${new Date().toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}</strong> `
+                        }</div>
+                      <div class="container__head">
+                           <div>${
+                             data?.viewTemplate ? "IPR REPORT" : "IPR REPORT"
+                           }</div>
+
+                      </div>
+                      <div class="container__body">
+                        <div class="container__body__section__top">
+
+                        </div>
+                        <div style="margin-top: 1rem">
+                          <div style="font-size: 18px;font-weight:500;text-align:left;">${
+                            data?.data?.firstName
+                          } ${data?.data?.middleName ?? ""} ${
+        data?.data?.lastName
+      }</div>
+
+                        </div>
+                        <hr>
+                  <div style="font-size: 14px;">
+          <table style="width: 100%; border-collapse: separate; text-align: left;">
+            <thead>
+              <tr>
+                <th>Employee No.</th>
+                <th>Academic Session</th>
+                <th>Designation</th>
+                <th>Department</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${data?.data?.employeeNo}</td>
+                <td>${data?.data?.sessionName}</td>
+                <td>${data?.data?.designationName}</td>
+                <td>${data?.data?.deaprtmentName}</td>
+              </tr>
+              <tr>
+                <th style="padding-top:10px;">Bank Account</th>
+                <th style="padding-top:10px;">PAN</th>
+                <th style="padding-top:10px;">PF Number</th>
+                <th></th>
+              </tr>
+              <tr>
+                <td>${data?.data?.bankAccountNo}</td>
+                <td>${data?.data.pan}</td>
+                <td>${data?.data?.pfNo}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+
+                <div style="font-size:20px;margin-top:10px;font-family:system-ui;">
+                IPR Details
+              </div>
+            </div>
+                        <hr />
+
+                      <div class="container__body__section__bottom">
+      <table style="width: 100%; border-collapse: collapse; text-align: center;">
+        <tr>
+          <td>Month</td>
+          <td>Date</td>
+          <td>Days</td>
+          <td>Basic</td>
+          <td>Allowances</td>
+          <td>Gross</td>
+          <td>Deductions</td>
+          <th style="font-weight: bold;">Net Salary</th>
+        </tr>
+        ${data?.data?.monthlyResponse
+          ?.map(
+            (val, i) =>
+              `
+            <tr>
+               <td align="center" style="width:10%; border-top: solid 0.1mm #D3D3D3;">${val.monthName}</td>
+               <td align="center" style="width:8%; border-top: solid 0.1mm #D3D3D3;">${val.date}</td>
+               <td align="center" style="width:8%; border-top: solid 0.1mm #D3D3D3;">${val.days}</td>
+               <td align="center" style="width:8%;  border-top: solid 0.1mm #D3D3D3;">₹${val.basic}</td>
+               <td align="center" style="width:8%;  border-top: solid 0.1mm #D3D3D3;">₹${totalAllowances[i]}</td>
+               <td align="center" style="width:8%;  border-top: solid 0.1mm #D3D3D3;">₹${val.gross}</td>
+
+               <td align="center" style="width:8%;  border-top: solid 0.1mm #D3D3D3;">₹${val.totalDeductions}</td>
+
+               <td align="center" style="width:10%;  border-top: solid 0.1mm #D3D3D3;"><strong>₹${val.netSalary}</strong></td></tr>`
+          )
+          .join("")}
+      </table>
+
+    </div>
+
+                        <hr />
+
+                      </div>
+                    </div>
+           <p style="font-size:12px;margin-top:10px;text-align:left;">
+        **All amounts displayed in this salary slip are in <strong>INR</strong>.
+        <br>
+    <strong>Note: This is a computer generated and does not require signatures.</strong>
+</p>
+                    
+                    `;
+
+      mainDiv.appendChild(div);
+    };
+  </script>
+  <script>
+    window.SetTemplateData({
+      viewTemplate: false,
+      data: {
+        sessionName: "2024 - 2025",
+        employeeNo: "0002",
+        employeeUid: "48fccc81-21f5-4911-a7e7-d52791ee3b75",
+        firstName: "Hemantika",
+        middleName: "singh",
+        lastName: "Chaturvedi",
+        departmentUid: "a5329867-02d0-43b1-8b9c-6c583b1bd2d2",
+        deaprtmentName: "IT",
+        designationUid: "e0f8f8d4-de3e-479a-8b20-431d40f4032c",
+        designationName: "Software Developer",
+        joiningDate: "01-04-2024",
+        pfNo: "",
+        bankAccountNo: "1234234234",
+        pan: "ABCDE3052T",
+        payScale: "25000 - 50000",
+        monthlyResponse: [
+          {
+            salaryGenerationUid: "cccf473e-a0bf-4181-ac4a-3eea077d335c",
+            salaryMonthUid: "72e75dc0-8ec6-4015-88b5-4c6b250adca6",
+            monthName: "January-2025",
+            date: "01-01-2025",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+              {
+                uid: "251e2272-fc18-474d-aaf3-c88cf68ee60d",
+                componentName: "Special Allowance",
+                value: 0,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "1f41ae74-83c5-442a-a96f-257c5cc51055",
+            salaryMonthUid: "45b8d1b9-cb3a-4c98-a6d4-f4fa5324d089",
+            monthName: "April-2024",
+            date: "01-04-2024",
+            type: "SALARY",
+            days: 30,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "305cb03a-d27e-4ffa-a098-867312551200",
+            salaryMonthUid: "f34b7a80-9fb1-4c84-ba56-6d84c27e79b9",
+            monthName: "May-2024",
+            date: "01-05-2024",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "8f504e5a-527d-4e8a-836b-2b13a921b6bd",
+            salaryMonthUid: "07b2ac09-dcc0-4035-8b38-d477c3ac4f5e",
+            monthName: "June-2024",
+            date: "01-06-2024",
+            type: "SALARY",
+            days: 30,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "edbd04b4-c2c7-4fbb-bfc4-5192ab8a05fc",
+            salaryMonthUid: "03a2d984-28b6-401a-8af0-154633e04538",
+            monthName: "July-2024",
+            date: "01-07-2024",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "ab247c4d-63b5-4229-979f-be534ed1c542",
+            salaryMonthUid: "3854a741-f32c-454f-9f66-9a44f55fc63a",
+            monthName: "August-2024",
+            date: "01-08-2024",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "26ef711a-93d1-4ee6-b5f3-63b9c3e3c421",
+            salaryMonthUid: "968180ac-08ba-4beb-9cff-510e32f8645c",
+            monthName: "September-2024",
+            date: "01-09-2024",
+            type: "SALARY",
+            days: 30,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "434d556c-a6da-432d-a424-83a7c7601ece",
+            salaryMonthUid: "c437e02c-bcbb-4e31-b284-f38cf5626295",
+            monthName: "October-2024",
+            date: "01-10-2024",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "f48d4826-cedb-48a5-b0e1-bf67d7c2c313",
+            salaryMonthUid: "913015e2-d35d-450e-a315-c4b9114cd07d",
+            monthName: "November-2024",
+            date: "01-11-2024",
+            type: "SALARY",
+            days: 30,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "c61be746-e0c3-41db-b22a-ec28ac496c7b",
+            salaryMonthUid: "2eb3b5d1-0518-4185-9690-1c6e8fc59a93",
+            monthName: "December-2024",
+            date: "01-12-2024",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "76070b95-3ace-4207-ac43-38944e6caf6d",
+            salaryMonthUid: "e7e90abb-c824-419b-a355-3b1248deea1d",
+            monthName: "February-2025",
+            date: "01-02-2025",
+            type: "SALARY",
+            days: 28,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+          {
+            salaryGenerationUid: "3fd8a1ce-53cc-4d91-81cb-567024ae502b",
+            salaryMonthUid: "d3a7813e-33ac-4b1e-9d56-0aebe7c61f35",
+            monthName: "March-2025",
+            date: "01-03-2025",
+            type: "SALARY",
+            days: 31,
+            basic: 30000,
+            allowances: [
+              {
+                uid: "8ed4b702-990e-45e7-9b22-3da63f64463c",
+                componentName: "House Rent Allowance",
+                value: 15000,
+              },
+              {
+                uid: "81a78213-05fd-43d5-84d0-bda86e3c7a5d",
+                componentName: "Dearness Allowance",
+                value: 15000,
+              },
+              {
+                uid: "9794d1d5-0f2c-49ea-a988-72c348d1f13d",
+                componentName: "Medical Allowance",
+                value: 2250,
+              },
+              {
+                uid: "ce047dfb-22a4-41ae-a554-910fa1512fee",
+                componentName: "Travel Allowance",
+                value: 0,
+              },
+            ],
+            gross: 62250,
+            deductions: [
+              {
+                uid: "15146d16-1925-48b4-9681-72a5246ad065",
+                componentName: "Employer PF Contribution",
+                value: 1250,
+              },
+              {
+                uid: "d8f6acfb-fb13-4d95-bf2d-e2212a79e8ee",
+                componentName: "Employee PF Contribution",
+                value: 1800,
+              },
+              {
+                uid: "b287fac0-e32a-4e8e-a420-f3b0aa5cdf31",
+                componentName: "Employee Pension Plan",
+                value: 550,
+              },
+            ],
+            totalDeductions: 3600,
+            netSalary: 58650,
+          },
+        ],
+      },
+
+      header: `<figure class="table" style="width:100%;">\n <table cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="text-align:center;vertical-align:top;width:15%;"><img style="max-height:120px;max-width:120px;width:100%;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/templates/devserver-test-1/images/hand-drawn-cap-elementary-school-logo_23-2149689281.avif" align="center"></td>\n    <td style="vertical-align:top;width:70%;" align="left">\n     <div style="color:#01293c;font-size:11pt;line-height:150%;text-align:center;width:100%;">\n      <span style="color:#01293c;"><span style="font-size:15pt;padding-bottom:15mm;padding-top:5mm;"><strong>BIRLA VIDYA NIKETAN</strong></span></span><br>(Sarala Birla Group of Schools)<br>PUSHP VIHAR-IV, NEW DELHI-110017<br>Phone No. : 011-29561762<br>Website : www.birla.ac.in<br>&nbsp;\n     </div></td>\n    <td style="text-align:center;vertical-align:top;width:15%;">&nbsp;</td>\n   </tr>\n  </tbody>\n </table>\n</figure>`,
+      footer: `<page_footer>\n <table style=\"padding:2mm 0mm 0mm;\" cellspacing=\"0\" cellpadding=\"0\">\n  <tbody>\n   <tr>\n    <td style=\"padding:0mm;width:100%;\" width=\"100%\" align=\"left\" valign=\"top\"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>`,
+    });
+  </script>
+</html>
