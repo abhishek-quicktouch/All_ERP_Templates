@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Layout</title>
+    <style>
+      /* General styles for desktop */
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 16px;
+        margin-bottom: 20px;
+        position: relative;
+        padding: 10px;
+      }
+
+      .container img {
+        height: 100px;
+        width: 100px;
+      }
+
+      .container .text-content {
+        flex: 1; /* Take up remaining space */
+        text-align: center;
+      }
+
+      .container .text-content span:first-child {
+        font-size: 36px;
+      }
+
+      .container .text-content span:last-child {
+        font-size: 18px;
+      }
+
+      /* Media query for smaller screens (mobile) */
+      @media (max-width: 600px) {
+        .container {
+          flex-direction: column; /* Stack the logo and text */
+          align-items: center;
+        }
+
+        .container img {
+          height: 80px;
+          width: 80px;
+          margin-bottom: 10px;
+        }
+
+        .container .text-content {
+          text-align: center;
+        }
+
+        .container .text-content span:first-child {
+          font-size: 24px;
+        }
+
+        .container .text-content span:last-child {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        font-size: 16px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      "
+    >
+      <img
+        style="height: 80px; width: 80px; margin-right: 20px"
+        src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-11-15T06_48_00_367827780.jpeg"
+        alt="School Logo"
+      />
+      <div style="flex-grow: 1; text-align: center">
+        <span style="font-size: 24px; display: block"
+          ><strong>Quicktouch Technologies Ltd.</strong></span
+        >
+        <span style="font-size: 14px; display: block"
+          >203, D-Mall, Netaji Subhash Place, Pitampura, Delhi-110034</span
+        >
+      </div>
+    </div>
+  </body>
+</html>

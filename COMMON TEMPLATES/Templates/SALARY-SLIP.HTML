@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="payroll" style="margin: 20px">Salary Slip</div>
+  </body>
+  <script>
+    window.SetTemplateData = function (data) {
+      const apiData = data?.viewTemplate
+        ? {
+            allowances: [
+              {
+                uid: "0e5cb59c-d40b-4d15-9c07-448b1bb60cd6",
+                name: "GP",
+                amount: "1900.00",
+              },
+              {
+                uid: "4cd43b3e-bebf-4788-bb05-cc26dafe3d29",
+                name: "HRA",
+                amount: "9950.00",
+              },
+              {
+                uid: "741e893e-4e35-46e0-8677-7c12238f1341",
+                name: "TA",
+                amount: "3500.00",
+              },
+              {
+                uid: "ae2d5df6-acb8-4b19-b99a-c2dbe075fccc",
+                name: "DA",
+                amount: "9950.00",
+              },
+              {
+                uid: "f594a9b4-1a3f-47f4-8edc-bcdbea11b08d",
+                name: "MA",
+                amount: "1493.00",
+              },
+            ],
+            deductions: [
+              {
+                uid: "b2bef175-0f0a-4f84-8293-512425fefbd1",
+                name: "EPP",
+                amount: "2487.00",
+              },
+              {
+                uid: "d2815035-60d3-44fa-bec9-6cb9636ec9f2",
+                name: "EPC",
+                amount: "3582.00",
+              },
+              {
+                uid: "ed3935ac-b9e0-42be-b74b-c2e5e5474fe8",
+                name: "EPF",
+                amount: "731.00",
+              },
+            ],
+            remittances: [
+              {
+                uid: "92704a6d-89f4-4204-904c-ec04afbc7e5d",
+                name: "Test Recalculate",
+                amount: "1990.00",
+              },
+              {
+                uid: "d784a85b-39e2-45a4-adae-f5a5eb6b9eeb",
+                name: "EDLI",
+                amount: "75.00",
+              },
+            ],
+          }
+        : data?.data || {};
+
+      const mainDiv = document.getElementById("payroll");
+
+      mainDiv.innerHTML = `<style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+        .container {
+          font-family: "Roboto", sans-serif;
+        }
+
+        .container__body__section__top {
+          display: flex;
+        }
+        .container__head {
+          display: flex;
+          justify-content: space-between;
+          font-size: 20px;
+          font-weight: bold;
+        }
+        .container__body__section__top {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .container__body__section__top div {
+          width: 25%;
+        }
+        .container__body__section__top div div {
+          width: 100%;
+        }
+        .container__body__section__mid {
+          display: flex;
+          justify-content: space-between;
+          margin: 1rem 0;
+        }
+        .container__body__section__mid div {
+          width: 25%;
+        }
+        .container__body__section__mid div div {
+          width: 100%;
+        }
+        .container__body__section__bottom {
+          display: flex;
+          justify-content: space-between;
+        }
+        .container__body__section__bottom__left {
+          /* display: flex; */
+          width: 50%;
+        }
+        .container__body__section__bottom__left div {
+          display: flex;
+          justify-content: space-between;
+        }
+        .container__body__section__bottom__right {
+          width: 50%;
+          padding-left: 2rem;
+        }
+        .container__body__section__bottom__right div {
+          display: flex;
+          justify-content: space-between;
+        }
+        .bold {
+          font-weight: bold;
+        }
+        .line {
+          border: 1px solid;
+          background-color: #000;
+        }
+        .grayLine {
+          height: 1px;
+          background-color: lightgray;
+        }
+      </style>`;
+
+      const div = document.createElement("div");
+
+      const totalEarnings = () => {
+        let html = `<div>
+                <div>Basic</div>
+                  <div>${`₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(apiData?.basic || 0).toLocaleString("en-IN")
+                  }`}</div>
+                </div>`;
+        apiData?.allowances?.forEach((d) => {
+          html += `<div>
+                  <div>${d?.name}</div>
+                  <div>₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(d?.amount || 0).toLocaleString("en-IN")
+                  }</div>
+                </div>`;
+        });
+        html += ` <div style="font-weight:600">
+                  <div >Total Earnings</div>
+                  <div>₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(
+                          apiData?.grossSalary !== 0
+                            ? apiData?.grossSalary
+                            : apiData?.totalSalary || 0
+                        ).toLocaleString("en-IN")
+                  }</div>
+                </div>
+                <div style="font-weight:600">
+                  <div>Net Salary Payable</div>
+                  <div>₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(apiData?.netSalary || 0).toLocaleString("en-IN")
+                  }</div>
+                </div>`;
+        return html;
+      };
+      const totalDeductions = () => {
+        let html = ``;
+        apiData?.deductions?.forEach((d) => {
+          html += `<div>
+                  <div> ${d?.name}</div>
+                  <div>₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(d?.amount || 0).toLocaleString("en-IN")
+                  }</div>
+                </div>`;
+        });
+
+        html += `<div style="font-weight:600">
+                  <div>Total Deductions</div>
+                  <div>₹ ${
+                    data?.viewTemplate
+                      ? "_______________"
+                      : Number(apiData?.totalDeductions || 0).toLocaleString(
+                          "en-IN"
+                        )
+                  }</div>
+                </div>`;
+
+        return html;
+      };
+
+      div.innerHTML = `
+          ${data?.header ?? ""}
+          <div class="container">
+          <div class="container__head">
+            <div>${
+              data?.viewTemplate
+                ? "Emplayee Name"
+                : `${apiData?.firstName ?? ""} ${apiData?.middleName ?? ""} ${
+                    apiData?.lastName ?? ""
+                  }`
+            }</div>
+            <div> Payslip ${
+              data?.viewTemplate ? "Month" : apiData?.monthYear ?? "-"
+            }</div>
+          </div>
+          <hr class="line" />
+          <div class="container__body">
+            <div class="container__body__section__top">
+              <div>
+                <div>Employee No</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.employeeNo ?? "-"
+                }</div>
+              </div>
+              <div>
+                <div>Date Joined</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.appointmentDate ?? "-"
+                }</div>
+              </div>
+              <div>
+                <div>Designation</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.designationName ?? "-"
+                }</div>
+              </div>
+              <div>
+                <div>Payment Mode</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.paymentMode ?? "-"
+                }</div>
+              </div>
+              <div style="margin-top: 2rem">
+                <div>Bank</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.bankName ?? "-"
+                }</div>
+              </div>
+              <div style="margin-top: 2rem">
+                <div>Bank Account</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.bankAccountNo ?? "-"
+                }</div>
+              </div>
+              <div style="margin-top: 2rem">
+                <div>PAN</div>
+                <div class="bold">${
+                  data?.viewTemplate ? "_______________" : apiData?.panNo ?? "-"
+                }</div>
+              </div>
+              <div style="margin-top: 2rem">
+                <div>PF Number</div>
+                <div class="bold">${
+                  data?.viewTemplate
+                    ? "_______________"
+                    : apiData?.pfAccountNo ?? "-"
+                }</div>
+              </div>
+            </div>
+            <div style="margin-top: 2rem">
+              <div style="font-size: 18px;font-weight:500">Salary Details</div>
+              <hr class="line" />
+            </div>
+            <div class="container__body__section__mid">
+              <div>
+                <div>Total working days</div>
+                <div class="bold">${
+                  data?.viewTemplate ? "_______________" : apiData?.totalDays
+                } Days</div>
+              </div>
+              <div>
+                <div>LWP</div>
+                <div class="bold">${
+                  data?.viewTemplate ? "_______________" : apiData?.lwp
+                } Days</div>
+              </div>
+              <div>
+                <div>days payable</div>
+                <div class="bold">${
+                  data?.viewTemplate ? "_______________" : apiData?.noOfDays
+                } Days</div>
+              </div>
+              <div style="visibility: hidden">
+                <div>days payable</div>
+                <div>300</div>
+              </div>
+            </div>
+            <hr />
+
+            <div class="container__body__section__bottom">
+              <div class="container__body__section__bottom__left">
+                <div>
+                  <div style="font-weight:600">Earnings</div>
+                </div>
+    ${totalEarnings()}
+              </div>
+              <div class="container__body__section__bottom__right">
+                <div>
+                <div class="bold">Deductions</div>
+              </div>
+              ${totalDeductions()}
+              </div>
+            </div>
+            <hr />
+
+          </div>
+        </div>
+        ${data?.footer ?? ""}
+        `;
+
+      mainDiv.appendChild(div);
+    };
+  </script>
+  <script>
+    window.SetTemplateData({
+      viewTemplate: false,
+      data: {
+        employeeUid: "61588ac4-55c0-466f-95fa-912ae36f6130",
+        employeeNo: "0004",
+        firstName: "Devendra",
+        middleName: "",
+        lastName: "Brijwasi",
+        designationName: "Vice Principal",
+        basic: 19900,
+        payScale: "5200 - 20200",
+        noOfDays: "29",
+        joiningDate: null,
+        monthYear: "February-2024",
+        pfAccountNo: "121212121212",
+        bankAccountNo: "9898767676",
+        pensionNo: "989898129812",
+        salary: 0,
+        allowances: [
+          {
+            uid: "0e5cb59c-d40b-4d15-9c07-448b1bb60cd6",
+            name: "GP",
+            amount: "1900.00",
+          },
+          {
+            uid: "4cd43b3e-bebf-4788-bb05-cc26dafe3d29",
+            name: "HRA",
+            amount: "9950.00",
+          },
+          {
+            uid: "741e893e-4e35-46e0-8677-7c12238f1341",
+            name: "TA",
+            amount: "3500.00",
+          },
+          {
+            uid: "ae2d5df6-acb8-4b19-b99a-c2dbe075fccc",
+            name: "DA",
+            amount: "9950.00",
+          },
+          {
+            uid: "f594a9b4-1a3f-47f4-8edc-bcdbea11b08d",
+            name: "MA",
+            amount: "1493.00",
+          },
+        ],
+        deductions: [
+          {
+            uid: "b2bef175-0f0a-4f84-8293-512425fefbd1",
+            name: "EPP",
+            amount: "2487.00",
+          },
+          {
+            uid: "d2815035-60d3-44fa-bec9-6cb9636ec9f2",
+            name: "EPC",
+            amount: "3582.00",
+          },
+          {
+            uid: "ed3935ac-b9e0-42be-b74b-c2e5e5474fe8",
+            name: "EPF",
+            amount: "731.00",
+          },
+        ],
+        remittances: [
+          {
+            uid: "92704a6d-89f4-4204-904c-ec04afbc7e5d",
+            name: "Test Recalculate",
+            amount: "1990.00",
+          },
+          {
+            uid: "d784a85b-39e2-45a4-adae-f5a5eb6b9eeb",
+            name: "EDLI",
+            amount: "75.00",
+          },
+        ],
+        totalAllowances: 26793,
+        totalDeductions: 6800,
+        totalRemittances: 2065,
+        totalSalary: 0,
+        netSalary: 39893,
+        grossSalary: 46693,
+        bankName: "SBI",
+        panNo: "ABCDE5252L",
+        appointmentDate: "04-01-2024",
+        totalDays: 29,
+        lwp: 0,
+        startDate: null,
+        dateOfBirth: "05-01-2003",
+        dateOfIncrement: "10-05-2024",
+        pbasic: 19900,
+        salaryMonthUid: "b8208c91-4e75-495f-8c36-1b6870e5a4ec",
+      },
+      header: `<figure class="table" style="width:100%;">\n <table cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="text-align:center;vertical-align:top;width:15%;"><img style="max-height:120px;max-width:120px;width:100%;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/templates/devserver-test-1/images/hand-drawn-cap-elementary-school-logo_23-2149689281.avif" align="center"></td>\n    <td style="vertical-align:top;width:70%;" align="left">\n     <div style="color:#01293c;font-size:11pt;line-height:150%;text-align:center;width:100%;">\n      <span style="color:#01293c;"><span style="font-size:15pt;padding-bottom:15mm;padding-top:5mm;"><strong>BIRLA VIDYA NIKETAN</strong></span></span><br>(Sarala Birla Group of Schools)<br>PUSHP VIHAR-IV, NEW DELHI-110017<br>Phone No. : 011-29561762<br>Website : www.birla.ac.in<br>&nbsp;\n     </div></td>\n    <td style="text-align:center;vertical-align:top;width:15%;">&nbsp;</td>\n   </tr>\n  </tbody>\n </table>\n</figure>`,
+      footer: `<page_footer>\n <table style=\"padding:2mm 0mm 0mm;\" cellspacing=\"0\" cellpadding=\"0\">\n  <tbody>\n   <tr>\n    <td style=\"padding:0mm;width:100%;\" width=\"100%\" align=\"left\" valign=\"top\"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>`,
+    });
+  </script>
+</html>
