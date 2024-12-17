@@ -45,45 +45,43 @@
     };
 
     const getSubjectMarks = (marksData) => {
-      const subjects = marksData?.baseTermData?.subject?.filter((d) => {
-        console.log(d, "ffffffffffffff d")
-        return d.scholastic;
-      });
+
 
       let check = true;
 
       let str = "";
       let grandTotal = 0
       let totalMaxObtained = 0
-      subjects.forEach((sub, i) => {
-        let maxObtained = 0;
-        marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
-          (d) => {
-            if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
-              totalMaxObtained += d?.total
-              str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
-                }</td>${d?.markSheetReport
-                  .map((v) => {
-                    maxObtained += Math.round(v?.obtained);
-                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""
-                      }">${attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained) || "-"
-                      }</td>`;
-                  })
-                  .join("")} 
+
+      marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
+        (d) => {
+          let maxObtained = 0;
+          if (d?.subjectName) {
+            totalMaxObtained += d?.total
+            str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
+              }</td>${d?.markSheetReport
+                .map((v) => {
+                  maxObtained += Math.round(v?.obtained);
+                  return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""
+                    }">${attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained) || "-"
+                    }</td>`;
+                })
+                .join("")} 
               <td style="text-align: center ;" >${maxObtained || "-"}</td>
               <td style="text-align: center">${d?.grade || "-"}</td></tr>`;
-              grandTotal += maxObtained
-            }
+            grandTotal += maxObtained
           }
-        );
-      });
+        }
+      );
+
 
       return { rows: str, grandTotal, colspan: marksData?.markData?.markSheetTerms.length, totalMaxObtained };
     };
 
     const getCoScholasticSub = (marksData) => {
       const subjects = marksData?.baseTermData?.subject?.filter((d) => {
-        return d.scholastic == false;
+        console.log(d, "fffffffffffff d")
+        return !d?.scholastic && d?.termName == "PRE BOARD";
       });
 
       let str = "";
@@ -1653,6 +1651,36 @@
               "createddate": "2024-05-16 06:44:38.299734",
               "editeddate": "2024-07-18 06:41:06.601021"
             },
+            "termName": "Internal",
+            "max": 20,
+            "markObtained": 18,
+            "percentage": 90,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 1,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
+              "subjectName": "ENGLISH",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "user_374830",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-05-16 06:44:38.299734",
+              "editeddate": "2024-07-18 06:41:06.601021"
+            },
             "termName": "PRE BOARD",
             "max": 80,
             "markObtained": 55,
@@ -1662,6 +1690,36 @@
             "attachmentName": "",
             "additional": false,
             "priority": 1,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "56d48e61-36a7-4f00-a316-e0d141a9a986",
+              "subjectName": "HINDI",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "user_374830",
+              "editedUser": "user_374830",
+              "createddate": "2024-05-16 06:44:48.348445",
+              "editeddate": "2024-05-16 06:44:48.348005"
+            },
+            "termName": "Internal",
+            "max": 20,
+            "markObtained": 19,
+            "percentage": 95,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 2,
             "scholastic": true,
             "added": true
           },
@@ -1713,6 +1771,36 @@
               "createddate": "2024-05-16 06:45:28.451693",
               "editeddate": "2024-05-16 06:45:28.449747"
             },
+            "termName": "Internal",
+            "max": 20,
+            "markObtained": 20,
+            "percentage": 100,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 5,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "ca5b6b7a-20cd-443f-97ac-4155045130cd",
+              "subjectName": "MATHEMATICS",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "user_374830",
+              "editedUser": "user_374830",
+              "createddate": "2024-05-16 06:45:28.451693",
+              "editeddate": "2024-05-16 06:45:28.449747"
+            },
             "termName": "PRE BOARD",
             "max": 80,
             "markObtained": 17.5,
@@ -1722,6 +1810,36 @@
             "attachmentName": "",
             "additional": false,
             "priority": 5,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "de31f0de-5d27-432d-9c49-30383c4f0a9a",
+              "subjectName": "SCIENCE",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-05-22 04:51:28.465457",
+              "editeddate": "2024-05-22 04:51:28.46146"
+            },
+            "termName": "Internal",
+            "max": 20,
+            "markObtained": 20,
+            "percentage": 100,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 6,
             "scholastic": true,
             "added": true
           },
@@ -1773,6 +1891,36 @@
               "createddate": "2024-05-22 04:51:33.462211",
               "editeddate": "2024-06-03 05:22:15.306851"
             },
+            "termName": "Internal",
+            "max": 20,
+            "markObtained": 0,
+            "percentage": 0,
+            "grade": "E",
+            "remarkStatus": "Absent",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 7,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
+              "subjectName": "SOCIAL SCIENCE",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "user_374830",
+              "createddate": "2024-05-22 04:51:33.462211",
+              "editeddate": "2024-06-03 05:22:15.306851"
+            },
             "termName": "PRE BOARD",
             "max": 80,
             "markObtained": 30,
@@ -1782,6 +1930,36 @@
             "attachmentName": "",
             "additional": false,
             "priority": 7,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
+              "subjectName": "INFORMATION TECHNOLOGY",
+              "nature": "2A LIFE SKILLS",
+              "natureUid": "697b3ac1-52ee-47f3-8975-f57484813072",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "user_374830",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-05-16 06:46:01.304863",
+              "editeddate": "2024-07-18 09:05:05.992916"
+            },
+            "termName": "Internal",
+            "max": 50,
+            "markObtained": 50,
+            "percentage": 100,
+            "grade": "A1",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 8,
             "scholastic": true,
             "added": true
           },

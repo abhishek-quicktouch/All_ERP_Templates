@@ -1,240 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fee receipt</title>
-  </head>
-  <body>
-    <div id="studentsList">Student Fee</div>
-    <script>
+
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Fee receipt</title>
+</head>
+
+<body>
+   <div id="studentsList">Student Fee</div>
+   <script>
       window.SetTemplateData = function (dataList) {
-        function convertNumberToWords(number) {
-          const units = [
-            "",
-            "ONE",
-            "TWO",
-            "THREE",
-            "FOUR",
-            "FIVE",
-            "SIX",
-            "SEVEN",
-            "EIGHT",
-            "NINE",
-          ];
-          const teens = [
-            "TEN",
-            "ELEVEN",
-            "TWELVE",
-            "THIRTEEN",
-            "FOURTEEN",
-            "FIFTEEN",
-            "SIXTEEN",
-            "SEVENTEEN",
-            "EIGHTEEN",
-            "NINETEEN",
-          ];
-          const tens = [
-            "",
-            "",
-            "TWENTY",
-            "THIRTY",
-            "FORTY",
-            "FIFTY",
-            "SIXTY",
-            "SEVENTY",
-            "EIGHTY",
-            "NINETY",
-          ];
+         function convertNumberToWords(number) {
+            const units = [
+               "",
+               "ONE",
+               "TWO",
+               "THREE",
+               "FOUR",
+               "FIVE",
+               "SIX",
+               "SEVEN",
+               "EIGHT",
+               "NINE",
+            ];
+            const teens = [
+               "TEN",
+               "ELEVEN",
+               "TWELVE",
+               "THIRTEEN",
+               "FOURTEEN",
+               "FIFTEEN",
+               "SIXTEEN",
+               "SEVENTEEN",
+               "EIGHTEEN",
+               "NINETEEN",
+            ];
+            const tens = [
+               "",
+               "",
+               "TWENTY",
+               "THIRTY",
+               "FORTY",
+               "FIFTY",
+               "SIXTY",
+               "SEVENTY",
+               "EIGHTY",
+               "NINETY",
+            ];
 
-          function convertChunk(chunk) {
-            let words = "";
+            function convertChunk(chunk) {
+               let words = "";
 
-            if (chunk >= 100) {
-              words += units[Math.floor(chunk / 100)] + " HUNDRED";
-              chunk %= 100;
+               if (chunk >= 100) {
+                  words += units[Math.floor(chunk / 100)] + " HUNDRED";
+                  chunk %= 100;
 
-              if (chunk > 0) {
-                words += " ";
-              }
+                  if (chunk > 0) {
+                     words += " ";
+                  }
+               }
+
+               if (chunk >= 10 && chunk < 20) {
+                  words += teens[chunk - 10];
+               } else if (chunk >= 20) {
+                  words += tens[Math.floor(chunk / 10)];
+
+                  if (chunk % 10 > 0) {
+                     words += " " + units[chunk % 10];
+                  }
+               } else if (chunk > 0) {
+                  words += units[chunk];
+               }
+
+               return words;
             }
 
-            if (chunk >= 10 && chunk < 20) {
-              words += teens[chunk - 10];
-            } else if (chunk >= 20) {
-              words += tens[Math.floor(chunk / 10)];
-
-              if (chunk % 10 > 0) {
-                words += " " + units[chunk % 10];
-              }
-            } else if (chunk > 0) {
-              words += units[chunk];
+            if (number === 0) {
+               return "RUPEES ZERO ONLY";
             }
 
-            return words;
-          }
+            const crore = Math.floor(number / 10000000);
+            const lakh = Math.floor((number % 10000000) / 100000);
+            const thousand = Math.floor((number % 100000) / 1000);
+            const remainder = number % 1000;
 
-          if (number === 0) {
-            return "RUPEES ZERO ONLY";
-          }
+            let result = "";
 
-          const crore = Math.floor(number / 10000000);
-          const lakh = Math.floor((number % 10000000) / 100000);
-          const thousand = Math.floor((number % 100000) / 1000);
-          const remainder = number % 1000;
+            if (crore > 0) {
+               result += convertChunk(crore) + " CRORE ";
+            }
 
-          let result = "";
+            if (lakh > 0) {
+               result += convertChunk(lakh) + " LAKH ";
+            }
 
-          if (crore > 0) {
-            result += convertChunk(crore) + " CRORE ";
-          }
+            if (thousand > 0) {
+               result += convertChunk(thousand) + " THOUSAND ";
+            }
 
-          if (lakh > 0) {
-            result += convertChunk(lakh) + " LAKH ";
-          }
+            if (remainder > 0) {
+               result += convertChunk(remainder);
+            }
 
-          if (thousand > 0) {
-            result += convertChunk(thousand) + " THOUSAND ";
-          }
+            return "RUPEES " + result.trim() + " ONLY";
+         }
 
-          if (remainder > 0) {
-            result += convertChunk(remainder);
-          }
+         const installmentStartEndDate = (val) => {
+            const obj = {
+               JAN: "31-JAN-2024",
+               FEB: "28-FEB-2024",
+               MAR: "31-MAR-2024",
+               APR: "30-APR-2023",
+               MAY: "31-MAY-2023",
+               JUN: "30-JUN-2023",
+               JUL: "31-JUL-2023",
+               AUG: "31-AUG-2023",
+               SEP: "30-SEP-2023",
+               OCT: "31-OCT-2023",
+               NOV: "30-NOV-2023",
+               DEC: "31-DEC-2023",
+            };
+            const obj2 = {
+               JAN: "2024",
+               FEB: "2024",
+               MAR: "2024",
+            };
+            const installments = val.split(",");
 
-          return "RUPEES " + result.trim() + " ONLY";
-        }
+            const string = `01-${installments[0]}-${obj2[installments[0]] ?? "2023"
+               } TO ${obj[installments[installments.length - 1]]}`;
 
-        const installmentStartEndDate = (val) => {
-          const obj = {
-            JAN: "31-JAN-2024",
-            FEB: "28-FEB-2024",
-            MAR: "31-MAR-2024",
-            APR: "30-APR-2023",
-            MAY: "31-MAY-2023",
-            JUN: "30-JUN-2023",
-            JUL: "31-JUL-2023",
-            AUG: "31-AUG-2023",
-            SEP: "30-SEP-2023",
-            OCT: "31-OCT-2023",
-            NOV: "30-NOV-2023",
-            DEC: "31-DEC-2023",
-          };
-          const obj2 = {
-            JAN: "2024",
-            FEB: "2024",
-            MAR: "2024",
-          };
-          const installments = val.split(",");
+            return string;
+         };
 
-          const string = `01-${installments[0]}-${
-            obj2[installments[0]] ?? "2023"
-          } TO ${obj[installments[installments.length - 1]]}`;
+         const paymentMonth = (dateString) => {
+            const [day, month, year] = dateString.split("-");
 
-          return string;
-        };
+            const date = new Date(year, month - 1, day);
 
-        const paymentMonth = (dateString) => {
-          const [day, month, year] = dateString.split("-");
+            const monthNames = [
+               "JAN",
+               "FEB",
+               "MAR",
+               "APR",
+               "MAY",
+               "JUN",
+               "JUL",
+               "AUG",
+               "SEP",
+               "OCT",
+               "NOV",
+               "DEC",
+            ];
 
-          const date = new Date(year, month - 1, day);
+            const paymentMonth = monthNames[date.getMonth()];
 
-          const monthNames = [
-            "JAN",
-            "FEB",
-            "MAR",
-            "APR",
-            "MAY",
-            "JUN",
-            "JUL",
-            "AUG",
-            "SEP",
-            "OCT",
-            "NOV",
-            "DEC",
-          ];
+            return paymentMonth;
+         };
+         const multipleStudents = dataList;
+         const studentHtml = document.getElementById("studentsList");
+         studentHtml.innerHTML = ``;
+         multipleStudents?.forEach((element) => {
+            const basicDetails = {
+               academicSession:
+                  element?.student?.studentInfoResponse?.[0]?.academicSession,
+               admissionNo: element?.contentRequest?.admissionNo,
+               // rollNo:
+               studentName: element?.contentRequest?.studentName,
+               fatherName: element?.student?.fatherName,
+               phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+               classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+               address: `${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                  ?.houseNo
+                  ? element?.student?.studentInfoResponse?.[0]
+                     ?.studentAddressResponse?.houseNo + ", "
+                  : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.street
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.street + ", "
+                     : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.landmark
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.landmark + ", "
+                     : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.area
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.area + ", "
+                     : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.city
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.city + ", "
+                     : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.district
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.district + ", "
+                     : ""
+                  }${element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                     ?.pincode
+                     ? element?.student?.studentInfoResponse?.[0]
+                        ?.studentAddressResponse?.pincode
+                     : ""
+                  }`,
+            };
 
-          const paymentMonth = monthNames[date.getMonth()];
+            const feeDetails = element?.contentRequest;
+            const studentDetails = element?.student;
+            const componentTotal = (component) => {
+               return feeDetails?.studentFeeCollectionReceiptList?.reduce(
+                  (prev, current) => prev + Number(current[component]),
+                  0
+               );
+            };
 
-          return paymentMonth;
-        };
-        const multipleStudents = dataList;
-        const studentHtml = document.getElementById("studentsList");
-        studentHtml.innerHTML = ``;
-        multipleStudents?.forEach((element) => {
-          const basicDetails = {
-            academicSession:
-              element?.student?.studentInfoResponse?.[0]?.academicSession,
-            admissionNo: element?.contentRequest?.admissionNo,
-            // rollNo:
-            studentName: element?.contentRequest?.studentName,
-            fatherName: element?.student?.fatherName,
-            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
-            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
-            address: `${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.houseNo
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.houseNo + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.street
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.street + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.landmark
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.landmark + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.area
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.area + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.city
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.city + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.district
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.district + ", "
-                : ""
-            }${
-              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
-                ?.pincode
-                ? element?.student?.studentInfoResponse?.[0]
-                    ?.studentAddressResponse?.pincode
-                : ""
-            }`,
-          };
-          
-          const feeDetails = element?.contentRequest;
-          const studentDetails = element?.student;
-          const componentTotal = (component) => {
-            return feeDetails?.studentFeeCollectionReceiptList?.reduce(
-              (prev, current) => prev + Number(current[component]),
-              0
+            console.log(
+               element,
+               basicDetails,
+               feeDetails,
+               dataList,
+               "ddddddddddddd"
             );
-          };
 
-          console.log(
-            element,
-            basicDetails,
-            feeDetails,
-            dataList,
-            "ddddddddddddd"
-          );
-
-          const singleStudentHtml = document.createElement("div");
-          singleStudentHtml.style.pageBreakAfter = "always";
-          singleStudentHtml.innerHTML = `<style type="text/css">
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakAfter = "always";
+            singleStudentHtml.innerHTML = `<style type="text/css">
    @page {
    size: A4
    }
@@ -276,14 +270,14 @@
             <!-- start left Student Copy -->
             <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
                <tr>
-                   <td style="width: 15%; align="left" >
+                   <td style="width: 10%; align="left" >
 
                     <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_50_24_362537686.jpeg"/>
 
                     </td>
-                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
-                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">${element?.student?.school?.schoolName}</span>
-                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.educationBoard || ""}<br>${element?.student?.school?.plotNumber || ""} ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
+                  <td style="width:90%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                      <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">${element?.student?.school?.schoolName}</span>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
                         ${element?.student?.school?.phoneNo1 || ""} |
                         ${element?.student?.school?.phoneNo2 || ""} | 
                         ${element?.student?.school?.contactEmail || ""}
@@ -330,9 +324,8 @@
                      <table width="100%" border="0" cellspacing="0" >
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.studentName
-                           } (${basicDetails?.admissionNo})</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.studentName
+               } (${basicDetails?.admissionNo})</td>
                         </tr>
                      </table>
                   </td>
@@ -341,8 +334,8 @@
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Month</td>
                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${paymentMonth(
-                             feeDetails?.feeDate
-                           )}</td>
+                  feeDetails?.feeDate
+               )}</td>
                         </tr>
                      </table>
                   </td>
@@ -352,9 +345,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.fatherName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.fatherName
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -362,9 +354,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.classSection
-                           }</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.classSection
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -374,9 +365,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.userName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.userName
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -384,11 +374,10 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Id</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeMode == "ONLINE"
-                               ? feeDetails?.feeUid
-                               : ""
-                           }</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeMode == "ONLINE"
+                  ? feeDetails?.feeUid
+                  : ""
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -398,15 +387,13 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeModeRemark ?? ""
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeModeRemark ?? ""
+               }</td>
                         </tr>
                      </table>
                   </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? ` <td style="width:50%;">
+                  ${feeDetails?.feeMode != "CASH"
+                  ? ` <td style="width:50%;">
                         <table
                           width="100%"
                           border="0"
@@ -424,23 +411,21 @@
                           </tr>
                         </table>
                       </td>`
-                      : ""
-                  }
+                  : ""
+               }
                </tr>
                <tr>
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.paidInstallmentsName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.paidInstallmentsName
+               }</td>
                         </tr>
                      </table>
                   </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? `  <td style="width:50%;">
+                  ${feeDetails?.feeMode != "CASH"
+                  ? `  <td style="width:50%;">
                         <table
                           width="100%"
                           border="0"
@@ -458,8 +443,8 @@
                           </tr>
                         </table>
                       </td>`
-                      : ""
-                  }
+                  : ""
+               }
                </tr>
             </table>
             <!--// student basic details -->
@@ -479,36 +464,30 @@
                   <td align="right" style="width:20%; border-bottom: solid 0.264583333mm #000000; font-weight:bold;">Paid ₹</td>
                </tr>
               ${feeDetails?.studentFeeCollectionReceiptList
-                ?.map(
-                  (val, ind) => `
+                  ?.map(
+                     (val, ind) => `
                <tr>
-                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${
-                    ind + 1
-                  }</td>
-                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentName
-                  }</td>
-                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentAmount
-                  }</td>
-                  <td align="right" style="width:20%;">${
-                    val.componentReceived
-                  }</td>
+                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${ind + 1
+                        }</td>
+                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${val.componentName
+                        }</td>
+                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${val.componentAmount
+                        }</td>
+                  <td align="right" style="width:20%;">${val.componentReceived
+                        }</td>
                </tr>
                `
-                )
-                .join("")}
+                  )
+                  .join("")}
                <tr>
                   <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Payment Mode</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${
-                    feeDetails.feeMode
-                  }</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${feeDetails.feeMode
+               }</td>
                </tr>
                <tr>
                   <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
-                    feeDetails.netReceived
-                  }</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails.netReceived
+               }</td>
                </tr>
             </table>
             <!--// Main Table -->
@@ -550,14 +529,14 @@
             <!-- start left Student Copy -->
             <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
                <tr>
-                  <td style="width: 15%; align="left" >
+                  <td style="width: 10%; align="left" >
                   
                     <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_50_24_362537686.jpeg"/>
                  
                     </td>
-                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                  <td style="width:90%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
                       <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">${element?.student?.school?.schoolName}</span>
-                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.educationBoard || ""}<br>${element?.student?.school?.plotNumber || ""}, ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
                         ${element?.student?.school?.phoneNo1 || ""} |
                         ${element?.student?.school?.phoneNo2 || ""} | 
                         ${element?.student?.school?.contactEmail || ""}
@@ -604,9 +583,8 @@
                      <table width="100%" border="0" cellspacing="0" >
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.studentName
-                           } (${basicDetails?.admissionNo})</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.studentName
+               } (${basicDetails?.admissionNo})</td>
                         </tr>
                      </table>
                   </td>
@@ -615,8 +593,8 @@
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Month</td>
                            <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${paymentMonth(
-                             feeDetails?.feeDate
-                           )}</td>
+                  feeDetails?.feeDate
+               )}</td>
                         </tr>
                      </table>
                   </td>
@@ -626,9 +604,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.fatherName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.fatherName
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -636,9 +613,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Class</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             basicDetails.classSection
-                           }</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.classSection
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -648,9 +624,8 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.userName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.userName
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -658,11 +633,10 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:50%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Payment Id</td>
-                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeMode == "ONLINE"
-                               ? feeDetails?.feeUid
-                               : ""
-                           }</td>
+                           <td style="width:50%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeMode == "ONLINE"
+                  ? feeDetails?.feeUid
+                  : ""
+               }</td>
                         </tr>
                      </table>
                   </td>
@@ -672,15 +646,13 @@
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.feeModeRemark ?? ""
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeModeRemark ?? ""
+               }</td>
                         </tr>
                      </table>
                   </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? ` <td style="width:50%;">
+                  ${feeDetails?.feeMode != "CASH"
+                  ? ` <td style="width:50%;">
                         <table
                           width="100%"
                           border="0"
@@ -698,23 +670,21 @@
                           </tr>
                         </table>
                       </td>`
-                      : ""
-                  }
+                  : ""
+               }
                </tr>
                <tr>
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                            <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
-                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${
-                             feeDetails?.paidInstallmentsName
-                           }</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.paidInstallmentsName
+               }</td>
                         </tr>
                      </table>
                   </td>
-                  ${
-                    feeDetails?.feeMode != "CASH"
-                      ? `  <td style="width:50%;">
+                  ${feeDetails?.feeMode != "CASH"
+                  ? `  <td style="width:50%;">
                         <table
                           width="100%"
                           border="0"
@@ -732,8 +702,8 @@
                           </tr>
                         </table>
                       </td>`
-                      : ""
-                  }
+                  : ""
+               }
                </tr>
             </table>
             <!--// student basic details -->
@@ -753,36 +723,30 @@
                   <td align="right" style="width:20%; border-bottom: solid 0.264583333mm #000000; font-weight:bold;">Paid ₹</td>
                </tr>
               ${feeDetails?.studentFeeCollectionReceiptList
-                ?.map(
-                  (val, ind) => `
+                  ?.map(
+                     (val, ind) => `
                <tr>
-                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${
-                    ind + 1
-                  }</td>
-                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentName
-                  }</td>
-                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${
-                    val.componentAmount
-                  }</td>
-                  <td align="right" style="width:20%;">${
-                    val.componentReceived
-                  }</td>
+                  <td align="center" style="width:10%; border-right: solid 0.264583333mm #000000;">${ind + 1
+                        }</td>
+                  <td align="left" style="width:40%; border-right: solid 0.264583333mm #000000;">${val.componentName
+                        }</td>
+                  <td align="right" style="width:30%; border-right: solid 0.264583333mm #000000;">${val.componentAmount
+                        }</td>
+                  <td align="right" style="width:20%;">${val.componentReceived
+                        }</td>
                </tr>
                `
-                )
-                .join("")}
+                  )
+                  .join("")}
                <tr>
                   <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Payment Mode</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${
-                    feeDetails.feeMode
-                  }</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">${feeDetails.feeMode
+               }</td>
                </tr>
                <tr>
                   <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total</td>
-                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${
-                    feeDetails.netReceived
-                  }</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails.netReceived
+               }</td>
                </tr>
             </table>
             <!--// Main Table -->
@@ -822,278 +786,278 @@
 </page>
       `;
 
-          studentHtml.appendChild(singleStudentHtml);
-        });
+            studentHtml.appendChild(singleStudentHtml);
+         });
       };
-    </script>
-    <script>
+   </script>
+   <script>
       window.SetTemplateData([
-        {
-          student: {
-                  "dob": "22-04-2015",
-                  "admissionNo": "27",
-                  "studentName": "SONALI PRIYA",
-                  "className": "I",
-                  "sectionName": "A",
-                  "rollNo": 4,
-                  "fatherName": "PRMANAND KUMAR",
-                  "motherName": "NA",
-                  "attendance": "162.0/183",
-                  "boardRollNumber": "",
-                  "studentInfoResponse": [
-                      {
-                          "id": 74538,
-                          "userUid": "cc729b6e-177d-436e-b6c7-4ef3b5d5e757",
-                          "userName": null,
-                          "fatherUserName": null,
-                          "motherUserName": null,
-                          "guardianUserName": null,
-                          "uid": "e37455db-bcea-4272-b2a5-05303b8f0a2a",
-                          "studentId": "27",
-                          "studentName": "SONALI PRIYA",
-                          "fatherName": "PRMANAND KUMAR",
-                          "motherName": "",
-                          "dob": "22-04-2015",
-                          "gender": "Female",
-                          "studentAdhaarcard": "",
-                          "joiningClass": "UKG",
-                          "joiningSections": "A",
-                          "joiningDate": "01-01-2022",
-                          "plotNumber": "",
-                          "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
-                          "city": "",
-                          "state": "",
-                          "pincode": "843106",
-                          "phone1": null,
-                          "rollNo": 4,
-                          "emergencyNumber": null,
-                          "mobileNumber": "9430005360",
-                          "studentEmail": null,
-                          "religion": "",
-                          "category": "",
-                          "minority": "",
-                          "motherTongue": "",
-                          "idMark": "",
-                          "height": "",
-                          "weight": "",
-                          "physicalDisability": "",
-                          "bloodGroup": "",
-                          "healthRemark": "",
-                          "siblingDetails": "",
-                          "alumni": "",
-                          "siblingResponse": [],
-                          "fatherOccupation": "",
-                          "fatherQualification": "",
-                          "fatherOrganization": "",
-                          "fatherDesignation": "",
-                          "fatherIncome": "",
-                          "fatherArea": "",
-                          "fatherCity": "",
-                          "fatherState": "",
-                          "fatherPincode": null,
-                          "fatherPhone": null,
-                          "fatherMobile": "9771553300",
-                          "fatherEmail": null,
-                          "fatherAdhaarNumber": null,
-                          "schoolUid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
-                          "motherQualification": "",
-                          "motherOccupation": "",
-                          "motherOrganization": "",
-                          "motherDesignation": "",
-                          "motherIncome": "",
-                          "motherArea": "",
-                          "motherCity": "",
-                          "motherState": "",
-                          "motherPincode": null,
-                          "motherPhone": null,
-                          "motherMobile": null,
-                          "motherEmail": null,
-                          "motherAdhaarNumber": null,
-                          "guardianName": null,
-                          "relation": null,
-                          "guardianOccupation": null,
-                          "guardianPhone": null,
-                          "guardianMobile": null,
-                          "guardianEmail": null,
-                          "guardianAddress": null,
-                          "leavingDate": null,
-                          "previousSchoolName": null,
-                          "otp": "mmBSc0",
-                          "schoolName": "Demo Public School",
-                          "remark": null,
-                          "classTeacher": null,
-                          "classTeacherUserName": null,
-                          "classes": "I",
-                          "classUid": null,
-                          "sections": "A",
-                          "group": null,
-                          "wing": "NA",
-                          "status": "Studying",
-                          "academicSession": "2023-2024",
-                          "joiningStatus": "Old",
-                          "houses": null,
-                          "certificates": "",
-                          "certificatesList": [],
-                          "caste": "",
-                          "listOfDocuments": null,
-                          "attached": false,
-                          "required": false,
-                          "submitted": false,
-                          "studentHostel": [],
-                          "studentConcession": [],
-                          "studentTransport": [],
-                          "studentAadharCard": null,
-                          "fatherAadharCard": null,
-                          "motherAadharCard": null,
-                          "studentImage": null,
-                          "fatherImage": null,
-                          "motherImage": null,
-                          "guardianImage": null,
-                          "birthCertificate": null,
-                          "classSectionUid": "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
-                          "aluminiProof": null,
-                          "siblingProof": null,
-                          "residenceProof": null,
-                          "firstBornChildProof": null,
-                          "medicalFitnessCertificate": null,
-                          "fatherQualificationProof": null,
-                          "motherQualificationProof": null,
-                          "casteCertificate": null,
-                          "createdUser": "quickadmin",
-                          "editedUser": "quickadmin",
-                          "createddate": "2023-04-04 04:44:13.227069",
-                          "editeddate": "2023-04-04 04:44:13.227069",
-                          "studentAddressResponse": {
-                              "uid": "74e0cbe4-ccf0-4506-8cd0-3e5ddbba84b0",
-                              "houseNo": null,
-                              "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
-                              "landmark": null,
-                              "city": "",
-                              "district": null,
-                              "state": "",
-                              "poPs": null,
-                              "pincode": 843106,
-                              "street": "",
-                              "userName": null,
-                              "createdDate": "25-09-2023 05:17 PM",
-                              "editedDate": "25-09-2023 05:17 PM",
-                              "createdBy": "quickadmin",
-                              "editedBy": "quickadmin"
-                          },
-                          "fatherAddressResponse": null,
-                          "motherAddressResponse": null,
-                          "guardianAddressResponse": null,
-                          "correspondenceAddressResponse": null
-                      }
-                  ],
-                  "classTeacher": "",
-                  "classTeacherUserName": "",
-                  "school": {
-                      "uid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
-                      "apikey": "Fmiji8zVez6WfMHEY2_6-SUVWNrIt8zx",
-                      "schoolName": "REDWOODS GLOBAL SCHOOL",
-                      "schoolAbb": "RGS",
-                      "educationBoard": "Central Board of Secondary Education (CBSE)",
-                      "registrationNo": null,
-                      "plotNumber": "Chakmal, Pokhraira, Post- Giddha",
-                      "area": "P.S- Saraiya",
-                      "city": "Dist- Muzaffarpur",
-                      "pincode": "843106",
-                      "state": "Bihar",
-                      "phoneNo1": "62233231455",
-                      "phoneNo2": "8678862234",
-                      "contactName": "Sk Paswan",
-                      "contactMobile": "8678862234",
-                      "contactEmail": "redwoodsglobals@gmail.com",
-                      "schoolCode": null,
-                      "pfCode": null,
-                      "societyManagement": "Redwoods Educational Trust",
-                      "language": null,
-                      "schoolLogo": null,
-                      "schoolFavicon": null,
-                      "enabled": true,
-                      "subDomain": null,
-                      "website": "www.redwoodsglobals.com",
-                      "schemaPrefix": null,
-                      "editedDate": "07-05-2024 06:38 PM",
-                      "editedUser": "quickadmin",
-                      "visitorSchool": false,
-                      "clientSchoolId": null,
-                      "cscId": null,
-                      "onlinePaymentEnabled": false,
-                      "registrationSeries": null,
-                      "underTakingDetails": null,
-                      "formNumberStart": null,
-                      "sessionResponse": null,
-                      "schoolLogoUrl": null,
-                      "printAcknowledge": false,
-                      "notificationEnabled": true,
-                      "loanEnabled": false,
-                      "whatsAppEnabled": false,
-                      "smsenabled": false
+         {
+            student: {
+               "dob": "22-04-2015",
+               "admissionNo": "27",
+               "studentName": "SONALI PRIYA",
+               "className": "I",
+               "sectionName": "A",
+               "rollNo": 4,
+               "fatherName": "PRMANAND KUMAR",
+               "motherName": "NA",
+               "attendance": "162.0/183",
+               "boardRollNumber": "",
+               "studentInfoResponse": [
+                  {
+                     "id": 74538,
+                     "userUid": "cc729b6e-177d-436e-b6c7-4ef3b5d5e757",
+                     "userName": null,
+                     "fatherUserName": null,
+                     "motherUserName": null,
+                     "guardianUserName": null,
+                     "uid": "e37455db-bcea-4272-b2a5-05303b8f0a2a",
+                     "studentId": "27",
+                     "studentName": "SONALI PRIYA",
+                     "fatherName": "PRMANAND KUMAR",
+                     "motherName": "",
+                     "dob": "22-04-2015",
+                     "gender": "Female",
+                     "studentAdhaarcard": "",
+                     "joiningClass": "UKG",
+                     "joiningSections": "A",
+                     "joiningDate": "01-01-2022",
+                     "plotNumber": "",
+                     "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
+                     "city": "",
+                     "state": "",
+                     "pincode": "843106",
+                     "phone1": null,
+                     "rollNo": 4,
+                     "emergencyNumber": null,
+                     "mobileNumber": "9430005360",
+                     "studentEmail": null,
+                     "religion": "",
+                     "category": "",
+                     "minority": "",
+                     "motherTongue": "",
+                     "idMark": "",
+                     "height": "",
+                     "weight": "",
+                     "physicalDisability": "",
+                     "bloodGroup": "",
+                     "healthRemark": "",
+                     "siblingDetails": "",
+                     "alumni": "",
+                     "siblingResponse": [],
+                     "fatherOccupation": "",
+                     "fatherQualification": "",
+                     "fatherOrganization": "",
+                     "fatherDesignation": "",
+                     "fatherIncome": "",
+                     "fatherArea": "",
+                     "fatherCity": "",
+                     "fatherState": "",
+                     "fatherPincode": null,
+                     "fatherPhone": null,
+                     "fatherMobile": "9771553300",
+                     "fatherEmail": null,
+                     "fatherAdhaarNumber": null,
+                     "schoolUid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                     "motherQualification": "",
+                     "motherOccupation": "",
+                     "motherOrganization": "",
+                     "motherDesignation": "",
+                     "motherIncome": "",
+                     "motherArea": "",
+                     "motherCity": "",
+                     "motherState": "",
+                     "motherPincode": null,
+                     "motherPhone": null,
+                     "motherMobile": null,
+                     "motherEmail": null,
+                     "motherAdhaarNumber": null,
+                     "guardianName": null,
+                     "relation": null,
+                     "guardianOccupation": null,
+                     "guardianPhone": null,
+                     "guardianMobile": null,
+                     "guardianEmail": null,
+                     "guardianAddress": null,
+                     "leavingDate": null,
+                     "previousSchoolName": null,
+                     "otp": "mmBSc0",
+                     "schoolName": "Demo Public School",
+                     "remark": null,
+                     "classTeacher": null,
+                     "classTeacherUserName": null,
+                     "classes": "I",
+                     "classUid": null,
+                     "sections": "A",
+                     "group": null,
+                     "wing": "NA",
+                     "status": "Studying",
+                     "academicSession": "2023-2024",
+                     "joiningStatus": "Old",
+                     "houses": null,
+                     "certificates": "",
+                     "certificatesList": [],
+                     "caste": "",
+                     "listOfDocuments": null,
+                     "attached": false,
+                     "required": false,
+                     "submitted": false,
+                     "studentHostel": [],
+                     "studentConcession": [],
+                     "studentTransport": [],
+                     "studentAadharCard": null,
+                     "fatherAadharCard": null,
+                     "motherAadharCard": null,
+                     "studentImage": null,
+                     "fatherImage": null,
+                     "motherImage": null,
+                     "guardianImage": null,
+                     "birthCertificate": null,
+                     "classSectionUid": "a2a75ab3-07be-47ce-b87a-6cccc7e53f82",
+                     "aluminiProof": null,
+                     "siblingProof": null,
+                     "residenceProof": null,
+                     "firstBornChildProof": null,
+                     "medicalFitnessCertificate": null,
+                     "fatherQualificationProof": null,
+                     "motherQualificationProof": null,
+                     "casteCertificate": null,
+                     "createdUser": "quickadmin",
+                     "editedUser": "quickadmin",
+                     "createddate": "2023-04-04 04:44:13.227069",
+                     "editeddate": "2023-04-04 04:44:13.227069",
+                     "studentAddressResponse": {
+                        "uid": "74e0cbe4-ccf0-4506-8cd0-3e5ddbba84b0",
+                        "houseNo": null,
+                        "area": "VILL-CHAKMAL, POST-GIDDHA, P.S-SARAIYA",
+                        "landmark": null,
+                        "city": "",
+                        "district": null,
+                        "state": "",
+                        "poPs": null,
+                        "pincode": 843106,
+                        "street": "",
+                        "userName": null,
+                        "createdDate": "25-09-2023 05:17 PM",
+                        "editedDate": "25-09-2023 05:17 PM",
+                        "createdBy": "quickadmin",
+                        "editedBy": "quickadmin"
+                     },
+                     "fatherAddressResponse": null,
+                     "motherAddressResponse": null,
+                     "guardianAddressResponse": null,
+                     "correspondenceAddressResponse": null
                   }
-              },
+               ],
+               "classTeacher": "",
+               "classTeacherUserName": "",
+               "school": {
+                  "uid": "98c3e150-4275-4c5a-ae7a-4191bba0daf1",
+                  "apikey": "Fmiji8zVez6WfMHEY2_6-SUVWNrIt8zx",
+                  "schoolName": "REDWOODS GLOBAL SCHOOL",
+                  "schoolAbb": "RGS",
+                  "educationBoard": "Central Board of Secondary Education (CBSE)",
+                  "registrationNo": null,
+                  "plotNumber": "Chakmal, Pokhraira, Post- Giddha",
+                  "area": "P.S- Saraiya",
+                  "city": "Dist- Muzaffarpur",
+                  "pincode": "843106",
+                  "state": "Bihar",
+                  "phoneNo1": "62233231455",
+                  "phoneNo2": "8678862234",
+                  "contactName": "Sk Paswan",
+                  "contactMobile": "8678862234",
+                  "contactEmail": "redwoodsglobals@gmail.com",
+                  "schoolCode": null,
+                  "pfCode": null,
+                  "societyManagement": "Redwoods Educational Trust",
+                  "language": null,
+                  "schoolLogo": null,
+                  "schoolFavicon": null,
+                  "enabled": true,
+                  "subDomain": null,
+                  "website": "www.redwoodsglobals.com",
+                  "schemaPrefix": null,
+                  "editedDate": "07-05-2024 06:38 PM",
+                  "editedUser": "quickadmin",
+                  "visitorSchool": false,
+                  "clientSchoolId": null,
+                  "cscId": null,
+                  "onlinePaymentEnabled": false,
+                  "registrationSeries": null,
+                  "underTakingDetails": null,
+                  "formNumberStart": null,
+                  "sessionResponse": null,
+                  "schoolLogoUrl": null,
+                  "printAcknowledge": false,
+                  "notificationEnabled": true,
+                  "loanEnabled": false,
+                  "whatsAppEnabled": false,
+                  "smsenabled": false
+               }
+            },
 
-          contentRequest: {
-            feeUid: "8e3fa9de-df3c-41b2-ad1f-707ae32ccd57",
-            receiptNo: "1",
-            admissionNo: "176",
-            studentName: "Tannu",
-            studentClass: "TENTH",
-            studentSection: "A",
-            paidInstallmentsName: "JAN",
-            feeDate: "29-01-2024",
-            feeTime: "12:13:15",
-            userName: "SANDEEPGARG_403245",
-            feeMode: "CASH",
-            feeModeNumber: "-",
-            modeBank: "-",
-            modeBranch: "-",
-            feeModeDate: "-",
-            feeModeRemark: null,
-            feeDeleteRemark: null,
-            isBounced: "0",
-            bouncedDate: "-",
-            totalAmount: "1900.00",
-            excessPaid: "0.00",
-            excessUsed: "0.00",
-            excessBalance: "0.0",
-            netReceived: "1900.00",
-            studentFeeCollectionReceiptList: [
-              {
-                componentName: "TUITION FEE",
-                componentAmount: "1600.00",
-                componentType: "",
-                componentConcession: "0.00",
-                componentDiscount: "0.00",
-                accountName: "ACCOUNT 1",
-                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
-                componentReceived: "1600.00",
-              },
-              {
-                componentName: "EXAM FEE",
-                componentAmount: "300.00",
-                componentType: "",
-                componentConcession: "0.00",
-                componentDiscount: "0.00",
-                accountName: "ACCOUNT 1",
-                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
-                componentReceived: "300.00",
-              },
-              {
-                componentName: "FINE",
-                componentAmount: "50.00",
-                componentType: "FINE",
-                componentConcession: "0.00",
-                componentDiscount: "50.00",
-                accountName: "ACCOUNT 1",
-                accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
-                componentReceived: "0.00",
-              },
-            ],
-          },
+            contentRequest: {
+               feeUid: "8e3fa9de-df3c-41b2-ad1f-707ae32ccd57",
+               receiptNo: "1",
+               admissionNo: "176",
+               studentName: "Tannu",
+               studentClass: "TENTH",
+               studentSection: "A",
+               paidInstallmentsName: "JAN",
+               feeDate: "29-01-2024",
+               feeTime: "12:13:15",
+               userName: "SANDEEPGARG_403245",
+               feeMode: "CASH",
+               feeModeNumber: "-",
+               modeBank: "-",
+               modeBranch: "-",
+               feeModeDate: "-",
+               feeModeRemark: null,
+               feeDeleteRemark: null,
+               isBounced: "0",
+               bouncedDate: "-",
+               totalAmount: "1900.00",
+               excessPaid: "0.00",
+               excessUsed: "0.00",
+               excessBalance: "0.0",
+               netReceived: "1900.00",
+               studentFeeCollectionReceiptList: [
+                  {
+                     componentName: "TUITION FEE",
+                     componentAmount: "1600.00",
+                     componentType: "",
+                     componentConcession: "0.00",
+                     componentDiscount: "0.00",
+                     accountName: "ACCOUNT 1",
+                     accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                     componentReceived: "1600.00",
+                  },
+                  {
+                     componentName: "EXAM FEE",
+                     componentAmount: "300.00",
+                     componentType: "",
+                     componentConcession: "0.00",
+                     componentDiscount: "0.00",
+                     accountName: "ACCOUNT 1",
+                     accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                     componentReceived: "300.00",
+                  },
+                  {
+                     componentName: "FINE",
+                     componentAmount: "50.00",
+                     componentType: "FINE",
+                     componentConcession: "0.00",
+                     componentDiscount: "50.00",
+                     accountName: "ACCOUNT 1",
+                     accountUid: "798aa82a-6e19-4994-aafc-667c9f2bd5e0",
+                     componentReceived: "0.00",
+                  },
+               ],
+            },
 
-          header: `
+            header: `
           <table style="width:100%;" cellspacing="0" cellpadding="0">
                   <tbody>
                      <tr>
@@ -1133,10 +1097,11 @@
                   </tbody>
                </table>
     `,
-          footer:
-            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
-        },
+            footer:
+               '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+         },
       ]);
-    </script>
-  </body>
+   </script>
+</body>
+
 </html>
