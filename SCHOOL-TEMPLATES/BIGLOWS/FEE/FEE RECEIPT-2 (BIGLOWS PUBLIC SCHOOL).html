@@ -449,14 +449,25 @@ size: A4 landscape;
                                 </tr>
                                     `
         })).join("")}
-                                ${feeDetails?.excessBalance > 0 ? ` <tr>
+                                ${feeDetails?.excessPaid > 0 ? ` <tr>
                                     <td align="left" style="width:5%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
-                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Excess Balance</td>
+                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Excess Paid</td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
                                     <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;"></td>
-                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${feeDetails?.excessBalance || ""}</td>
-                                </tr>` : ""}
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${feeDetails?.excessPaid || ""}</td>
+                                </tr> 
+                                ` : ""}
+                                ${feeDetails?.excessUsed > 0 ? `
+                                 <tr>
+                                    <td align="left" style="width:5%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Excess Used</td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;"></td>
+                                    <td align="right" style="width:20%; border-top: solid 0.25mm #000000; padding:2mm;font-weight:bold;">${feeDetails?.excessUsed || ""}</td>
+                                </tr>
+                                ` : ""}
                                 <tr>
                                     <td align="left" style="width:5%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;"></td>
                                     <td align="left" style="width:35%; border-top: solid 0.25mm #000000;padding:2mm; font-weight:bold;">Total Amount</td>

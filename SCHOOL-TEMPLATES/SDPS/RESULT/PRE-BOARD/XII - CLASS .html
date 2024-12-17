@@ -24,49 +24,98 @@
     };
 
     const getTerms = (termData) => {
-      const res = termData?.markSheetTerms
+      const head = termData?.markSheetTerms
         ?.map((d) => {
-          return `<th >${d?.headerName} <br/> ${d?.subHeaderName}</th>`;
+          return [
+            `<th>${d?.headerName}</th>`,
+
+          ].join("");
+        })
+        .join("");
+      const subHead = termData?.markSheetTerms
+        ?.map((d) => {
+          return [
+
+            `<th>${d?.subHeaderName}</th>`,
+          ].join("");
         })
         .join("");
 
-      return res;
+      return { head, subHead };
     };
 
     const getSubjectMarks = (marksData) => {
-      const subjects = marksData?.baseTermData?.subject?.filter((d) => {
-        return d.scholastic;
-      });
-
-      let check = true;
+      const subjects = marksData?.baseTermData?.subject?.filter((d) => d.scholastic);
 
       let str = "";
-      let grandTotal = 0
-      let totalMaxObtained = 0
-      subjects.forEach((sub, i) => {
-        let maxObtained = 0;
-        marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
-          (d) => {
-            if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
-              totalMaxObtained += d?.total
-              str += `<tr><td class="align-left" style="padding-left: 0.3rem;">${d?.subjectName
-                }</td>${d?.markSheetReport
-                  .map((v) => {
-                    maxObtained += Math.round(v?.obtained);
-                    return `<td  style="text-align: center;width:10%; font-weight:${v?.status ? "bold;" : ""
-                      }">${attendanceValue[v?.status?.toLowerCase()] || Math.round(v?.obtained) || "-"
-                      }</td>`;
-                  })
-                  .join("")} 
-              <td style="text-align: center ;color: red" >${maxObtained || "-"}</td>
-              <td style="text-align: center">${d?.grade || "-"}</td></tr>`;
-              grandTotal += maxObtained
-            }
-          }
-        );
-      });
+      let grandTotal = 0;
+      let totalMaxObtained = 0;
 
-      return { rows: str, grandTotal, colspan: marksData?.markData?.markSheetTerms.length, totalMaxObtained };
+      // Function to calculate grade based on percentage
+      const calculateGrade = (percentage) => {
+
+        if (percentage >= 80) return "A";
+
+        if (percentage >= 60) return "B";
+
+        if (percentage >= 40) return "C";
+        if (percentage >= 33) return "D";
+        return "E";
+
+      };
+
+      // Loop through subjects with step size of 2 to group theory and practical
+      for (let i = 0; i < subjects.length; i += 2) {
+        const theorySubject = subjects[i];
+        const practicalSubject = subjects[i + 1];
+
+        let theoryMarks = "-";
+        let theoryMaxMarks = 0;
+        let practicalMarks = "-";
+        let practicalMaxMarks = 0;
+
+        // Find the marks for the current pair of subjects
+        marksData?.markData?.subjectWiseMarkSheetReportResponses?.forEach((d) => {
+          if (theorySubject?.subjectAllResponse?.subjectName === d?.subjectName) {
+            theoryMarks = d?.markSheetReport?.[0]?.obtained || "-";
+            theoryMaxMarks = d?.markSheetReport?.[0]?.max || 0;
+          }
+          if (practicalSubject?.subjectAllResponse?.subjectName === d?.subjectName) {
+            practicalMarks = d?.markSheetReport?.[0]?.obtained || "-";
+            practicalMaxMarks = d?.markSheetReport?.[0]?.max || 0;
+          }
+        });
+
+        // Calculate percentage
+        const obtainedMarks =
+          (theoryMarks !== "-" ? Math.round(theoryMarks) : 0) +
+          (practicalMarks !== "-" ? Math.round(practicalMarks) : 0);
+        const maxMarks = theoryMaxMarks + practicalMaxMarks;
+
+        const percentage = maxMarks > 0 ? ((obtainedMarks / maxMarks) * 100).toFixed(2) : 0;
+        const grade = calculateGrade(percentage);
+
+        grandTotal += obtainedMarks;
+        totalMaxObtained += maxMarks;
+
+        // Append to the output string
+        str += `
+      <tr>
+        <td  style="padding-left: 0.3rem;text-align: left">${theorySubject?.subjectAllResponse?.subjectName}</td>
+        <td style="text-align: center;">${Math.round(theoryMarks) || "-"}</td>
+        <td style="text-align: center;">${Math.round(practicalMarks) || "-"}</td>
+        <td style="text-align: center;">${percentage}</td>
+        <td style="text-align: center;">${grade}</td>
+      </tr>`;
+      }
+
+      // Return the generated rows and totals
+      return {
+        rows: str,
+        grandTotal,
+        colspan: 4,
+        totalMaxObtained,
+      };
     };
 
     const getCoScholasticSub = (marksData) => {
@@ -79,7 +128,7 @@
       subjects.forEach((sub) => {
         str += `<tr><td class="align-left" colspan="10" style="padding-left: 0.3rem;">${sub?.subjectAllResponse?.subjectName
           }</td>
-              <td align="center" style="font-weight:${sub?.remarkStatus ? "bold;" : ""
+                <td align="center" style="font-weight:${sub?.remarkStatus ? "bold;" : ""
           }">${attendanceValue[sub?.remarkStatus?.toLowerCase()] || sub?.grade
           }</td></tr> `;
       });
@@ -89,235 +138,245 @@
 
     const student = document.getElementById("student");
     student.innerHTML = `
-           <style>
-            #student{
-            padding:1.2rem;
+            <style>
+              #student{
+              padding:1.2rem;
+              }
+
+                @page {
+                      size: A4
+                      }
+          .student-header-card {
+            width: 45%;
+            border: 1px solid;
+          }
+
+
+            .alignLeft{
+            text-align: left;
             }
 
-               @page {
-                    size: A4
-                    }
-        .student-header-card {
-          width: 45%;
-          border: 1px solid;
-        }
+          .scholastic-areas {
+            margin-top: 3rem;
+            border: 1px solid;
+          }
+          .subject-head,
+          .subject-list {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid;
+            padding: 3px;
+          }
+          .subject-head div {
+          }
 
+          .co-scholastic-areas {
+            border: 1px solid;
+            margin-top: 1.5rem;
+          }
 
-          .alignLeft{
-          text-align: left;
-           }
+          .co-scholastic-sub-list {
+            display: flex;
+            justify-content: space-between;
+          }
+          .co-scholastic-sub-list div {
+            width: 50%;
+            border: 1px solid;
+          }
+          .flex-btw {
+            display: flex;
+            justify-content: space-between;
+          }
 
-        .scholastic-areas {
-          margin-top: 3rem;
-          border: 1px solid;
-        }
-        .subject-head,
-        .subject-list {
-          display: flex;
-          justify-content: space-between;
-          border: 1px solid;
-          padding: 3px;
-        }
-        .subject-head div {
-        }
-
-        .co-scholastic-areas {
-          border: 1px solid;
-          margin-top: 1.5rem;
-        }
-
-        .co-scholastic-sub-list {
-          display: flex;
-          justify-content: space-between;
-        }
-        .co-scholastic-sub-list div {
-          width: 50%;
-          border: 1px solid;
-        }
-        .flex-btw {
-          display: flex;
-          justify-content: space-between;
-        }
-
-        .other-detail-table {
-          border: 1px solid;
-        }
-        p {
-          margin: 4px 0;
-          font-size: small;
-        }
-        .other-details-list {
-          width: 33%;
-          border-right: 1px solid;
-        }
-        .other-details-list p {
-          margin: 4px 16px;
-        }
-        .other-details-list-2 {
-          display: flex;
-          flex-direction: column;
-          width: 33%;
-          border-right: 1px solid;
-        }
-        .other-details-list-2 div {
-          display: flex;
-          justify-content: space-between;
-          margin: 0 1rem;
-          font-size:small;
-          text-align:center;
-        }
-        .student-header-card {
-          padding: 4px;
-          padding-left: 8px;
-        }
-        .student-header-card div {
-          width: 50%;
-        }
-        .align-left {
-          text-align: left;
-        }
-        table,
-        th,
-        td {
-          border-collapse: collapse;
-          border: 1px solid;
-          padding: 2px;
-        }
-        .paddingLeft {
-          padding-left: 2rem;
-        }
-      </style>`;
+          .other-detail-table {
+            border: 1px solid;
+          }
+          p {
+            margin: 4px 0;
+            font-size: small;
+          }
+          .other-details-list {
+            width: 33%;
+            border-right: 1px solid;
+          }
+          .other-details-list p {
+            margin: 4px 16px;
+          }
+          .other-details-list-2 {
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+            border-right: 1px solid;
+          }
+          .other-details-list-2 div {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 1rem;
+            font-size:small;
+            text-align:center;
+          }
+          .student-header-card {
+            padding: 4px;
+            padding-left: 8px;
+          }
+          .student-header-card div {
+            width: 50%;
+          }
+          .align-left {
+            text-align: left;
+          }
+          table,
+          th,
+          td {
+            border-collapse: collapse;
+            border: 1px solid;
+            padding: 2px;
+          }
+          .paddingLeft {
+            padding-left: 2rem;
+          }
+        </style>`;
 
     data?.forEach((st) => {
       student.innerHTML += `<div style="page-break-before: always;"></div>
-    <page orientation="portrait" format="A4" margin="0">
-      <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-      <div style="width:15%; ">
-        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_37_854900798.png" alt="" style="width:100%;"/>
-      </div>
-      <div style="width:50%; ">
-        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_18_859220087.png" alt="" style="width:100%; height:140px;"/>
-      </div>
-      <div style="width:15%; ">
-        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_18_848990259.png" alt="" style="width:100%; "/>
-      </div>
-      </div>
-      <div style="text-align: center; font-weight: bold; margin-top:-5px;">
-          <p style="font-size:18px; padding:0px; margin:0px;">PERFORMANCE REPORT</p>
-          <p style="font-size:18px; padding:0px; margin:0px;">${st?.markData?.markSheetName
-        }</p>
-        <p style="font-size:18px; padding:0px; margin:0px;">SESSION : ${st?.markData?.academicSession
-        }</p
-          <p style="font-size:18px; padding:0px; margin:0px;">CLASS : ${st?.student?.className
-        }</p>
+      <page orientation="portrait" format="A4" margin="0">
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+        <div style="width:15%; ">
+          <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_37_854900798.png" alt="" style="width:100%;"/>
         </div>
+        <div style="width:50%; ">
+          <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_18_859220087.png" alt="" style="width:100%; height:140px;"/>
+        </div>
+        <div style="width:15%; ">
+          <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-09-19T11_32_18_848990259.png" alt="" style="width:100%; "/>
+        </div>
+        </div>
+        <div style="text-align: center; font-weight: bold; margin-top:-5px;">
+            <p style="font-size:18px; padding:0px; margin:0px;">PERFORMANCE REPORT</p>
+            <p style="font-size:18px; padding:0px; margin:0px;">${st?.markData?.markSheetName
+        }</p>
+          <p style="font-size:18px; padding:0px; margin:0px;">SESSION : ${st?.markData?.academicSession
+        }</p
+            <p style="font-size:18px; padding:0px; margin:0px;">CLASS : ${st?.student?.className
+        }</p>
+          </div>
 
-<table style="width: 100%; border-collapse: collapse;">
-  <tr>
-    <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border-right:none; width: 20%">
-      <strong>STUDENT'S NAME</strong>
-    </td>
-    <td style="text-align: left;   border-left:none; ">: ${st?.student?.studentName
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border-right:none; width: 20%">
+        <strong>STUDENT'S NAME</strong>
+      </td>
+      <td style="text-align: left;   border-left:none; ">: ${st?.student?.studentName
         }</td>
-    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none ; width: 20%">
-      <strong>ADMISSION NO</strong> 
-    </td>
-    <td style="text-align: left;  border-left:none;">: ${st?.student?.admissionNo
+      <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none ; width: 20%">
+        <strong>ADMISSION NO</strong> 
+      </td>
+      <td style="text-align: left;  border-left:none;">: ${st?.student?.admissionNo
         }</td>
-  </tr>
-  <tr>
-    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
-      <strong>FATHER'S NAME</strong> 
-    </td>
-    <td style="text-align: left;  border-left:none;">: ${st?.student?.fatherName
+    </tr>
+    <tr>
+      <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+        <strong>FATHER'S NAME</strong> 
+      </td>
+      <td style="text-align: left;  border-left:none;">: ${st?.student?.fatherName
         }</td>
-    <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px;border-right:none">
-      <strong>CLASS & SECTION</strong> 
-    </td>
-    <td style="text-align: left;  border-left:none;">: ${st?.student?.className + "-" + st?.student?.sectionName
+      <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px;border-right:none">
+        <strong>CLASS & SECTION</strong> 
+      </td>
+      <td style="text-align: left;  border-left:none;">: ${st?.student?.className + "-" + st?.student?.sectionName
         }</td>
-  </tr>
-  <tr>
-    <td style="text-align: left; padding-left: 0.3rem;   padding-right: 10px;border-right:none">
-      <strong>MOTHER'S NAME</strong> 
-    </td>
-    <td style="text-align: left;  border-left:none;">: ${st?.student?.motherName
+    </tr>
+    <tr>
+      <td style="text-align: left; padding-left: 0.3rem;   padding-right: 10px;border-right:none">
+        <strong>MOTHER'S NAME</strong> 
+      </td>
+      <td style="text-align: left;  border-left:none;">: ${st?.student?.motherName
         }</td>
-    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
-      <strong>ROLL NO</strong> 
-    </td>
-    <td style="text-align: left;  border-left:none;">: ${st?.student?.rollNo
+      <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+        <strong>ROLL NO</strong> 
+      </td>
+      <td style="text-align: left;  border-left:none;">: ${st?.student?.rollNo
         }</td>
-  </tr>
-  <tr>
-    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
-      <strong>DATE OF BIRTH</strong> 
-    </td>
-    <td style="text-align: left;   border-left:none;">: ${st?.student.studentInfoResponse?.[0]?.dob
+    </tr>
+    <tr>
+      <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+        <strong>DATE OF BIRTH</strong> 
+      </td>
+      <td style="text-align: left;   border-left:none;">: ${st?.student.studentInfoResponse?.[0]?.dob
         }</td>
-    <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
-      <strong>ATTENDANCE</strong> 
-    </td>
-    <td style="text-align: left;   border-left:none;">:${st?.baseTermData?.remarksEntry?.fields?.find(
+      <td style="text-align: left; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+        <strong>ATTENDANCE</strong> 
+      </td>
+      <td style="text-align: left;   border-left:none;">:${st?.baseTermData?.remarksEntry?.fields?.find(
           (f) => f.title === "Attendance"
         )?.value || "-"
         } </td>
-  </tr>
-</table>
+    </tr>
+  </table>
 
 
-<table style="width: 100%; border: none; ">
-          <tr>
-            <div style="margin:8px 0;text-align: center;font-size:14px;font-weight:bold;">SCHOLASTIC AREAS</div>
-            <th class="align-left" style="width: 20%;  padding-left: 0.3rem;">SUBJECTS</th>
-          ${getTerms(st?.markData)}
-            <th style="width:11%">TOTAL</th>
-            <th style="width:11%;">GRADE</th>
+  <table style="width: 100%; border: none; margin-top: 20px; ">
+    <tr>
+            
+              <th style="text-align: left;width:20%;" >SCHOLASTIC</th>
+           <th style="width:20%;">THEORY</th>
+           <th style="width:20%;">PRACTICAL</th>
+              <th style="width:20%;">TOTAL</th>
+              <th style="width:20%;">GRADE</th>
 
-          </tr>
-          <tr>
-            ${getSubjectMarks(st)?.rows}
-              <tr>
-                  <td style="text-align:left;font-weight:bold; border:none;">Total : ${getSubjectMarks(st)?.grandTotal}</td> 
-                   <td colspan=${getSubjectMarks(st)?.colspan
-        } style="text-align:left;font-weight:bold;  border:none;"></td> 
-                   <td colspan=2 style="text-align:right;font-weight:bold; border:none;" >Percentage : ${((getSubjectMarks(st)?.grandTotal / getSubjectMarks(st)?.totalMaxObtained) * 100).toFixed(0)}%</td>
-                  </td>
-             </tr>
-          </tr>
+            </tr>
+            <tr>
+              <th style="text-align: left;" >SUBJECTS</th>
+            <th >80/70/30</th>
+              <th >20/30/70</th>
+              <th >100</th>
+              <th ></th>
+
+            </tr>
+            <tr>
+              ${getSubjectMarks(st)?.rows}
+               
+            </tr>
+            <tr>
+                    <td style="text-align:left;font-weight:bold; border:none;">Total : ${getSubjectMarks(st)?.grandTotal}</td> 
+                    <td colspan=2 style="text-align:left;font-weight:bold;  border:none;"></td> 
+                    <td colspan=2 style="text-align:right;font-weight:bold; border:none;" >Percentage : ${((getSubjectMarks(st)?.grandTotal / getSubjectMarks(st)?.totalMaxObtained) * 100).toFixed(0)}%</td>
+                    </td>
+              </tr>
+          </table>
+
+
+          <table style="width:100%; margin-top:20px;">
+            <tr style="margin-top:4px;">
+                <th class="alignLeft" colspan="10" style="padding-left: 0.3rem;">CO-SCHOLASTIC</th>
+                <th  style="min-width:100px;">GRADE</th>
+            </tr>
+          ${getCoScholasticSub(st)}
+
         </table>
-
-
-         <table style="width:100%;">
-          <div style="margin: 4px 0;text-align: center;font-size:14px;font-weight:bold;margin-top:3px;">CO-SCHOLASTIC AREAS</div>
-          <tr style="margin-top:4px;">
-              <th class="alignLeft" colspan="10" style="padding-left: 0.3rem;">SUBJECTS</th>
-              <th  style="min-width:100px;">GRADE</th>
-          </tr>
-        ${getCoScholasticSub(st)}
-
-      </table>
-        <div
-          class="total"
-          style="display: flex; justify-content: space-between; margin: 1rem 0"
-        >
-
-        </div>
-        
-        <div class="other-details">
-          <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; font-weight:bold;">
-            <div>CLASS TEACHER</div>
-            <div>EXAMINATION INCHARGE</div>
-            <div>PRINCIPAL</div>
-          </div>
+          <div
+            class="total"
+            style="display: flex; justify-content: space-between; margin: 1rem 0"
+          >
 
           </div>
-        </div>
-    </page>
+          
+          <div class="other-details">
+            <div class="flex-btw" style="margin-top: 4rem; margin-bottom: 8px; font-weight:bold;">
+              <div>CLASS TEACHER</div>
+              <div>EXAMINATION INCHARGE</div>
+              <div>PRINCIPAL</div>
+            </div>
 
-      `;
+            </div>
+          </div>
+      </page>
+
+        `;
     });
   };
+
+
 </script>
 <script>
   window.SetTemplateData([
@@ -636,34 +695,22 @@
       },
       markData: {
         "academicSession": "2024-2025",
-        "admissionNo": "20159460",
-        "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-        "studentName": "Aarush Chandel",
-        "rollNo": 10101,
-        "fatherName": "Lovlit Singh Chandel",
-        "className": "X",
+        "admissionNo": "20138167",
+        "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+        "studentName": "Abhishek",
+        "rollNo": 12101,
+        "fatherName": "Sandeep Kumar",
+        "className": "XII",
         "sectionName": "A",
         "terms": "PRE BOARD",
         "markSheetName": "PRE BOARD",
         "overAllRank": "1",
         "markSheetTerms": [
           {
-            "id": 1453,
-            "headerName": "INTERNAL ASSESSMENT",
-            "subHeaderName": "(20/50)",
+            "id": 1458,
+            "headerName": "PRE BOARD",
+            "subHeaderName": "80/70",
             "priority": 1,
-            "bestOf": 0,
-            "decimalPlaces": 2,
-            "weightage": 20,
-            "terms": [
-              "Internal"
-            ]
-          },
-          {
-            "id": 1454,
-            "headerName": "THEORY",
-            "subHeaderName": "(80/50)",
-            "priority": 2,
             "bestOf": 0,
             "decimalPlaces": 2,
             "weightage": 80,
@@ -679,68 +726,31 @@
             "subjectNature": "THEORY",
             "markSheetReport": [
               {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
                 "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                "subjectName": "ENGLISH",
-                "subjectNature": "THEORY",
-                "max": 20,
-                "obtained": 18,
-                "grade": "A2",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
-                  "priority": 1,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
                 "terms": "PRE BOARD",
                 "subjectUid": "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
                 "subjectName": "ENGLISH",
                 "subjectNature": "THEORY",
                 "max": 80,
-                "obtained": 55,
-                "grade": "B2",
+                "obtained": 58,
+                "grade": "B1",
                 "status": "",
                 "markSheetName": "PRE BOARD",
-                "attachmentName": "",
+                "attachmentName": "ENGLISH",
                 "session": "2024-2025",
                 "decimalPlaces": 2,
                 "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
                   "bestOf": 0,
                   "decimalPlaces": 2,
                   "weightage": 80,
@@ -753,11 +763,11 @@
                 "pass": true
               }
             ],
-            "marksObtained": 73,
-            "total": 100,
-            "percentage": 73,
+            "marksObtained": 58,
+            "total": 80,
+            "percentage": 72.5,
             "grade": "B1",
-            "className": "X",
+            "className": "XII",
             "sectionName": "A",
             "terms": "PRE BOARD",
             "markSheetName": "PRE BOARD",
@@ -766,73 +776,36 @@
             "visible": false
           },
           {
-            "subjectUid": "56d48e61-36a7-4f00-a316-e0d141a9a986",
-            "subjectName": "HINDI",
-            "subjectNature": "THEORY",
+            "subjectUid": "4a79fc7e-05f0-4b4f-bffb-b5847379da17",
+            "subjectName": "ENGLISH PR",
+            "subjectNature": "PRACTICAL",
             "markSheetReport": [
               {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
                 "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
                 "terms": "PRE BOARD",
-                "subjectUid": "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                "subjectName": "HINDI",
-                "subjectNature": "THEORY",
-                "max": 20,
-                "obtained": 19,
+                "subjectUid": "4a79fc7e-05f0-4b4f-bffb-b5847379da17",
+                "subjectName": "ENGLISH PR",
+                "subjectNature": "PRACTICAL",
+                "max": 80,
+                "obtained": 80,
                 "grade": "A1",
                 "status": "",
                 "markSheetName": "PRE BOARD",
-                "attachmentName": "",
+                "attachmentName": "ENGLISH",
                 "session": "2024-2025",
                 "decimalPlaces": 2,
                 "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
                   "priority": 1,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                "subjectName": "HINDI",
-                "subjectNature": "THEORY",
-                "max": 80,
-                "obtained": 30,
-                "grade": "D",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
                   "bestOf": 0,
                   "decimalPlaces": 2,
                   "weightage": 80,
@@ -845,11 +818,11 @@
                 "pass": true
               }
             ],
-            "marksObtained": 49,
-            "total": 100,
-            "percentage": 49,
-            "grade": "C2",
-            "className": "X",
+            "marksObtained": 80,
+            "total": 80,
+            "percentage": 100,
+            "grade": "A1",
+            "className": "XII",
             "sectionName": "A",
             "terms": "PRE BOARD",
             "markSheetName": "PRE BOARD",
@@ -858,73 +831,36 @@
             "visible": false
           },
           {
-            "subjectUid": "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-            "subjectName": "MATHEMATICS",
+            "subjectUid": "fc807c99-8d9a-4d5a-8c61-d3df7002c5de",
+            "subjectName": "GEOGRAPHY",
             "subjectNature": "THEORY",
             "markSheetReport": [
               {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
                 "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
                 "terms": "PRE BOARD",
-                "subjectUid": "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                "subjectName": "MATHEMATICS",
-                "subjectNature": "THEORY",
-                "max": 20,
-                "obtained": 20,
-                "grade": "A1",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
-                  "priority": 1,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                "subjectName": "MATHEMATICS",
+                "subjectUid": "fc807c99-8d9a-4d5a-8c61-d3df7002c5de",
+                "subjectName": "GEOGRAPHY",
                 "subjectNature": "THEORY",
                 "max": 80,
-                "obtained": 17.5,
+                "obtained": 26.29,
                 "grade": "E",
                 "status": "",
                 "markSheetName": "PRE BOARD",
-                "attachmentName": "",
+                "attachmentName": "GEOGRAPHY",
                 "session": "2024-2025",
                 "decimalPlaces": 2,
                 "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
                   "bestOf": 0,
                   "decimalPlaces": 2,
                   "weightage": 80,
@@ -937,11 +873,121 @@
                 "pass": false
               }
             ],
-            "marksObtained": 37.5,
-            "total": 100,
-            "percentage": 37.5,
-            "grade": "D",
-            "className": "X",
+            "marksObtained": 26.29,
+            "total": 80,
+            "percentage": 32.86,
+            "grade": "E",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 3,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "91888616-b3e8-45c8-be5c-d0e79bbf1b75",
+            "subjectName": "GEOGRAPHY PR",
+            "subjectNature": "PRACTICAL",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "91888616-b3e8-45c8-be5c-d0e79bbf1b75",
+                "subjectName": "GEOGRAPHY PR",
+                "subjectNature": "PRACTICAL",
+                "max": 80,
+                "obtained": 53.33,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "GEOGRAPHY",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 53.33,
+            "total": 80,
+            "percentage": 66.66,
+            "grade": "B2",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 4,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "4e6d548a-f0f1-49e3-acd5-336fed9c2b2a",
+            "subjectName": "ECONOMICS",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "4e6d548a-f0f1-49e3-acd5-336fed9c2b2a",
+                "subjectName": "ECONOMICS",
+                "subjectNature": "THEORY",
+                "max": 80,
+                "obtained": 17.5,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "ECONOMICS",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": false
+              }
+            ],
+            "marksObtained": 17.5,
+            "total": 80,
+            "percentage": 21.88,
+            "grade": "E",
+            "className": "XII",
             "sectionName": "A",
             "terms": "PRE BOARD",
             "markSheetName": "PRE BOARD",
@@ -950,73 +996,36 @@
             "visible": false
           },
           {
-            "subjectUid": "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-            "subjectName": "SCIENCE",
-            "subjectNature": "THEORY",
+            "subjectUid": "a4093f62-dcbe-418d-b551-3a60a1fa4926",
+            "subjectName": "ECONOMICS PR",
+            "subjectNature": "PRACTICAL",
             "markSheetReport": [
               {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
                 "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
                 "terms": "PRE BOARD",
-                "subjectUid": "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                "subjectName": "SCIENCE",
-                "subjectNature": "THEORY",
-                "max": 20,
-                "obtained": 20,
-                "grade": "A1",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
-                  "priority": 1,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                "subjectName": "SCIENCE",
-                "subjectNature": "THEORY",
+                "subjectUid": "a4093f62-dcbe-418d-b551-3a60a1fa4926",
+                "subjectName": "ECONOMICS PR",
+                "subjectNature": "PRACTICAL",
                 "max": 80,
-                "obtained": 32,
-                "grade": "D",
+                "obtained": 72,
+                "grade": "A2",
                 "status": "",
                 "markSheetName": "PRE BOARD",
-                "attachmentName": "",
+                "attachmentName": "ECONOMICS",
                 "session": "2024-2025",
                 "decimalPlaces": 2,
                 "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
                   "bestOf": 0,
                   "decimalPlaces": 2,
                   "weightage": 80,
@@ -1029,11 +1038,11 @@
                 "pass": true
               }
             ],
-            "marksObtained": 52,
-            "total": 100,
-            "percentage": 52,
-            "grade": "C1",
-            "className": "X",
+            "marksObtained": 72,
+            "total": 80,
+            "percentage": 90,
+            "grade": "A2",
+            "className": "XII",
             "sectionName": "A",
             "terms": "PRE BOARD",
             "markSheetName": "PRE BOARD",
@@ -1042,75 +1051,38 @@
             "visible": false
           },
           {
-            "subjectUid": "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-            "subjectName": "SOCIAL SCIENCE",
+            "subjectUid": "b587ff77-4f1f-47e3-a8c0-4169aeaa102b",
+            "subjectName": "INFORMATICS PRACTICES",
             "subjectNature": "THEORY",
             "markSheetReport": [
               {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
                 "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
                 "terms": "PRE BOARD",
-                "subjectUid": "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                "subjectName": "SOCIAL SCIENCE",
+                "subjectUid": "b587ff77-4f1f-47e3-a8c0-4169aeaa102b",
+                "subjectName": "INFORMATICS PRACTICES",
                 "subjectNature": "THEORY",
-                "max": 20,
-                "obtained": 0,
-                "grade": "E",
-                "status": "Absent",
+                "max": 80,
+                "obtained": 65.14,
+                "grade": "A2",
+                "status": "",
                 "markSheetName": "PRE BOARD",
-                "attachmentName": "",
+                "attachmentName": "INFORMATICS PRACTICES",
                 "session": "2024-2025",
                 "decimalPlaces": 2,
                 "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
                   "priority": 1,
                   "bestOf": 0,
                   "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": false
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                "subjectName": "SOCIAL SCIENCE",
-                "subjectNature": "THEORY",
-                "max": 80,
-                "obtained": 30,
-                "grade": "D",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
                   "weightage": 80,
                   "terms": [
                     "PRE BOARD"
@@ -1121,170 +1093,298 @@
                 "pass": true
               }
             ],
-            "marksObtained": 30,
-            "total": 100,
-            "percentage": 30,
-            "grade": "E",
-            "className": "X",
-            "sectionName": "A",
-            "terms": "PRE BOARD",
-            "markSheetName": "PRE BOARD",
-            "subjectPrt": 7,
-            "decimalPlaces": 2,
-            "visible": false
-          },
-          {
-            "subjectUid": "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
-            "subjectName": "INFORMATION TECHNOLOGY",
-            "subjectNature": "2A LIFE SKILLS",
-            "markSheetReport": [
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
-                "subjectName": "INFORMATION TECHNOLOGY",
-                "subjectNature": "2A LIFE SKILLS",
-                "max": 50,
-                "obtained": 50,
-                "grade": "A1",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1453,
-                  "headerName": "INTERNAL ASSESSMENT",
-                  "subHeaderName": "(20/50)",
-                  "priority": 1,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 20,
-                  "terms": [
-                    "Internal"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              },
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
-                "subjectName": "INFORMATION TECHNOLOGY",
-                "subjectNature": "2A LIFE SKILLS",
-                "max": 50,
-                "obtained": 27,
-                "grade": "C1",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 80,
-                  "terms": [
-                    "PRE BOARD"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              }
-            ],
-            "marksObtained": 77,
-            "total": 100,
-            "percentage": 77,
-            "grade": "B1",
-            "className": "X",
-            "sectionName": "A",
-            "terms": "PRE BOARD",
-            "markSheetName": "PRE BOARD",
-            "subjectPrt": 8,
-            "decimalPlaces": 2,
-            "visible": false
-          },
-          {
-            "subjectUid": "b6a8b747-d821-4d59-a9b5-a0a3341703e6",
-            "subjectName": "INFORMATION TECHNOLOGY PR",
-            "subjectNature": "PRACTICAL",
-            "markSheetReport": [
-              {
-                "studentInfoUid": "f4170e35-d918-4350-a54f-304a1b607254",
-                "admissionNo": "20159460",
-                "studentName": "Aarush Chandel",
-                "rollNo": 10101,
-                "fatherName": "Lovlit Singh Chandel",
-                "className": "X",
-                "sectionName": "A",
-                "classSectionUid": "8734037e-ee34-45a0-9e8b-fadc8d4b87a4",
-                "terms": "PRE BOARD",
-                "subjectUid": "b6a8b747-d821-4d59-a9b5-a0a3341703e6",
-                "subjectName": "INFORMATION TECHNOLOGY PR",
-                "subjectNature": "PRACTICAL",
-                "max": 80,
-                "obtained": 59.2,
-                "grade": "B1",
-                "status": "",
-                "markSheetName": "PRE BOARD",
-                "attachmentName": "",
-                "session": "2024-2025",
-                "decimalPlaces": 2,
-                "markSheetTermResponse": {
-                  "id": 1454,
-                  "headerName": "THEORY",
-                  "subHeaderName": "(80/50)",
-                  "priority": 2,
-                  "bestOf": 0,
-                  "decimalPlaces": 2,
-                  "weightage": 80,
-                  "terms": [
-                    "PRE BOARD"
-                  ]
-                },
-                "visible": false,
-                "graded": false,
-                "pass": true
-              }
-            ],
-            "marksObtained": 59.2,
+            "marksObtained": 65.14,
             "total": 80,
-            "percentage": 74,
-            "grade": "B1",
-            "className": "X",
+            "percentage": 81.43,
+            "grade": "A2",
+            "className": "XII",
             "sectionName": "A",
             "terms": "PRE BOARD",
             "markSheetName": "PRE BOARD",
             "subjectPrt": 9,
             "decimalPlaces": 2,
             "visible": false
+          },
+          {
+            "subjectUid": "e63df624-142d-4564-9752-645a91d125d3",
+            "subjectName": "INFORMATICS PRACTICES PR",
+            "subjectNature": "PRACTICAL",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "e63df624-142d-4564-9752-645a91d125d3",
+                "subjectName": "INFORMATICS PRACTICES PR",
+                "subjectNature": "PRACTICAL",
+                "max": 80,
+                "obtained": 66.67,
+                "grade": "A2",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "INFORMATICS PRACTICES",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 66.67,
+            "total": 80,
+            "percentage": 83.34,
+            "grade": "A2",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 10,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "dfb7b176-b4f3-40a8-88e7-b1915bcdbc16",
+            "subjectName": "PSYCHOLOGY",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "dfb7b176-b4f3-40a8-88e7-b1915bcdbc16",
+                "subjectName": "PSYCHOLOGY",
+                "subjectNature": "THEORY",
+                "max": 80,
+                "obtained": 19.43,
+                "grade": "E",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "PSYCHOLOGY",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": false
+              }
+            ],
+            "marksObtained": 19.43,
+            "total": 80,
+            "percentage": 24.29,
+            "grade": "E",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 13,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "0f738754-2ac3-45bb-8912-0065f44714f2",
+            "subjectName": "PSYCHOLOGY PR",
+            "subjectNature": "PRACTICAL",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "0f738754-2ac3-45bb-8912-0065f44714f2",
+                "subjectName": "PSYCHOLOGY PR",
+                "subjectNature": "PRACTICAL",
+                "max": 80,
+                "obtained": 64,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "PSYCHOLOGY",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 64,
+            "total": 80,
+            "percentage": 80,
+            "grade": "B1",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 14,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "b6d15e62-0a02-4723-828e-871f1412afd6",
+            "subjectName": "PHYSICAL EDUCATION",
+            "subjectNature": "THEORY",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "b6d15e62-0a02-4723-828e-871f1412afd6",
+                "subjectName": "PHYSICAL EDUCATION",
+                "subjectNature": "THEORY",
+                "max": 80,
+                "obtained": 57.14,
+                "grade": "B1",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "PHYSICAL EDUCATION",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 57.14,
+            "total": 80,
+            "percentage": 71.43,
+            "grade": "B1",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 17,
+            "decimalPlaces": 2,
+            "visible": false
+          },
+          {
+            "subjectUid": "0ff880b8-b2fd-4b76-9c39-f8ae414fd8e3",
+            "subjectName": "PHYSICAL EDUCATION PR",
+            "subjectNature": "PRACTICAL",
+            "markSheetReport": [
+              {
+                "studentInfoUid": "ba421cfd-7cec-4fc6-9103-52dd66cab2da",
+                "admissionNo": "20138167",
+                "studentName": "Abhishek",
+                "rollNo": 12101,
+                "fatherName": "Sandeep Kumar",
+                "className": "XII",
+                "sectionName": "A",
+                "classSectionUid": "68bcfccf-a0d7-4742-9424-b1ff6c20c918",
+                "terms": "PRE BOARD",
+                "subjectUid": "0ff880b8-b2fd-4b76-9c39-f8ae414fd8e3",
+                "subjectName": "PHYSICAL EDUCATION PR",
+                "subjectNature": "PRACTICAL",
+                "max": 80,
+                "obtained": 56,
+                "grade": "B2",
+                "status": "",
+                "markSheetName": "PRE BOARD",
+                "attachmentName": "PHYSICAL EDUCATION",
+                "session": "2024-2025",
+                "decimalPlaces": 2,
+                "markSheetTermResponse": {
+                  "id": 1458,
+                  "headerName": "PRE BOARD",
+                  "subHeaderName": "80/70",
+                  "priority": 1,
+                  "bestOf": 0,
+                  "decimalPlaces": 2,
+                  "weightage": 80,
+                  "terms": [
+                    "PRE BOARD"
+                  ]
+                },
+                "visible": false,
+                "graded": false,
+                "pass": true
+              }
+            ],
+            "marksObtained": 56,
+            "total": 80,
+            "percentage": 70,
+            "grade": "B2",
+            "className": "XII",
+            "sectionName": "A",
+            "terms": "PRE BOARD",
+            "markSheetName": "PRE BOARD",
+            "subjectPrt": 18,
+            "decimalPlaces": 2,
+            "visible": false
           }
         ],
-        "marksObtained": 377.7,
-        "total": 680,
-        "percentage": 55.54,
-        "overAllGrade": "C1",
+        "marksObtained": 635.5,
+        "total": 960,
+        "percentage": 66.2,
+        "overAllGrade": "B2",
         "visible": false
       },
       remarks: {
@@ -1637,11 +1737,11 @@
             },
             "termName": "PRE BOARD",
             "max": 80,
-            "markObtained": 55,
-            "percentage": 68.75,
-            "grade": "B2",
+            "markObtained": 58,
+            "percentage": 72.5,
+            "grade": "B1",
             "remarkStatus": "",
-            "attachmentName": "",
+            "attachmentName": "ENGLISH",
             "additional": false,
             "priority": 1,
             "scholastic": true,
@@ -1649,158 +1749,8 @@
           },
           {
             "subjectAllResponse": {
-              "uid": "56d48e61-36a7-4f00-a316-e0d141a9a986",
-              "subjectName": "HINDI",
-              "nature": "THEORY",
-              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "user_374830",
-              "editedUser": "user_374830",
-              "createddate": "2024-05-16 06:44:48.348445",
-              "editeddate": "2024-05-16 06:44:48.348005"
-            },
-            "termName": "PRE BOARD",
-            "max": 80,
-            "markObtained": 30,
-            "percentage": 37.5,
-            "grade": "D",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 2,
-            "scholastic": true,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-              "subjectName": "MATHEMATICS",
-              "nature": "THEORY",
-              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "user_374830",
-              "editedUser": "user_374830",
-              "createddate": "2024-05-16 06:45:28.451693",
-              "editeddate": "2024-05-16 06:45:28.449747"
-            },
-            "termName": "PRE BOARD",
-            "max": 80,
-            "markObtained": 17.5,
-            "percentage": 21.875,
-            "grade": "E",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 5,
-            "scholastic": true,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-              "subjectName": "SCIENCE",
-              "nature": "THEORY",
-              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "QuickCampus",
-              "editedUser": "QuickCampus",
-              "createddate": "2024-05-22 04:51:28.465457",
-              "editeddate": "2024-05-22 04:51:28.46146"
-            },
-            "termName": "PRE BOARD",
-            "max": 80,
-            "markObtained": 32,
-            "percentage": 40,
-            "grade": "D",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 6,
-            "scholastic": true,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-              "subjectName": "SOCIAL SCIENCE",
-              "nature": "THEORY",
-              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "QuickCampus",
-              "editedUser": "user_374830",
-              "createddate": "2024-05-22 04:51:33.462211",
-              "editeddate": "2024-06-03 05:22:15.306851"
-            },
-            "termName": "PRE BOARD",
-            "max": 80,
-            "markObtained": 30,
-            "percentage": 37.5,
-            "grade": "D",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 7,
-            "scholastic": true,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
-              "subjectName": "INFORMATION TECHNOLOGY",
-              "nature": "2A LIFE SKILLS",
-              "natureUid": "697b3ac1-52ee-47f3-8975-f57484813072",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "user_374830",
-              "editedUser": "QuickCampus",
-              "createddate": "2024-05-16 06:46:01.304863",
-              "editeddate": "2024-07-18 09:05:05.992916"
-            },
-            "termName": "PRE BOARD",
-            "max": 50,
-            "markObtained": 27,
-            "percentage": 54,
-            "grade": "C1",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 8,
-            "scholastic": true,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "b6a8b747-d821-4d59-a9b5-a0a3341703e6",
-              "subjectName": "INFORMATION TECHNOLOGY PR",
+              "uid": "4a79fc7e-05f0-4b4f-bffb-b5847379da17",
+              "subjectName": "ENGLISH PR",
               "nature": "PRACTICAL",
               "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
               "cbseVIIICode": "",
@@ -1812,27 +1762,147 @@
               "haveChild": false,
               "createdUser": "QuickCampus",
               "editedUser": "QuickCampus",
-              "createddate": "2024-07-18 11:40:20.170321",
-              "editeddate": "2024-07-18 11:40:20.158284"
+              "createddate": "2024-07-19 10:27:16.844459",
+              "editeddate": "2024-07-19 10:27:16.843834"
             },
             "termName": "PRE BOARD",
-            "max": 50,
-            "markObtained": 37,
-            "percentage": 74,
-            "grade": "B1",
+            "max": 20,
+            "markObtained": 20,
+            "percentage": 100,
+            "grade": "A1",
             "remarkStatus": "",
-            "attachmentName": "",
+            "attachmentName": "ENGLISH",
             "additional": false,
-            "priority": 9,
+            "priority": 2,
             "scholastic": true,
             "added": true
           },
           {
             "subjectAllResponse": {
-              "uid": "075b8ea5-6715-4666-b004-a24297fd9a84",
-              "subjectName": "ART EDUCATION",
-              "nature": "2A LIFE SKILLS",
-              "natureUid": "697b3ac1-52ee-47f3-8975-f57484813072",
+              "uid": "fc807c99-8d9a-4d5a-8c61-d3df7002c5de",
+              "subjectName": "GEOGRAPHY",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 06:47:21.093852",
+              "editeddate": "2024-07-18 06:47:21.090739"
+            },
+            "termName": "PRE BOARD",
+            "max": 70,
+            "markObtained": 23,
+            "percentage": 32.857142857142854,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "GEOGRAPHY",
+            "additional": false,
+            "priority": 3,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "91888616-b3e8-45c8-be5c-d0e79bbf1b75",
+              "subjectName": "GEOGRAPHY PR",
+              "nature": "PRACTICAL",
+              "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-19 10:27:32.611917",
+              "editeddate": "2024-07-19 10:27:32.611426"
+            },
+            "termName": "PRE BOARD",
+            "max": 30,
+            "markObtained": 20,
+            "percentage": 66.66666666666667,
+            "grade": "B2",
+            "remarkStatus": "",
+            "attachmentName": "GEOGRAPHY",
+            "additional": false,
+            "priority": 4,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "4e6d548a-f0f1-49e3-acd5-336fed9c2b2a",
+              "subjectName": "ECONOMICS",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 06:51:40.78921",
+              "editeddate": "2024-07-18 06:51:40.785213"
+            },
+            "termName": "PRE BOARD",
+            "max": 80,
+            "markObtained": 17.5,
+            "percentage": 21.875,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "ECONOMICS",
+            "additional": false,
+            "priority": 5,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "a4093f62-dcbe-418d-b551-3a60a1fa4926",
+              "subjectName": "ECONOMICS PR",
+              "nature": "PRACTICAL",
+              "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-19 10:28:07.36693",
+              "editeddate": "2024-07-19 10:28:07.366086"
+            },
+            "termName": "PRE BOARD",
+            "max": 20,
+            "markObtained": 18,
+            "percentage": 90,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "ECONOMICS",
+            "additional": false,
+            "priority": 6,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "b587ff77-4f1f-47e3-a8c0-4169aeaa102b",
+              "subjectName": "INFORMATICS PRACTICES",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
               "cbseVIIICode": "",
               "cbseXCode": "",
               "cbseXIICode": "",
@@ -1841,19 +1911,229 @@
               "parentName": [],
               "haveChild": false,
               "createdUser": "user_374830",
-              "editedUser": "user_374830",
-              "createddate": "2024-06-03 05:22:45.656365",
-              "editeddate": "2024-06-05 03:45:33.082566"
+              "editedUser": "QuickCampus",
+              "createddate": "2024-06-03 05:22:45.716179",
+              "editeddate": "2024-07-18 06:55:12.429307"
+            },
+            "termName": "PRE BOARD",
+            "max": 70,
+            "markObtained": 57,
+            "percentage": 81.42857142857143,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "INFORMATICS PRACTICES",
+            "additional": false,
+            "priority": 9,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "e63df624-142d-4564-9752-645a91d125d3",
+              "subjectName": "INFORMATICS PRACTICES PR",
+              "nature": "PRACTICAL",
+              "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-19 10:28:39.749169",
+              "editeddate": "2024-07-19 10:28:39.748374"
+            },
+            "termName": "PRE BOARD",
+            "max": 30,
+            "markObtained": 25,
+            "percentage": 83.33333333333333,
+            "grade": "A2",
+            "remarkStatus": "",
+            "attachmentName": "INFORMATICS PRACTICES",
+            "additional": false,
+            "priority": 10,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "dfb7b176-b4f3-40a8-88e7-b1915bcdbc16",
+              "subjectName": "PSYCHOLOGY",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 06:56:46.512735",
+              "editeddate": "2024-07-18 06:56:46.506238"
+            },
+            "termName": "PRE BOARD",
+            "max": 70,
+            "markObtained": 17,
+            "percentage": 24.285714285714285,
+            "grade": "E",
+            "remarkStatus": "",
+            "attachmentName": "PSYCHOLOGY",
+            "additional": false,
+            "priority": 13,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "0f738754-2ac3-45bb-8912-0065f44714f2",
+              "subjectName": "PSYCHOLOGY PR",
+              "nature": "PRACTICAL",
+              "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-19 10:28:49.26251",
+              "editeddate": "2024-07-19 10:28:49.261704"
+            },
+            "termName": "PRE BOARD",
+            "max": 30,
+            "markObtained": 24,
+            "percentage": 80,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "PSYCHOLOGY",
+            "additional": false,
+            "priority": 14,
+            "scholastic": true,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "b6d15e62-0a02-4723-828e-871f1412afd6",
+              "subjectName": "PHYSICAL EDUCATION",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 06:53:08.529518",
+              "editeddate": "2024-07-18 06:53:08.528412"
+            },
+            "termName": "PRE BOARD",
+            "max": 70,
+            "markObtained": 50,
+            "percentage": 71.42857142857143,
+            "grade": "B1",
+            "remarkStatus": "",
+            "attachmentName": "PHYSICAL EDUCATION",
+            "additional": true,
+            "priority": 17,
+            "scholastic": true,
+            "added": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "0ff880b8-b2fd-4b76-9c39-f8ae414fd8e3",
+              "subjectName": "PHYSICAL EDUCATION PR",
+              "nature": "PRACTICAL",
+              "natureUid": "aa6226e9-8651-45fe-a0aa-d2a13715d4d1",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-19 10:29:15.183642",
+              "editeddate": "2024-07-19 10:29:15.172473"
+            },
+            "termName": "PRE BOARD",
+            "max": 30,
+            "markObtained": 21,
+            "percentage": 70,
+            "grade": "B2",
+            "remarkStatus": "",
+            "attachmentName": "PHYSICAL EDUCATION",
+            "additional": true,
+            "priority": 18,
+            "scholastic": true,
+            "added": false
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "8cdb4764-7fc0-4e78-9889-cc9704397771",
+              "subjectName": "WORK EXPERIENCE",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 08:44:07.502469",
+              "editeddate": "2024-07-18 08:44:07.500768"
             },
             "termName": "PRE BOARD",
             "max": 100,
-            "markObtained": 79.99,
-            "percentage": 79.99,
+            "markObtained": 100,
+            "percentage": 100,
+            "grade": "A",
+            "remarkStatus": "",
+            "attachmentName": "",
+            "additional": false,
+            "priority": 19,
+            "scholastic": false,
+            "added": true
+          },
+          {
+            "subjectAllResponse": {
+              "uid": "065807eb-419e-4c2d-8595-bb50a9def90e",
+              "subjectName": "GENERAL STUDIES",
+              "nature": "THEORY",
+              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
+              "cbseVIIICode": "",
+              "cbseXCode": "",
+              "cbseXIICode": "",
+              "status": true,
+              "parent": [],
+              "parentName": [],
+              "haveChild": false,
+              "createdUser": "QuickCampus",
+              "editedUser": "QuickCampus",
+              "createddate": "2024-07-18 08:44:36.250509",
+              "editeddate": "2024-07-18 08:44:36.249534"
+            },
+            "termName": "PRE BOARD",
+            "max": 100,
+            "markObtained": 74.99,
+            "percentage": 74.99,
             "grade": "B",
             "remarkStatus": "",
             "attachmentName": "",
             "additional": false,
-            "priority": 10,
+            "priority": 20,
             "scholastic": false,
             "added": true
           },
@@ -1883,37 +2163,7 @@
             "remarkStatus": "",
             "attachmentName": "",
             "additional": false,
-            "priority": 11,
-            "scholastic": false,
-            "added": true
-          },
-          {
-            "subjectAllResponse": {
-              "uid": "8cdb4764-7fc0-4e78-9889-cc9704397771",
-              "subjectName": "WORK EXPERIENCE",
-              "nature": "THEORY",
-              "natureUid": "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              "cbseVIIICode": "",
-              "cbseXCode": "",
-              "cbseXIICode": "",
-              "status": true,
-              "parent": [],
-              "parentName": [],
-              "haveChild": false,
-              "createdUser": "QuickCampus",
-              "editedUser": "QuickCampus",
-              "createddate": "2024-07-18 08:44:07.502469",
-              "editeddate": "2024-07-18 08:44:07.500768"
-            },
-            "termName": "PRE BOARD",
-            "max": 100,
-            "markObtained": 39.99,
-            "percentage": 39.99,
-            "grade": "D",
-            "remarkStatus": "",
-            "attachmentName": "",
-            "additional": false,
-            "priority": 12,
+            "priority": 21,
             "scholastic": false,
             "added": true
           },
@@ -1937,2730 +2187,16 @@
             },
             "termName": "PRE BOARD",
             "max": 100,
-            "markObtained": 32.99,
-            "percentage": 32.99,
-            "grade": "E",
+            "markObtained": 49.99,
+            "percentage": 49.99,
+            "grade": "C",
             "remarkStatus": "",
             "attachmentName": "",
             "additional": false,
-            "priority": 13,
+            "priority": 22,
             "scholastic": false,
             "added": true
           }
-        ],
-        remarksEntry: {
-          uid: null,
-          terms: null,
-          studentId: null,
-          studentName: null,
-          rollNumber: 0,
-          classSectionUid: null,
-          classSection: null,
-          description: null,
-          fields: null,
-          status: false,
-          createdUser: null,
-          editedUser: null,
-          createdDate: null,
-          editedDate: null,
-        },
-        school: {
-          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
-          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
-          schoolName: "SDPS Punjabi Bagh",
-          schoolAbb: "SPB",
-          educationBoard: null,
-          registrationNo: null,
-          plotNumber: null,
-          area: null,
-          city: null,
-          pincode: null,
-          state: null,
-          phoneNo1: null,
-          phoneNo2: null,
-          contactName: "VANDANA GUPTA",
-          contactMobile: "9868359499",
-          contactEmail: "sg4vgoyal@gmail.com",
-          schoolCode: null,
-          pfCode: null,
-          societyManagement: null,
-          language: null,
-          schoolLogo: null,
-          schoolFavicon: null,
-          enabled: true,
-          subDomain: "sdps",
-          website: null,
-          schemaPrefix: null,
-          editedDate: "02-08-2024 01:11 PM",
-          editedUser: "QuickCampus",
-          visitorSchool: false,
-          clientSchoolId: null,
-          cscId: null,
-          onlinePaymentEnabled: true,
-          registrationSeries: null,
-          underTakingDetails: null,
-          formNumberStart: null,
-          sessionResponse: null,
-          schoolLogoUrl: null,
-          printAcknowledge: false,
-          whatsAppEnabled: false,
-          smsenabled: false,
-          notificationEnabled: true,
-          loanEnabled: false,
-        },
-        promotedClass: null,
-        promotedSection: null,
-        perSignedUrlResponse: {
-          url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/SDPS/student-info/20148970/student/images/20148970.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240904T072906Z&X-Amz-SignedHeaders=host&X-Amz-Expires=599&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240904%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=4865ffdff2f26050f07da6477a9be357fb267db2d678f2e3e54a077ecb1689fa",
-          fileName: "20148970.png",
-        },
-        pass: false,
-        status_code: 200,
-      },
-    },
-    {
-      student: {
-        dob: "29-06-2010",
-        admissionNo: "20148970",
-        studentName: "Ridhima",
-        className: "IX",
-        sectionName: "A",
-        rollNo: 9125,
-        fatherName: "Kamal",
-        motherName: "Sangeeta",
-        attendance: "5.0/8",
-        boardRollNumber: "",
-        studentInfoResponse: [
-          {
-            id: 282700,
-            userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
-            userName: null,
-            fatherUserName: null,
-            motherUserName: null,
-            guardianUserName: null,
-            uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
-            studentId: "20148970",
-            exAdmissionNo: null,
-            studentName: "Ridhima",
-            fatherName: "Kamal",
-            motherName: "Sangeeta",
-            dob: "29-06-2010",
-            gender: "Female",
-            studentAdhaarcard: "",
-            joiningClass: "IX",
-            joiningSections: "A",
-            joiningDate: "19-04-2024",
-            plotNumber: "",
-            area: "New Moti Nagar",
-            city: "New Delhi",
-            state: "NA",
-            pincode: "110015",
-            phone1: null,
-            rollNo: 9125,
-            emergencyNumber: "",
-            mobileNumber: "8802424733",
-            studentEmail: null,
-            religion: "",
-            category: "",
-            minority: "",
-            motherTongue: "",
-            idMark: "",
-            height: "",
-            weight: "",
-            physicalDisability: "",
-            bloodGroup: "",
-            healthRemark: "",
-            siblingDetails: "",
-            alumni: "",
-            siblingResponse: [],
-            fatherOccupation: "",
-            fatherQualification: "",
-            fatherOrganization: "",
-            fatherDesignation: "",
-            fatherIncome: "",
-            fatherArea: "NA",
-            fatherCity: "NA",
-            fatherState: "NA",
-            fatherPincode: "",
-            fatherPhone: null,
-            fatherMobile: "8802225545",
-            fatherEmail: null,
-            fatherAdhaarNumber: "",
-            schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
-            motherQualification: "",
-            motherOccupation: "",
-            motherOrganization: "",
-            motherDesignation: "",
-            motherIncome: "",
-            motherArea: "NA",
-            motherCity: "NA",
-            motherState: "NA",
-            motherPincode: "",
-            motherPhone: null,
-            motherMobile: "",
-            motherEmail: null,
-            motherAdhaarNumber: "",
-            guardianName: null,
-            relation: null,
-            guardianOccupation: null,
-            guardianPhone: null,
-            guardianMobile: null,
-            guardianEmail: null,
-            guardianAddress: null,
-            leavingDate: null,
-            previousSchoolName: null,
-            otp: null,
-            schoolName: "Demo Public School",
-            remark: null,
-            classTeacher: "",
-            classTeacherUserName: "",
-            classes: "IX",
-            classUid: null,
-            sections: "A",
-            group: "IX-X(HINDI)",
-            wing: "NA",
-            status: "Studying",
-            academicSession: "2024-2025",
-            joiningStatus: "Old",
-            houses: null,
-            certificates: "",
-            certificatesList: [],
-            caste: "",
-            listOfDocuments: null,
-            attached: false,
-            required: false,
-            submitted: false,
-            studentHostel: [],
-            studentConcession: [
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "APR",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "MAY",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "JUN",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "JUL",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "AUG",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "SEP",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "OCT",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "NOV",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "DEC",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "JAN",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "FEB",
-              },
-              {
-                concessionName: "HALF T.FEE",
-                consessionType: null,
-                employeeId: null,
-                installment: "MAR",
-              },
-            ],
-            studentTransport: [],
-            studentAadharCard: null,
-            fatherAadharCard: null,
-            motherAadharCard: null,
-            studentImage: null,
-            fatherImage: null,
-            motherImage: null,
-            guardianImage: null,
-            birthCertificate: null,
-            classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
-            aluminiProof: null,
-            siblingProof: null,
-            residenceProof: null,
-            firstBornChildProof: null,
-            medicalFitnessCertificate: null,
-            fatherQualificationProof: null,
-            motherQualificationProof: null,
-            casteCertificate: null,
-            createdUser: "QuickCampus",
-            editedUser: "QuickCampus",
-            createddate: "2024-04-19 12:30:13.725495",
-            editeddate: "2024-04-19 12:30:13.725495",
-            permanentEducationNumber: null,
-            studentAddressResponse: {
-              uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
-              houseNo: null,
-              area: "New Moti Nagar",
-              landmark: null,
-              city: "New Delhi",
-              district: null,
-              state: "NA",
-              poPs: null,
-              pincode: 110015,
-              street: "B-1/112",
-              userName: "SPB303_20148970",
-              createdDate: "19-04-2024 06:00 PM",
-              editedDate: "19-04-2024 06:00 PM",
-              createdBy: "QuickCampus",
-              editedBy: "QuickCampus",
-            },
-            fatherAddressResponse: {
-              uid: "80b031ab-293b-488e-9752-a0d48ff88055",
-              houseNo: null,
-              area: "NA",
-              landmark: null,
-              city: "NA",
-              district: null,
-              state: "NA",
-              poPs: null,
-              pincode: 0,
-              street: null,
-              userName: null,
-              createdDate: "19-04-2024 06:00 PM",
-              editedDate: "19-04-2024 06:00 PM",
-              createdBy: "QuickCampus",
-              editedBy: "QuickCampus",
-            },
-            motherAddressResponse: {
-              uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
-              houseNo: null,
-              area: "NA",
-              landmark: null,
-              city: "NA",
-              district: null,
-              state: "NA",
-              poPs: null,
-              pincode: 0,
-              street: null,
-              userName: null,
-              createdDate: "19-04-2024 06:00 PM",
-              editedDate: "19-04-2024 06:00 PM",
-              createdBy: "QuickCampus",
-              editedBy: "QuickCampus",
-            },
-            guardianAddressResponse: null,
-            correspondenceAddressResponse: null,
-          },
-        ],
-        classTeacher: "",
-        classTeacherUserName: "",
-        permanentEducationNumber: null,
-        school: {
-          uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
-          apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
-          schoolName: "SDPS Punjabi Bagh",
-          schoolAbb: "SPB",
-          educationBoard: null,
-          registrationNo: null,
-          plotNumber: null,
-          area: null,
-          city: null,
-          pincode: null,
-          state: null,
-          phoneNo1: null,
-          phoneNo2: null,
-          contactName: "VANDANA GUPTA",
-          contactMobile: "9868359499",
-          contactEmail: "sg4vgoyal@gmail.com",
-          schoolCode: null,
-          pfCode: null,
-          societyManagement: null,
-          language: null,
-          schoolLogo: null,
-          schoolFavicon: null,
-          enabled: true,
-          subDomain: "sdps",
-          website: null,
-          schemaPrefix: null,
-          editedDate: "02-08-2024 01:11 PM",
-          editedUser: "QuickCampus",
-          visitorSchool: false,
-          clientSchoolId: null,
-          cscId: null,
-          onlinePaymentEnabled: true,
-          registrationSeries: null,
-          underTakingDetails: null,
-          formNumberStart: null,
-          sessionResponse: null,
-          schoolLogoUrl: null,
-          printAcknowledge: false,
-          whatsAppEnabled: false,
-          smsenabled: false,
-          notificationEnabled: true,
-          loanEnabled: false,
-        },
-      },
-      markData: {
-        academicSession: "2024-2025",
-        admissionNo: "20170442",
-        studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-        studentName: "Tanmay Jain",
-        rollNo: 6321,
-        fatherName: "Virender Kumar Jain",
-        className: "VI",
-        sectionName: "C",
-        terms: "FIRST TERMINAL EXAM",
-        markSheetName: "TERM I",
-        overAllRank: "1",
-        markSheetTerms: [
-          {
-            id: 743,
-            headerName: "ATT.",
-            subHeaderName: "(5)",
-            priority: 1,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["ATTENDANCE"],
-          },
-          {
-            id: 744,
-            headerName: "PBA 1",
-            subHeaderName: "(5)",
-            priority: 2,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["PROJECT BASED ACTIVITY"],
-          },
-          {
-            id: 745,
-            headerName: "PA 1",
-            subHeaderName: "(5)",
-            priority: 3,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["UNIT TEST I"],
-          },
-          {
-            id: 746,
-            headerName: "PF 1",
-            subHeaderName: "(5)",
-            priority: 4,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["PORTFOLIO"],
-          },
-          {
-            id: 747,
-            headerName: "SE 1",
-            subHeaderName: "(5)",
-            priority: 5,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["SUBJECT ENRICHMENT"],
-          },
-          {
-            id: 748,
-            headerName: "MA 1",
-            subHeaderName: "(5)",
-            priority: 6,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 5,
-            terms: ["MULTIPLE ASSESSMENT"],
-          },
-          {
-            id: 749,
-            headerName: "MID TERM",
-            subHeaderName: "(70)",
-            priority: 7,
-            bestOf: 0,
-            decimalPlaces: 2,
-            weightage: 70,
-            terms: ["FIRST TERMINAL EXAM"],
-          },
-        ],
-        subjectWiseMarkSheetReportResponses: [
-          {
-            subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-            subjectName: "ENGLISH",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.83,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-                subjectName: "ENGLISH",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 59.5,
-                grade: "A2",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 89.33,
-            total: 100,
-            percentage: 89.33,
-            grade: "A2",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 1,
-            decimalPlaces: 2,
-            visible: false,
-          },
-          {
-            subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-            subjectName: "HINDI",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.42,
-                grade: "A2",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-                subjectName: "HINDI",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 68.25,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 97.67,
-            total: 100,
-            percentage: 97.67,
-            grade: "A1",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 2,
-            decimalPlaces: 2,
-            visible: false,
-          },
-          {
-            subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-            subjectName: "MATHEMATICS",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.83,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-                subjectName: "MATHEMATICS",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 63.58,
-                grade: "A2",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 93.41,
-            total: 100,
-            percentage: 93.41,
-            grade: "A1",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 3,
-            decimalPlaces: 2,
-            visible: false,
-          },
-          {
-            subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-            subjectName: "SCIENCE",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.08,
-                grade: "A2",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4,
-                grade: "B1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-                subjectName: "SCIENCE",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 67.67,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 95.75,
-            total: 100,
-            percentage: 95.75,
-            grade: "A1",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 4,
-            decimalPlaces: 2,
-            visible: false,
-          },
-          {
-            subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-            subjectName: "SOCIAL SCIENCE",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.67,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-                subjectName: "SOCIAL SCIENCE",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 70,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 99.67,
-            total: 100,
-            percentage: 99.67,
-            grade: "A1",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 5,
-            decimalPlaces: 2,
-            visible: false,
-          },
-          {
-            subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-            subjectName: "FRENCH",
-            subjectNature: "THEORY",
-            markSheetReport: [
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 743,
-                  headerName: "ATT.",
-                  subHeaderName: "(5)",
-                  priority: 1,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["ATTENDANCE"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 744,
-                  headerName: "PBA 1",
-                  subHeaderName: "(5)",
-                  priority: 2,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PROJECT BASED ACTIVITY"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 4.5,
-                grade: "A2",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 745,
-                  headerName: "PA 1",
-                  subHeaderName: "(5)",
-                  priority: 3,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["UNIT TEST I"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 746,
-                  headerName: "PF 1",
-                  subHeaderName: "(5)",
-                  priority: 4,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["PORTFOLIO"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 747,
-                  headerName: "SE 1",
-                  subHeaderName: "(5)",
-                  priority: 5,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["SUBJECT ENRICHMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 5,
-                obtained: 5,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 748,
-                  headerName: "MA 1",
-                  subHeaderName: "(5)",
-                  priority: 6,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 5,
-                  terms: ["MULTIPLE ASSESSMENT"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-              {
-                studentInfoUid: "e7d2677c-0098-4dbb-92c5-8b2f87324f9f",
-                admissionNo: "20170442",
-                studentName: "Tanmay Jain",
-                rollNo: 6321,
-                fatherName: "Virender Kumar Jain",
-                className: "VI",
-                sectionName: "C",
-                classSectionUid: "4e379806-be16-4226-8744-0b1477b8c51c",
-                terms: "FIRST TERMINAL EXAM",
-                subjectUid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-                subjectName: "FRENCH",
-                subjectNature: "THEORY",
-                max: 70,
-                obtained: 68.83,
-                grade: "A1",
-                status: "",
-                markSheetName: "TERM I",
-                attachmentName: "",
-                session: "2024-2025",
-                decimalPlaces: 2,
-                markSheetTermResponse: {
-                  id: 749,
-                  headerName: "MID TERM",
-                  subHeaderName: "(70)",
-                  priority: 7,
-                  bestOf: 0,
-                  decimalPlaces: 2,
-                  weightage: 70,
-                  terms: ["FIRST TERMINAL EXAM"],
-                },
-                visible: false,
-                graded: false,
-                pass: true,
-              },
-            ],
-            marksObtained: 98.33,
-            total: 100,
-            percentage: 98.33,
-            grade: "A1",
-            className: "VI",
-            sectionName: "C",
-            terms: "FIRST TERMINAL EXAM",
-            markSheetName: "TERM I",
-            subjectPrt: 6,
-            decimalPlaces: 2,
-            visible: false,
-          },
-        ],
-        marksObtained: 574.16,
-        total: 600,
-        percentage: 95.69,
-        overAllGrade: "A1",
-        visible: false,
-      },
-      remarks: {
-        uid: null,
-        terms: null,
-        studentId: null,
-        studentName: null,
-        rollNumber: 0,
-        classSectionUid: null,
-        classSection: null,
-        description: null,
-        fields: null,
-        status: false,
-        createdUser: null,
-        editedUser: null,
-        createdDate: null,
-        editedDate: null,
-      },
-      baseTermData: {
-        studentAcademic: {
-          dob: "29-06-2010",
-          admissionNo: "20148970",
-          studentName: "Ridhima",
-          className: "IX",
-          sectionName: "A",
-          rollNo: 9125,
-          fatherName: "Kamal",
-          motherName: "Sangeeta",
-          attendance: "5.0/8",
-          boardRollNumber: "",
-          studentInfoResponse: [
-            {
-              id: 282700,
-              userUid: "d69f6d41-516a-4deb-b1fc-c7c47945cb08",
-              userName: null,
-              fatherUserName: null,
-              motherUserName: null,
-              guardianUserName: null,
-              uid: "91515523-ab41-4bc1-8716-a3b5b5fa8136",
-              studentId: "20148970",
-              exAdmissionNo: null,
-              studentName: "Ridhima",
-              fatherName: "Kamal",
-              motherName: "Sangeeta",
-              dob: "29-06-2010",
-              gender: "Female",
-              studentAdhaarcard: "",
-              joiningClass: "IX",
-              joiningSections: "A",
-              joiningDate: "19-04-2024",
-              plotNumber: "",
-              area: "New Moti Nagar",
-              city: "New Delhi",
-              state: "NA",
-              pincode: "110015",
-              phone1: null,
-              rollNo: 9125,
-              emergencyNumber: "",
-              mobileNumber: "8802424733",
-              studentEmail: null,
-              religion: "",
-              category: "",
-              minority: "",
-              motherTongue: "",
-              idMark: "",
-              height: "",
-              weight: "",
-              physicalDisability: "",
-              bloodGroup: "",
-              healthRemark: "",
-              siblingDetails: "",
-              alumni: "",
-              siblingResponse: [],
-              fatherOccupation: "",
-              fatherQualification: "",
-              fatherOrganization: "",
-              fatherDesignation: "",
-              fatherIncome: "",
-              fatherArea: "NA",
-              fatherCity: "NA",
-              fatherState: "NA",
-              fatherPincode: "",
-              fatherPhone: null,
-              fatherMobile: "8802225545",
-              fatherEmail: null,
-              fatherAdhaarNumber: "",
-              schoolUid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
-              motherQualification: "",
-              motherOccupation: "",
-              motherOrganization: "",
-              motherDesignation: "",
-              motherIncome: "",
-              motherArea: "NA",
-              motherCity: "NA",
-              motherState: "NA",
-              motherPincode: "",
-              motherPhone: null,
-              motherMobile: "",
-              motherEmail: null,
-              motherAdhaarNumber: "",
-              guardianName: null,
-              relation: null,
-              guardianOccupation: null,
-              guardianPhone: null,
-              guardianMobile: null,
-              guardianEmail: null,
-              guardianAddress: null,
-              leavingDate: null,
-              previousSchoolName: null,
-              otp: null,
-              schoolName: "Demo Public School",
-              remark: null,
-              classTeacher: "",
-              classTeacherUserName: "",
-              classes: "IX",
-              classUid: null,
-              sections: "A",
-              group: "IX-X(HINDI)",
-              wing: "NA",
-              status: "Studying",
-              academicSession: "2024-2025",
-              joiningStatus: "Old",
-              houses: null,
-              certificates: "",
-              certificatesList: [],
-              caste: "",
-              listOfDocuments: null,
-              attached: false,
-              required: false,
-              submitted: false,
-              studentHostel: [],
-              studentConcession: [
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "APR",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "MAY",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "JUN",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "JUL",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "AUG",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "SEP",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "OCT",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "NOV",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "DEC",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "JAN",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "FEB",
-                },
-                {
-                  concessionName: "HALF T.FEE",
-                  consessionType: null,
-                  employeeId: null,
-                  installment: "MAR",
-                },
-              ],
-              studentTransport: [],
-              studentAadharCard: null,
-              fatherAadharCard: null,
-              motherAadharCard: null,
-              studentImage: null,
-              fatherImage: null,
-              motherImage: null,
-              guardianImage: null,
-              birthCertificate: null,
-              classSectionUid: "ea284164-bbf5-436c-a069-44192489e040",
-              aluminiProof: null,
-              siblingProof: null,
-              residenceProof: null,
-              firstBornChildProof: null,
-              medicalFitnessCertificate: null,
-              fatherQualificationProof: null,
-              motherQualificationProof: null,
-              casteCertificate: null,
-              createdUser: "QuickCampus",
-              editedUser: "QuickCampus",
-              createddate: "2024-04-19 12:30:13.725495",
-              editeddate: "2024-04-19 12:30:13.725495",
-              permanentEducationNumber: null,
-              studentAddressResponse: {
-                uid: "2b65ac15-5246-459f-933c-9de4b6f04a5d",
-                houseNo: null,
-                area: "New Moti Nagar",
-                landmark: null,
-                city: "New Delhi",
-                district: null,
-                state: "NA",
-                poPs: null,
-                pincode: 110015,
-                street: "B-1/112",
-                userName: "SPB303_20148970",
-                createdDate: "19-04-2024 06:00 PM",
-                editedDate: "19-04-2024 06:00 PM",
-                createdBy: "QuickCampus",
-                editedBy: "QuickCampus",
-              },
-              fatherAddressResponse: {
-                uid: "80b031ab-293b-488e-9752-a0d48ff88055",
-                houseNo: null,
-                area: "NA",
-                landmark: null,
-                city: "NA",
-                district: null,
-                state: "NA",
-                poPs: null,
-                pincode: 0,
-                street: null,
-                userName: null,
-                createdDate: "19-04-2024 06:00 PM",
-                editedDate: "19-04-2024 06:00 PM",
-                createdBy: "QuickCampus",
-                editedBy: "QuickCampus",
-              },
-              motherAddressResponse: {
-                uid: "d9bbec96-fe70-4784-8412-d29a304700c9",
-                houseNo: null,
-                area: "NA",
-                landmark: null,
-                city: "NA",
-                district: null,
-                state: "NA",
-                poPs: null,
-                pincode: 0,
-                street: null,
-                userName: null,
-                createdDate: "19-04-2024 06:00 PM",
-                editedDate: "19-04-2024 06:00 PM",
-                createdBy: "QuickCampus",
-                editedBy: "QuickCampus",
-              },
-              guardianAddressResponse: null,
-              correspondenceAddressResponse: null,
-            },
-          ],
-          classTeacher: "",
-          classTeacherUserName: "",
-          permanentEducationNumber: null,
-          school: {
-            uid: "2bca8578-4126-4a49-89bd-6fc7a4935c0c",
-            apikey: "z8LR4MzBIzcTijv1vhBFlOl2NGLYnpg8",
-            schoolName: "SDPS Punjabi Bagh",
-            schoolAbb: "SPB",
-            educationBoard: null,
-            registrationNo: null,
-            plotNumber: null,
-            area: null,
-            city: null,
-            pincode: null,
-            state: null,
-            phoneNo1: null,
-            phoneNo2: null,
-            contactName: "VANDANA GUPTA",
-            contactMobile: "9868359499",
-            contactEmail: "sg4vgoyal@gmail.com",
-            schoolCode: null,
-            pfCode: null,
-            societyManagement: null,
-            language: null,
-            schoolLogo: null,
-            schoolFavicon: null,
-            enabled: true,
-            subDomain: "sdps",
-            website: null,
-            schemaPrefix: null,
-            editedDate: "02-08-2024 01:11 PM",
-            editedUser: "QuickCampus",
-            visitorSchool: false,
-            clientSchoolId: null,
-            cscId: null,
-            onlinePaymentEnabled: true,
-            registrationSeries: null,
-            underTakingDetails: null,
-            formNumberStart: null,
-            sessionResponse: null,
-            schoolLogoUrl: null,
-            printAcknowledge: false,
-            whatsAppEnabled: false,
-            smsenabled: false,
-            notificationEnabled: true,
-            loanEnabled: false,
-          },
-        },
-        subject: [
-          {
-            subjectAllResponse: {
-              uid: "56db9fd6-6c6e-4711-98f8-20ac7de516b9",
-              subjectName: "ENGLISH",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "QuickCampus",
-              createddate: "2024-05-16 06:44:38.299734",
-              editeddate: "2024-07-18 06:41:06.601021",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 51,
-            percentage: 85,
-            grade: "A2",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 1,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "56d48e61-36a7-4f00-a316-e0d141a9a986",
-              subjectName: "HINDI",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "user_374830",
-              createddate: "2024-05-16 06:44:48.348445",
-              editeddate: "2024-05-16 06:44:48.348005",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 58.5,
-            percentage: 97.5,
-            grade: "A1",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 2,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "ca5b6b7a-20cd-443f-97ac-4155045130cd",
-              subjectName: "MATHEMATICS",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "user_374830",
-              createddate: "2024-05-16 06:45:28.451693",
-              editeddate: "2024-05-16 06:45:28.449747",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 54.5,
-            percentage: 90.83333333333333,
-            grade: "A2",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 3,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "de31f0de-5d27-432d-9c49-30383c4f0a9a",
-              subjectName: "SCIENCE",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "QuickCampus",
-              editedUser: "QuickCampus",
-              createddate: "2024-05-22 04:51:28.465457",
-              editeddate: "2024-05-22 04:51:28.46146",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 58,
-            percentage: 96.66666666666667,
-            grade: "A1",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 4,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "066e7cdd-3bc6-4b92-aeb5-f20bb946190b",
-              subjectName: "SOCIAL SCIENCE",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "QuickCampus",
-              editedUser: "user_374830",
-              createddate: "2024-05-22 04:51:33.462211",
-              editeddate: "2024-06-03 05:22:15.306851",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 60,
-            percentage: 100,
-            grade: "A1",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 5,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "bcf3d9b9-4178-4089-8d66-e5cccd0c24b2",
-              subjectName: "FRENCH",
-              nature: "THEORY",
-              natureUid: "ea5cce4d-578d-43a2-b0c5-4d27d4ee303d",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "user_374830",
-              createddate: "2024-06-03 05:22:45.644252",
-              editeddate: "2024-06-05 03:45:01.731041",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 60,
-            markObtained: 59,
-            percentage: 98.33333333333333,
-            grade: "A1",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 6,
-            scholastic: true,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "a265a65f-a1de-4bbd-a48d-bdf1e3d6a721",
-              subjectName: "INFORMATION TECHNOLOGY",
-              nature: "2A LIFE SKILLS",
-              natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "QuickCampus",
-              createddate: "2024-05-16 06:46:01.304863",
-              editeddate: "2024-07-18 09:05:05.992916",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 100,
-            markObtained: 100,
-            percentage: 100,
-            grade: "A",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 8,
-            scholastic: false,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "075b8ea5-6715-4666-b004-a24297fd9a84",
-              subjectName: "ART EDUCATION",
-              nature: "2A LIFE SKILLS",
-              natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "user_374830",
-              createddate: "2024-06-03 05:22:45.656365",
-              editeddate: "2024-06-05 03:45:33.082566",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 100,
-            markObtained: 74.99,
-            percentage: 74.99,
-            grade: "B",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 9,
-            scholastic: false,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "2da03450-1d00-4c3c-bc5e-4c590b0098a9",
-              subjectName: "DISCIPLINE",
-              nature: "2A LIFE SKILLS",
-              natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "user_374830",
-              createddate: "2024-06-03 05:22:45.692195",
-              editeddate: "2024-06-05 03:47:48.790194",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 100,
-            markObtained: 100,
-            percentage: 100,
-            grade: "A",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 10,
-            scholastic: false,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "15247237-c055-4606-89e1-a4ee213cedaa",
-              subjectName: "HEALTH & PHYSICAL EDUCATION",
-              nature: "2A LIFE SKILLS",
-              natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "QuickCampus",
-              createddate: "2024-06-03 05:22:45.704368",
-              editeddate: "2024-07-18 08:45:35.356345",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 100,
-            markObtained: 100,
-            percentage: 100,
-            grade: "A",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 12,
-            scholastic: false,
-            added: true,
-          },
-          {
-            subjectAllResponse: {
-              uid: "f0633a4e-d5a1-4c28-a69e-8e67c673ebdb",
-              subjectName: "G.K. & MORAL VALUES",
-              nature: "2A LIFE SKILLS",
-              natureUid: "697b3ac1-52ee-47f3-8975-f57484813072",
-              cbseVIIICode: "",
-              cbseXCode: "",
-              cbseXIICode: "",
-              status: true,
-              parent: [],
-              parentName: [],
-              haveChild: false,
-              createdUser: "user_374830",
-              editedUser: "QuickCampus",
-              createddate: "2024-06-03 05:22:45.672147",
-              editeddate: "2024-09-11 07:52:22.298752",
-            },
-            termName: "FIRST TERMINAL EXAM",
-            max: 100,
-            markObtained: 100,
-            percentage: 100,
-            grade: "A",
-            remarkStatus: "",
-            attachmentName: "",
-            additional: false,
-            priority: 13,
-            scholastic: false,
-            added: true,
-          },
         ],
         remarksEntry: {
           uid: null,
