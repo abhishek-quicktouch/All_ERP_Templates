@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="payroll" style="margin: 20px">Salary Certificate</div>
+  </body>
+  <script>
+    window.SetTemplateData = function (data) {
+      console.log(data, "datata from salary cetto");
+      const apiData = data?.viewTemplate
+        ? {
+            allowances: [
+              {
+                uid: "0e5cb59c-d40b-4d15-9c07-448b1bb60cd6",
+                name: "GP",
+                amount: "1900.00",
+              },
+              {
+                uid: "4cd43b3e-bebf-4788-bb05-cc26dafe3d29",
+                name: "HRA",
+                amount: "9950.00",
+              },
+              {
+                uid: "741e893e-4e35-46e0-8677-7c12238f1341",
+                name: "TA",
+                amount: "3500.00",
+              },
+              {
+                uid: "ae2d5df6-acb8-4b19-b99a-c2dbe075fccc",
+                name: "DA",
+                amount: "9950.00",
+              },
+              {
+                uid: "f594a9b4-1a3f-47f4-8edc-bcdbea11b08d",
+                name: "MA",
+                amount: "1493.00",
+              },
+            ],
+            deductions: [
+              {
+                uid: "b2bef175-0f0a-4f84-8293-512425fefbd1",
+                name: "EPP",
+                amount: "2487.00",
+              },
+              {
+                uid: "d2815035-60d3-44fa-bec9-6cb9636ec9f2",
+                name: "EPC",
+                amount: "3582.00",
+              },
+              {
+                uid: "ed3935ac-b9e0-42be-b74b-c2e5e5474fe8",
+                name: "EPF",
+                amount: "731.00",
+              },
+            ],
+            remittances: [
+              {
+                uid: "92704a6d-89f4-4204-904c-ec04afbc7e5d",
+                name: "Test Recalculate",
+                amount: "1990.00",
+              },
+              {
+                uid: "d784a85b-39e2-45a4-adae-f5a5eb6b9eeb",
+                name: "EDLI",
+                amount: "75.00",
+              },
+            ],
+          }
+        : data?.data || {};
+      const mainDiv = document.getElementById("payroll");
+
+      mainDiv.innerHTML = `<style>
+            @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+            .container {
+              font-family: "Roboto", sans-serif;
+            }
+
+            .container__body__section__top {
+              display: flex;
+            }
+            .container__head {
+              display: flex;
+              justify-content: center;
+              font-size: 20px;
+              font-weight: bold;
+             text-decoration:underline;
+            }
+             .container__head__right{
+             display:flex;
+             justify-content:flex-end;
+             }
+            .container__body__section__top {
+              display: flex;
+              flex-wrap: wrap;
+            }
+            .container__body__section__top div {
+              width: 25%;
+            }
+            .container__body__section__top div div {
+              width: 100%;
+            }
+            .container__body__section__mid {
+              display: flex;
+              justify-content: space-between;
+              margin: 1rem 0;
+            }
+            .container__body__section__mid div {
+              width: 25%;
+            }
+            .container__body__section__mid div div {
+              width: 100%;
+            }
+            .container__body__section__bottom {
+              display: flex;
+              justify-content: space-between;
+            }
+            .container__body__section__bottom__left {
+              /* display: flex; */
+              width: 50%;
+            }
+            .container__body__section__bottom__left div {
+              display: flex;
+              justify-content: space-between;
+            }
+            .container__body__section__bottom__right {
+              width: 50%;
+              padding-left: 2rem;
+            }
+            .container__body__section__bottom__right div {
+              display: flex;
+              justify-content: space-between;
+            }
+            .bold {
+              font-weight: bold;
+            }
+            .line {
+              border: 1px solid;
+              background-color: #000;
+            }
+            .grayLine {
+              height: 1px;
+              background-color: lightgray;
+            }
+          </style>`;
+
+      const div = document.createElement("div");
+
+      const totalEarnings = () => {
+        let html = `<div>
+                    <div>Basic</div>
+                      <div>${`₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(apiData?.basic || 0).toLocaleString("en-IN")
+                      }`}</div>
+                    </div>`;
+        apiData?.allowances
+          ?.filter?.((item) => item.value !== 0)
+          ?.forEach((d) => {
+            html += `<div>
+                      <div>${d?.componentName}</div>
+                      <div>₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(d?.value || 0).toLocaleString("en-IN")
+                      }</div>
+                    </div>`;
+          });
+        html += ` <div style="font-weight:600">
+                      <div >Total Earnings</div>
+                      <div>₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(apiData?.gross || 0).toLocaleString("en-IN")
+                      }</div>
+                    </div>
+                    <div style="font-weight:600">
+                      <div>Net Salary Payable</div>
+                      <div>₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(apiData?.netSalary || 0).toLocaleString(
+                              "en-IN"
+                            )
+                      }</div>
+                    </div>`;
+        return html;
+      };
+      const totalDeductions = () => {
+        let html = ``;
+        apiData?.deductions?.forEach((d) => {
+          html += `<div>
+                      <div> ${d?.componentName}</div>
+                      <div>₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(d?.value || 0).toLocaleString("en-IN")
+                      }</div>
+                    </div>`;
+        });
+
+        html += `<div style="font-weight:600">
+                      <div>Total Deductions</div>
+                      <div>₹ ${
+                        data?.viewTemplate
+                          ? "_______________"
+                          : Number(
+                              apiData?.totalDeductions || 0
+                            ).toLocaleString("en-IN")
+                      }</div>
+                    </div>`;
+
+        return html;
+      };
+
+      div.innerHTML = `
+              ${data?.header ?? ""}
+              <div class="container">
+                <div class= "container__head__right">${
+                  data?.viewTemplate
+                    ? `Date : <strong>${new Date().toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })} </strong>`
+                    : `Date :  <strong>${new Date().toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}</strong> `
+                }</div>
+              <div class="container__head">
+                   <div>${
+                     data?.viewTemplate
+                       ? "TO WHOM SO EVER IT MAY CONCERN"
+                       : "TO WHOM SO EVER IT MAY CONCERN"
+                   }</div>
+
+              </div>
+              <div class="container__body">
+                <div class="container__body__section__top">
+
+                </div>
+                <div style="margin-top: 1rem">
+                  <div style="font-size: 18px;font-weight:500;text-align:center;margin-bottom:20px;">Salary Certificate</div>
+
+                </div>
+            <div className="container__body__section__mid">
+      <div style="font-size:14px;">
+        ${`This is to certify that <strong>${data?.data?.firstName} ${data?.data?.middleName} ${data?.data?.lastName}</strong> has been working as the <strong>${data?.data?.designationName} at Quicktouch Technologies Ltd. </strong> <br>
+        <strong>${data?.data?.firstName} ${data?.data?.middleName} ${data?.data?.lastName}</strong> has been employed with our organization, and we have found them to be a hardworking and diligent employee.`}
+      </div>
+
+        <div style="font-size:14px;margin-top:10px; margin-bottom:20px;">
+        ${`The gross salary of <strong>${data?.data?.firstName} ${
+          data?.data?.middleName
+        } ${data?.data?.lastName}</strong> for the month ${
+          data?.data?.fromSalaryMonthName === data?.data?.toSalaryMonthName
+            ? `of <strong>${data?.data?.fromSalaryMonthName}</strong>`
+            : `from <strong>${data?.data?.fromSalaryMonthName}</strong> to <strong>${data?.data?.toSalaryMonthName}</strong>`
+        } as follows:`}
+      </div>
+    </div>
+                <hr />
+
+                <div class="container__body__section__bottom">
+                  <div class="container__body__section__bottom__left">
+                    <div>
+                      <div style="font-weight:600">Earnings</div>
+                    </div>
+        ${totalEarnings()}
+                  </div>
+                  <div class="container__body__section__bottom__right">
+                    <div>
+                    <div class="bold">Deductions</div>
+                  </div>
+                  ${totalDeductions()}
+                  </div>
+                </div>
+                <hr />
+
+              </div>
+            </div>
+            ${data?.footer ?? ""}
+            `;
+
+      mainDiv.appendChild(div);
+    };
+  </script>
+  <script>
+    window.SetTemplateData({
+      viewTemplate: true,
+      data: {
+        employeeUid: "144aea10-b41d-4e20-8020-cd01c5e4feea",
+        employeeNo: "0003",
+        firstName: "John",
+        middleName: "",
+        lastName: "Wick",
+        designationName: "DEVELOPER",
+        fromSalaryMonthName: "April-2024",
+        toSalaryMonthName: "April-2024",
+        basic: 10000,
+        allowances: [
+          {
+            uid: "8246d3e7-fca2-4d82-aa13-4e7c292f847d",
+            componentName: "Dearness Allowance",
+            value: 5000,
+          },
+          {
+            uid: "454f06e0-6824-4f03-a0bd-0489657ad7f3",
+            componentName: "House Rent Allowance",
+            value: 5000,
+          },
+          {
+            uid: "656c2b42-1b62-4eb3-92b8-4d2bfd156b9b",
+            componentName: "Medical Allowance",
+            value: 750,
+          },
+        ],
+        gross: 20750,
+        deductions: [
+          {
+            uid: "f2931a4d-b246-4f9b-b00b-7b074f8fd158",
+            componentName: "Employer PF Contribution",
+            value: 1250,
+          },
+          {
+            uid: "2e2c97fa-b829-412f-9b95-964eb78f101d",
+            componentName: "Employee PF Contribution",
+            value: 1800,
+          },
+          {
+            uid: "be0e5f15-1069-4083-992f-c63855a47417",
+            componentName: "Pension Contribution",
+            value: 550,
+          },
+        ],
+        totalDeductions: 3600,
+        netSalary: 17150,
+      },
+      header: `<figure class="table" style="width:100%;">\n <table cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="text-align:center;vertical-align:top;width:15%;"><img style="max-height:120px;max-width:120px;width:100%;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/templates/devserver-test-1/images/hand-drawn-cap-elementary-school-logo_23-2149689281.avif" align="center"></td>\n    <td style="vertical-align:top;width:70%;" align="left">\n     <div style="color:#01293c;font-size:11pt;line-height:150%;text-align:center;width:100%;">\n      <span style="color:#01293c;"><span style="font-size:15pt;padding-bottom:15mm;padding-top:5mm;"><strong>BIRLA VIDYA NIKETAN</strong></span></span><br>(Sarala Birla Group of Schools)<br>PUSHP VIHAR-IV, NEW DELHI-110017<br>Phone No. : 011-29561762<br>Website : www.birla.ac.in<br>&nbsp;\n     </div></td>\n    <td style="text-align:center;vertical-align:top;width:15%;">&nbsp;</td>\n   </tr>\n  </tbody>\n </table>\n</figure>`,
+      footer: `<page_footer>\n <table style=\"padding:2mm 0mm 0mm;\" cellspacing=\"0\" cellpadding=\"0\">\n  <tbody>\n   <tr>\n    <td style=\"padding:0mm;width:100%;\" width=\"100%\" align=\"left\" valign=\"top\"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>`,
+    });
+  </script>
+</html>
