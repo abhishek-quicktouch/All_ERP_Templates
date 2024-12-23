@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPS SLC</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Character certificate</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const basicDetails = {
+          place: "Delhi",
+          date: new Date().toLocaleDateString("en-GB", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
+          principal: "O. V. SHARMA",
+        };
+        const multipleStudents = [dataList];
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = `<style type="text/css">
+   @page {
+   size: A4
+   }
+   * {
+   margin: 0px;
+   padding: 0px;
+   color: #000;
+   }
+   td {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 0.5mm;
+   padding-bottom: 0.5mm;
+   font-size: 9pt;
+   color: #000000;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   th {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 0.5mm;
+   padding-bottom: 0.5mm;
+   background: #e7e7e7;
+   font-family: Arial, Helvetica, sans-serif;
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   @media print {
+   @page {
+   margin:2mm;
+   size: A4
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   }
+</style>`;
+        multipleStudents?.forEach((element, index) => {
+          function formatDateToText(dateString) {
+            // Define arrays for text representation
+            const monthsText = [
+              "ZERO",
+              "JANUARY",
+              "FEBRUARY",
+              "MARCH",
+              "APRIL",
+              "MAY",
+              "JUNE",
+              "JULY",
+              "AUGUST",
+              "SEPTEMBER",
+              "OCTOBER",
+              "NOVEMBER",
+              "DECEMBER",
+            ];
+
+            // Split the date string into year, month, and day
+            const [year, month, day] = dateString.split("-");
+
+            // Convert year, month, and day to text representation
+            const yearText = convertToText(Number(year));
+            const monthText = monthsText[Number(month)];
+            const dayText = convertToText(Number(day));
+
+            // Combine the text representation
+            const result = `${dayText} ${monthText} ${yearText}`;
+            console.log(result);
+            return result;
+          }
+
+          //roman to words
+          const romanToWords = {
+            I: "FIRST",
+            II: "SECOND",
+            III: "THIRD",
+            IV: "FOURTH",
+            V: "FIFTH",
+            VI: "SIXTH",
+            VII: "SEVENTH",
+            VIII: "EIGHTH",
+            IX: "NINTH",
+            X: "TENTH",
+            XI: "ELEVENTH",
+            XII: "TWELFTH",
+          };
+          // Helper function to convert a number to text representation
+          function convertToText(number) {
+            const digitsText = [
+              "ZERO",
+              "ONE",
+              "TWO",
+              "THREE",
+              "FOUR",
+              "FIVE",
+              "SIX",
+              "SEVEN",
+              "EIGHT",
+              "NINE",
+            ];
+
+            if (number < 10) {
+              return digitsText[number];
+            } else if (number >= 10 && number < 20) {
+              // Special cases for teens
+              const teensText = [
+                "TEN",
+                "ELEVEN",
+                "TWELVE",
+                "THIRTEEN",
+                "FOURTEEN",
+                "FIFTEEN",
+                "SIXTEEN",
+                "SEVENTEEN",
+                "EIGHTEEN",
+                "NINETEEN",
+              ];
+              return teensText[number - 10];
+            } else if (number < 100) {
+              const tensText = [
+                "",
+                "",
+                "TWENTY",
+                "THIRTY",
+                "FORTY",
+                "FIFTY",
+                "SIXTY",
+                "SEVENTY",
+                "EIGHTY",
+                "NINETY",
+              ];
+
+              const ten = Math.floor(number / 10);
+              const unit = number % 10;
+
+              return `${tensText[ten]} ${digitsText[unit]}`;
+            } else if (number < 1000) {
+              const hundred = Math.floor(number / 100);
+              const remainder = number % 100;
+
+              if (remainder === 0) {
+                return `${digitsText[hundred]} HUNDRED`;
+              } else {
+                return `${digitsText[hundred]} HUNDRED ${convertToText(
+                  remainder
+                )}`;
+              }
+            } else {
+              // Handle thousands
+              const thousand = Math.floor(number / 1000);
+              const remainder = number % 1000;
+
+              if (remainder === 0) {
+                return `${digitsText[thousand]} THOUSAND`;
+              } else {
+                return `${digitsText[thousand]} THOUSAND ${convertToText(
+                  remainder
+                )}`;
+              }
+            }
+          }
+
+          //single student details
+          const contentData = element?.contentRequest?.contentRequest?.[0];
+          const schoolDetails = element?.contentRequest?.schoolDetails;
+          let todayDate = new Date();
+          let date = `${todayDate?.getDate()}/${
+            todayDate.getMonth() + 1
+          }/${todayDate.getFullYear()}`;
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `
+          <page orientation="portrait" format="A4" margin="0">
+   <!--content area-->
+   <!-- Spacing -->
+   <!-- Spacing -->
+   <table style="width: 100%;">
+      <tbody>
+         <tr valign="top">
+            <td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <!-- Header Section -->
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td align="center" style="width:100%; padding-top:2mm; padding-bottom:1mm;">
+                           <span style="font-size:16pt; font-weight: bold; text-transform:uppercase; font-family: arial;">
+                           SHAHEED RAJPAL D.A.V. PUBLIC SCHOOL, DAYANAND VIHAR, DELHI
+                           </span><br/>
+                           ASMISSION SLIP FOR NEW ADMISSION (W.E.F SESSION ${
+                             contentData?.academicSession
+                           })
+                        </td>
+                     </tr>
+                     <tr align="center" style="width:100%;">
+                       <td style="font-size:15pt; font-weight: bold;">
+                        &nbsp
+                        </td>
+                    </tr>
+                     <tr align="center" style="width:100%;">
+                       <td style="font-size:15pt; font-weight: bold;">
+                         CLASS : ${contentData?.classes || ""}-${
+            contentData?.sections || ""
+          }
+                        </td>
+                    </tr>
+                  </tbody>
+               </table>
+               <!-- Spacing -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <div style="height:2mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </table>
+               <!-- Header Section -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                        <div style="height:5mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </table>
+               <!--// Basic Details -->
+               <!-- Certificate -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">1. STUDENT'S NAME</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; text-transform:uppercase; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.studentName || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">2. GENDER </span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; text-transform:uppercase; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.gender || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">3. GEN/SC/ST/OBC</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; text-transform:uppercase; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.category || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">4. RELIGION</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.religion || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">5. FATHER'S NAME</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.fatherName || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">6. MOTHER'S NAME</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.motherName || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">7. ADMISSION NO.</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.studentId || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">8. DATE OF ADMISSION</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.joiningDate || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">9. DATE OF BIRTH</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.dob
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">10. ADDRESS</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.area || ""
+                                 } ${contentData?.city || ""} ${
+            contentData?.state=="NA" ? "" : contentData?.state
+          } ${contentData?.pincode || ""}</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:76%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">11. MOBILE NO.(THIS NO. WILL BE USED FOR SENDING SMS)</span>
+                              </td>
+                              <td style="width:24%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.fatherMobile
+                                     ? `${contentData?.fatherMobile}`
+                                     : ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">12. PHONE/CONTACT NO.2</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.fatherMobile
+                                     ? `${contentData?.fatherMobile}/`
+                                     : ""
+                                 } ${contentData?.motherMobile || ""}</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">13. EMERGENCY CONTACT NO.</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.emergencyNumber || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:36%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">14. FATHER'S E-MAIL ID</span>
+                              </td>
+                              <td style="width:64%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.fatherEmail || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:36%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">15. MOTHER'S EMAIL ID</span>
+                              </td>
+                              <td style="width:64%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.motherEmail || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">16. BLOOD GROUP OF THE STUDENT</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.bloodGroup || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">17. PHYSICAL DISABILITY (IF ANY)</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.physicalDisability
+                                     ? "Yes"
+                                     : "No"
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:68%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">18. HEALTH REMARK (IF ANY INCLUDING ALLERGIES)</span>
+                              </td>
+                              <td style="width:32%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.healthRemark || "-"
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:46%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">19. AVAILING SCHOOL BUS FACILITY</span>
+                              </td>
+                              <td style="width:54%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.studentTransport?.length
+                                     ? "Yes"
+                                     : "No"
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:26%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">20. IF YES, BUS NO.</span>
+                              </td>
+                              <td style="width:74%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.studentTransport?.length
+                                     ? `${contentData?.studentTransport?.[0]?.circle}`
+                                     : ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:36%; padding-top:0mm; padding-bottom:0mm;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;">21. NAME OF BUS STOP</span>
+                              </td>
+                              <td style="width:64%; padding-top:0mm; padding-bottom:0mm; border-bottom: solid 0.7mm #000000;">
+                                 <span style="font-size:12pt; font-family: ui-monospace;"><i>&nbsp;${
+                                   contentData?.studentTransport?.length
+                                     ? `${contentData?.studentTransport?.[0]?.drop}`
+                                     : ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+               </table>
+               <!--  -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td style="padding-left:0mm; padding-right:0mm; padding-top:15mm; padding-bottom:0mm;">
+                        <div style="height:10mm;">&nbsp;</div>
+                     </td>
+                  </tr>
+               </table>
+               <!-- footer -->
+               <table cellspacing="0" style="width:100%;">
+                  <tr>
+                     <td valign="top" style="padding-left:0mm; width:20%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:14pt; font-family: ui-monospace; text-align:center; font-weight: bold; ">
+                        <div style="border-bottom:dotted 0.7mm #000000;">
+                            <span style="text-align:center; font-size:14px;">${date}</span>    
+                        </div>    
+                        Date
+                    </td>
+
+                     <td valign="top" style="padding-left:0mm; width:20%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:14pt; font-family: ui-monospace; text-align:center; font-weight: bold; ">&nbsp</td>
+
+                     <td valign="top" style="padding-left:0mm; width:60%; height:12mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; line-height:130%; font-size:14pt; font-family: ui-monospace; text-align:center; font-weight: bold; ">
+                         <div style="border-bottom:dotted 0.7mm #000000;">
+                            &nbsp
+                        </div>
+                        Signature of Dealing Astt. (Admin Office)
+                     </td>
+                  </tr>
+               </table>
+               <!-- footer -->
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   <!--  -->
+   <!--// content area-->
+</page>`;
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData(
+        {
+          contentRequest: {
+            components: [],
+            contentRequest: [
+              {
+                id: 289234,
+                userUid: "16ac7e55-09ea-435e-8055-439d2267a725",
+                userName: null,
+                fatherUserName: null,
+                motherUserName: null,
+                guardianUserName: null,
+                uid: "777e87dc-ddad-4144-b984-f807e45dd2f8",
+                studentId: "15842",
+                exAdmissionNo: null,
+                studentName: "Aabhal Tyagi",
+                fatherName: "Mr. Arun Tyagi",
+                motherName: "Kusum Tyagi",
+                dob: "20-08-2010",
+                gender: "FEMALE",
+                studentAdhaarcard: "510921991122",
+                joiningClass: "IX",
+                joiningSections: "B",
+                joiningDate: "06-05-2024",
+                plotNumber: "Wa-52",
+                area: "Shakarpur",
+                city: "Delhi",
+                state: "NA",
+                pincode: "110092",
+                phone1: "",
+                rollNo: 1,
+                emergencyNumber: "9811997087",
+                mobileNumber: "9868288108",
+                studentEmail: "aruntyagi0977@gmail.com",
+                religion: "",
+                category: "",
+                minority: "",
+                motherTongue: "",
+                idMark: "",
+                height: "",
+                weight: "",
+                physicalDisability: "",
+                bloodGroup: "",
+                healthRemark: "",
+                siblingDetails: "",
+                alumni: "",
+                siblingResponse: [],
+                fatherOccupation: "",
+                fatherQualification: "",
+                fatherOrganization: "",
+                fatherDesignation: "",
+                fatherIncome: "",
+                fatherArea: "NA",
+                fatherCity: "NA",
+                fatherState: "NA",
+                fatherPincode: "",
+                fatherPhone: "",
+                fatherMobile: "9868288108",
+                fatherEmail: null,
+                fatherAdhaarNumber: "",
+                schoolUid: "508425ac-8c1a-4702-bbae-b24621aab919",
+                motherQualification: "",
+                motherOccupation: "",
+                motherOrganization: "",
+                motherDesignation: "",
+                motherIncome: "",
+                motherArea: "NA",
+                motherCity: "NA",
+                motherState: "NA",
+                motherPincode: "",
+                motherPhone: "",
+                motherMobile: "9868288108",
+                motherEmail: null,
+                motherAdhaarNumber: "",
+                guardianName: null,
+                relation: null,
+                guardianOccupation: null,
+                guardianPhone: null,
+                guardianMobile: null,
+                guardianEmail: null,
+                guardianAddress: null,
+                leavingDate: null,
+                previousSchoolName: "",
+                otp: null,
+                schoolName: "Demo Public School",
+                remark: "",
+                classTeacher: "",
+                classTeacherUserName: "",
+                classes: "IX",
+                classUid: null,
+                sections: "B",
+                group: "IX-X(HINDI)",
+                wing: "NA",
+                status: "Studying",
+                academicSession: "2024-25",
+                joiningStatus: "Old",
+                houses: null,
+                certificates: "",
+                certificatesList: [],
+                caste: "",
+                listOfDocuments: null,
+                attached: false,
+                required: false,
+                submitted: false,
+                studentHostel: [],
+                studentConcession: [],
+                studentTransport: [
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "APR",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "MAY",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "JUN",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "JUL",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "AUG",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "SEP",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "OCT",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "NOV",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "DEC",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "JAN",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "FEB",
+                  },
+                  {
+                    circle: "3000-1",
+                    route: "S2",
+                    pick: "BAWA PALACE",
+                    drop: "BAWA PALACE",
+                    installment: "MAR",
+                  },
+                ],
+                studentAadharCard: null,
+                fatherAadharCard: null,
+                motherAadharCard: null,
+                studentImage: null,
+                fatherImage: null,
+                motherImage: null,
+                guardianImage: null,
+                birthCertificate: null,
+                classSectionUid: "a19cd213-eea8-41a8-b5b8-5f458248539d",
+                aluminiProof: null,
+                siblingProof: null,
+                residenceProof: null,
+                firstBornChildProof: null,
+                medicalFitnessCertificate: null,
+                fatherQualificationProof: null,
+                motherQualificationProof: null,
+                casteCertificate: null,
+                createdUser: "Reena_487422",
+                editedUser: "QuickCampus",
+                createddate: "2024-05-06 09:45:24.341115",
+                editeddate: "2024-12-19 05:26:49.389109",
+                permanentEducationNumber: "",
+                studentAddressResponse: {
+                  uid: "2f470dbd-910b-45f6-b3ea-503b68e1be71",
+                  houseNo: null,
+                  area: "Shakarpur",
+                  landmark: null,
+                  city: "Delhi",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 110092,
+                  street: "Wa-52",
+                  userName: "SRDAV831_15842",
+                  createdDate: "06-05-2024 03:15 PM",
+                  editedDate: "19-12-2024 10:56 AM",
+                  createdBy: "Reena_487422",
+                  editedBy: "QuickCampus",
+                },
+                fatherAddressResponse: {
+                  uid: "374a14f2-1ae3-4024-949f-fbf49ac18263",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "06-05-2024 03:15 PM",
+                  editedDate: "19-12-2024 10:56 AM",
+                  createdBy: "Reena_487422",
+                  editedBy: "QuickCampus",
+                },
+                motherAddressResponse: {
+                  uid: "3f23d979-84c7-4130-a99d-f8c63c042684",
+                  houseNo: null,
+                  area: "NA",
+                  landmark: null,
+                  city: "NA",
+                  district: null,
+                  state: "NA",
+                  poPs: null,
+                  pincode: 0,
+                  street: null,
+                  userName: null,
+                  createdDate: "06-05-2024 03:15 PM",
+                  editedDate: "19-12-2024 10:56 AM",
+                  createdBy: "Reena_487422",
+                  editedBy: "QuickCampus",
+                },
+                guardianAddressResponse: null,
+                correspondenceAddressResponse: {
+                  uid: "e075b821-cd0f-4060-8c51-5de32130e05b",
+                  houseNo: null,
+                  area: "",
+                  landmark: null,
+                  city: "",
+                  district: null,
+                  state: "",
+                  poPs: null,
+                  pincode: null,
+                  street: "",
+                  userName: "SRDAV831_15842",
+                  createdDate: "10-08-2024 12:46 PM",
+                  editedDate: "19-12-2024 10:56 AM",
+                  createdBy: "QuickCampus",
+                  editedBy: "QuickCampus",
+                },
+              },
+            ],
+            dates: {},
+            schoolDetails: {
+              uid: "508425ac-8c1a-4702-bbae-b24621aab919",
+              apikey: "NCxlflgpv06g_hefzhFO64jWpirLDxyG",
+              schoolName: "SRDAV PUBLIC SCHOOL",
+              schoolAbb: "SRDAV",
+              educationBoard: "Central Board of Secondary Education (CBSE)",
+              registrationNo: null,
+              plotNumber: null,
+              area: "DAYANAND VIHAR",
+              city: "DELHI",
+              pincode: "110092",
+              state: "Delhi",
+              phoneNo1: null,
+              phoneNo2: null,
+              contactName: "Reena",
+              contactMobile: null,
+              contactEmail: "DAVR_DV@YAHOO.COM",
+              schoolCode: "25005",
+              pfCode: null,
+              societyManagement: null,
+              language: null,
+              schoolLogo: null,
+              schoolFavicon: null,
+              enabled: true,
+              subDomain: "srdav",
+              website: null,
+              schemaPrefix: null,
+              editedDate: "19-12-2024 10:38 AM",
+              editedUser: "QuickCampus",
+              visitorSchool: false,
+              clientSchoolId: null,
+              cscId: null,
+              onlinePaymentEnabled: true,
+              registrationSeries: null,
+              underTakingDetails: null,
+              formNumberStart: null,
+              sessionResponse: null,
+              schoolLogoUrl: null,
+              printAcknowledge: false,
+              wabaId: "",
+              phoneNumberId: "",
+              whatsappApiKey: "",
+              isQuickCampusWhatsapp: true,
+              whatsAppEnabled: true,
+              smsenabled: false,
+              notificationEnabled: true,
+              loanEnabled: false,
+            },
+            studentImage: "",
+            fatherImage: "",
+            motherImage: "",
+            schoolLogo: null,
+            header: "",
+            footer: "",
+          },
+        },
+      );
+    </script>
+  </body>
+</html>
