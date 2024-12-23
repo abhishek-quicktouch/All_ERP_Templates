@@ -275,7 +275,7 @@ size: A4;
 		<!-- title -->
 		<table cellspacing="0" style="width:100%;">
 			<tr>
-				<td align="center" style="width:100%; padding-top:30mm; padding-bottom:5mm; font-size:20pt; text-transform:uppercase;">Transfer Certificate</td>
+				<td align="center" style="width:100%; padding-top:30mm; padding-bottom:5mm; font-size:25pt; text-transform:uppercase; font-weight:bold;">Transfer Certificate</td>
 			</tr>	
 		</table>
 		<!--// title -->
@@ -308,7 +308,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">1.</td>
 					<td style="width:15%;  padding-left:0mm;">Name of Pupil</td>
-					<td style="width:78%; text-transform:uppercase; border-bottom: solid  0.3mm #000000; padding-left:40mm;">${
+					<td style="width:78%; text-transform:uppercase; border-bottom: solid  0.3mm #000000; padding-left:39mm;font-weight:bold;">${
             studentInfo?.studentName
           }</td>
 				</tr>
@@ -322,7 +322,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">2.</td>
 					<td style="width:15%;  padding-left:0mm;">Mother's Name </td>
-					<td style="width:78%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:40mm;">${
+					<td style="width:78%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:39mm;font-weight:bold;">${
             studentInfo?.motherName
           }</td>
 				</tr>
@@ -336,7 +336,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">3.</td>
 					<td style="width:30%;  padding-left:0mm;">Father's/ Guardian's Name </td>
-					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:12mm;">${
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:12mm;font-weight:bold;">${
             studentInfo?.fatherName
           }</td>
 				</tr>
@@ -350,7 +350,7 @@ size: A4;
 				<tr>
 					<td style="width:2%;">4.</td>
 					<td style="width:15%; padding-left:0mm;">Nationality </td>
-					<td style="width:78%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:40mm;">${
+					<td style="width:78%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:40mm;font-weight:bold;">${
             contentData?.nationality
           }</td>
 				</tr>
@@ -364,7 +364,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">5.</td>
 					<td style="width:65%; padding-left:0mm;">Whether the Candidate belongs to Schedule Caste or Schedule Tribe </td>
-					<td style="width:33%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+					<td style="width:33%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
                         contentData?.category
           }</td>
 				</tr>
@@ -378,7 +378,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">6.</td>
 					<td  style="width:45%;  padding-left:0mm;">Date of First Admission in the School with Class </td>
-                    	<td style="width:53%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:10mm;">(${
+                    	<td style="width:53%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:10mm;font-weight:bold;">(${
            contentData.joiningDate
                         }) - ${contentData?.joiningClass}</td>
 				</tr>
@@ -396,7 +396,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">7.</td>
 					<td style="width:55%;   padding-left:0mm;">Date of Birth according to Admission register (in figures)</td>
-					<td style="width:43%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:10mm;">${
+					<td style="width:43%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:10mm;font-weight:bold;">${
             contentData.dob
           }</td>
 					
@@ -411,7 +411,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">8.</td>
 					<td style="width:45%;  padding-left:0mm;">Class in which the pupil last studied (in figures)</td>
-					<td style="width:53%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:30mm;">${
+					<td style="width:53%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:30mm;font-weight:bold;">${
             contentData?.classes
           }</td>
 				</tr>
@@ -425,7 +425,7 @@ size: A4;
 				<tr>
 					<td style="width:2%;">9.</td>
 					<td style="width:45%; padding-left:0mm;">Class in which the pupil studying (in figures)</td>
-					<td style="width:53%; border-bottom: solid 0.3mm #000000; padding-left:30mm;">${
+					<td style="width:53%; border-bottom: solid 0.3mm #000000; padding-left:30mm;font-weight:bold;">${
                         contentData?.presentClass
           }</td>
 				</tr>
@@ -439,7 +439,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">10.</td>
 					<td style="width:55%; padding-left:0mm;">School/ Board Annual examination last taken with result </td>
-					<td style="width:43%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+					<td style="width:43%; border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
                         contentData?.examLastTaken ? contentData?.examLastTaken: "-"
           }</td>
 				</tr>
@@ -453,8 +453,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">11.</td>
-					<td style="width:55%; padding-left:0mm;"> Whether failed, if so once/ twice in the same class</td>
-					<td style="width:43%;border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight: 500;">${
+					<td style="width:47%; padding-left:0mm;"> Whether failed, if so once/ twice in the same class</td>
+					<td style="width:51%;border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
             contentData?.weatherFailed.toUpperCase()
 
           }</td>
@@ -479,12 +479,12 @@ size: A4;
     return `
       <tr>
         <td style="width:2%;">${index + 1}.</td>
-        <td style="width:48%; padding-left:0mm; border-bottom: solid 0.3mm #000000;">
+        <td style="width:48%; padding-left:0mm; border-bottom: solid 0.3mm #000000;font-weight:bold;">
           ${item.toUpperCase()}
         </td>
         ${index + 1 < subjectsArray.length ? `
           <td style="width:2%;">${index + 2}.</td>
-          <td style="width:48%; padding-left:0mm; border-bottom: solid 0.3mm #000000;">
+          <td style="width:48%; padding-left:0mm; border-bottom: solid 0.3mm #000000;font-weight:bold;">
             ${subjectsArray[index + 1]?.toUpperCase() || ''}
           </td>
         ` : ''}
@@ -509,8 +509,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">13.</td>
-					<td style="width:50%;padding-left:0mm;">Whether qualified for promotion to the higher class</td>
-					<td style="width:18%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+					<td style="width:48%;padding-left:0mm;">Whether qualified for promotion to the higher class</td>
+					<td style="width:20%; border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
             contentData?.weatherQualifiedForPromotion?.toUpperCase()
           }</td>
           		<td style="width:30%; ">, if so to which class</td>
@@ -527,11 +527,11 @@ size: A4;
 				<tr>
 					<td style="width:2%; "></td>
 					<td style="width:12%;padding-left:0mm;">(In figure)</td>
-					<td style="width:13%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+					<td style="width:13%; border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
             contentData.promotedClass
           }</td>
           		<td style="width:12%; ">(in words)</td>
-                		<td style="width:66%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${(getClassTextBasedOnFigure(contentData.promotedClass))
+                		<td style="width:66%; border-bottom: solid 0.3mm #000000; padding-left:20mm;font-weight:bold;">${(getClassTextBasedOnFigure(contentData.promotedClass))
             
           }</td>
 				</tr>
@@ -546,8 +546,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">14.</td>
-					<td style="width:45%; padding-left:0mm;">School dues paid upto</td>
-					<td style="width:53%; border-bottom: solid 0.3mm #000000; padding-left:40mm;">${
+					<td style="width:25%; padding-left:0mm;">School dues paid upto</td>
+					<td style="width:73%; border-bottom: solid 0.3mm #000000; padding-left:40mm;font-weight:bold;">${
             contentData.feePaidUpto
           }</td>
 				</tr>
@@ -561,7 +561,7 @@ size: A4;
 				<tr>
 					<td style="width:2%; ">15.</td>
 					<td style="width:65%;  padding-left:0mm;">Any fee concession availed off, if so, the nature of such concession </td>
-					<td style="width:33%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+					<td style="width:33%; border-bottom: solid 0.3mm #000000; padding-left:10mm;font-weight:bold;">${
             contentData.anyFeeConcession?.toUpperCase()
           }</td>
 					
@@ -576,7 +576,7 @@ size: A4;
 				<tr>
 					<td style="width:2%;">16.</td>
 					<td style="width:8%;  padding-left:0mm;">Attendance</td>
-					<td style="width:90%; border-bottom: solid 0.25mm #000000; padding-left:76mm;">${
+					<td style="width:90%; border-bottom: solid 0.25mm #000000; padding-left:68mm;font-weight:bold;">${
                         parseFloat(studentInfo.attendance) * 100 
           }%</td>
 				</tr>
@@ -589,8 +589,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">17.</td>
-					<td style="width:45%; padding-left:0mm;"> Whether NCC Cadet/ Boy Scout/ Girl Guide:</td>
-					<td style="width:53%; border-bottom: solid 0.25mm #000000; padding-left:10mm;">${
+					<td style="width:42%; padding-left:0mm;"> Whether NCC Cadet/ Boy Scout/ Girl Guide:</td>
+					<td style="width:56%; border-bottom: solid 0.25mm #000000; padding-left:10mm;font-weight:bold;">${
             contentData.nccOrScout?.toUpperCase()
           }</td>
 				</tr>
@@ -602,8 +602,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">18.</td>
-					<td style="width:40%; padding-left:0mm;"> General Conduct</td>
-					<td style="width:58%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+					<td style="width:20%; padding-left:0mm;"> General Conduct</td>
+					<td style="width:78%; border-bottom: solid 0.3mm #000000; padding-left:39mm;font-weight:bold;">${
             contentData.generalConduct?.toUpperCase()
           }</td>
 				</tr>
@@ -616,8 +616,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%;">19.</td>
-					<td style="width:40%;  padding-left:0mm;">Date of application of certificate </td>
-					<td style="width:58%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+					<td style="width:30%;  padding-left:0mm;">Date of application of certificate </td>
+					<td style="width:68%; border-bottom: solid 0.3mm #000000; padding-left:20mm;font-weight:bold;">${
             contentData.applicationDate
           }</td>
 				</tr>
@@ -630,8 +630,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%;">20.</td>
-					<td style="width:40%;  padding-left:0mm;">Date of issue of certificate </td>
-					<td style="width:58%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+					<td style="width:30%;  padding-left:0mm;">Date of issue of certificate </td>
+					<td style="width:68%; border-bottom: solid 0.3mm #000000; padding-left:20mm;font-weight:bold;">${
             contentData.issueDate
           }</td>
 				</tr>
@@ -644,8 +644,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">21.</td>
-					<td style="width:40%;  padding-left:0mm;">Reasons for leaving the school </td>
-					<td style="width:58%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+					<td style="width:30%;  padding-left:0mm;">Reasons for leaving the school </td>
+					<td style="width:68%; border-bottom: solid 0.3mm #000000; padding-left:20mm;font-weight:bold;">${
             contentData.reasonWithdrawal?.toUpperCase()
           }</td>
 				</tr>
@@ -657,8 +657,8 @@ size: A4;
 			<table width="100%" border="0" cellspacing="0">
 				<tr>
 					<td style="width:2%; ">22.</td>
-					<td style="width:40%;  padding-left:0mm;">Any other remarks</td>
-					<td style="width:58%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+					<td style="width:20%;  padding-left:0mm;">Any other remarks</td>
+					<td style="width:78%; border-bottom: solid 0.3mm #000000; padding-left:20mm;font-weight:bold;">${
             contentData.anyOtherRemark?.toUpperCase()
           }</td>
 				</tr>
