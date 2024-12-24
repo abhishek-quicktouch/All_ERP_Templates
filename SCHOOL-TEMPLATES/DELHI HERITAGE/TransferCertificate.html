@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SLC</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Character certificate</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = ``;
+        multipleStudents?.forEach((element, index) => {
+          function formatDateToText(dateString) {
+            console.log(dateString,"dateeeeeeeee")
+            // Define arrays for text representation
+            const monthsText = [
+              "ZERO",
+              "JANUARY",
+              "FEBRUARY",
+              "MARCH",
+              "APRIL",
+              "MAY",
+              "JUNE",
+              "JULY",
+              "AUGUST",
+              "SEPTEMBER",
+              "OCTOBER",
+              "NOVEMBER",
+              "DECEMBER",
+            ];
+
+            // Split the date string into year, month, and day
+            const [day, month, year] = dateString.split("-");
+
+            // Convert year, month, and day to text representation
+            const yearText = convertToText(Number(year));
+            const monthText = monthsText[Number(month)];
+            const dayText = convertToText(Number(day));
+
+            // Combine the text representation
+            const result = `${dayText} ${monthText} ${yearText}`;
+            return result;
+          }
+          const getClassTextBasedOnFigure = (figure) => {
+  switch (figure) {
+    case 'I':
+      return 'FIRST';
+    case 'II':
+      return 'SECOND';
+    case 'III':
+      return 'THIRD';
+    case 'IV':
+      return 'FOURTH';
+    case 'V':
+      return 'FIFTH';
+    case 'VI':
+      return 'SIXTH';
+    case 'VII':
+      return 'SEVENTH';
+    case 'VIII':
+      return 'EIGHTH';
+    case 'IX':
+      return 'NINTH';
+    case 'X':
+      return 'TENTH';
+    case 'XI':
+      return 'ELEVENTH';
+    case 'XII':
+      return 'TWELFTH';
+    default:
+      return figure;
+  }
+};
+          //roman to words
+          const romanToWords = {
+            I: "FIRST",
+            II: "SECOND",
+            III: "THIRD",
+            IV: "FOURTH",
+            V: "FIFTH",
+            VI: "SIXTH",
+            VII: "SEVENTH",
+            VIII: "EIGHTH",
+            IX: "NINTH",
+            X: "TENTH",
+            XI: "ELEVENTH",
+            XII: "TWELFTH",
+          };
+          // Helper function to convert a number to text representation
+          function convertToText(number) {
+            const digitsText = [
+              "ZERO",
+              "ONE",
+              "TWO",
+              "THREE",
+              "FOUR",
+              "FIVE",
+              "SIX",
+              "SEVEN",
+              "EIGHT",
+              "NINE",
+            ];
+
+            if (number < 10) {
+              return digitsText[number];
+            } else if (number >= 10 && number < 20) {
+              // Special cases for teens
+              const teensText = [
+                "TEN",
+                "ELEVEN",
+                "TWELVE",
+                "THIRTEEN",
+                "FOURTEEN",
+                "FIFTEEN",
+                "SIXTEEN",
+                "SEVENTEEN",
+                "EIGHTEEN",
+                "NINETEEN",
+              ];
+              return teensText[number - 10];
+            } else if (number < 100) {
+              const tensText = [
+                "",
+                "",
+                "TWENTY",
+                "THIRTY",
+                "FORTY",
+                "FIFTY",
+                "SIXTY",
+                "SEVENTY",
+                "EIGHTY",
+                "NINETY",
+              ];
+
+              const ten = Math.floor(number / 10);
+              const unit = number % 10;
+
+              return `${tensText[ten]} ${digitsText[unit]}`;
+            } else if (number < 1000) {
+              const hundred = Math.floor(number / 100);
+              const remainder = number % 100;
+
+              if (remainder === 0) {
+                return `${digitsText[hundred]} HUNDRED`;
+              } else {
+                return `${digitsText[hundred]} HUNDRED ${convertToText(
+                  remainder
+                )}`;
+              }
+            } else {
+              // Handle thousands
+              const thousand = Math.floor(number / 1000);
+              const remainder = number % 1000;
+
+              if (remainder === 0) {
+                return `${digitsText[thousand]} THOUSAND`;
+              } else {
+                return `${digitsText[thousand]} THOUSAND ${convertToText(
+                  remainder
+                )}`;
+              }
+            }
+          }
+
+          //single student details
+          const contentData = element?.contentRequest;
+          const studentInfo = element?.student;
+          const schoolDetails = studentInfo.school;
+
+          const basicDetails = {
+            place: "Delhi",
+            date: new Date().toLocaleDateString("en-GB", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            }),
+            principal: "O. V. SHARMA",
+            academicSession: element?.contentRequest?.academicSession,
+            admissionNo: element?.contentRequest?.admissionNo,
+            studentName: element?.contentRequest?.studentName,
+            fatherName: element?.student?.fatherName,
+            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+            address: `${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.houseNo
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.houseNo + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.street
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.street + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.landmark
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.landmark + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.area
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.area + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.pincode
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.pincode
+                : ""
+            }`,
+            addressDistrict:
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.district,
+          };
+
+          console.log(contentData,"contnetDataaaaaaaaaa", studentInfo,"studentInfoooooooooo", schoolDetails,"schoooool Detailsssss", basicDetails,"bassssssssiicc");
+         const subjectsArray = contentData?.subjects?.split(", ").map(subject => subject.trim());
+        
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.style.margin="30px";
+          singleStudentHtml.innerHTML = `<style type="text/css">
+@page {
+size: A4
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+}
+td {
+	padding-right: 2mm;
+	padding-top: 1mm;
+	font-size: 11pt;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+}
+th {
+	padding-left: 2mm;
+	padding-right: 2mm;
+	padding-top: 2mm;
+	padding-bottom: 2mm;
+	font-size: 11pt;
+	background: #000000;
+	color: #fcfcfc;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+ @media print {
+@page {
+margin:auto;
+size: A4;
+}
+
+}
+</style>
+          
+          
+<page orientation="portrait" format="A4" margin="0">
+<table cellspacing="0" style="width:100%;">
+	<tr>
+		<td style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+		<!-- start header section -->
+		<table cellspacing="0" style="width:100%;">
+		
+		</table>
+		<!--// end header section -->
+		
+		<!-- title -->
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td align="center" style="width:100%; padding-top:30mm; padding-bottom:5mm; font-size:20pt; text-transform:uppercase;">Transfer Certificate</td>
+			</tr>	
+		</table>
+		<!--// title -->
+			
+		<!-- Affiliation -->
+		<table cellspacing="0" style="width:100%;">
+            <tr>
+                <td align="left" style="width:33%;font-weight:bold;">T.C.NO: ${
+                     contentData.tcNumber ||"-"
+                    }
+</td>
+			<tr>
+				<td align="left" style="width:33%;font-weight:bold;">Affiliation No : 
+          2730770 
+        </td>
+				<td align="right" style="width:33%;font-weight:bold;">School Code: 75428</td>
+				<td align="right" style="width:33%;font-weight:bold;">Admission no. : ${
+          basicDetails?.admissionNo || "-"
+        }</td>
+			</tr>	
+           <tr>
+				<td align="left" style="width:33%;">
+        </td>
+				<td align="right" style="width:33%;"></td>
+				<td align="right" style="width:33%;font-weight:bold;">ExAdmission No:  ${
+        studentInfo?. exAdmissionNo ?? "-"
+        }</td>
+			</tr>
+		</table>	
+		<!-- Affiliation -->
+			
+		<table cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:10mm;">&nbsp;</div></td>
+			</tr>
+    	</table>
+			
+		<!-- Start Main Content -->
+		<table cellspacing="0" style="width: 100%;">
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">1.</td>
+					<td style="width:30%;  padding-left:0mm;">Name of Pupil</td>
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid  0.3mm #000000; padding-left:13mm;">${
+            studentInfo?.studentName
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">2.</td>
+					<td style="width:30%;  padding-left:0mm;">Mother's Name </td>
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:13mm;">${
+            studentInfo?.motherName
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+
+        <tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">3.</td>
+					<td style="width:30%;  padding-left:0mm;">Father's/ Guardian's Name </td>
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:13mm;">${
+            studentInfo?.fatherName
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+	
+		
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">4.</td>
+					<td style="width:30%; padding-left:0mm;">Date of Birth</td>
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:13mm;">${
+                        contentData?.dob
+          }</td>
+				</tr>
+        <tr>
+					<td style="width:2%;">  </td>
+					<td style="width:30%; padding-left:0mm;">(in words)</td>
+					<td style="width:68%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:13mm;">${
+                        formatDateToText(contentData?.dob)
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+				
+	
+	<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%;">5.</td>
+					<td style="width:10%; padding-left:0mm;">Nationality </td>
+					<td style="width:10%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:5mm;">${
+            contentData?.nationality
+          }</td>
+					<td style="width:2%;">6.</td>
+
+					<td style="width:40%; padding-left:0mm;">Whether the candidate belongs to S.C/S.T/O.B.C.</td>
+                    	<td style="width:20%; text-transform:uppercase; border-bottom: solid 0.3mm #000000; padding-left:0mm;">${
+            contentData?.category
+          }</td>	
+
+				</tr>
+			</table>
+			</td>
+		</tr>
+		<tr>
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">7.</td>
+					<td  style="width:28%;  padding-left:0mm;">Date of Admission with Class </td>
+                    	<td style="width:70%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:15mm;">${
+           contentData.joiningClass
+                        } ( ${contentData?.joiningDate})</td>
+				</tr>
+				
+				
+				
+				</tr>
+			</table>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">8.</td>
+					<td style="width:46%;padding-left:0mm;">Class in which the pupil last Studied(in figures)</td>
+					<td style="width:15%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:0mm;">${
+            contentData.classes
+          }</td>
+					<td style="width:11%;   padding-left:0mm;">(in words)</td>
+                    	<td style="width:26%; padding-left:0mm; border-bottom: solid 0.3mm #000000; text-transform:uppercase;padding-left:0mm;">${
+            getClassTextBasedOnFigure(contentData.classes)
+          }</td>
+					
+				</tr>
+			</table>
+			</td>
+		</tr>
+				<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">9.</td>
+					<td style="width:52%; padding-left:0mm;">School/ Board Annual examination last taken with result </td>
+					<td style="width:46%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+                        contentData?.examLastTaken ? contentData?.examLastTaken: "-"
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+        <tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">10.</td>
+					<td style="width:47%; padding-left:0mm;"> Whether failed, if so once/ twice in the same class</td>
+					<td style="width:51%;border-bottom: solid 0.3mm #000000; padding-left:18mm;font-weight: 500;">${
+            contentData?.weatherFailed.toUpperCase()
+
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+		
+		
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%;">11.</td>
+					<td style="width:8%; padding-left:0mm;">Subjects</td>
+					<td style="width:90%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+                        contentData?.subjects?.toUpperCase()
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+     
+				
+				
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">12.</td>
+					<td style="width:48%;padding-left:0mm;">Whether qualified for promotion to the higher class</td>
+					<td style="width:38%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+            contentData?.weatherQualifiedForPromotion?.toUpperCase()
+          }</td>
+          		<td style="width:12%; ">, if so</td>
+				</tr>
+          
+			</table>
+			</td>
+		</tr>
+
+        <tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:5%;>"  "</td>
+					<td style="width:14%;padding-left:0mm;">to which class</td>
+					<td style="width:81%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+            contentData.promotedClass
+          }</td>
+          		
+				</tr>
+                	
+
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">13.</td>
+					<td style="width:47%; padding-left:0mm;">Month upto which the pupil has paid School dues</td>
+					<td style="width:51%; border-bottom: solid 0.3mm #000000; padding-left:38mm;">${
+            contentData.feePaidUpto
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">14.</td>
+					<td style="width:62%;  padding-left:0mm;">Any fee concession availed of. if so, the nature of such concession </td>
+					<td style="width:36%; border-bottom: solid 0.3mm #000000; padding-left:10mm;">${
+            contentData.anyFeeConcession?.toUpperCase()
+          }</td>
+					
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%;">15.</td>
+					<td style="width:33%;  padding-left:0mm;">Total No. of Working Days Present</td>
+					<td style="width:65%; border-bottom: solid 0.25mm #000000; padding-left:20mm;">${
+            contentData?.totalDaysPresent
+          } Days</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">16.</td>
+					<td style="width:25%; padding-left:0mm;"> Total No. of Working Days</td>
+					<td style="width:73%; border-bottom: solid 0.25mm #000000; padding-left:20mm;">${
+            contentData?.totalWorkingDays
+          } Days</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+
+  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" >
+                           <tr>
+                              <td style="width:100%;">
+                                 <span>17. Games played or extra curricular activities in which the pupil usually took part(mention achievement level </span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:100%;">
+                        <table width="100%" style="width:100%;" cellspacing="0" cellpadding="0">
+                           <tr>
+                              <td style="width:11%;">
+                                 <span >&nbsp;&nbsp;therein):</span>
+                              </td>
+                              <td style="width:89%;  border-bottom: solid 0.3mm #000000;">
+                                 <span><i>&nbsp;${
+                                   contentData?.gamesOrExtraCurricular || ""
+                                 }</i></span>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+        	<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">18.</td>
+					<td style="width:18%; padding-left:0mm;"> General Conduct</td>
+					<td style="width:80%; border-bottom: solid 0.3mm #000000; padding-left:42mm;">${
+            contentData.generalConduct?.toUpperCase()
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%;">19.</td>
+					<td style="width:30%;  padding-left:0mm;">Date of application of certificate </td>
+					<td style="width:68%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+            contentData.applicationDate
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+		
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%;">20.</td>
+					<td style="width:26%;  padding-left:0mm;">Date of issue of certificate </td>
+					<td style="width:72%; border-bottom: solid 0.3mm #000000; padding-left:28mm;">${
+            contentData.issueDate
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+			
+		<tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">21.</td>
+					<td style="width:30%;  padding-left:0mm;">Reasons for leaving the school </td>
+					<td style="width:68%; border-bottom: solid 0.3mm #000000; padding-left:20mm;">${
+            contentData.reasonWithdrawal?.toUpperCase()
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+        <tr>
+			<td style="width:100%; padding-left:0mm; padding-right:0mm;">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td style="width:2%; ">22.</td>
+					<td style="width:18%;  padding-left:0mm;">Any other remarks</td>
+					<td style="width:80%; border-bottom: solid 0.3mm #000000; padding-left:43mm;">${
+            contentData.anyOtherRemark?.toUpperCase()
+          }</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+	</table>
+	<!--// End Main Content -->
+			
+	<table cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><div style="height:15mm;">&nbsp;</div></td>
+        </tr>
+    </table>
+	
+	<!-- Signature -->
+    <table cellspacing="0" style="width:100%;">
+        <tr>
+            <td align="left" style="width:20%;"></td>
+            <td align="center" style="width:30%;"></td>
+            <td align="center" style="width:30%;"></td>
+
+            <td align="right" style="width:20%;"></td>
+        </tr>
+		<tr>
+            <td align="left" style="width:20%; font-weight:bold;">Signature of <br> Class Teacher<br/></td>
+            <td align="center" style="width:30%;font-weight:bold;">  <div style="padding-right:12px;text-align:left;">Checked By</div>
+  <div style="text-align:left;">(With full name & designation)</div></td>
+            <td align="center" style="width:30%; font-weight:bold; text-align:left;">Signature of Head of School with date<br>SCHOOL SEAL<br/></td>
+  <td style="width:20%; font-weight:bold; text-align:right;">
+  <div style="text-align:right;padding-right:12px;">Counter Signed</div>
+  <div style="text-align:right;">Education Officer</div>
+</td>
+
+
+
+        </tr>
+    </table>	
+    <!-- Signature -->
+			
+			
+	</td>
+	</tr>
+			
+</table>
+	
+</page>`;
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+      window.SetTemplateData([
+        {
+          student: {
+  dob: "12-02-2020",
+  admissionNo: "1",
+  studentName: "Saumya",
+  className: "PRE SCHOOL",
+  sectionName: "A",
+  rollNo: 0,
+  fatherName: "Sunil",
+  motherName: "Laila",
+  attendance: "0.0/0",
+  boardRollNumber: "",
+  studentInfoResponse: [
+    {
+      id: 327672,
+      userUid: "301d1069-31f1-43c8-af25-b26c79d9cd7d",
+      userName: null,
+      fatherUserName: null,
+      motherUserName: null,
+      guardianUserName: null,
+      uid: "226fe0bc-74c5-4a02-a047-26160b43267d",
+      studentId: "1",
+      exAdmissionNo: null,
+      studentName: "Saumya",
+      fatherName: "",
+      motherName: "",
+      dob: "12-02-2020",
+      gender: "Female",
+      studentAdhaarcard: "",
+      joiningClass: "PRE SCHOOL",
+      joiningSections: "A",
+      joiningDate: "01-12-2024",
+      plotNumber: "",
+      area: "",
+      city: "",
+      state: "",
+      pincode: null,
+      phone1: "",
+      rollNo: 0,
+      emergencyNumber: "",
+      mobileNumber: "7008064317",
+      studentEmail: null,
+      religion: "",
+      category: "",
+      minority: "",
+      motherTongue: "",
+      idMark: "",
+      height: "",
+      weight: "",
+      physicalDisability: "",
+      bloodGroup: "",
+      healthRemark: "",
+      siblingDetails: "",
+      alumni: "",
+      siblingResponse: [],
+      fatherOccupation: "",
+      fatherQualification: "GRADUATE",
+      fatherOrganization: "",
+      fatherDesignation: "",
+      fatherIncome: "",
+      fatherArea: "",
+      fatherCity: "",
+      fatherState: "",
+      fatherPincode: null,
+      fatherPhone: "",
+      fatherMobile: "",
+      fatherEmail: null,
+      fatherAdhaarNumber: "",
+      schoolUid: "4f735315-173a-40f8-85b1-0223f10b5fd3",
+      motherQualification: "",
+      motherOccupation: "",
+      motherOrganization: "",
+      motherDesignation: "",
+      motherIncome: "",
+      motherArea: "",
+      motherCity: "",
+      motherState: "",
+      motherPincode: null,
+      motherPhone: "",
+      motherMobile: "",
+      motherEmail: null,
+      motherAdhaarNumber: "",
+      guardianName: "",
+      relation: "",
+      guardianOccupation: "",
+      guardianPhone: "",
+      guardianMobile: "",
+      guardianEmail: null,
+      guardianAddress: "",
+      leavingDate: null,
+      previousSchoolName: "",
+      otp: null,
+      schoolName: "Demo Public School",
+      remark: "",
+      classTeacher: "Ridhima Saini",
+      classTeacherUserName: "RidhimaSaini_531844",
+      classes: "PRE SCHOOL",
+      classUid: null,
+      sections: "A",
+      group: null,
+      wing: "NA",
+      status: "Left",
+      academicSession: "2024-2025",
+      joiningStatus: "New",
+      houses: null,
+      certificates: "",
+      certificatesList: [],
+      caste: "",
+      listOfDocuments: null,
+      attached: false,
+      required: false,
+      submitted: false,
+      studentHostel: [],
+      studentConcession: [],
+      studentTransport: [],
+      studentAadharCard: null,
+      fatherAadharCard: null,
+      motherAadharCard: null,
+      studentImage: null,
+      fatherImage: null,
+      motherImage: null,
+      guardianImage: null,
+      birthCertificate: null,
+      classSectionUid: "111407a2-73d5-4084-9846-5069eb15081a",
+      aluminiProof: null,
+      siblingProof: null,
+      residenceProof: null,
+      firstBornChildProof: null,
+      medicalFitnessCertificate: null,
+      fatherQualificationProof: null,
+      motherQualificationProof: null,
+      casteCertificate: null,
+      createdUser: "quickadmin",
+      editedUser: "quickadmin",
+      createddate: "2024-12-24 05:45:19.037205",
+      editeddate: "2024-12-24 05:54:56.442404",
+      permanentEducationNumber: "",
+      studentAddressResponse: {
+        uid: "efe0f67f-7adb-4d06-9e94-0536528d2519",
+        houseNo: null,
+        area: "",
+        landmark: null,
+        city: "",
+        district: null,
+        state: "",
+        poPs: null,
+        pincode: null,
+        street: "",
+        userName: "DHS307_1",
+        createdDate: "24-12-2024 11:15 AM",
+        editedDate: "24-12-2024 11:24 AM",
+        createdBy: "quickadmin",
+        editedBy: "quickadmin"
+      },
+      fatherAddressResponse: {
+        uid: "125fc9b8-ccbb-477d-baf5-dbdfa2432830",
+        houseNo: null,
+        area: "",
+        landmark: null,
+        city: "",
+        district: null,
+        state: "",
+        poPs: null,
+        pincode: null,
+        street: null,
+        userName: null,
+        createdDate: "24-12-2024 11:15 AM",
+        editedDate: "24-12-2024 11:24 AM",
+        createdBy: "quickadmin",
+        editedBy: "quickadmin"
+      },
+      motherAddressResponse: {
+        uid: "b9fdb5b7-bd57-4a21-b05d-9e1b66b0a398",
+        houseNo: null,
+        area: "",
+        landmark: null,
+        city: "",
+        district: null,
+        state: "",
+        poPs: null,
+        pincode: null,
+        street: null,
+        userName: null,
+        createdDate: "24-12-2024 11:15 AM",
+        editedDate: "24-12-2024 11:24 AM",
+        createdBy: "quickadmin",
+        editedBy: "quickadmin"
+      },
+      guardianAddressResponse: {
+        uid: "c1ecd6a6-1209-40cf-8f80-8d6b00ae16ce",
+        houseNo: null,
+        area: "",
+        landmark: null,
+        city: null,
+        district: null,
+        state: null,
+        poPs: null,
+        pincode: null,
+        street: null,
+        userName: null,
+        createdDate: "24-12-2024 11:15 AM",
+        editedDate: "24-12-2024 11:24 AM",
+        createdBy: "quickadmin",
+        editedBy: "quickadmin"
+      },
+      correspondenceAddressResponse: {
+        uid: "ee56d753-b029-4474-b7ee-5c9dbfe520de",
+        houseNo: null,
+        area: "",
+        landmark: null,
+        city: "",
+        district: null,
+        state: "",
+        poPs: null,
+        pincode: null,
+        street: "",
+        userName: "DHS307_1",
+        createdDate: "24-12-2024 11:15 AM",
+        editedDate: "24-12-2024 11:24 AM",
+        createdBy: "quickadmin",
+        editedBy: "quickadmin"
+      }
+    }
+  ],
+  classTeacher: "Ridhima Saini",
+  classTeacherUserName: "RidhimaSaini_531844",
+  permanentEducationNumber: "",
+  school: {
+    uid: "4f735315-173a-40f8-85b1-0223f10b5fd3",
+    apikey: "TVlnyTSIWWew-QC_MqY7aMJW2oHkh_lO",
+    schoolName: "Delhi Heritage School",
+    schoolAbb: "DHS",
+    educationBoard: null,
+    registrationNo: null,
+    plotNumber: "Main Road",
+    area: "Sec-22, Rohini",
+    city: "Delhi",
+    pincode: "110086",
+    state: "Delhi",
+    phoneNo1: null,
+    phoneNo2: null,
+    contactName: null,
+    contactMobile: null,
+    contactEmail: null,
+    schoolCode: null,
+    pfCode: null,
+    societyManagement: null,
+    language: null,
+    schoolLogo: null,
+    schoolFavicon: null,
+    enabled: true,
+    subDomain: null,
+    website: null,
+    schemaPrefix: null,
+    editedDate: "24-12-2024 11:11 AM",
+    editedUser: "quickadmin",
+    visitorSchool: false,
+    clientSchoolId: null,
+    cscId: null,
+    onlinePaymentEnabled: false,
+    registrationSeries: null,
+    underTakingDetails: null,
+    formNumberStart: null,
+    sessionResponse: null,
+    schoolLogoUrl: null,
+    printAcknowledge: false,
+    wabaId: "",
+    phoneNumberId: "",
+    whatsappApiKey: "",
+    isQuickCampusWhatsapp: false,
+    notificationEnabled: true,
+    loanEnabled: false,
+    whatsAppEnabled: false,
+    smsenabled: false
+  }
+},
+contentRequest:
+  {
+  id: 0,
+  uid: null,
+  studentId: "1",
+  tcNumber: null,
+  dob: "12-02-2020",
+  gender: "Female",
+  studentAdhaarcard: "",
+  joiningClass: "PRE SCHOOL",
+  joiningSections: "A",
+  joiningDate: "01-12-2024",
+  plotNumber: "",
+  area: "",
+  city: "",
+  state: "",
+  pincode: "0",
+  phone1: "",
+  rollNo: 0,
+  emergencyNumber: "",
+  mobileNumber: "7008064317",
+  studentEmail: "",
+  religion: "",
+  schoolUid: "4f735315-173a-40f8-85b1-0223f10b5fd3",
+  minority: "",
+  motherTongue: "",
+  idMark: "",
+  height: "",
+  weight: "",
+  physicalDisability: "",
+  bloodGroup: "",
+  healthRemark: "",
+  siblingDetails: null,
+  alumni: "",
+  schoolName: "Delhi Heritage School",
+  fatherOccupation: "",
+  fatherQualification: "GRADUATE",
+  fatherOrganization: "",
+  fatherDesignation: "",
+  fatherIncome: "",
+  fatherArea: "",
+  fatherCity: "",
+  fatherState: "",
+  fatherPincode: "0",
+  fatherPhone: "",
+  fatherMobile: "",
+  fatherEmail: "",
+  fatherAdhaarNumber: "",
+  motherQualification: "",
+  motherOccupation: "",
+  motherOrganization: "",
+  motherDesignation: "",
+  motherIncome: "",
+  motherArea: "",
+  motherCity: "",
+  motherState: "",
+  motherPincode: "0",
+  motherPhone: "",
+  motherMobile: "",
+  motherEmail: "",
+  motherAdhaarNumber: "",
+  guardianName: "",
+  relation: "",
+  guardianOccupation: "",
+  guardianPhone: "",
+  guardianMobile: "",
+  guardianEmail: "",
+  guardianAddress: "",
+  leavingDate: null,
+  previousSchoolName: "",
+  remark: "",
+  classes: "PRE SCHOOL",
+  sections: "A",
+  group: null,
+  wing: "NA",
+  joiningStatus: "New",
+  houses: null,
+  certificates: "",
+  certificatesList: [],
+  caste: "",
+  listOfDocuments: null,
+  attached: false,
+  required: false,
+  submitted: false,
+  studentHostel: [],
+  studentConcession: [],
+  studentTransport: [],
+  status: "Left",
+  presentClass: null,
+  promotedClass: "PRE SCHOOL",
+  permanentEducationNumber: "",
+  feePaidUpto: "1000",
+  reasonWithdrawal: "Parents Desire",
+  anyOtherRemark: "NO",
+  generalConduct: "Good",
+  applicationDate: "24-12-2024",
+  issueDate: "24-12-2024",
+  fatherName: "",
+  motherName: "",
+  studentName: "Saumya",
+  examLastTaken: "78",
+  weatherFailed: "No",
+  academicSession: "2024-2025",
+  admissionNo: "1",
+  printDate: "",
+  medium: null,
+  subjects: "English, Hindi, Maths, Science,Social",
+  nccOrScout: "Yes",
+  gamesOrExtraCurricular: "Participated in All Activities",
+  category: "OBC",
+  nationality: "INDIAN",
+  weatherQualifiedForPromotion: "Yes",
+  anyFeeConcession: "EWS",
+  totalWorkingDays: "0",
+  totalDaysPresent: "0",
+  createdUser: null,
+  editedUser: null,
+  createdDate: "",
+  editedDate: null,
+  publishUrl: null
+},
+ header: `
+          <table cellspacing="0" style="width:100%;">
+             <tr>
+                <td style="padding-left:0mm; padding-right:0mm; padding-top:10mm; padding-bottom:10mm;">
+                   <div style="height:10mm;">&nbsp;</div>
+                </td>
+             </tr>
+          </table>
+    `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ]);
+    </script>
+  </body>
+</html>
