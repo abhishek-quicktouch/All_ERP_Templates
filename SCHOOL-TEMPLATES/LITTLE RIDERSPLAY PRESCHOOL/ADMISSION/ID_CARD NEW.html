@@ -79,17 +79,17 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
                                     <p style="font-size: 13px; text-align: center; text-transform: uppercase;  margin-top: 5px;">${el?.contentRequest?.className ?? ""}</p>
                                 </div>
                                 <div style="text-transform: uppercase; position: relative;bottom: 40px;">
-                                    <div style="display: flex; padding: 0px 5px;">
-                                        <p style="font-size: 10px; width: 40%; font-weight: 700;padding: 2px;">Admission No. :</p>
-                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;">${el?.contentRequest?.admissionNo ?? "-"}</p>
+                                    <div style="display: flex; padding: 0px 20px;">
+                                        <p style="font-size: 10px; width: 40%; font-weight: 700;padding: 2px;">Admission No.</p>
+                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;"> : ${el?.contentRequest?.admissionNo ?? "-"}</p>
                                     </div>
-                                    <div style="display: flex; padding: 0px 5px;">
-                                        <p style="font-size: 10px; width: 40%; font-weight: 700;padding: 2px;">D.O.B. :</p>
-                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;">${el?.contentRequest?.dob ?? "-"}</p>
+                                    <div style="display: flex; padding: 0px 20px;">
+                                        <p style="font-size: 10px; width: 40%; font-weight: 700;padding: 2px;">D.O.B.</p>
+                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;"> : ${el?.contentRequest?.dob ?? "-"}</p>
                                     </div>
-                                    <div style="display: flex; padding: 0px 5px;">
-                                        <p style="font-size: 10px; width: 40%;padding: 2px; font-weight: 700;">Blood Group :</p>
-                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;">${el?.contentRequest?.bloodGroup ?? "-"}</p>
+                                    <div style="display: flex; padding: 0px 20px;">
+                                        <p style="font-size: 10px; width: 40%;padding: 2px; font-weight: 700;">Blood Group</p>
+                                        <p style="font-size: 10px; width: 60%;padding: 2px; font-weight: 700;"> : ${el?.contentRequest?.bloodGroup ?? "-"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -97,29 +97,54 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
     
                         <!-- Back Side of ID Card -->
                         <div style="height: 400px; width: 300px;  border-radius: 10px; overflow: hidden; position: relative; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; border-color:#8c8c8c;">
-                            <div style="padding: 10px;">
-                                
-                                <p style="font-size: 12px; font-weight: 700;">Father's Name: ${el?.contentRequest?.fatherInformation?.name ?? "-"}</p>
-                                <p style="font-size: 12px; font-weight: 700;">Mobile No. : ${el?.contentRequest?.guardianInfo?.contactNo ?? "-"}</p>
-                                 <p style="font-size: 12px; font-weight: 700;">Mother's Name : ${el?.contentRequest?.motherInformation?.name ?? "-"}</p>
-                                  <p style="font-size: 12px; font-weight: 700;">Mobile No. : ${el?.contentRequest?.guardianInfo?.contactNo ?? "-"}</p>
-                                <p style="font-size: 12px; font-weight: 700;">Address : ${el?.contentRequest?.permanentAddress?.houseNo ? el?.contentRequest?.permanentAddress?.houseNo + ", " : ""}${el?.contentRequest?.permanentAddress?.area ? el?.contentRequest?.permanentAddress?.area + ", " : ""}${el?.contentRequest?.permanentAddress?.street ? el?.contentRequest?.permanentAddress?.street + ", " : ""}${el?.contentRequest?.permanentAddress?.city ? el?.contentRequest?.permanentAddress?.city + ", " : ""}${el?.contentRequest?.permanentAddress?.state ? el?.contentRequest?.permanentAddress?.state + ", " : ""}${el?.contentRequest?.permanentAddress?.pincode ? el?.contentRequest?.permanentAddress?.pincode : ""}</p>
-                              <div style="width: 100%; height: 250px;  position: relative;bottom: 70px; ">
-                                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-19T07_34_12_207892707.png" style="opacity: 0.9;" width="100%"  height="100%"/>
-                                
-                             
-                            </div>
-                            <div style="position: relative;bottom: 150px;  text-align: center; align-items: center;" >
+                            <table style="padding: 10px; width: 100%;">
+                                <tr>
+                                    <td style="font-size: 12px; font-weight: 700; width: 34%;">Father's Name</td>
+                                    <td style="font-size: 12px; font-weight: 700;width: 2%;">: </td>
+                                    <td style="font-size: 12px; font-weight: 700; width: 64%;">${el?.contentRequest?.fatherInformation?.name ?? "-"}</td>
+                                </tr>
+                               
+                                <tr>
+                                    <td style="font-size: 12px; font-weight: 700; width: 34%;">Mother's Name</td>
+                                    <td style="font-size: 12px; font-weight: 700;width: 2%;">: </td>
+                                    <td style="font-size: 12px; font-weight: 700; width: 64%;"> ${el?.contentRequest?.motherInformation?.name ?? "-"}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 12px; font-weight: 700; width: 34%;">Mobile No.</td>
+                                    <td style="font-size: 12px; font-weight: 700;width: 2%;">: </td>
+                                    <td style="font-size: 12px; font-weight: 700; width: 64%;"> ${el?.contentRequest?.guardianInfo?.contactNo ?? "-"}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 12px; font-weight: 700; width: 34%; vertical-align: top; text-align: left;">Address</td>
+                                    <td style="font-size: 12px; font-weight: 700; width: 2%; vertical-align: top; text-align: left;">: </td>
+                                    <td style="font-size: 12px; font-weight: 700; width: 64%;"> 
+                                        ${el?.contentRequest?.permanentAddress?.houseNo ? el?.contentRequest?.permanentAddress?.houseNo + ", " : ""}
+                                        ${el?.contentRequest?.permanentAddress?.area ? el?.contentRequest?.permanentAddress?.area + ", " : ""}
+                                        ${el?.contentRequest?.permanentAddress?.street ? el?.contentRequest?.permanentAddress?.street + ", " : ""}
+                                        ${el?.contentRequest?.permanentAddress?.city ? el?.contentRequest?.permanentAddress?.city + ", " : ""}
+                                        ${el?.contentRequest?.permanentAddress?.state ? el?.contentRequest?.permanentAddress?.state + ", " : ""}
+                                        ${el?.contentRequest?.permanentAddress?.pincode ? el?.contentRequest?.permanentAddress?.pincode : ""}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="width: 100%; height: 250px; position: relative; bottom: 60px;">
+                                        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-19T07_34_12_207892707.png" style="opacity: 0.4;" width="100%" height="100%" />
+                                    </td>
+                                </tr>
+                            </table> 
+                            <div style="position: relative;bottom: 145px;  text-align: center; align-items: center;" >
 <h3 style="color: #06402a;" >If found please return to :</h3>
 <h4 style="padding:  2px;" >${el?.school?.schoolName ?? ""}</h4>
-<h5 >${el?.school?.plotNumber ? el?.school?.plotNumber : "" || ""} ${el?.school?.area ?? ""} ${el?.school?.city ?? ""} ${el?.school?.state ?? ""} ${el?.school?.pincode ?? ""}</h5>
-<h5>Mob : ${el?.school?.contactMobile ?? ""}</h5>
+<h5 >${el?.school?.plotNumber ? el?.school?.plotNumber : "" || ""} ${el?.school?.area ?? ""} ${el?.school?.city ?? ""} ${el?.school?.state ?? ""} ${el?.school?.pincode ?? ""}, ${el?.school?.contactMobile ?? ""}</h5>
+
 <h5>Email : ${el?.school?.contactEmail ?? ""}</h5>
+                            
+
                     
+<div style=" background-color: #06402a;  height: 100px; width: 100%; margin: 10px 0px 0px 0px;" ></div>
+</div>
 </div>
 
-</div>
-<div style="height: 80px ;background-color: #06402a; width: 100%; position: relative;bottom: 150px;" ></div>
                     </div>`;
                 studentHtml.appendChild(singleStudentHtml);
             });
