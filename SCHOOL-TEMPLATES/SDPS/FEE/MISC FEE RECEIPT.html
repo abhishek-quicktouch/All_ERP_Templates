@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPS</title>
+  </head>
+  <body>
+    <div id="studentsList">Student Fee</div>
+    <script>
+      window.SetTemplateData = function (dataList) {
+        function convertNumberToWords(number) {
+          const units = [
+            "",
+            "ONE",
+            "TWO",
+            "THREE",
+            "FOUR",
+            "FIVE",
+            "SIX",
+            "SEVEN",
+            "EIGHT",
+            "NINE",
+          ];
+          const teens = [
+            "TEN",
+            "ELEVEN",
+            "TWELVE",
+            "THIRTEEN",
+            "FOURTEEN",
+            "FIFTEEN",
+            "SIXTEEN",
+            "SEVENTEEN",
+            "EIGHTEEN",
+            "NINETEEN",
+          ];
+          const tens = [
+            "",
+            "",
+            "TWENTY",
+            "THIRTY",
+            "FORTY",
+            "FIFTY",
+            "SIXTY",
+            "SEVENTY",
+            "EIGHTY",
+            "NINETY",
+          ];
+
+          function convertChunk(chunk) {
+            let words = "";
+
+            if (chunk >= 100) {
+              words += units[Math.floor(chunk / 100)] + " HUNDRED";
+              chunk %= 100;
+
+              if (chunk > 0) {
+                words += " ";
+              }
+            }
+
+            if (chunk >= 10 && chunk < 20) {
+              words += teens[chunk - 10];
+            } else if (chunk >= 20) {
+              words += tens[Math.floor(chunk / 10)];
+
+              if (chunk % 10 > 0) {
+                words += " " + units[chunk % 10];
+              }
+            } else if (chunk > 0) {
+              words += units[chunk];
+            }
+
+            return words;
+          }
+
+          if (number === 0) {
+            return "RUPEES ZERO ONLY";
+          }
+
+          const crore = Math.floor(number / 10000000);
+          const lakh = Math.floor((number % 10000000) / 100000);
+          const thousand = Math.floor((number % 100000) / 1000);
+          const remainder = number % 1000;
+
+          let result = "";
+
+          if (crore > 0) {
+            result += convertChunk(crore) + " CRORE ";
+          }
+
+          if (lakh > 0) {
+            result += convertChunk(lakh) + " LAKH ";
+          }
+
+          if (thousand > 0) {
+            result += convertChunk(thousand) + " THOUSAND ";
+          }
+
+          if (remainder > 0) {
+            result += convertChunk(remainder);
+          }
+
+          return "RUPEES " + result.trim() + " ONLY";
+        }
+
+        const installmentStartEndDate = (val, session) => {
+          const fromYear = session?.split("-")[0];
+          const toYear = session?.split("-")[1];
+          const obj = {
+            JAN: `31-JAN-${toYear}`,
+            FEB: `28-FEB-${toYear}`,
+            MAR: `31-MAR-${toYear}`,
+            APR: `30-APR-${fromYear}`,
+            MAY: `31-MAY-${fromYear}`,
+            JUN: `30-JUN-${fromYear}`,
+            JUL: `31-JUL-${fromYear}`,
+            AUG: `31-AUG-${fromYear}`,
+            SEP: `30-SEP-${fromYear}`,
+            OCT: `31-OCT-${fromYear}`,
+            NOV: `30-NOV-${fromYear}`,
+            DEC: `31-DEC-${fromYear}`,
+          };
+          const obj2 = {
+            JAN: `${toYear}`,
+            FEB: `${toYear}`,
+            MAR: `${toYear}`,
+          };
+          const installments = val.split(",");
+
+          const string = `01-${installments[0]}-${
+            obj2[installments[0]] ?? fromYear
+          } TO ${obj[installments[installments.length - 1]]}`;
+
+          return string;
+        };
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = `
+        <style type="text/css">
+   @page {
+   size: A4
+   }
+   * {
+   margin: 0px;
+   padding: 0px;
+   color: #000;
+   font-family: Courier New;
+   }
+   td {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 0mm;
+   padding-bottom: 0mm;
+   font-size: 5pt;
+   color: #000000;
+   }
+   th {
+   padding-left: 1mm;
+   padding-right: 1mm;
+   padding-top: 1mm;
+   padding-bottom: 1mm;
+   background: #e7e7e7;
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   @media print {
+   @page {
+   margin:5mm;
+   size: A4
+   }
+   .signImg {
+   width: 150px;
+   height: auto;
+   }
+   }
+   @media print {
+   .pagebreak {
+   clear: both;
+   page-break-after: always;
+   }
+   }
+</style>`;
+        multipleStudents?.forEach((element) => {
+            const contentRequestData= element?.contentRequest?.filter((item)=>item.external===false)
+            const receiptNo= contentRequestData?.map((receiptNo)=>receiptNo.receiptNo)?.sort()
+           
+          
+          const basicDetails = {
+            academicSession:
+              element?.student?.studentInfoResponse?.[0]?.academicSession,
+            admissionNo: element?.contentRequest?.admissionNo,
+            studentName: element?.contentRequest?.studentName,
+            fatherName: element?.student?.fatherName,
+            phoneNo: element?.student?.studentInfoResponse?.[0]?.mobileNumber,
+            classSection: `${element?.student?.className}-${element?.student?.sectionName}`,
+            address: `${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.houseNo
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.houseNo + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.street
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.street + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.landmark
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.landmark + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.area
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.area + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.city
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.city + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.district
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.district + ", "
+                : ""
+            }${
+              element?.student?.studentInfoResponse?.[0]?.studentAddressResponse
+                ?.pincode
+                ? element?.student?.studentInfoResponse?.[0]
+                    ?.studentAddressResponse?.pincode
+                : ""
+            }`,
+          };
+
+          const feeDetails = element?.contentRequest;
+          const componentTotal = (component) => {
+            return feeDetails?.studentFeeCollectionReceiptList?.reduce(
+              (prev, current) => prev + Number(current[component]),
+              0
+            );
+          };
+
+
+          const singleStudentHtml = document.createElement("div");
+          singleStudentHtml.style.pageBreakAfter = "always";
+          singleStudentHtml.innerHTML = `<page orientation="portrait" format="A4" margin="0">
+   <!--// content area-->
+   <table cellspacing="0" style="width:100%;">
+      <tbody>
+         <tr>
+            <td style="padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <div style="height:5mm;">&nbsp;</div>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+   <!--content area-->
+
+   <table style="width: 100%;">
+      <tbody>
+         <tr valign="top">
+            <td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+               <!-- Header Section -->
+              <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;">
+                           <img align="left" style="width: 80px;" src="
+                            https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-08-06T08_08_17_209919856.png">
+                        </td>
+                        <td align="middle" style="width:80%; padding-top:0mm; padding-bottom:0mm;">
+                           <span style="font-size:20pt; text-transform:uppercase; font-weight:bold; padding-top:0mm; padding-bottom:0mm; font-family: math;">SDPS Punjabi Bagh</span>
+                           <br>
+                           <span style="width:80%; padding-top:0mm; padding-bottom:0mm; font-size:10pt; text-transform:uppercase; font-family: math;">Road No. 10, East Punjabi Bagh, New Delhi</span></br>
+                           <span style="color: #000000; padding-top:0mm; padding-bottom:0mm; font-size:10pt; line-height: 140%; text-transform:uppercase; font-family: math;">
+                           (Under the aegis of Sanatan Dharam Education Trust)
+                        </span>
+                        </td>
+                        
+                     </tr>
+                  </tbody>
+               </table>
+               <table style="width:100%;" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr>
+                        <td valign="middle" align="left" style="width:8%; padding-top:0mm; padding-bottom:0mm;">
+                           &nbsp;
+                        </td>
+                        <td align="middle" style="width:84%; padding-top:5mm; padding-bottom:5mm; ">
+                           <span style="width:84%; padding-top:0mm; padding-bottom:20mm; font-size:16pt; text-transform:uppercase; font-family: Courier New;">CLASS FEE RECEIPT</span>
+                        </td>
+                        <td valign="middle" align="right" style="width:8%; padding-top:0mm; padding-bottom:0mm; ">
+                           &nbsp;
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Header Section -->
+               <!-- Student | Receipt Details -->
+               <table cellspacing="0" style="width: 100%; padding-top:1mm; padding-bottom:1mm;">
+                  <tbody>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0">
+                              <tbody>
+                                 <tr>
+                                    
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                   
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                       HEAD NAME
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;${
+                                    contentRequestData?.[0]?.feeHead
+                                    }</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td style="width: 40%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                 
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                      FEE DATE
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;${
+                                     element?.dates?.fromDate ?element?.dates?.fromDate :""
+                                    }  ${element?.dates?.toDate ? `- ${element?.dates?.toDate}`:""}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                     CLASS-SECTION
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;${
+                                     contentRequestData?.[0]?.studentClass 
+                                    }${contentRequestData?.[0]?.studentSection?`-${contentRequestData?.[0]?.studentSection}`:""}</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td style="width: 60%;">
+                           <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <tbody>
+                                 <tr>
+                                    <td style="width:35%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                     CLASS-TEACHER
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;
+                                  </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Student | Receipt Details -->
+               <!-- Main Table Head -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; ">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                   
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <!-- Main Table Head -->
+               <!-- FEE | ADMISSION -->
+           
+               <!-- FEE | ADMISSION -->
+               <!-- TOTAL | CHEQUE | FINE -->
+               <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; ">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+ <td style="width:17%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                   RECEIPT NO
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;${
+                                    receiptNo[0]
+                                    } ${receiptNo[receiptNo.length-1]!==receiptNo[0] ? `to ${receiptNo[receiptNo.length-1]}`:"-"}</td>
+                                    
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                    <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; ">
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+                                   
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                              
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                       <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                               
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                               
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+
+
+                  </tbody>
+               </table>
+               
+               <!-- TOTAL | CHEQUE | FINE -->
+               <!-- Net Amount Received -->
+               <table cellspacing="0" style="width:100%;">
+                  <tbody>
+                   
+                       <tr>
+ <td style="width:17%; font-size:12pt; padding-left:1mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                   TOTAL STUDENTS
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;${
+                                      receiptNo.length
+                                    }</td>
+                                    
+                                 </tr>
+                                   <tr>
+ <td style="width:17%; font-size:12pt; padding-left:1mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                   RATE
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;<span style="border-bottom:1px dashed #000;">${
+                                     Number(contentRequestData?.[0]?.amount).toFixed(1)
+                                    }</span></td>
+                                    
+                                 </tr>
+                  </tbody>
+               </table>
+               
+                         <table cellspacing="0" style="width:100%; padding-top:1mm; padding-bottom:1mm; ">
+                           
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                              
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                       <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                               
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                               
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+
+                  <tbody>
+                     <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+ <td style="width:17%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                                TOTAL
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> :&nbsp;&nbsp;<span style="border-bottom: 1px dashed #000;">${
+                                       Number( receiptNo.length * contentRequestData?.[0]?.amount).toFixed(1)
+                                    }</span></td>
+                                    
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                        <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+ <td style="width:17%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                               
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;"> &nbsp; &nbsp;&nbsp;<span style=" text-align:right;">${
+                                     "VIKAS"
+                                    }</span></td>
+                                    
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                      <tr>
+                        <td align="center">
+                           <table cellspacing="0" style="width:100%;">
+                              <tbody>
+                                 <tr>
+ <td style="width:17%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; font-family: Courier New;">
+                               
+                                    </td>
+                                    <td style="width:65%; font-size:12pt; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm; text-transform: uppercase; font-family: Courier New;">    <span style=" text-align:right;">${
+                                     "(FEE CLERK)"
+                                    }</span></td>
+                                    
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                     </tr>
+                   
+
+                  </tbody>
+               </table>
+
+                  </tbody>
+               </table>
+               <!-- Net Amount Received -->
+               <!-- footer -->
+
+               <!-- footer -->
+            </td>
+         </tr>
+      </tbody>
+   </table>
+            
+            </page>`;
+
+          studentHtml.appendChild(singleStudentHtml);
+        });
+      };
+    </script>
+    <script>
+   window.SetTemplateData([
+        {
+          dates: { fromDate: "11-09-2024", toDate: "15-09-2024" },
+          session: "2024-2025",
+          contentRequest: [
+  {
+    feeUid: "69d72904-c002-4f54-b0b1-4e33313ef576",
+    receiptNo: "213",
+    admissionNo: "-",
+    studentName: "MS BINDU BEHL",
+    studentClass: "-",
+    studentSection: "-",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "26-12-2024",
+    amount: "169.00",
+    feeHead: "LIBRARY FINE",
+    narration: "R NO-7896 TO 7900",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: true
+  },
+  {
+    feeUid: "e7142f8a-604d-427c-850f-4b7bd91164c1",
+    receiptNo: "212",
+    admissionNo: "20232595",
+    studentName: "Naman Prasad",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "a29a34e0-37b1-414d-8409-0fd8362997d7",
+    receiptNo: "211",
+    admissionNo: "20232586",
+    studentName: "Priya Kumari Soni",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "541b62af-034c-4c3f-8ffd-f5b9924ced6f",
+    receiptNo: "210",
+    admissionNo: "20232583",
+    studentName: "Chirag",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "cfad5dfd-2cd3-4c3f-a30f-cb304f9cebbf",
+    receiptNo: "209",
+    admissionNo: "20232569",
+    studentName: "Hardik Marwah",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "98d57821-ab5e-4859-9475-d445aceaf9d8",
+    receiptNo: "208",
+    admissionNo: "20201860",
+    studentName: "Hemant Kumar",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "07427384-e757-4213-8a15-1f5bec8fd732",
+    receiptNo: "207",
+    admissionNo: "20191505",
+    studentName: "Divvy Garg",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "9476678e-86c9-481c-a7a9-311e0e6f8daa",
+    receiptNo: "206",
+    admissionNo: "20170032",
+    studentName: "Chakshu Malhotra",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "9856583d-12a4-425f-a744-6bb7707333d6",
+    receiptNo: "205",
+    admissionNo: "20170009",
+    studentName: "Subhajit Malik",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "1e5270a0-458d-4304-b369-cccf93d9184e",
+    receiptNo: "204",
+    admissionNo: "20159483",
+    studentName: "Dikshita Sharma",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "39712dea-1f45-4bde-86ef-fc823f8d849e",
+    receiptNo: "203",
+    admissionNo: "20159460",
+    studentName: "Aarush Chandel",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "29625e80-995f-4167-adcd-3bf0e8a5c410",
+    receiptNo: "202",
+    admissionNo: "20148909",
+    studentName: "Bhumi Sharma",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "3c7212f2-3478-4450-b388-1cec3f08e38d",
+    receiptNo: "201",
+    admissionNo: "20138740",
+    studentName: "Krishna Garg",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "ebbe8e27-a546-4e90-9d28-5d8072da5baa",
+    receiptNo: "200",
+    admissionNo: "20138730",
+    studentName: "Ashna Sharma",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "bed54d94-853e-4504-9e87-5d43e327da2d",
+    receiptNo: "199",
+    admissionNo: "20138651",
+    studentName: "Geet Bhatia",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "f7207d9e-9606-49c2-b72c-3b29d4b08f0d",
+    receiptNo: "198",
+    admissionNo: "20138640",
+    studentName: "Janvi Sharma",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "950a2c6e-4aee-416a-b25a-5affcdf0f2ec",
+    receiptNo: "197",
+    admissionNo: "20138636",
+    studentName: "Sujal Bindal",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "4ef9ac6f-f442-4e18-a69f-2241c3437327",
+    receiptNo: "196",
+    admissionNo: "20138634",
+    studentName: "Chitkarsh Gautam",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "8c34e977-b18f-4c86-80c4-93b97377c18d",
+    receiptNo: "195",
+    admissionNo: "20138631",
+    studentName: "Shradha Atheya",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "31379760-9d9f-4cc6-ab8b-5fdcdc8a766c",
+    receiptNo: "194",
+    admissionNo: "20138630",
+    studentName: "Ansh Atheya",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "0bf31826-b471-4618-95f6-4b9422c20a78",
+    receiptNo: "193",
+    admissionNo: "20138624",
+    studentName: "Harsh Singhal",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "6c63735a-d90a-4f6c-a9b0-f1ffd96a6f25",
+    receiptNo: "192",
+    admissionNo: "20138605",
+    studentName: "Shivam",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "c4964161-5cf3-43e7-8614-345f2dfe0ca8",
+    receiptNo: "191",
+    admissionNo: "20138585",
+    studentName: "Kavya Khurana",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "338afe23-2055-4f84-8384-9550e82a2b81",
+    receiptNo: "190",
+    admissionNo: "20138582",
+    studentName: "Mudit Taneja",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "e766c35e-a1b7-437a-8a6c-8db5d0dd966e",
+    receiptNo: "189",
+    admissionNo: "20138579",
+    studentName: "Devank Jain",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  },
+  {
+    feeUid: "9f063c64-ae71-4ca4-b20e-260031d156e5",
+    receiptNo: "188",
+    admissionNo: "20138575",
+    studentName: "Dishita Shakyawar",
+    studentClass: "X",
+    studentSection: "A",
+    onAccount: "ACCOUNT ONE",
+    miscFeeDate: "19-12-2024",
+    amount: "200.00",
+    feeHead: "GROUP PHOTOGRAPH",
+    narration: "GROUP PHOTOGRAPH",
+    userName: "SangeetaDahiya_505056",
+    paymentMode: "CASH",
+    modeNumber: "-",
+    modeBank: "-",
+    modeBranch: "-",
+    modeDate: "-",
+    modeRemark: "-",
+    feeDeleteRemark: null,
+    bouncedDate: "-",
+    bounced: false,
+    external: false
+  }
+],
+          header: `
+        <table style="width:100%;" cellspacing="0" cellpadding="0">
+                <tbody>
+                   <tr>
+                      <td valign="top" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm;"><img align="left" style="width: 140px;" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/DIPS653/school-logo.png"></td>
+                      <td align="center" style="width:80%; padding-top:0mm; padding-bottom:1mm;">
+                         <span style="color:#0089e0; font-size:54pt; text-transform:uppercase; font-weight:bold; padding-top:4mm; font-family: ui-sans-serif;">DE&nbsp;INDIAN</span> 
+                         <br>
+                         <span style="color:#0089e0; font-size:26pt; text-transform:uppercase; font-weight:bold; font-family: ui-sans-serif;">PUBLIC&nbsp;SCHOOL</span>
+                      </td>
+                      <td valign="middle" rowspan="2" align="left" style="width:10%; padding-top:0mm; padding-bottom:0mm; ">
+                         <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%; text-transform:uppercase;">School&nbsp;Copy</span>
+                      </td>
+                   </tr>
+                   <tr>
+                      <td align="center" style="width:85%; font-size:10pt; font-weight:bold; padding-top:0mm; padding-bottom:0mm;">
+                         <table cellspacing="0" style="width:100%;">
+                            <tbody>
+                               <tr>
+                                  <td style="width:10%;">&nbsp;</td>
+                                  <td align="center" style="width:80%; border-top: solid 0.264583333mm #000000; font-weight:bold; font-size:14pt; text-transform:uppercase;">Give WINGS TO YOUR DREAMS
+                                  </td>
+                                  <td style="width:10%;">&nbsp;</td>
+                               </tr>
+                               <tr>
+                                  <td style="width:10%;">&nbsp;</td>
+                                  <td align="center" style="width:80%; font-weight:bold; font-size:14pt;">
+                                     <span style="color: #000000; font-weight:bold; font-size:10pt; line-height: 140%;">POCKET-11, SECTOR-24, ROHINI, DELHI-110085 <br>
+                                     27050252 <br>
+                                     www.dipsrohini.in, rohini.dips@yahoo.co.in</span>
+                                  </td>
+                                  <td style="width:10%;">&nbsp;</td>
+                               </tr>
+                            </tbody>
+                         </table>
+                      </td>
+                   </tr>
+                </tbody>
+             </table>
+  `,
+          footer:
+            '<page_footer>\n <table style="padding:2mm 0mm 0mm;" cellspacing="0" cellpadding="0">\n  <tbody>\n   <tr>\n    <td style="padding:0mm;width:100%;" width="100%" align="left" valign="top"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</page_footer>',
+        },
+      ])</script>
+  </body>
+</html>
