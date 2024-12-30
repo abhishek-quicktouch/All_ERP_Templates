@@ -109,7 +109,7 @@
       return res;
     };
 
-    const getSubjectMarks = (marksData) => {
+    const getSubjectMarks = (marksData, graphSubjects) => {
       const subjects = marksData?.baseTermData?.subject.filter((d) => {
         return d.scholastic;
       });
@@ -122,6 +122,9 @@
         marksData?.markData?.subjectWiseMarkSheetReportResponses?.find(
           (d) => {
             if (sub?.subjectAllResponse?.subjectName === d?.subjectName) {
+              let subjectTotal = 0;
+              let subjectMaxTotal = 0;
+              const marks = {};
               let temp = d?.markSheetReport?.find(
                 (m) =>
                   m?.markSheetTermResponse?.headerName?.toLowerCase() ==
@@ -132,10 +135,21 @@
               str += `<tr><td class="align-left" style="padding-left: 0.3rem; font-size:12px;">${d?.subjectName
                 }</td>${d.markSheetReport
                   .map((v) => {
+                    subjectTotal += Number(v?.obtained) || 0;
+                    subjectMaxTotal += Number(v?.max) || 0;
                     return `<td  style="text-align: center; font-size:12px;  font-weight:${v?.status ? "bold" : ""
                       }">${attendanceValue[v?.status] || v?.obtained}</td>`;
                   })
                   .join("")} 
+                  ${(() => {
+                  graphSubjects.push({
+                    subject: d.subjectName,
+                    marks: subjectTotal,
+                    maxPossible: subjectMaxTotal,
+                    percentage: (subjectTotal / subjectMaxTotal) * 100,
+                  });
+                  return '';
+                })()}
                   <td style="text-align: center; font-size:12px;" >${midTermOutOf}</td>
                   <td style="text-align: center; font-size:12px;" >${(
                   (d?.marksObtained || 0) -
@@ -157,8 +171,200 @@
         );
       });
 
-      return str;
+      return { graphSubjects, str };
     };
+    function generateGraph(
+      subjects,
+      studentPerformanceData,
+      uniqueGraphId
+    ) {
+      if (!subjects || !studentPerformanceData) {
+        console.error("Invalid inputs provided");
+        return;
+      }
+
+      const filteredSubjects = subjects
+        .filter((subject) =>
+          studentPerformanceData.some(
+            (data) => data.subjectName === subject.subject
+          )
+        )
+        .map((subject) => {
+          const performanceData = studentPerformanceData.find(
+            (data) => data.subjectName === subject.subject
+          );
+          return {
+            subjectName: subject?.subject,
+            maxMark: performanceData.maxMark,
+            maxObtainedMark: performanceData.maxObtainedMark,
+            averageObtainedMark: performanceData.averageObtainedMark,
+            actualObtained: subject?.marks
+          };
+        });
+
+      const chartContainer = document.getElementById(uniqueGraphId);
+      chartContainer.innerHTML = "";
+
+      // Set container styles
+      chartContainer.style.display = "flex";
+      chartContainer.style.flexDirection = "column";
+      chartContainer.style.alignItems = "center";
+      chartContainer.style.width = "100%";
+      chartContainer.style.height = "250px";
+      chartContainer.style.backgroundColor = "#f0f0f0";
+      chartContainer.style.padding = "2px";
+
+      // Y-axis container
+      const yAxisContainer = document.createElement("div");
+      Object.assign(yAxisContainer.style, {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "170px",
+        marginRight: "10px",
+        // width: "400px",
+      });
+
+      // Adding y-axis labels (100 to 0)
+      [100, 80, 60, 40, 20, 0].forEach((value) => {
+        const yLabel = document.createElement("div");
+        yLabel.textContent = value;
+        Object.assign(yLabel.style, {
+          fontSize: "10px",
+          color: "#333",
+          textAlign: "right",
+        });
+        yAxisContainer.appendChild(yLabel);
+      });
+
+      // Main container to hold y-axis and bar graph
+      const mainContainer = document.createElement("div");
+      mainContainer.style.display = "flex";
+      mainContainer.style.alignItems = "flex-end";
+      chartContainer.appendChild(mainContainer);
+
+      mainContainer.appendChild(yAxisContainer);
+
+      // Bar graph container
+      const barGraph = document.createElement("div");
+      Object.assign(barGraph.style, {
+        display: "flex",
+        alignItems: "flex-end",
+        gap: "50px",
+        height: "100%",
+        width: "100%",
+        backgroundColor: "#ffffff",
+        padding: "0px",
+        boxSizing: "border-box",
+        overflow: "hidden",
+      });
+      mainContainer.appendChild(barGraph);
+
+      const barLabels = document.createElement("div");
+      Object.assign(barLabels.style, {
+        display: "flex",
+        justifyContent: "space-around",
+        width: "55%",
+        marginTop: "10px",
+      });
+      chartContainer.appendChild(barLabels);
+
+      filteredSubjects.forEach((subject) => {
+        const subjectGroup = document.createElement("div");
+        Object.assign(subjectGroup.style, {
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-end",
+          gap: "2px",
+          width: "50px",
+          height: "100%",
+        });
+
+        const averageBar = document.createElement("div");
+        Object.assign(averageBar.style, {
+          width: "10px",
+          backgroundColor: "#4CAF50",
+          height: `${(subject.averageObtainedMark / subject.maxMark) * 100
+            }%`,
+        });
+
+        const maxObtainedBar = document.createElement("div");
+        Object.assign(maxObtainedBar.style, {
+          width: "10px",
+          backgroundColor: "#FFA726",
+          height: `${(subject.actualObtained / subject.maxMark) * 100}%`,
+        });
+
+        const maxMarkBar = document.createElement("div");
+        Object.assign(maxMarkBar.style, {
+          width: "10px",
+          backgroundColor: "#2196F3",
+          height: `${(subject.maxObtainedMark / subject.maxMark) * 100}%`,
+        });
+
+        subjectGroup.appendChild(averageBar);
+        subjectGroup.appendChild(maxObtainedBar);
+        subjectGroup.appendChild(maxMarkBar);
+        barGraph.appendChild(subjectGroup);
+
+        const label = document.createElement("div");
+        label.innerText = subject.subjectName;
+        Object.assign(label.style, {
+          fontSize: "9px",
+          textAlign: "center",
+          marginTop: "5px",
+          transform: "rotate(-30deg)",
+          wordBreak: "break-word",
+          width: "50px",
+        });
+        barLabels.appendChild(label);
+      });
+
+      const legend = document.createElement("div");
+      Object.assign(legend.style, {
+        display: "flex",
+        gap: "15px",
+        marginTop: "20px",
+        alignItems: "center",
+      });
+      chartContainer.appendChild(legend);
+
+      const legendData = [
+        { color: "#4CAF50", label: "Average Obtained" },
+        { color: "#FFA726", label: "Marks Obtained" },
+        { color: "#2196F3", label: "Highest Obtained" },
+      ];
+
+      legendData.forEach((item) => {
+        const legendItem = document.createElement("div");
+        Object.assign(legendItem.style, {
+          display: "flex",
+          alignItems: "center",
+          gap: "5px",
+        });
+
+        const legendColor = document.createElement("div");
+        Object.assign(legendColor.style, {
+          width: "10px",
+          height: "10px",
+          backgroundColor: item.color,
+          display: "inline-block",
+        });
+
+        const legendTextContainer = document.createElement("span");
+        legendTextContainer.textContent = item.label;
+        Object.assign(legendTextContainer.style, {
+          fontSize: "10px",
+          color: "#333",
+          fontWeight: "bold",
+          marginLeft: "5px",
+        });
+
+        legendItem.appendChild(legendColor);
+        legendItem.appendChild(legendTextContainer);
+        legend.appendChild(legendItem);
+      });
+    }
 
     const getCoScholasticSub = (marksData) => {
       const subjects = marksData?.baseTermData?.subject.filter((d) => {
@@ -285,7 +491,9 @@
         }
       </style>`;
 
-    data?.forEach((st) => {
+    data?.forEach((st, index) => {
+      let graphSubjects = [];
+      const uniqueGraphId = `graph-container-${index}`;
       let { street, area, city, state, pincode } =
         st?.student.studentInfoResponse?.[0]?.studentAddressResponse;
       let address = `${street || ""}${area || ""} ${city + "." || ""}  `;
@@ -310,7 +518,7 @@
         }</p>
         </div>
 
-<table style="width: 100%; border-collapse: collapse; font-size:13px;">
+<table style="width: 100%; border-collapse: collapse; font-size:13px; text-transform: uppercase">
   <tr>
     <td style="text-align: left;  padding-left: 0.3rem; padding-right: 10px; border:none; width: 20%;">
       <strong>NAME</strong>
@@ -370,19 +578,37 @@
           ${getTerms(st?.markData, true)}
           </tr>
           <tr>
-            ${getSubjectMarks(st)}
+            ${getSubjectMarks(st, graphSubjects).str}
           </tr>
         </table>
-
-         <table style="width:100%;">
-            <div style="margin: 4px 0;text-align: center;font-size:14px;font-weight:bold;margin-top:8px;">CO-SCHOLASTIC AREAS</div>
-          <tr style="margin-top:4px;">
+<div style="width:100%; display:flex;">  
+  <table style="width:50%; margin-top:10px;">
+   
+            <tr style="margin-top:4px;">
+              <th   colspan="2" style="min-width:73px; font-size:13px;">SCHOLASTIC AREAS</th>
+              <tr>
               <th class="alignLeft" colspan="10" style="padding-left: 0.3rem; font-size:13px;">SUBJECTS</th>
               <th style="min-width:73px; font-size:13px;">GRADE</th>
+            </tr>
           </tr>
+           
         ${getCoScholasticSub(st)}
 
+        
+
       </table>
+
+       <div class="section" style="width: 50%">
+                        <h3 style="text-align: center; font-size: 12px;height: 22px;  border: 1px solid black; padding: 2px; text-transform: uppercase">
+                            ${st?.student?.studentName || "STUDENT"
+        }'S PERFORMANCE ANALYSIS
+                        </h3>
+                        <div id="${uniqueGraphId}">
+                            <div id="${uniqueGraphId}"></div>
+                        </div>
+      </div>
+  </div>
+         
         <div
           class="total"
           style="display: flex; justify-content: space-between; margin: 2rem 0"
@@ -451,7 +677,13 @@
           </div>
     </page>
 
-      `;
+      `; if (graphSubjects.length > 0) {
+        generateGraph(
+          graphSubjects,
+          st?.studentPerfromanceData?.classWiseMarkResponse,
+          uniqueGraphId
+        );
+      }
     });
   };
 

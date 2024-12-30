@@ -69,12 +69,12 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
                                 </div>
                             </div>
                             <div style="height: 50%; ">
-                                <div style="display: flex; justify-content: center; align-items: center; padding-top: 10px;">
-                                    <div style="border: 1.5px solid; height: 95px; width: 75px; overflow: hidden; border-radius: 6px; position: relative;bottom: 50px;  ">
-                                        <img style="height: 100%; width: 100%; object-fit: contain;" src="${el?.contentRequest?.preSignedUrlResponse?.url ?? ""}" />
+                                <div style="display: flex; justify-content: center; align-items: center; ">
+                                    <div style="position: relative; bottom: 40px; height: 95px; width: 75px; border-radius: 6px; overflow: hidden; border: 1.5px solid;padding-top: 10px;">
+                                        <img style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; object-fit: cover;" src="${el?.contentRequest?.preSignedUrlResponse?.url ?? ""}" />
                                     </div>
                                 </div>
-                                <div style="position: relative;bottom: 50px; padding: 0px 5px;" >
+                                <div style="position: relative;bottom: 40px; padding: 0px 5px;" >
                                     <p style="font-size: 15px; text-align: center; text-transform: uppercase; color: #06402a; margin-top: 5px; font-weight: 900;">${el?.contentRequest?.studentName ?? ""}</p>
                                     <p style="font-size: 13px; text-align: center; text-transform: uppercase;  margin-top: 5px;">${el?.contentRequest?.className ?? ""}</p>
                                 </div>
@@ -224,7 +224,7 @@ https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/
                     rollNo: 15,
                     session: "2023-24",
                     preSignedUrlResponse: {
-                        url: "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/TSQ342/student-info/1/student/images/1.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240513T110936Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20240513%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=b1692426159d947b5195dac2b32ad69a552f2ddbc2076faa9a7bb49262bf0012",
+                        url: "https://quick-prod.s3.ap-south-1.amazonaws.com/uploads/LRS886/student-info/11/student/images/11.png",
                         fileName: "1.png"
                     },
                     fatherInformation: {
