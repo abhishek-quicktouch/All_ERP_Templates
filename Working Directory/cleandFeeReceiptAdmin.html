@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+    <div id="studentsList">
+        Processed Dynamic School Report Generator Script
+    </div>
+</body>
+<script>
+    window.SetTemplateData = function (data) {
+        function cleanStudentData(rawData) {
+            const {
+                dob,
+                admissionNo,
+                studentName,
+                className,
+                sectionName,
+                rollNo,
+                fatherName,
+                motherName,
+                attendance,
+                mobileNumber,
+                studentAddressResponse,
+                siblingResponse,
+                studentTransport,
+                studentConcession,
+                schoolName,
+            } = rawData.studentInfoResponse[0]; // Assuming first object in studentInfoResponse is relevant
+
+            return {
+                basicInfo: {
+                    studentName,
+                    admissionNo,
+                    dob,
+                    className,
+                    sectionName,
+                    rollNo,
+                    attendance,
+                    fatherName: fatherName || "N/A",
+                    motherName: motherName || "N/A",
+                },
+                contactInfo: {
+                    mobileNumber: mobileNumber || "N/A",
+                    address: {
+                        area: studentAddressResponse?.area || "N/A",
+                        city: studentAddressResponse?.city || "N/A",
+                        state: studentAddressResponse?.state || "N/A",
+                        pincode: studentAddressResponse?.pincode || "N/A",
+                    },
+                },
+                siblings: siblingResponse.map((sibling) => ({
+                    name: sibling.siblingName,
+                    classSection: sibling.siblingClassSection,
+                })),
+                transport: studentTransport.map((transport) => ({
+                    circle: transport.circle,
+                    route: transport.route,
+                    pick: transport.pick,
+                    drop: transport.drop,
+                    installment: transport.installment,
+                })),
+                concessions: studentConcession.map((concession) => ({
+                    name: concession.concessionName,
+                    installment: concession.installment,
+                })),
+                schoolInfo: {
+                    schoolName,
+                },
+            };
+        }
+
+
+        data.map((data) => {
+            const cleanData = cleanStudentData(
+                data?.student
+            )
+            console.log(data, "fffffffffffffff  data");
+            console.log(cleanData, "fffffffffffffff Cleaned data");
+
+        })
+
+
+
+    };
+</script>
+
+<script>
+    window.SetTemplateData([
+        {
+            "student": {
+                "dob": "17-11-2019",
+                "admissionNo": "1283",
+                "studentName": "Aahil",
+                "className": "Nursery",
+                "sectionName": "A",
+                "rollNo": 1,
+                "fatherName": "",
+                "motherName": "",
+                "attendance": "3.0/5",
+                "boardRollNumber": "",
+                "studentInfoResponse": [
+                    {
+                        "id": 327684,
+                        "userUid": "4d678000-5e42-4ec2-995a-b9fd374693f6",
+                        "userName": null,
+                        "fatherUserName": null,
+                        "motherUserName": null,
+                        "guardianUserName": null,
+                        "uid": "543db021-2fae-459b-aaed-0c1b2a40ea3a",
+                        "studentId": "1283",
+                        "exAdmissionNo": null,
+                        "studentName": "Aahil",
+                        "fatherName": "",
+                        "motherName": "",
+                        "dob": "17-11-2019",
+                        "gender": "NA",
+                        "studentAdhaarcard": "",
+                        "joiningClass": "Nursery",
+                        "joiningSections": "A",
+                        "joiningDate": "18-11-2024",
+                        "plotNumber": "",
+                        "area": "NA",
+                        "city": "NA",
+                        "state": "NA",
+                        "pincode": null,
+                        "phone1": null,
+                        "rollNo": 1,
+                        "emergencyNumber": "",
+                        "mobileNumber": "9958937678",
+                        "studentEmail": null,
+                        "religion": "",
+                        "category": "",
+                        "minority": "",
+                        "motherTongue": "",
+                        "idMark": "",
+                        "height": "",
+                        "weight": "",
+                        "physicalDisability": "",
+                        "bloodGroup": "",
+                        "healthRemark": "",
+                        "siblingDetails": "",
+                        "alumni": "",
+                        "siblingResponse": [
+                            {
+                                "uid": "4f477705-62a1-45cf-8f54-47cf3ac00750",
+                                "siblingUid": "aae76859-cf48-4070-828f-1a5af87e4c80",
+                                "admissionNo": "1167",
+                                "siblingName": "Mehvish",
+                                "siblingClassSection": "UKG-A"
+                            }
+                        ],
+                        "fatherOccupation": "",
+                        "fatherQualification": "",
+                        "fatherOrganization": "",
+                        "fatherDesignation": "",
+                        "fatherIncome": "",
+                        "fatherArea": "NA",
+                        "fatherCity": "NA",
+                        "fatherState": "NA",
+                        "fatherPincode": "",
+                        "fatherPhone": null,
+                        "fatherMobile": "",
+                        "fatherEmail": null,
+                        "fatherAdhaarNumber": "",
+                        "schoolUid": "6965b51e-c2a3-4598-8392-411d393776c5",
+                        "motherQualification": "",
+                        "motherOccupation": "",
+                        "motherOrganization": "",
+                        "motherDesignation": "",
+                        "motherIncome": "",
+                        "motherArea": "NA",
+                        "motherCity": "NA",
+                        "motherState": "NA",
+                        "motherPincode": "",
+                        "motherPhone": null,
+                        "motherMobile": "",
+                        "motherEmail": null,
+                        "motherAdhaarNumber": "",
+                        "guardianName": null,
+                        "relation": null,
+                        "guardianOccupation": null,
+                        "guardianPhone": null,
+                        "guardianMobile": null,
+                        "guardianEmail": null,
+                        "guardianAddress": null,
+                        "leavingDate": null,
+                        "previousSchoolName": "",
+                        "otp": null,
+                        "schoolName": "Demo Public School",
+                        "remark": "",
+                        "classTeacher": "",
+                        "classTeacherUserName": "",
+                        "classes": "Nursery",
+                        "classUid": null,
+                        "sections": "A",
+                        "group": null,
+                        "wing": "NA",
+                        "status": "Studying",
+                        "academicSession": "2024-25",
+                        "joiningStatus": "New",
+                        "houses": null,
+                        "certificates": "",
+                        "certificatesList": [],
+                        "caste": "",
+                        "listOfDocuments": null,
+                        "attached": false,
+                        "required": false,
+                        "submitted": false,
+                        "studentHostel": [],
+                        "studentConcession": [
+                            {
+                                "concessionName": "Staff 50%",
+                                "consessionType": null,
+                                "employeeId": null,
+                                "installment": "APRIL"
+                            },
+                            {
+                                "concessionName": "Staff 50%",
+                                "consessionType": null,
+                                "employeeId": null,
+                                "installment": "MAY"
+                            }
+                        ],
+                        "studentTransport": [
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "APRIL"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "MAY"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "JULY"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "AUGUST"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "SEPTEMBER"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "OCTOBER"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "NOVEMBER"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "DECEMBER"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "JANUARY"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "FEBUARY"
+                            },
+                            {
+                                "circle": "Baoli",
+                                "route": "R NO 1",
+                                "pick": "Baoli",
+                                "drop": "Baoli",
+                                "installment": "MARCH"
+                            }
+                        ],
+                        "studentAadharCard": null,
+                        "fatherAadharCard": null,
+                        "motherAadharCard": null,
+                        "studentImage": null,
+                        "fatherImage": null,
+                        "motherImage": null,
+                        "guardianImage": null,
+                        "birthCertificate": null,
+                        "classSectionUid": "ed7ae791-ffc8-4ecc-94a3-3ffb7373affe",
+                        "aluminiProof": null,
+                        "siblingProof": null,
+                        "residenceProof": null,
+                        "firstBornChildProof": null,
+                        "medicalFitnessCertificate": null,
+                        "fatherQualificationProof": null,
+                        "motherQualificationProof": null,
+                        "casteCertificate": null,
+                        "createdUser": "QuickCampus",
+                        "editedUser": "MayankTyagi_531752",
+                        "createddate": "2024-11-18 12:45:20.473925",
+                        "editeddate": "2024-12-25 05:59:29.552033",
+                        "permanentEducationNumber": "",
+                        "studentAddressResponse": {
+                            "uid": "9a2995db-7a17-4bf6-aa2b-fa92b68f50ec",
+                            "houseNo": null,
+                            "area": "NA",
+                            "landmark": null,
+                            "city": "NA",
+                            "district": null,
+                            "state": "NA",
+                            "poPs": null,
+                            "pincode": null,
+                            "street": "NA",
+                            "userName": "DGA907_1283",
+                            "createdDate": "18-11-2024 06:15 PM",
+                            "editedDate": "25-12-2024 11:29 AM",
+                            "createdBy": "QuickCampus",
+                            "editedBy": "MayankTyagi_531752"
+                        },
+                        "fatherAddressResponse": {
+                            "uid": "3edcae9c-e088-46af-a874-544cdcb3459b",
+                            "houseNo": null,
+                            "area": "NA",
+                            "landmark": null,
+                            "city": "NA",
+                            "district": null,
+                            "state": "NA",
+                            "poPs": null,
+                            "pincode": 0,
+                            "street": null,
+                            "userName": null,
+                            "createdDate": "18-11-2024 06:15 PM",
+                            "editedDate": "25-12-2024 11:29 AM",
+                            "createdBy": "QuickCampus",
+                            "editedBy": "MayankTyagi_531752"
+                        },
+                        "motherAddressResponse": {
+                            "uid": "5864c6f0-59f9-4052-9e2b-8d83fa42f29b",
+                            "houseNo": null,
+                            "area": "NA",
+                            "landmark": null,
+                            "city": "NA",
+                            "district": null,
+                            "state": "NA",
+                            "poPs": null,
+                            "pincode": 0,
+                            "street": null,
+                            "userName": null,
+                            "createdDate": "18-11-2024 06:15 PM",
+                            "editedDate": "25-12-2024 11:29 AM",
+                            "createdBy": "QuickCampus",
+                            "editedBy": "MayankTyagi_531752"
+                        },
+                        "guardianAddressResponse": null,
+                        "correspondenceAddressResponse": {
+                            "uid": "bf5f061f-d7ef-4959-a8c5-7d2a17c054c1",
+                            "houseNo": null,
+                            "area": "",
+                            "landmark": null,
+                            "city": "",
+                            "district": null,
+                            "state": "",
+                            "poPs": null,
+                            "pincode": null,
+                            "street": "",
+                            "userName": "DGA907_1283",
+                            "createdDate": "23-12-2024 11:08 AM",
+                            "editedDate": "25-12-2024 11:29 AM",
+                            "createdBy": "QuickCampus",
+                            "editedBy": "MayankTyagi_531752"
+                        }
+                    }
+                ],
+                "classTeacher": "",
+                "classTeacherUserName": "",
+                "permanentEducationNumber": "",
+                "school": {
+                    "uid": "6965b51e-c2a3-4598-8392-411d393776c5",
+                    "apikey": "be2f731b-06d6-47da-91aa-9650e5fb7964",
+                    "schoolName": "Divine Global Academy",
+                    "schoolAbb": "DGA",
+                    "educationBoard": "Central Board of Secondary Education (CBSE)",
+                    "registrationNo": null,
+                    "plotNumber": null,
+                    "area": "Chhaprauli Road, Baraut",
+                    "city": "Baghpat",
+                    "pincode": "250611",
+                    "state": "Uttar Pradesh",
+                    "phoneNo1": "7668022362",
+                    "phoneNo2": null,
+                    "contactName": "Mayank Tyagi",
+                    "contactMobile": "7668022362",
+                    "contactEmail": "divineglobalacademy.inquiry@gmail.com",
+                    "schoolCode": null,
+                    "pfCode": null,
+                    "societyManagement": null,
+                    "language": null,
+                    "schoolLogo": null,
+                    "schoolFavicon": null,
+                    "enabled": true,
+                    "subDomain": null,
+                    "website": null,
+                    "schemaPrefix": null,
+                    "editedDate": "13-11-2024 04:18 PM",
+                    "editedUser": "QuickCampus",
+                    "visitorSchool": false,
+                    "clientSchoolId": null,
+                    "cscId": null,
+                    "onlinePaymentEnabled": false,
+                    "registrationSeries": null,
+                    "underTakingDetails": null,
+                    "formNumberStart": null,
+                    "sessionResponse": null,
+                    "schoolLogoUrl": null,
+                    "printAcknowledge": false,
+                    "wabaId": "",
+                    "phoneNumberId": "",
+                    "whatsappApiKey": "",
+                    "isQuickCampusWhatsapp": false,
+                    "whatsAppEnabled": false,
+                    "smsenabled": false,
+                    "notificationEnabled": true,
+                    "loanEnabled": false
+                }
+            },
+            "contentRequest": {
+                "feeUid": "1bf533f0-5c96-4402-8808-f26a1f56d6a1",
+                "receiptNo": "1",
+                "admissionNo": "1283",
+                "studentName": "Aahil",
+                "studentClass": "Nursery",
+                "studentSection": "A",
+                "paidInstallmentsName": "APRIL",
+                "feeDate": "23-12-2024",
+                "feeTime": "13:23:23",
+                "userName": "MayankTyagi_531752",
+                "feeMode": "CASH",
+                "feeModeNumber": "-",
+                "modeBank": "-",
+                "modeBranch": "-",
+                "feeModeDate": "-",
+                "feeModeRemark": "-",
+                "feeDeleteRemark": "-",
+                "isBounced": "0",
+                "bouncedDate": "-",
+                "totalAmount": "2033.00",
+                "excessPaid": "0.00",
+                "excessUsed": "0.00",
+                "excessBalance": "0.0",
+                "netReceived": "2033.00",
+                "studentFeeCollectionReceiptList": [
+                    {
+                        "componentName": "TUTION FEE",
+                        "componentAmount": "1333.00",
+                        "componentType": "",
+                        "componentConcession": "0.00",
+                        "componentDiscount": "0.00",
+                        "accountName": "ACCOUNT1",
+                        "accountUid": "6954cdc9-dda3-4a29-a2fe-df34336b9f57",
+                        "componentReceived": "1333.00"
+                    },
+                    {
+                        "componentName": "TRANSPORT FEE",
+                        "componentAmount": "700.00",
+                        "componentType": "TRANSPORT",
+                        "componentConcession": "0.00",
+                        "componentDiscount": "0.00",
+                        "accountName": "ACCOUNT1",
+                        "accountUid": "6954cdc9-dda3-4a29-a2fe-df34336b9f57",
+                        "componentReceived": "700.00"
+                    }
+                ],
+                "classSection": "Nursery-A",
+                "TUTION FEE Amount(₹)": "1333.00",
+                "TUTION FEE Received(₹)": "1333.00",
+                "TUTION FEE Concession(₹)": "0.00",
+                "TUTION FEE Discount(₹)": "0.00",
+                "TRANSPORT FEE Amount(₹)": "700.00",
+                "TRANSPORT FEE Received(₹)": "700.00",
+                "TRANSPORT FEE Concession(₹)": "0.00",
+                "TRANSPORT FEE Discount(₹)": "0.00"
+            },
+            "header": null,
+            "footer": null
+        }
+    ]);
+</script>
+
+</html>

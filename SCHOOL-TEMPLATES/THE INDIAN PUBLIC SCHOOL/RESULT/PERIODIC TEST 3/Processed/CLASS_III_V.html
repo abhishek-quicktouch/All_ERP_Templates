@@ -130,13 +130,29 @@
                   m?.markSheetTermResponse?.headerName?.toLowerCase() ==
                   "half yearly"
               )?.obtained;
+              console.log(d, "fffffffffffffff d.markSheetReport")
               let midTermOutOf = temp ? +((2 / 3) * temp).toFixed(2) : 0;
-
+              let status = d?.markSheetReport?.find((m) => m?.markSheetTermResponse?.terms?.includes("HALF YEARLY") && m?.status)?.status
               str += `<tr><td class="align-left" style="padding-left: 0.3rem; font-size:12px;">${d?.subjectName
                 }</td>${d.markSheetReport
                   .map((v) => {
                     subjectTotal += Number(v?.obtained) || 0;
-                    subjectMaxTotal += Number(v?.max) || 0;
+
+                    if (attendanceValue[v?.status] === "ML" && v?.markSheetTermResponse?.terms?.includes("HALF YEARLY")) {
+                      subjectMaxTotal += 0
+                    }
+                    else if (v?.markSheetTermResponse?.terms?.includes("HALF YEARLY")) {
+                      subjectMaxTotal += 20
+                    }
+                    else if (attendanceValue[v?.status] === "ML") {
+                      subjectMaxTotal += 0
+                    }
+                    else {
+                      subjectMaxTotal += Number(v?.max)
+                    }
+
+                    console.log(subjectMaxTotal, "ffffffffffff subjectMaxTotal")
+
                     return `<td  style="text-align: center; font-size:12px;  font-weight:${v?.status ? "bold" : ""
                       }">${attendanceValue[v?.status] || v?.obtained}</td>`;
                   })
@@ -150,16 +166,17 @@
                   });
                   return '';
                 })()}
-                  <td style="text-align: center; font-size:12px;" >${midTermOutOf}</td>
-                  <td style="text-align: center; font-size:12px;" >${(
+                  <td style="text-align: center; font-size:12px;font-weight:${status ? "bold" : ""
+                }" >${attendanceValue[status] || midTermOutOf}</td>
+                  <td style="text-align: center; font-size:12px; " >${(
                   (d?.marksObtained || 0) -
                   (temp || 0) +
                   midTermOutOf
                 ).toFixed(2)}</td>
                  <td style="text-align: center; font-size:12px;" >${(
-                  ((d?.marksObtained || 0) - (temp || 0) + midTermOutOf) *
-                  2
-                ).toFixed(2)}</td>
+                  ((d?.marksObtained || 0) - (temp || 0) + midTermOutOf) / subjectMaxTotal *
+                  100
+                ).toFixed(2)}%</td>
               <td style="text-align: center; font-size:12px;">${getGradeCustomFunction(
                   (
                     ((d?.marksObtained || 0) - (temp || 0) + midTermOutOf) *
@@ -938,16 +955,16 @@
         },
         "markData": {
           "academicSession": "2024-2025",
-          "admissionNo": "7006",
-          "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-          "studentName": "Shanzay Hayat",
-          "rollNo": 36,
-          "fatherName": "SUHEL PARVEZ",
+          "admissionNo": "7120",
+          "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+          "studentName": "Anaya Satija",
+          "rollNo": 8,
+          "fatherName": "VIKRAM SATIJA",
           "className": "III",
           "sectionName": "A",
           "terms": "HALF YEARLY",
           "markSheetName": "TERM-I",
-          "overAllRank": "13",
+          "overAllRank": "1",
           "markSheetTerms": [
             {
               "id": 1361,
@@ -999,7 +1016,7 @@
             },
             {
               "id": 1365,
-              "headerName": "Multiple assessment",
+              "headerName": "Multiple Assessment",
               "subHeaderName": "(5)",
               "priority": 5,
               "bestOf": 0,
@@ -1041,11 +1058,11 @@
               "subjectNature": "THEORY",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1054,8 +1071,8 @@
                   "subjectName": "ENGLISH",
                   "subjectNature": "THEORY",
                   "max": 5,
-                  "obtained": 3,
-                  "grade": "C1",
+                  "obtained": 4,
+                  "grade": "B1",
                   "status": "",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
@@ -1078,11 +1095,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1115,11 +1132,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1152,11 +1169,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1165,9 +1182,9 @@
                   "subjectName": "ENGLISH",
                   "subjectNature": "THEORY",
                   "max": 5,
-                  "obtained": 5,
+                  "obtained": 0,
                   "grade": "A1",
-                  "status": "",
+                  "status": "Absent",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
                   "session": "2024-2025",
@@ -1189,11 +1206,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1211,7 +1228,7 @@
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
                     "id": 1365,
-                    "headerName": "Multiple assessment",
+                    "headerName": "Multiple Assessment",
                     "subHeaderName": "(5)",
                     "priority": 5,
                     "bestOf": 0,
@@ -1226,11 +1243,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1239,7 +1256,7 @@
                   "subjectName": "ENGLISH",
                   "subjectNature": "THEORY",
                   "max": 5,
-                  "obtained": 4.8,
+                  "obtained": 4.9,
                   "grade": "A1",
                   "status": "",
                   "markSheetName": "TERM-I",
@@ -1263,11 +1280,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1275,8 +1292,8 @@
                   "subjectUid": "7ab87a55-c716-4a0c-ab21-86cf07b94d19",
                   "subjectName": "ENGLISH",
                   "subjectNature": "THEORY",
-                  "max": 20,
-                  "obtained": 18.67,
+                  "max": 30,
+                  "obtained": 28,
                   "grade": "A1",
                   "status": "",
                   "markSheetName": "TERM-I",
@@ -1300,9 +1317,9 @@
                   "pass": true
                 }
               ],
-              "marksObtained": 46.47,
-              "total": 50,
-              "percentage": 92.94,
+              "marksObtained": 56.9,
+              "total": 60,
+              "percentage": 94.83,
               "grade": "A1",
               "className": "III",
               "sectionName": "A",
@@ -1318,11 +1335,11 @@
               "subjectNature": "THEORY",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1331,9 +1348,9 @@
                   "subjectName": "HINDI",
                   "subjectNature": "THEORY",
                   "max": 5,
-                  "obtained": 3,
-                  "grade": "C1",
-                  "status": "",
+                  "obtained": 0,
+                  "grade": "B1",
+                  "status": "Medical",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
                   "session": "2024-2025",
@@ -1355,11 +1372,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1392,11 +1409,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1429,11 +1446,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1466,11 +1483,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1488,7 +1505,7 @@
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
                     "id": 1365,
-                    "headerName": "Multiple assessment",
+                    "headerName": "Multiple Assessment",
                     "subHeaderName": "(5)",
                     "priority": 5,
                     "bestOf": 0,
@@ -1503,11 +1520,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1540,11 +1557,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1552,9 +1569,9 @@
                   "subjectUid": "b6c5404e-c32b-4115-b523-73a055a95318",
                   "subjectName": "HINDI",
                   "subjectNature": "THEORY",
-                  "max": 20,
-                  "obtained": 16,
-                  "grade": "B1",
+                  "max": 30,
+                  "obtained": 29,
+                  "grade": "A1",
                   "status": "",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
@@ -1577,10 +1594,10 @@
                   "pass": true
                 }
               ],
-              "marksObtained": 43.5,
-              "total": 50,
-              "percentage": 87,
-              "grade": "A2",
+              "marksObtained": 57.5,
+              "total": 60,
+              "percentage": 95.83,
+              "grade": "A1",
               "className": "III",
               "sectionName": "A",
               "terms": "HALF YEARLY",
@@ -1595,11 +1612,11 @@
               "subjectNature": "THEORY",
               "markSheetReport": [
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1608,8 +1625,8 @@
                   "subjectName": "MATHEMATICS",
                   "subjectNature": "THEORY",
                   "max": 5,
-                  "obtained": 3,
-                  "grade": "C1",
+                  "obtained": 4,
+                  "grade": "B1",
                   "status": "",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
@@ -1632,11 +1649,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1669,11 +1686,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1706,11 +1723,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1743,11 +1760,11 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
@@ -1765,7 +1782,7 @@
                   "decimalPlaces": 2,
                   "markSheetTermResponse": {
                     "id": 1365,
-                    "headerName": "Multiple assessment",
+                    "headerName": "Multiple Assessment",
                     "subHeaderName": "(5)",
                     "priority": 5,
                     "bestOf": 0,
@@ -1780,17 +1797,294 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
                   "terms": "HALF YEARLY",
                   "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
                   "subjectName": "MATHEMATICS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 5,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1366,
+                    "headerName": "Periodic Test I",
+                    "subHeaderName": "(5)",
+                    "priority": 6,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "PERIODIC TEST 1"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
+                  "subjectName": "MATHEMATICS",
+                  "subjectNature": "THEORY",
+                  "max": 30,
+                  "obtained": 30,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1460,
+                    "headerName": "Half Yearly",
+                    "subHeaderName": "(30)",
+                    "priority": 7,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 30,
+                    "terms": [
+                      "HALF YEARLY"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                }
+              ],
+              "marksObtained": 59,
+              "total": 60,
+              "percentage": 98.33,
+              "grade": "A1",
+              "className": "III",
+              "sectionName": "A",
+              "terms": "HALF YEARLY",
+              "markSheetName": "TERM-I",
+              "subjectPrt": 3,
+              "decimalPlaces": 2,
+              "visible": false
+            },
+            {
+              "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+              "subjectName": "EVS",
+              "subjectNature": "THEORY",
+              "markSheetReport": [
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 4,
+                  "grade": "B1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1361,
+                    "headerName": "Attendance",
+                    "subHeaderName": "(5)",
+                    "priority": 1,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "ATTENDANCE"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 5,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1362,
+                    "headerName": "Subject Enrichment",
+                    "subHeaderName": "(5)",
+                    "priority": 2,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "SUBJECT ENRICHMENT"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 5,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1363,
+                    "headerName": "Project based activities",
+                    "subHeaderName": "(5)",
+                    "priority": 3,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "PROJECT BASED ACTIVITIES"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 5,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1364,
+                    "headerName": "Portfolio",
+                    "subHeaderName": "(5)",
+                    "priority": 4,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "PORTFOLIO"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
+                  "subjectNature": "THEORY",
+                  "max": 5,
+                  "obtained": 5,
+                  "grade": "A1",
+                  "status": "",
+                  "markSheetName": "TERM-I",
+                  "attachmentName": "",
+                  "session": "2024-2025",
+                  "decimalPlaces": 2,
+                  "markSheetTermResponse": {
+                    "id": 1365,
+                    "headerName": "Multiple Assessment",
+                    "subHeaderName": "(5)",
+                    "priority": 5,
+                    "bestOf": 0,
+                    "decimalPlaces": 2,
+                    "weightage": 5,
+                    "terms": [
+                      "MULTIPLE ASSESSMENT"
+                    ]
+                  },
+                  "visible": false,
+                  "graded": false,
+                  "pass": true
+                },
+                {
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
+                  "className": "III",
+                  "sectionName": "A",
+                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
+                  "terms": "HALF YEARLY",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
                   "subjectNature": "THEORY",
                   "max": 5,
                   "obtained": 4.9,
@@ -1817,22 +2111,22 @@
                   "pass": true
                 },
                 {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
+                  "studentInfoUid": "4f060778-b9c4-42ef-abe0-7bc950963c55",
+                  "admissionNo": "7120",
+                  "studentName": "Anaya Satija",
+                  "rollNo": 8,
+                  "fatherName": "VIKRAM SATIJA",
                   "className": "III",
                   "sectionName": "A",
                   "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
                   "terms": "HALF YEARLY",
-                  "subjectUid": "eac5c643-3186-4371-be82-77420d86279e",
-                  "subjectName": "MATHEMATICS",
+                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
+                  "subjectName": "EVS",
                   "subjectNature": "THEORY",
-                  "max": 20,
-                  "obtained": 17.33,
+                  "max": 30,
+                  "obtained": 0,
                   "grade": "A2",
-                  "status": "",
+                  "status": "Medical",
                   "markSheetName": "TERM-I",
                   "attachmentName": "",
                   "session": "2024-2025",
@@ -1854,287 +2148,10 @@
                   "pass": true
                 }
               ],
-              "marksObtained": 45.23,
-              "total": 50,
-              "percentage": 90.46,
-              "grade": "A2",
-              "className": "III",
-              "sectionName": "A",
-              "terms": "HALF YEARLY",
-              "markSheetName": "TERM-I",
-              "subjectPrt": 3,
-              "decimalPlaces": 2,
-              "visible": false
-            },
-            {
-              "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-              "subjectName": "EVS",
-              "subjectNature": "THEORY",
-              "markSheetReport": [
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 3,
-                  "grade": "C1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1361,
-                    "headerName": "Attendance",
-                    "subHeaderName": "(5)",
-                    "priority": 1,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "ATTENDANCE"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1362,
-                    "headerName": "Subject Enrichment",
-                    "subHeaderName": "(5)",
-                    "priority": 2,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "SUBJECT ENRICHMENT"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1363,
-                    "headerName": "Project based activities",
-                    "subHeaderName": "(5)",
-                    "priority": 3,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "PROJECT BASED ACTIVITIES"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1364,
-                    "headerName": "Portfolio",
-                    "subHeaderName": "(5)",
-                    "priority": 4,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "PORTFOLIO"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 5,
-                  "grade": "A1",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1365,
-                    "headerName": "Multiple assessment",
-                    "subHeaderName": "(5)",
-                    "priority": 5,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "MULTIPLE ASSESSMENT"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 5,
-                  "obtained": 4.1,
-                  "grade": "A2",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1366,
-                    "headerName": "Periodic Test I",
-                    "subHeaderName": "(5)",
-                    "priority": 6,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 5,
-                    "terms": [
-                      "PERIODIC TEST 1"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                },
-                {
-                  "studentInfoUid": "29c615a4-c157-4635-8825-ec5d3eac7cd2",
-                  "admissionNo": "7006",
-                  "studentName": "Shanzay Hayat",
-                  "rollNo": 36,
-                  "fatherName": "SUHEL PARVEZ",
-                  "className": "III",
-                  "sectionName": "A",
-                  "classSectionUid": "f1a2faba-9518-4c6f-aa64-3b9a00330035",
-                  "terms": "HALF YEARLY",
-                  "subjectUid": "1ac3f4c6-bcfd-45b2-8963-6b0d4d239888",
-                  "subjectName": "EVS",
-                  "subjectNature": "THEORY",
-                  "max": 20,
-                  "obtained": 16.33,
-                  "grade": "A2",
-                  "status": "",
-                  "markSheetName": "TERM-I",
-                  "attachmentName": "",
-                  "session": "2024-2025",
-                  "decimalPlaces": 2,
-                  "markSheetTermResponse": {
-                    "id": 1460,
-                    "headerName": "Half Yearly",
-                    "subHeaderName": "(30)",
-                    "priority": 7,
-                    "bestOf": 0,
-                    "decimalPlaces": 2,
-                    "weightage": 30,
-                    "terms": [
-                      "HALF YEARLY"
-                    ]
-                  },
-                  "visible": false,
-                  "graded": false,
-                  "pass": true
-                }
-              ],
-              "marksObtained": 43.43,
-              "total": 50,
-              "percentage": 86.86,
-              "grade": "A2",
+              "marksObtained": 55.9,
+              "total": 60,
+              "percentage": 93.17,
+              "grade": "A1",
               "className": "III",
               "sectionName": "A",
               "terms": "HALF YEARLY",
@@ -2144,10 +2161,10 @@
               "visible": false
             }
           ],
-          "marksObtained": 178.63,
-          "total": 200,
-          "percentage": 89.32,
-          "overAllGrade": "A2",
+          "marksObtained": 229.3,
+          "total": 240,
+          "percentage": 95.54,
+          "overAllGrade": "A1",
           "visible": false
         },
         "remarks": {
@@ -2900,8 +2917,8 @@
               "subjectAllResponse": {
                 "uid": "64a97937-ce5c-4dd5-abf5-6ef0c38a8ff1",
                 "subjectName": "COMPUTERS",
-                "nature": "THEORY",
-                "natureUid": "4aecc2f8-3f69-42ce-af6a-4df138ff8381",
+                "nature": "1B Scholastic",
+                "natureUid": "89388935-b07e-44ce-8eb8-e92357785a67",
                 "cbseVIIICode": "",
                 "cbseXCode": "",
                 "cbseXIICode": "",
@@ -2910,9 +2927,9 @@
                 "parentName": [],
                 "haveChild": false,
                 "createdUser": "SimranjeetKaur_522590",
-                "editedUser": "SimranjeetKaur_522590",
+                "editedUser": "QuickCampus",
                 "createddate": "2024-09-28 07:45:26.255154",
-                "editeddate": "2024-09-28 07:45:26.254429"
+                "editeddate": "2024-12-30 10:19:35.569715"
               },
               "termName": "HALF YEARLY",
               "max": 100,
