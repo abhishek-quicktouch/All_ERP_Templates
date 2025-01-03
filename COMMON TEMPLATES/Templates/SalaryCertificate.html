@@ -260,8 +260,8 @@
 
         <div style="font-size:14px;margin-top:10px; margin-bottom:20px;">
         ${`The gross salary of <strong>${data?.data?.firstName} ${
-          data?.data?.middleName
-        } ${data?.data?.lastName}</strong> for the month ${
+          data?.data?.middleName ?? ""
+        } ${data?.data?.lastName ?? ""}</strong> for the month ${
           data?.data?.fromSalaryMonthName === data?.data?.toSalaryMonthName
             ? `of <strong>${data?.data?.fromSalaryMonthName}</strong>`
             : `from <strong>${data?.data?.fromSalaryMonthName}</strong> to <strong>${data?.data?.toSalaryMonthName}</strong>`
