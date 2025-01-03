@@ -26,12 +26,11 @@
       let sum = 0;
       arr.forEach((el) => {
         if (data[el]) {
-          sum += (data[el]["ASSESSMENT"] ? (data[el]["ASSESSMENT"]["obt"] || 0) : 0) +
-            (data[el]["EXAM"] ? (data[el]["EXAM"]["obt"] || 0) : 0);
+          sum += (data[el]["ASSESSMENT"] ? (data[el]["ASSESSMENT"]["obt"] || 0) : 0) + (data[el]["EXAM"] ? (data[el]["EXAM"]["obt"] || 0) : 0);
         }
       });
       arr.forEach((el, i) => {
-        if (data[el] && i === 0) {
+        if (data[el] && i == 0) {
           data[el]["AVG"] = Math.round(sum / arr?.length);
           data[el]["SPAN"] = arr?.length;
         } else {
@@ -45,134 +44,312 @@
       let allSubjects = [];
       let subjectData = {};
       let allTotal = {};
-      let termTotals = {}; // Store totals for each term
       let rowSpan = {};
       let overallTotal = 0;
       let overallTotalMax = 0;
-
-      data?.subjectWiseMarkSheetReportResponses?.forEach((el) => {
+      let terms = data?.markSheetTerms?.map((el) => {
+        return {
+          headerName: el?.headerName,
+          subHeaderName: el?.subHeaderName,
+        };
+      });
+      data?.subjectWiseMarkSheetReportResponses?.map((el, ind) => {
         let markSheet = el?.markSheetReport;
         subjectData[el?.subjectName] = {};
-
         markSheet?.forEach((t) => {
-          const term = t?.markSheetTermResponse?.headerName;
-
-          if (!termTotals[term]) {
-            termTotals[term] = { max: 0, obt: 0 };
-          }
-
-          termTotals[term].max += t?.max || 0;
-          termTotals[term].obt += t?.obtained || 0;
-
           if (t?.attachmentName && !rowSpan[t?.attachmentName]) {
             rowSpan[t?.attachmentName] = [];
           }
 
-          if (t?.attachmentName && !rowSpan[t?.attachmentName]?.includes(el?.subjectName)) {
+          t?.attachmentName && !rowSpan[t?.attachmentName]?.includes(el?.subjectName) &&
             rowSpan[t?.attachmentName].push(el?.subjectName);
-          }
-
-          subjectData[el?.subjectName][term] = {
+          allTotal[t?.markSheetTermResponse?.headerName] = {
+            max:
+              t?.graded ? allTotal[t?.markSheetTermResponse?.headerName]?.max : (t?.max +
+                (allTotal[t?.markSheetTermResponse?.headerName]?.max || 0)),
+            obt:
+              t?.graded ? allTotal[t?.markSheetTermResponse?.headerName]?.obt : (t?.obtained +
+                (allTotal[t?.markSheetTermResponse?.headerName]?.obt || 0)),
+          };
+          subjectData[el?.subjectName][t?.markSheetTermResponse?.headerName] = {
             status: t?.status,
             max: t?.max,
             obt: t?.graded ? "" : t?.obtained,
             grade: t?.graded ? "" : t?.grade,
           };
-
           if (t?.graded) {
-            subjectData[el?.subjectName]["GRADE"] = el?.grade;
-          } else {
-            subjectData[el?.subjectName]["TOTAL"] = el?.marksObtained || 0;
+            subjectData[el?.subjectName]["GRADE"] = el?.grade
+          }
+          else {
+
+            subjectData[el?.subjectName]["TOTAL"] = el?.marksObtained || 0
           }
         });
-
         allSubjects.push(el?.subjectName);
       });
 
       for (let key in rowSpan) {
-        subjectData = CalculateAverage(rowSpan[key], subjectData, key);
+        subjectData = CalculateAverage(rowSpan[key], subjectData, key)
       }
 
       for (let k in subjectData) {
-        overallTotal += subjectData[k]["AVG"] || subjectData[k]["TOTAL"] || 0;
+        overallTotal += (subjectData[k]["AVG"] || subjectData[k]["TOTAL"] || 0)
         if (subjectData[k]["AVG"] || subjectData[k]["TOTAL"]) {
-          overallTotalMax += 100;
+          overallTotalMax += 100
         }
       }
 
-      return { terms: data?.markSheetTerms, allSubjects, subjectData, termTotals, rowSpan, overallTotal, overallTotalMax };
+      return { terms, allSubjects, subjectData, allTotal, rowSpan, overallTotal, overallTotalMax };
     }
 
     const student = document.getElementById("student");
 
     student.innerHTML = `
-      <style>
-        body {
-          font-family: Arial;
-          color: #1f497d;
-          margin: 0;
-          padding: 5px;
-          box-sizing: border-box;
-        }
-        #student {
-          padding: 1.2rem;
-        }
-        p {
-          margin: 4px 0;
-          font-size: small;
-        }
-        table, th, td {
-          border-collapse: collapse;
-          border: 1.5px solid black;
-          padding: 2px;
-          font-size: 12px;
-        }
-        .paddingLeft {
-          padding-left: 2rem;
-        }
-        @media print {
-          @page {
-            margin: 0.5mm;
-            size: A4;
-          }
-        }
+           <style>
+            body{
+                font-family: arial;
+                color: #1f497d;
+                margin:0px;
+                padding:5px;
+                box-sizing:border-box;
+            }
+            #student{
+            padding:1.2rem;
+            }
+
+            p {
+            margin: 4px 0;
+            font-size: small;
+            }
+            table,
+            th,
+            td {
+            border-collapse: collapse;
+            border: 1.5px solid black;
+            padding:2px;
+            font-size:12px;
+            }
+            .paddingLeft {
+            padding-left: 2rem;
+            }
+            @media print {
+              @page {
+                margin: 0.5mm;
+                size: A4;
+              }
+
+               body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_228266413.png') no-repeat center;
+                background-size: 80%;
+                opacity: 0.1;
+                z-index: -1;
+                pointer-events: none;
+            }
+            }
       </style>`;
 
     data?.forEach((st, index) => {
-      const { terms, allSubjects, subjectData, termTotals, overallTotal, overallTotalMax } = ConvertData(st?.markData);
+      const { terms, allSubjects, subjectData, allTotal, rowSpan, overallTotal, overallTotalMax } = ConvertData(st?.markData)
+      console.log(subjectData, "ffffffffffff subjectData")
+      const baseTermData = (st?.baseTermData?.subject || [])?.filter((t => !t?.scholastic))
 
-      student.innerHTML += `
-        <div style="page-break-before: always;"></div>
+      student.innerHTML += `<div style="page-break-before: always;"></div>
+    <page orientation="portrait" format="A4" margin="0" style=" position: relative; z-index: 1; font-size: 16px;">
+        <div style="border:2px solid black; display:flex; flex-direction:column; justify-content:space-between; padding:10px; height:91vh; margin-top:${index !== 0 ? "20px;" : ""}">
+    <div>  
+      <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div style="width:12%;">
+        <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-10-11T10_51_01_849434068.png" alt="" style="width:100%;"/>
+      </div>
+      <div style="width:76%; text-align:center;">
+       <p style="font-size:35px; font-weight:bold;">ST. JOHN'S CO-ED SCHOOL</p>
+       <p style="font-size:14px;">558, R. K. PURAM, MAWAIYA ROAD, NAINI, PRAYAGRAJ</p>
+      </div>
+      <div style="width:12%; ">
+      </div>
+      
+      </div>
+      <div style="text-align: center; font-weight: bold; margin-bottom:10px;">
+          <p style="font-size:15px; padding:0px; margin:0px;">PROGRESS REPORT : ${st?.markData?.academicSession
+        } (TERM - I)</p>
+        </div>
+
+<table style="width: 100%; border-collapse: collapse; ">
+  <tr>
+    <td style="text-align: left; color:black; padding-left: 0.3rem; padding-right: 10px; border-right:none; width: 30%;">
+      <strong>NAME</strong>
+    </td>
+    <td style="text-align: left; color:black;  border-left:none; ">: ${st?.student?.studentName}</td>
+    <td style="text-align: left; color:black; padding-left: 0.3rem; padding-right: 10px;border-right:none; width: 30%;">
+      <strong>CLASS & SECTION</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${st?.student?.className + "-" + st?.student?.sectionName}</td>
+  </tr>
+  <tr>
+    <td style="text-align: left;color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+      <strong>FATHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${st?.student?.fatherName}</td>
+    <td style="text-align: left;color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none">
+      <strong>D.O.B</strong> 
+    </td>
+    <td style="text-align: left; color:black;  border-left:none;">: ${st?.student.studentInfoResponse?.[0]?.dob}</td>
+  </tr>
+  <tr>
+    <td style="text-align: left; color:black;padding-left: 0.3rem;   padding-right: 10px;border-right:none">
+      <strong>MOTHER'S NAME</strong> 
+    </td>
+    <td style="text-align: left; color:black; border-left:none;">: ${st?.student?.motherName}</td>
+    <td style="text-align: left; color:black; padding-left: 0.3rem;  padding-right: 10px;border-right:none ; width: 20%">
+      <strong>ADM. NUMBER</strong> 
+    </td>
+    <td style="text-align: left;  border-left:none; color:black;">: ${st?.student?.admissionNo}</td>
+  </tr>
+</table>
+
+        <div style="width: 100%; display:flex; justify-content:space-between; margin-top:1rem; height:fit-content; gap:10px;">
+            <div style="width: 70%;">
+                <table style="width: 100%; border:none; ">
+                  <tr>
+                     <th rowspan="2" style="width:30%; font-size:12px;">SUBJECTS</th>
+                    <td colspan="2" style="text-align:center;font-weight:bold" >
+                      FIRST TERM 
+                    </td>
+                    <td colspan="2" style="text-align:center ;font-weight:bold" >
+                      SECOND TERM
+                    </td>
+
+                    <td  style="text-align:center ; font-weight:bold" >
+                      OVERALL
+                      (100)
+                    </td>
+                    </tr>
+                    <tr style="text-align:center; height:60px;">
+                     
+                       ${terms?.map((el, i) => i == 2 ? `<th style="text-align:center; font-size:12px;">TOTAL</br>(100)</th> 
+                       <th style="text-align:center;font-size:12px; width:20%;border-right:${i == 0 ? "1.5px solid black;" : null}">
+                            ${el?.headerName}</br>(${el?.subHeaderName})
+                            </th>` : `<th style="text-align:center;font-size:12px; width:20%;border-right:${i == 0 ? "1.5px solid black;" : null}">
+                            ${el?.headerName}</br>(${el?.subHeaderName})
+                            </th>`).join("")}
+                      <th style="text-align:center; font-size:12px;">TOTAL</br>(100)</th> 
+                    </tr>
+                    ${allSubjects?.map(el => {
+          return `<tr>
+                                <td style="font-size:12px;">${el}</td>
+                                 ${terms?.map((t, i) => {
+            i == 2 ? `<td style="text-align:center; font-weight: ${subjectData[el][t?.headerName]?.status ? "bold;" : ""}">${subjectData?.[el]?.[t?.headerName] ? attendanceValue[subjectData[el][t?.headerName]?.status] || subjectData[el][t?.headerName]?.status || subjectData[el][t?.headerName]?.obt || "-" : "-"}</td>
+            ${(() => {
+                if (subjectData[el]["SPAN"]) {
+                  return `<td style="text-align:center; background-color:${subjectData[el]["AVG"] < 35 ? "#ffc7ce;" : ""} color:${subjectData[el]["AVG"] < 35 ? "#a51218;" : ""}" rowspan=${subjectData[el]["SPAN"] || 1}>${subjectData[el]["AVG"]}</td>`
+                }
+                else if (subjectData[el]["GRADE"]) {
+                  return `<td style="text-align:center;">${subjectData[el]["GRADE"]}</td>`
+                }
+                else if (subjectData[el]["TOTAL"]) {
+                  return `<td style="text-align:center;  background-color:${subjectData[el]["TOTAL"] < 35 ? "#ffc7ce;" : ""} color:${subjectData[el]["TOTAL"] < 35 ? "#a51218;" : ""}">${subjectData[el]["TOTAL"]}</td>`
+                }
+                else {
+                  return ""
+                }
+              })()} 
+            `: `<td style="text-align:center; font-weight: ${subjectData[el][t?.headerName]?.status ? "bold;" : ""}">${subjectData?.[el]?.[t?.headerName] ? attendanceValue[subjectData[el][t?.headerName]?.status] || subjectData[el][t?.headerName]?.status || subjectData[el][t?.headerName]?.obt || "-" : "-"}</td>`
+          }).join("")}
+                                ${(() => {
+              if (subjectData[el]["SPAN"]) {
+                return `<td style="text-align:center; background-color:${subjectData[el]["AVG"] < 35 ? "#ffc7ce;" : ""} color:${subjectData[el]["AVG"] < 35 ? "#a51218;" : ""}" rowspan=${subjectData[el]["SPAN"] || 1}>${subjectData[el]["AVG"]}</td>`
+              }
+              else if (subjectData[el]["GRADE"]) {
+                return `<td style="text-align:center;">${subjectData[el]["GRADE"]}</td>`
+              }
+              else if (subjectData[el]["TOTAL"]) {
+                return `<td style="text-align:center;  background-color:${subjectData[el]["TOTAL"] < 35 ? "#ffc7ce;" : ""} color:${subjectData[el]["TOTAL"] < 35 ? "#a51218;" : ""}">${subjectData[el]["TOTAL"]}</td>`
+              }
+              else {
+                return ""
+              }
+            })()}
+                            </tr>`
+        }).join("")}
+                    ${baseTermData?.map((b => {
+          return `<tr>
+                            <td>${b?.subjectAllResponse?.subjectName}</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="text-align:center; font-weight: ${b?.remarkStatus
+              ? "bold;"
+              : ""
+            }">${b?.remarkStatus ? attendanceValue[b?.remarkStatus] || b?.remarkStatus : b?.grade}</td>
+                          </tr>`
+        })).join("")}
+                    <tr>
+                        <td style="font-size:12px; font-weight:bold;">TOTAL</td>
+                        ${terms?.map(el => {
+          return `<td style="font-size:12px; font-weight:bold; text-align:center;">${allTotal[el?.headerName]?.obt}</td>`
+        }).join("")}
+                        <td style="font-size:12px; font-weight:bold; text-align:center;">${overallTotal}</td>
+
+                    </tr>
+                    <tr>
+                        <td style="font-size:12px; font-weight:bold;">PERCENTAGE</td>
+                        <td style="font-size:12px; font-weight:bold;"></td>
+                        <td style="font-size:12px; font-weight:bold;"></td>
+                        <td style="font-size:12px; font-weight:bold; text-align:center;">${((overallTotal / overallTotalMax) * 100).toFixed(2)}%</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 25%; border:1.5px solid black; flex-grow: 1; min-height:100%; font-size:12px; font-weight:bold;">
+                <div style="height:60px; border-bottom:1.5px solid black; display:flex; justify-content:center; align-items:center; text-align:center;">CLASS TEACHER'S REMARK</div>
+                 <div style="height: calc(100% - 63px); display:flex; justify-content:center; align-items:center; text-align:center; padding:0px 1px;">${st?.remarks?.description || ""
+        }</div>
+            </div>   
+        </div>
+        
+        <table style="margin-top:10px; border:1.5px solid black; width:100%; text-align:center;">
+            <tr>
+              <th rowspan="2">ATTENDANCE</th>  
+              <th>WORKING DAYS</th> 
+              <th>PRESENT DAYS</th>
+            </tr>
+            <tr>
+              <td>${st?.remarks?.fields?.find(f => f?.title == "WORKING DAYS")?.value || "-"}</td>
+              <td>${st?.remarks?.fields?.find(f => f?.title == "PRESENT DAYS")?.value || "-"}</td> 
+            </tr>   
+        </table>
+        </div>
+
         <div>
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                ${terms.map(term => `<th>${term.headerName}</th>`).join("")}
-              </tr>
-            </thead>
-            <tbody>
-              ${allSubjects.map(subject => `
-                <tr>
-                  <td>${subject}</td>
-                  ${terms.map(term => `
-                    <td>${subjectData[subject][term.headerName]?.obt || ""}</td>
-                  `).join("")}
-                </tr>
-              `).join("")}
-              <tr>
-                <td><strong>Total</strong></td>
-                ${terms.map(term => `
-                  <td><strong>${termTotals[term.headerName]?.obt || 0}</strong></td>
-                `).join("")}
-              </tr>
-            </tbody>
-          </table>
-        </div>`;
+          <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; ">
+                  <div style="width:fit-content; margin-top:auto;">
+                    <p style="text-align:center;">_________________________</p>  
+                    <p style="font-weight:bold; text-align:center; font-size:14px;">CLASS TEACHER'S SIGNATURE</p>  
+                  </div>
+                  <div style="width:fit-content; text-align:center; margin-right:-35px;">
+                      <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/circular/images/UploadFile2024-10-09T06_15_25_233337673.png" style="width:70%;margin-bottom:-15px;"/>
+                      <p style="text-align:center;">_________________________</p>  
+                      <p style="font-weight:bold;text-align:center; font-size:14px;">PRINCIPAL'S SIGNATURE</p>  
+                  </div>
+                </div>
+                <div style="width:fit-content; margin-top:70px;">
+                      <p style="text-align:center;">_________________________</p>  
+                      <p style="font-weight:bold; text-align:center; font-size:14px;">PARENT'S SIGNATURE</p>  
+                </div>
+            </div>
+        </div>
+        </div>
+    </page>
+
+      `;
     });
   };
 </script>
-
 <script>
   window.SetTemplateData([
     {
