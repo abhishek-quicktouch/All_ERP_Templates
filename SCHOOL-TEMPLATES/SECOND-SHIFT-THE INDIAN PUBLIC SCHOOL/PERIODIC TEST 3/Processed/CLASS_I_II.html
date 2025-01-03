@@ -377,7 +377,9 @@ ${element.header
                     )}
                 </div>
 
-                
+                <div class="section">
+                    ${generateAdditionalTable(element?.baseTermData?.subject)}
+                </div>
 
                 <div style="width: 100%; display: flex;">
                     <div class="section" style="border-left: 1px solid black; width: 50%">
@@ -492,7 +494,8 @@ ${element.header
                         return `
                 <tr>
                     <td style="font-weight:bold">${subject?.subjectName}</td>
-                   
+                    <td style="text-align:center; font-weight:${isNaN(bestTermMark) ? "bold" : "normal"
+                            }">${bestTermMark}</td> 
                     ${termConfig
                                 .map(
                                     (term) => `
@@ -525,17 +528,17 @@ ${element.header
                 <th rowspan="2" style="text-align: center; width: 30%;">SUBJECT</th>
                 <!-- New header for best term -->
                 <th colspan="${termConfig.length + 3
-                    }" style="text-align: center;">TERM 1 (40 Marks)</th>
+                    }" style="text-align: center;">TERM 1 (20 Marks)</th>
             </tr>
             <tr style="background-color: #e4f2f2">
-                
+                 <th  style="text-align: center; width: 10%;">PT-2 <br/> (60)</th>
                 ${termConfig
                         .map(
                             (term) =>
                                 `<th style="text-align: center; width: 10%;">${term.headerName} ${term.subHeaderName}</th>`
                         )
                         .join("")}
-                <th style="text-align: center;width: 10%;">MARKS OUT OF (${totalSubheader})</th>
+                <th style="text-align: center;width: 10%;">Marks Out of (${totalSubheader})</th>
                 <th style="text-align: center; width: 10%;">GRADE</th>
             </tr>
             ${rows}

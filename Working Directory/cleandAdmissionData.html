@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processed Dynamic School Report Generator Script</title>
+</head>
+
+<body>
+    <div id="studentsList">
+        Processed Dynamic School Report Generator Script
+    </div>
+</body>
+<script>
+    window.SetTemplateData = function (data) {
+        function cleanAdmissionData(data) {
+            return {
+                // School Information
+
+                school_name: data.school?.schoolName,
+                school_abb: data.school?.schoolAbb,
+                board: data.school?.educationBoard,
+                school_city: data.school?.city,
+                school_state: data.school?.state,
+                school_pincode: data.school?.pincode,
+                school_area: data.school?.area,
+                school_plot_number: data.school?.plotNumber,
+
+                school_address: `${data.school?.plotNumber || ''}, ${data.school?.area || ''}, ${data.school?.city || ''}, ${data.school?.state || ''}, ${data.school?.pincode || ''}`.replace(/,\s*(?=,|$)/g, '').replace(/^\s*,\s*|\s*,\s*$/g, ''),
+                contact_name: data.school?.contactName,
+                contact_mobile: data.school?.contactMobile,
+                school_enabled: data.school?.enabled,
+                school_website: data.school?.website,
+                school_email: data.school?.contactEmail,
+
+
+
+                // Student Information
+                admission_no: data.contentRequest?.admissionNo,
+                student_name: data.contentRequest?.studentName,
+                class: data.contentRequest?.className,
+                roll_no: data.contentRequest?.rollNo,
+                section: data.contentRequest?.sectionName,
+                class_section: `${data.contentRequest?.className}-${data.contentRequest?.sectionName}`,
+                bloodGroup: data.contentRequest?.bloodGroup,
+                joining_date: data.contentRequest?.joiningDate,
+                dob: data.contentRequest?.dob,
+                gender: data.contentRequest?.gender,
+                blood_group: data.contentRequest?.bloodGroup,
+                house: data.contentRequest?.house,
+                student_image: data.contentRequest?.preSignedUrlResponse?.url,
+                // Parent Information
+                father_name: data.contentRequest?.fatherInformation?.name,
+                mother_name: data.contentRequest?.motherInformation?.name,
+
+                // Address Information
+
+                permanent_address: [data.contentRequest?.permanentAddress?.houseNo, data.contentRequest?.permanentAddress?.area, data.contentRequest?.permanentAddress?.street, data.contentRequest?.permanentAddress?.city, data.contentRequest?.permanentAddress?.state, data.contentRequest?.permanentAddress?.pincode].filter(val => val).join(", "),
+                permanent_house_no: data.contentRequest?.permanentAddress?.houseNo,
+                permanent_area: data.contentRequest?.permanentAddress?.area,
+                permanent_street: data.contentRequest?.permanentAddress?.street,
+                permanent_city: data.contentRequest?.permanentAddress?.city,
+                permanent_state: data.contentRequest?.permanentAddress?.state,
+                permanent_pincode: data.contentRequest?.permanentAddress?.pincode,
+                permanent_phone_no: data.contentRequest?.permanentAddress?.phoneNo,
+                permanent_mobile: data.contentRequest?.permanentAddress?.mobileNo,
+                characterCertificateDetail: data?.contentRequest?.characterCertificateDetail,
+                transportDetails: data?.contentRequest?.transportDetails
+
+            };
+        }
+        data.map((data) => {
+            const cleanData = cleanAdmissionData(
+                data
+            )
+            console.log(data, "fffffffffffffff  data");
+            console.log(cleanData, "fffffffffffffff Cleaned data");
+
+        })
+
+
+
+    };
+</script>
+
+<script>
+    window.SetTemplateData([
+        {
+            "school": {
+                "uid": "36ecc460-7970-49fe-adbc-3ab07f1e30bb",
+                "apikey": "XnlKPMf7TEELc-Z42eWG0IAlS1gduT7N",
+                "schoolName": "QuickCampus QT School",
+                "schoolAbb": "QC",
+                "educationBoard": "Central Board of Secondary Education (CBSE)",
+                "registrationNo": "6578",
+                "plotNumber": "23/1",
+                "area": "BU Block,Pitampura",
+                "city": "New-Delhi",
+                "pincode": "110034",
+                "state": "Delhi",
+                "phoneNo1": null,
+                "phoneNo2": null,
+                "contactName": "Demo School",
+                "contactMobile": "7788990088",
+                "contactEmail": null,
+                "schoolCode": "4561",
+                "pfCode": "QC0001",
+                "societyManagement": null,
+                "language": "English",
+                "schoolLogo": null,
+                "schoolFavicon": null,
+                "enabled": true,
+                "subDomain": "qc",
+                "website": null,
+                "schemaPrefix": null,
+                "editedDate": "18-12-2024 11:08 AM",
+                "editedUser": "quickadmin",
+                "visitorSchool": false,
+                "clientSchoolId": null,
+                "cscId": null,
+                "onlinePaymentEnabled": true,
+                "registrationSeries": null,
+                "underTakingDetails": null,
+                "formNumberStart": null,
+                "sessionResponse": null,
+                "schoolLogoUrl": null,
+                "printAcknowledge": false,
+                "wabaId": "",
+                "phoneNumberId": "",
+                "whatsappApiKey": "",
+                "isQuickCampusWhatsapp": true,
+                "whatsAppEnabled": true,
+                "smsenabled": true,
+                "notificationEnabled": true,
+                "loanEnabled": false
+            },
+            "contentRequest": {
+                "id": 283306,
+                "uid": "eadc2686-4539-49f3-9937-8b600ae914d2",
+                "admissionNo": "590",
+                "studentName": "Aayansh Taneja",
+                "className": "II",
+                "sectionName": "A",
+                "joiningStatus": "Old",
+                "joiningDate": "2020-01-04",
+                "gender": "Male",
+                "certificate": null,
+                "joiningClassName": "II",
+                "joiningSectionName": "A",
+                "group": null,
+                "status": "Studying",
+                "caste": null,
+                "wing": "Senior",
+                "house": null,
+                "dob": "2016-04-08",
+                "rollNo": 0,
+                "session": "2024-2025",
+                "permanentEducationNumber": null,
+                "preSignedUrlResponse": {
+                    "url": "https://quicktouch-erp-dev.s3.ap-south-1.amazonaws.com/uploads/QC/student-info/590/student/images/590.png?response-content-disposition=attachment&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241226T101302Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=AKIA2GAWML33TLRIRTGO%2F20241226%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Signature=4fc37928d2cf3da5e1de32bd162b36cc1a92cfc99ab0ec9c56e7749d7c4ecb4d",
+                    "fileName": "590.png"
+                },
+                "fatherInformation": {
+                    "name": "Manish Taneja",
+                    "qualification": null,
+                    "occupation": null,
+                    "yearlyIncome": null,
+                    "email": null
+                },
+                "motherInformation": {
+                    "name": "Charu Taneja",
+                    "qualification": null,
+                    "occupation": null,
+                    "yearlyIncome": null,
+                    "email": null
+                },
+                "permanentAddress": {
+                    "houseNo": null,
+                    "area": "Shalimar Bagh",
+                    "street": "Ag-488",
+                    "city": "Delhi",
+                    "pincode": "110088",
+                    "state": "Delhi",
+                    "emergencyNo": "",
+                    "phoneNo": null,
+                    "mobileNo": "9034219236"
+                },
+                "correspondanceAddress": {
+                    "houseNo": null,
+                    "area": null,
+                    "street": null,
+                    "city": null,
+                    "pincode": null,
+                    "state": null,
+                    "emergencyNo": "",
+                    "phoneNo": null,
+                    "mobileNo": "9034219236"
+                },
+                "officialAddress": {
+                    "houseNo": "NA",
+                    "area": null,
+                    "street": null,
+                    "city": null,
+                    "pincode": null,
+                    "state": null,
+                    "emergencyNo": "",
+                    "phoneNo": null,
+                    "mobileNo": "9953320224"
+                },
+                "guardianInformation": {
+                    "guradianName": null,
+                    "guradianRelation": null,
+                    "guradianOccupation": null,
+                    "guradianEmail": null,
+                    "guradianMobileNo": null
+                },
+                "characterCertificateDetail": {
+                    "uid": "cd04bf11-4a42-419c-8283-b87b15bd6941",
+                    "type": "GOOD",
+                    "issueDate": "2024-05-16"
+                },
+                "transportDetails": {
+                    "circleName": null,
+                    "routeName": null,
+                    "pickUp": null,
+                    "drop": null
+                },
+                "certificateList": [],
+                "bloodGroup": "B+",
+                "status_code": 200
+            },
+            "header": "<figure class=\"table\" style=\"width:100%;\">\n <table cellspacing=\"0\">\n  <tbody>\n   <tr>\n    <td style=\"padding:10mm 0mm;\">\n     <div style=\"height:10mm;\">\n      &nbsp;\n     </div></td>\n   </tr>\n  </tbody>\n </table>\n</figure>",
+            "footer": "<figure class=\"table\">\n <table style=\"padding:2mm 0mm 0mm;\" cellspacing=\"0\" cellpadding=\"0\">\n  <tbody>\n   <tr>\n    <td style=\"padding:0mm;vertical-align:top;width:100%;\" width=\"100%\" align=\"left\"><strong>Note</strong>: This is a computer generated report and does not require signatures.</td>\n   </tr>\n  </tbody>\n </table>\n</figure>",
+            "student": {},
+            "selectedDatesheet": []
+        }
+    ]);
+</script>
+
+</html>

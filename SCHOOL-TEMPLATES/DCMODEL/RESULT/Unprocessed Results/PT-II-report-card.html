@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Report Card</title>
+
+</head>
+
+<body>
+    <div id="studentsList">Student Report Card</div>
+</body>
+<script>
+    window.SetTemplateData = function (dataList) {
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = String(date.getFullYear());
+            return `${day}/${month}/${year}`;
+        }
+
+        function handleGetDate() {
+            let date = new Date(Date.now())
+            console.log(date.getUTCMonth())
+            let day = date.getDate().toString().padStart(2, "0")
+            let month = (date.getMonth() + 1).toString().padStart(2, "0")
+            let year = date.getFullYear()
+            return `${day}-${month}-${year}`
+        }
+
+        const multipleStudents = dataList;
+        const studentHtml = document.getElementById("studentsList");
+        studentHtml.innerHTML = "";
+        multipleStudents?.forEach((v) => {
+            console.log(v);
+            const student = v.student;
+            const markData = v.markData.termWiseSubjectResponse?.[0];
+            const singleStudentHtml = document.createElement("div");
+            singleStudentHtml.style.pageBreakAfter = "always";
+            singleStudentHtml.innerHTML = `
+                             <style type="text/css">
+                   @page {
+                   size: A4
+                   margin: 2mm;
+                   }
+                   * {
+                   	margin: 2px;
+                   	padding: 0px;
+                   	color: #000;
+                   }
+                   td {
+                   	padding-left: 1mm;
+                   	padding-right: 1mm;
+                   	padding-top: 2mm;
+                   	padding-bottom:2mm;
+                   	font-size: 9pt;
+                   	color: #000000;
+                   	font-family: Arial, Helvetica, sans-serif;
+                     font-size:16px;
+                   }
+                           .header {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+                   th {
+                   	padding-left: 1mm;
+                   	padding-right: 1mm;
+                   	padding-top:1mm;
+                   	padding-bottom: 1mm;
+                   	background: #e7e7e7;
+                   	font-family: Arial, Helvetica, sans-serif;
+                   }
+                   .bgcol{
+                   background-color: #999;
+                   }
+
+                   @media print {
+                   @page {
+                   margin:auto;
+                   size: A4
+                   }
+                   }
+                   </style>
+
+                   <page orientation="portrait" format="A4" margin="0">
+                   ${v?.header ? v?.header : ` <div class="header">
+              <img style="width:80px" src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_55_15_538524653.png" alt="School Logo">
+              <div >
+                <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_51_48_973290348.png" alt="Heading" style="height:35px;width:70%;"/>
+                <p style="font-size:13px ;margin:0px ;padding:0px">Affiliated to CBSE vide Aff No. 530531</p>
+                <p style="font-size:13px ;margin:0px ;padding:0px">Sector-9, Faridabad, (Haryana) India-121006</p>
+                <p style="font-size:13px ;margin:0px ;padding:0px">Email Id : dcmodelfaridabad@gmail.com Help Desk : +91-129-2226000, 9871583000</p>
+                
+              </div>
+              <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QUICKTOUCHQCSCHOOL/web-content/event/images/UploadFile2024-08-13T09_24_05_218290156.png" alt="School Logo">
+
+
+            </div>`}
+     
+               		<tr valign="top">
+                 	<td valign="top" style=" width:100%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
+                   		<!-- Basic Details -->
+                           <table cellspacing="0" style="width: 100%; margin-bottom:10px; border: solid 0.264583333mm #000000;">
+                           <tr>
+                         <div style="text-align:center;margin:4px 0;font-weight:bold;font-size:24px;text-transform:uppercase"> ${markData?.termName
+                } Performance
+                           </div>
+                            <div style="text-align:center;margin:2px 0;font-weight:bold;font-size:24px;margin-bottom:1.5rem;">Session - ${v?.markData?.academicSession
+                }
+                           </div>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" >
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>STUDENT'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.studentName
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ADMISSION NO.</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.admissionNo
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>FATHER'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">:  ${student?.fatherName
+                    ? `MR. ${student?.fatherName}`
+                    : " - "
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>CLASS</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student.className
+                }-${student.sectionName}</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>MOTHER'S NAME</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.motherName
+                    ? `MRS. ${student?.motherName}`
+                    : " - "
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+
+                           <td style="width:50%; border-bottom: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ROLL NO.</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.rollNo
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           <tr>
+                           <td style="width:50%; border-bottom: none; ">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>DATE OF BIRTH</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${student?.dob
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+
+                           <td style="width:50%; border-bottom: none; border-left: solid 0.264583333mm #000000;">
+                               <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                   <tr>
+                                       <td style="width:40%%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;"><strong>ATTENDANCE</strong></td>
+                                       <td style="width:60%; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${v?.remarks?.details?.[0]?.fields?.[0]
+                    ?.value ?? ""
+                }</td>
+                                   </tr>
+                               </table>
+                           </td>
+                           </tr>
+                           </table>
+                   		<!--// Basic Details -->
+
+
+                   		
+
+                   		<!-- Main Subject Table -->
+             <table cellspacing="0" style="width:100%; border: solid 0.264583333mm #000000;">
+                <tr>
+                   				<td align="center" colspan="4" style="width:100%; padding-left:0mm; padding-right:0mm; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:18px; font-weight:bold; color:#000000;border-bottom: solid 0.264583333mm #000000;" >PT 2</td>
+                   			</tr>
+               <tr style=" border-top: solid 0.264583333mm #000000;">
+                 <td  style="font-size:18px;border-bottom:1px solid;font-weight:bold" rowspan="1" align="left" style="width:16%; font-weight:bold; font-size:10pt;">SUBJECT</td>
+                 <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid;font-weight:bold" colspan="1" align="center" style="width:14%; border-left: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">MAX MARKS</td>
+                 <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid;font-weight:bold" colspan="1" align="center" style="width:14%; border-left: solid 0.264583333mm #000000;border-right: solid 0.264583333mm #000000; font-weight:bold; font-size:10pt;">OBTD. MARKS</td>
+                 <td style="font-size:18px;border-bottom:1px solid;font-weight:bold ;border-left:1px solid" rowspan="1" align="center">GRADE</td>
+               </tr>
+
+               ${markData?.subjectMarksEntryRequests
+                    ?.map(
+                        (subject) => `
+                   <tr >
+                     <td style="font-size:18px;border-bottom:1px solid;" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">${subject.subjectName}</td>
+                     <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.max}</td>
+                     <td style="font-size:18px;border-bottom:1px solid;border-left:1px solid" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${subject.status || subject.marks}</td>
+                     <td style="font-size:18px;border-bottom:1px solid;text-align:center; border-left: solid 0.264583333mm #000000;">${subject.grade}</td>
+                   </tr>
+                   `
+                    )
+                    .join("")}
+
+               <tr>
+                 <td style="font-size:18px;font-weight:bold" align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;">GRAND TOTAL</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalMarks
+                }</td>
+                 <td style="font-size:18px;border-left:1px solid;font-weight:bold" align="center" style="width:14%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalObtained
+                }</td>
+                 <td style="font-size:18px;font-weight:bold;  border-left: solid 0.264583333mm #000000; font-weight:bold;"></td>
+
+               </tr>
+               <tr>
+                 <td  align="left" style="width:16%; border-top: solid 0.264583333mm #000000; font-weight:bold;font-size:18px">OVERALL PERCENTAGE</td>
+                 <td  align="center" style="font-size:18px;width:28%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;"></td>
+                 <td  align="center" style="font-size:18px;width:28%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;">${markData?.totalPercentage.toFixed(
+                    2
+                )}%</td>
+                <td  align="center" style="font-size:18px;width:28%; border-top: solid 0.264583333mm #000000; border-left: solid 0.264583333mm #000000;"></td>
+               </tr>
+
+
+             </table>
+
+             
+             <div style="display: flex; justify-content: space-between; margin-top:2rem;font-weight: bold">
+             <div>Date :${v?.printDate || handleGetDate()
+                }</div>
+             <div>Place : Faridabad</div>
+           </div>
+
+           <div style="display: flex; justify-content: space-between; margin-top:2rem;font-weight: bold">
+             <div>Class Teacher</div>
+             <div>Wing Incharge</div>
+             <div>Principal</div>
+           </div>
+           <div style="margin-top:1rem ;text-align: center ;font-weight: bold">
+
+             ${v?.footer ? v?.footer : `<p>Note: This is a computer generated Report Card.</p>`}
+             </div>
+              </page>
+                   `;
+
+            studentHtml.appendChild(singleStudentHtml);
+        });
+    };
+
+
+</script>
+<script>
+    window.SetTemplateData([
+        {
+            header: ``,
+            footer: `<p style="font-size: 0.8em; margin-top: 20px;">Note: This is a computer generated Report Card. It does not need any signature. In case of any typing error or discrepancy please contact the Class Teacher.</p>`,
+            student: {
+                dob: "06-01-2016",
+                admissionNo: "20220146",
+                studentName: "Aaradhya Singh",
+                className: "PLP 1",
+                sectionName: "A",
+                rollNo: 1,
+                fatherName: "Mr. Bhupender Singh",
+                motherName: "Mrs. Sadhna Singh",
+                attendance: "0.0/0",
+                boardRollNumber: "",
+                studentInfoResponse: [
+                    {
+                        id: 262207,
+                        userUid: "6e46f26d-d49a-4abb-8d7e-5a156404f726",
+                        userName: null,
+                        fatherUserName: null,
+                        motherUserName: null,
+                        guardianUserName: null,
+                        uid: "56ad27a8-bc44-414c-a493-6546ecb8d9d0",
+                        studentId: "20220146",
+                        exAdmissionNo: null,
+                        studentName: "Aaradhya Singh",
+                        fatherName: "Mr. Bhupender Singh",
+                        motherName: "Mrs. Sadhna Singh",
+                        dob: "06-01-2016",
+                        gender: "Female",
+                        studentAdhaarcard: "",
+                        joiningClass: "FLP 4",
+                        joiningSections: "A",
+                        joiningDate: "31-03-2022",
+                        plotNumber: "",
+                        area: "Budh Vihar",
+                        city: "Delhi",
+                        state: "NA",
+                        pincode: "110085",
+                        phone1: null,
+                        rollNo: 1,
+                        emergencyNumber: "8920098444",
+                        mobileNumber: "9811230274",
+                        studentEmail: "bhpendersingh198383@gmail.com",
+                        religion: "",
+                        category: "General",
+                        minority: "",
+                        motherTongue: "",
+                        idMark: "",
+                        height: "",
+                        weight: "",
+                        physicalDisability: "",
+                        bloodGroup: "",
+                        healthRemark: "",
+                        siblingDetails: "",
+                        alumni: "",
+                        siblingResponse: [],
+                        fatherOccupation: "",
+                        fatherQualification: "",
+                        fatherOrganization: "",
+                        fatherDesignation: "",
+                        fatherIncome: "",
+                        fatherArea: "NA",
+                        fatherCity: "NA",
+                        fatherState: "NA",
+                        fatherPincode: "",
+                        fatherPhone: null,
+                        fatherMobile: "",
+                        fatherEmail: null,
+                        fatherAdhaarNumber: "",
+                        schoolUid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+                        motherQualification: "",
+                        motherOccupation: "",
+                        motherOrganization: "",
+                        motherDesignation: "",
+                        motherIncome: "",
+                        motherArea: "NA",
+                        motherCity: "NA",
+                        motherState: "NA",
+                        motherPincode: "",
+                        motherPhone: null,
+                        motherMobile: "",
+                        motherEmail: null,
+                        motherAdhaarNumber: "",
+                        guardianName: null,
+                        relation: null,
+                        guardianOccupation: null,
+                        guardianPhone: null,
+                        guardianMobile: null,
+                        guardianEmail: null,
+                        guardianAddress: null,
+                        leavingDate: null,
+                        previousSchoolName: null,
+                        otp: null,
+                        schoolName: "Demo Public School",
+                        remark: null,
+                        classTeacher: "",
+                        classTeacherUserName: "",
+                        classes: "PLP 1",
+                        classUid: null,
+                        sections: "A",
+                        group: "IST 2019-20",
+                        wing: "NA",
+                        status: "Studying",
+                        academicSession: "2024-25",
+                        joiningStatus: "Old",
+                        houses: "INTELLIGENCE BLUE",
+                        certificates: "",
+                        certificatesList: [],
+                        caste: "",
+                        listOfDocuments: null,
+                        attached: false,
+                        required: false,
+                        submitted: false,
+                        studentHostel: [],
+                        studentConcession: [],
+                        studentTransport: [],
+                        studentAadharCard: null,
+                        fatherAadharCard: null,
+                        motherAadharCard: null,
+                        studentImage: null,
+                        fatherImage: null,
+                        motherImage: null,
+                        guardianImage: null,
+                        birthCertificate: null,
+                        classSectionUid: "aaec752e-e0a8-4324-b724-c1ebbfd010c9",
+                        aluminiProof: null,
+                        siblingProof: null,
+                        residenceProof: null,
+                        firstBornChildProof: null,
+                        medicalFitnessCertificate: null,
+                        fatherQualificationProof: null,
+                        motherQualificationProof: null,
+                        casteCertificate: null,
+                        createdUser: "QuickCampus",
+                        editedUser: "QuickCampus",
+                        createddate: "2024-02-15 16:01:44.372632",
+                        editeddate: "2024-02-15 16:01:44.372632",
+                        permanentEducationNumber: null,
+                        studentAddressResponse: {
+                            uid: "86423eac-4008-4e81-aa51-dce3ecea84de",
+                            houseNo: null,
+                            area: "Budh Vihar",
+                            landmark: null,
+                            city: "Delhi",
+                            district: null,
+                            state: "NA",
+                            poPs: null,
+                            pincode: 110085,
+                            street: "A-28, Veer Singh Clny",
+                            userName: "DIPS653_20220146",
+                            createdDate: "15-02-2024 09:31 PM",
+                            editedDate: "15-02-2024 09:31 PM",
+                            createdBy: "QuickCampus",
+                            editedBy: "QuickCampus",
+                        },
+                        fatherAddressResponse: {
+                            uid: "f7b8eb06-f30c-4f8a-9b83-3f4998dfeb7c",
+                            houseNo: null,
+                            area: "NA",
+                            landmark: null,
+                            city: "NA",
+                            district: null,
+                            state: "NA",
+                            poPs: null,
+                            pincode: 0,
+                            street: null,
+                            userName: null,
+                            createdDate: "15-02-2024 09:31 PM",
+                            editedDate: "15-02-2024 09:31 PM",
+                            createdBy: "QuickCampus",
+                            editedBy: "QuickCampus",
+                        },
+                        motherAddressResponse: {
+                            uid: "70c761c8-f288-40b4-8c86-a4108e480c0d",
+                            houseNo: null,
+                            area: "NA",
+                            landmark: null,
+                            city: "NA",
+                            district: null,
+                            state: "NA",
+                            poPs: null,
+                            pincode: 0,
+                            street: null,
+                            userName: null,
+                            createdDate: "15-02-2024 09:31 PM",
+                            editedDate: "15-02-2024 09:31 PM",
+                            createdBy: "QuickCampus",
+                            editedBy: "QuickCampus",
+                        },
+                        guardianAddressResponse: null,
+                        correspondenceAddressResponse: null,
+                    },
+                ],
+                classTeacher: "",
+                classTeacherUserName: "",
+                permanentEducationNumber: null,
+                school: {
+                    uid: "ea2d79a7-b94f-484d-95fc-a1c40a990d3c",
+                    apikey: "_VpVjy9OY7dsc-JqhQia4PP8IeJfpf-6",
+                    schoolName: "DE INDIAN PUBLIC SCHOOL",
+                    schoolAbb: "DIPS",
+                    educationBoard: "Central Board of Secondary Education (CBSE)",
+                    registrationNo: "1412743",
+                    plotNumber: "POCKET-11",
+                    area: "SECTOR-24,ROHINI",
+                    city: "DELHI",
+                    pincode: "110085",
+                    state: "Delhi",
+                    phoneNo1: "1127050252",
+                    phoneNo2: "1127050253",
+                    contactName: "DIPS",
+                    contactMobile: null,
+                    contactEmail: "ROHINI.DIPS@YAHOO.CO.IN",
+                    schoolCode: null,
+                    pfCode: null,
+                    societyManagement: null,
+                    language: null,
+                    schoolLogo: null,
+                    schoolFavicon: null,
+                    enabled: true,
+                    subDomain: "dips",
+                    website: "WWW.DIPSROHINI.IN",
+                    schemaPrefix: null,
+                    editedDate: "20-07-2024 04:14 PM",
+                    editedUser: "QuickCampus",
+                    visitorSchool: false,
+                    clientSchoolId: null,
+                    cscId: null,
+                    onlinePaymentEnabled: true,
+                    registrationSeries: null,
+                    underTakingDetails: null,
+                    formNumberStart: null,
+                    sessionResponse: null,
+                    schoolLogoUrl: null,
+                    printAcknowledge: false,
+                    whatsAppEnabled: false,
+                    notificationEnabled: true,
+                    loanEnabled: false,
+                    smsenabled: false,
+                },
+            },
+            markData: {
+                "admissionNo": "20220062",
+                "permanentEducationNumber": "",
+                "studentName": "Aarav",
+                "className": "I",
+                "sectionName": "A",
+                "classSectionUid": "309b5b94-df01-44df-b880-0d7389a06dc0",
+                "academicSession": "2024-2025",
+                "fatherName": "Mr. Mani Bhushan",
+                "uid": "8a63a336-8f26-482d-8231-e7000ca541a7",
+                "attendanceResponse": null,
+                "pass": false,
+                "rollNo": 1,
+                "termWiseSubjectResponse": [
+                    {
+                        "totalMarks": 225,
+                        "totalObtained": 192,
+                        "overAllGrade": "A2",
+                        "totalPercentage": 85.33333333333334,
+                        "termName": "PERIODIC TEST 1",
+                        "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                        "pass": true,
+                        "subjectMarksEntryRequests": [
+                            {
+                                "marks": 43,
+                                "description": "",
+                                "status": "",
+                                "subject": "f133a7be-6baf-4d51-a294-3d2367af5564",
+                                "subjectName": "ENGLISH",
+                                "scholastic": true,
+                                "max": 50,
+                                "priority": 1,
+                                "min": 17,
+                                "attachmentName": null,
+                                "subjectNature": "Theory",
+                                "parent": [],
+                                "grade": "A2",
+                                "percentage": 86,
+                                "term": "PERIODIC TEST 1",
+                                "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                                "pass": true,
+                                "gradePattern": "USA 8POINT",
+                                "graded": false
+                            },
+                            {
+                                "marks": 47,
+                                "description": "",
+                                "status": "",
+                                "subject": "2d313014-b0d8-4a74-b153-29e752360a90",
+                                "subjectName": "Hindi",
+                                "scholastic": true,
+                                "max": 50,
+                                "priority": 2,
+                                "min": 17,
+                                "attachmentName": null,
+                                "subjectNature": "Theory",
+                                "parent": [],
+                                "grade": "A1",
+                                "percentage": 94,
+                                "term": "PERIODIC TEST 1",
+                                "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                                "pass": true,
+                                "gradePattern": "USA 8POINT",
+                                "graded": false
+                            },
+                            {
+                                "marks": 38,
+                                "description": "",
+                                "status": "",
+                                "subject": "23a98aa3-51e7-486a-ba32-d1b5be06f0c8",
+                                "subjectName": "MATHEMATICS",
+                                "scholastic": true,
+                                "max": 50,
+                                "priority": 3,
+                                "min": 17,
+                                "attachmentName": null,
+                                "subjectNature": "Theory",
+                                "parent": [],
+                                "grade": "B1",
+                                "percentage": 76,
+                                "term": "PERIODIC TEST 1",
+                                "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                                "pass": true,
+                                "gradePattern": "USA 8POINT",
+                                "graded": false
+                            },
+                            {
+                                "marks": 46,
+                                "description": "",
+                                "status": "",
+                                "subject": "3ec4f583-8be0-49f1-ae66-7d6dd8f2f9b2",
+                                "subjectName": "SOCIAL SCIENCE",
+                                "scholastic": true,
+                                "max": 50,
+                                "priority": 4,
+                                "min": 17,
+                                "attachmentName": null,
+                                "subjectNature": "Theory",
+                                "parent": [],
+                                "grade": "A1",
+                                "percentage": 92,
+                                "term": "PERIODIC TEST 1",
+                                "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                                "pass": true,
+                                "gradePattern": "USA 8POINT",
+                                "graded": false
+                            },
+                            {
+                                "marks": 18,
+                                "description": "",
+                                "status": "",
+                                "subject": "e0bd818c-7b89-49b6-9a8e-2ce4203aec38",
+                                "subjectName": "COMPUTER",
+                                "scholastic": true,
+                                "max": 25,
+                                "priority": 5,
+                                "min": 9,
+                                "attachmentName": null,
+                                "subjectNature": "Theory",
+                                "parent": [],
+                                "grade": "B1",
+                                "percentage": 72,
+                                "term": "PERIODIC TEST 1",
+                                "termUid": "6d8684a1-7460-4e71-a7eb-c768c893337a",
+                                "pass": true,
+                                "gradePattern": "USA 8POINT",
+                                "graded": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            remarks: {
+                uid: null,
+                terms: null,
+                studentId: null,
+                studentName: null,
+                rollNumber: 0,
+                classSectionUid: null,
+                classSection: null,
+                description: null,
+                fields: null,
+                status: false,
+                createdUser: null,
+                editedUser: null,
+                createdDate: null,
+                editedDate: null,
+            }
+        }
+    ]);
+</script>
+
+</html>

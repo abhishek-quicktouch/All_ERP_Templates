@@ -4,13 +4,14 @@
 <head>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>Fee receipt</title>
+   <title>Fee Receipt</title>
 </head>
 
 <body>
    <div id="studentsList">Student Fee</div>
    <script>
       window.SetTemplateData = function (dataList) {
+         console.log(dataList)
          function convertNumberToWords(number) {
             const units = [
                "",
@@ -270,17 +271,18 @@
             <!-- start left Student Copy -->
             <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
                <tr>
-                   <td style="width: 10%; align="left" >
+                   <td style="width: 15%; align="left" >
 
-                    <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_50_24_362537686.jpeg"/>
+                    <img style='width:100px; height:95px;' src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-30T07_44_04_355719606.png"/>
 
                     </td>
-                  <td style="width:90%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
-                      <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">${element?.student?.school?.schoolName}</span>
-                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
-                        ${element?.student?.school?.phoneNo1 || ""} |
-                        ${element?.student?.school?.phoneNo2 || ""} | 
-                        ${element?.student?.school?.contactEmail || ""}
+                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">Divine Global Academy</span>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;">Chhaprauli Road, Baraut, Baghpat, Uttar Pradesh, 250611<br>
+                        7668022362 | 
+                        divineglobalacademy.inquiry@gmail.com
+                        
                         </span>
                   </td>
                </tr>
@@ -323,8 +325,8 @@
                   <td style="width:60%;">
                      <table width="100%" border="0" cellspacing="0" >
                         <tr>
-                           <td style="width:26%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
-                           <td style="width:74%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.studentName
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Name</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.studentName
                } (${basicDetails?.admissionNo})</td>
                         </tr>
                      </table>
@@ -344,8 +346,8 @@
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                           <td style="width:26%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
-                           <td style="width:74%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.fatherName
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Father</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${basicDetails.fatherName
                }</td>
                         </tr>
                      </table>
@@ -364,8 +366,8 @@
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                           <td style="width:26%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
-                           <td style="width:74%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.userName
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Collected By</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.userName
                }</td>
                         </tr>
                      </table>
@@ -386,8 +388,8 @@
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                           <td style="width:26%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
-                           <td style="width:74%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeModeRemark ?? ""
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Narration</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.feeModeRemark ?? ""
                }</td>
                         </tr>
                      </table>
@@ -418,8 +420,8 @@
                   <td style="width:50%;">
                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                           <td style="width:26%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
-                           <td style="width:74%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.paidInstallmentsName
+                           <td style="width:40%; font-weight:bold; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">Fee Months</td>
+                           <td style="width:60%; text-transform:uppercase; padding-left:0mm; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">: ${feeDetails?.paidInstallmentsName
                }</td>
                         </tr>
                      </table>
@@ -485,8 +487,13 @@
                }</td>
                </tr>
                <tr>
-                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total</td>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total Received</td>
                   <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails.netReceived
+               }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails?.netAmount ? feeDetails?.netAmount - feeDetails.netReceived : feeDetails?.totalAmount - feeDetails.netReceived
                }</td>
                </tr>
             </table>
@@ -515,7 +522,7 @@
             </table> -->
             <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
                <tr>
-                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_46_56_402694431.png" style="width: 80px;"> <br><strong>Payment QR</strong></td>
+                  <td align="center" style="width:33%;"> <img src="" style="width: 80px;"> <br><strong>Payment QR</strong></td>
                   <td align="center" style="width:34%;">&nbsp;</td>
                   <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
                </tr>
@@ -528,18 +535,19 @@
          <td valign="top" align="left" style="width: 48%; padding-right:0mm; padding-top:0mm; padding-bottom:0mm;">
             <!-- start left Student Copy -->
             <table style="width:100%; border-bottom: solid 0.264583333mm #000000;" cellspacing="0" cellpadding="0">
-               <tr>
-                  <td style="width: 10%; align="left" >
-                  
-                    <img style='width:100px; height:95px;' src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_50_24_362537686.jpeg"/>
-                 
+              <tr>
+                   <td style="width: 15%; align="left" >
+
+                    <img style='width:100px; height:95px;' src="
+https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-30T07_44_04_355719606.png"/>
+
                     </td>
-                  <td style="width:90%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
-                      <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">${element?.student?.school?.schoolName}</span>
-                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;"> ${element?.student?.school?.area || ""} ${element?.student?.school?.city || ""}, ${element?.student?.school?.state || ""} ${element?.student?.school?.pincode || ""}<br>
-                        ${element?.student?.school?.phoneNo1 || ""} |
-                        ${element?.student?.school?.phoneNo2 || ""} | 
-                        ${element?.student?.school?.contactEmail || ""}
+                  <td style="width:85%; padding-top:2mm; padding-bottom:2mm; text-align:center; font-size:11pt; color:#333333;" valign="top" align="center">
+                     <span style="color:#000000; font-size:16pt; font-weight:bold; padding-top:5mm; text-transform:uppercase;">Divine Global Academy</span>
+                     <br/><span style="font-weight:bold; font-size:9pt; line-height: 140%; padding-top:5mm;">Chhaprauli Road, Baraut, Baghpat, Uttar Pradesh, 250611<br>
+                        7668022362 | 
+                        divineglobalacademy.inquiry@gmail.com
+                        
                         </span>
                   </td>
                </tr>
@@ -744,8 +752,13 @@
                }</td>
                </tr>
                <tr>
-                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total</td>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Total Received</td>
                   <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails.netReceived
+               }</td>
+               </tr>
+               <tr>
+                  <td align="left" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">Balance Amount</td>
+                  <td align="right" colspan="2" style="width:50%; border-top: solid 0.264583333mm #000000;">₹ ${feeDetails?.netAmount ? feeDetails?.netAmount - feeDetails.netReceived : feeDetails?.totalAmount - feeDetails.netReceived
                }</td>
                </tr>
             </table>
@@ -774,7 +787,7 @@
             </table> -->
             <table cellspacing="0" style="width:100%; border-bottom: dashed 0.264583333mm #000000;">
                <tr>
-                  <td align="center" style="width:33%;"> <img src="https://quickcampus-webcms-dev.s3.ap-south-1.amazonaws.com/QC/web-content/event/images/UploadFile2024-12-16T12_46_56_402694431.png" style="width: 80px;"> <br><strong>Payment QR</strong></td>
+                  <td align="center" style="width:33%;"> <img src="" style="width: 80px;"> <br><strong>Payment QR</strong></td>
                   <td align="center" style="width:34%;">&nbsp;</td>
                   <td align="center" valign="bottom" style="width:33%;">&nbsp;<br><strong>School Stamp</strong></td>
                </tr>
@@ -1018,10 +1031,11 @@
                feeDeleteRemark: null,
                isBounced: "0",
                bouncedDate: "-",
-               totalAmount: "1900.00",
+               // totalAmount: "1900.00",
                excessPaid: "0.00",
                excessUsed: "0.00",
                excessBalance: "0.0",
+               netAmount: "2000",
                netReceived: "1900.00",
                studentFeeCollectionReceiptList: [
                   {
